@@ -21,8 +21,10 @@ target_include_directories(shellet PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include/shellet>
     )
-target_compile_options(shellet PRIVATE "-std=c++11")
-target_compile_options(shellet_test PRIVATE "-std=c++11")
+target_compile_features(shellet PRIVATE cxx_std_11)
+target_compile_features(shellet_test PRIVATE cxx_std_11)
+#target_compile_options(shellet PRIVATE "-std=c++17")
+#target_compile_options(shellet_test PRIVATE "-std=c++17")
 
 add_custom_command(TARGET shellet_test
     POST_BUILD

@@ -103,27 +103,22 @@ void Scene::main_loop(int argc,char** argv){
     }
 
     init_from_config(argv[1]);
-//    Shader* m_shader=new Shader("shaders/plain.vs","shaders/plain.fs");
-//
-//    Mesh_Loader mesh_loader;
-//    mesh_loader.load_from_obj("cases/1_triangle.obj");
-//    m_positions=mesh_loader.get_positions();
-//    m_indices=mesh_loader.get_indices();
+
     make_buffers();
 
     glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
     while(!glfwWindowShouldClose(window)){
 
 
-	glClearColor(0.2,0.3,0.1,1);
-	glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.2,0.3,0.1,1);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-	m_shader->use();
-	glBindVertexArray(m_vao);
-	glDrawElements(GL_TRIANGLES,m_indices.size(),GL_UNSIGNED_INT,0);
+        m_shader->use();
+        glBindVertexArray(m_vao);
+        glDrawElements(GL_TRIANGLES,m_indices.size(),GL_UNSIGNED_INT,0);
 
-	glfwPollEvents();
-	glfwSwapBuffers(window);
+        glfwPollEvents();
+        glfwSwapBuffers(window);
     }
 
 }
