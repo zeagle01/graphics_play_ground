@@ -2,4 +2,4 @@
 build/
 
 #.swap files
-*.swap
+*.swp
