@@ -72,6 +72,14 @@ void Scene::init_from_config(const std::string& config_file){
     m_indices=mesh_loader.get_indices();
 }
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+    LOG(INFO)<<key;
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+}
+
 void Scene::main_loop(int argc,char** argv){
 
     LOG(INFO)<<"hi log";
@@ -96,6 +104,9 @@ void Scene::main_loop(int argc,char** argv){
     }
 
     glfwMakeContextCurrent(window);
+
+
+    glfwSetKeyCallback(window,key_callback);
 
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
