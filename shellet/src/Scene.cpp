@@ -1,0 +1,129 @@
+
+#include "Scene.h"
+#include "Shader.h"
+#include "Mesh_Loader.h"
+
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
+#include "glog/logging.h"
+
+#include "json/json.h"
+#include <fstream>
+
+#include <iostream>
+#include <boost/filesystem.hpp>
+
+int Scene::get_vertex_num()const {
+    return m_positions.size()/3;
+}
+int Scene::get_triangle_num()const {
+    return m_indices.size()/3;
+}
+
+
+void Scene::make_buffers(){
+
+    glGenVertexArrays(1,(GLuint*)&m_vao);
+    glGenBuffers(1,(GLuint*)&m_vbo);
+    glGenBuffers(1,(GLuint*)&m_ebo);
+
+    glBindVertexArray(m_vao);
+    glBindBuffer(GL_ARRAY_BUFFER,m_vbo);
+    glBufferData(GL_ARRAY_BUFFER,sizeof(float)*m_positions.size(),m_positions.data(),GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,m_ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(int)*m_indices.size(),m_indices.data(),GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3*sizeof(float),(void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+    glBindVertexArray(0);
+
+}
+
+void Scene::init(int argc,char** argv){
+    FLAGS_log_dir=".";
+    google::InitGoogleLogging(argv[0]);
+
+    m_shader=new Shader("vertex.vs","fragment.frag");
+
+}
+
+
+void Scene::init_from_config(const std::string& config_file){
+    Json::Value root;
+    std::string current_config_path = config_file;
+    //std::string current_config_path = boost::filesystem::system_complete(config_file).c_str();
+    std::ifstream fin(current_config_path);
+    fin>>root;
+
+    std::string current_config_dir=boost::filesystem::system_complete(config_file).parent_path().string()+"/"; 
+    m_mesh_file=current_config_dir+root["mesh_file"].asString();
+    m_vertex_shader_file=current_config_dir+root["vertex_shader"].asString();
+    m_fragment_shader_file=current_config_dir+root["fragment_shader"].asString();
+
+     m_shader=new Shader(m_vertex_shader_file,m_fragment_shader_file);
+
+    Mesh_Loader mesh_loader;
+    mesh_loader.load_from_obj(m_mesh_file);
+    m_positions=mesh_loader.get_positions();
+    m_indices=mesh_loader.get_indices();
+}
+
+void Scene::main_loop(int argc,char** argv){
+
+    LOG(INFO)<<"hi log";
+
+
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
+
+
+
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
+
+#endif
+
+    GLFWwindow* window=glfwCreateWindow(800,600,"hi graphic world",NULL,NULL); 
+
+    if(window==nullptr){
+	LOG(ERROR)<<"window create failed";
+    }
+
+    glfwMakeContextCurrent(window);
+
+
+    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+	LOG(ERROR)<<"glad load failed";
+    }
+
+    init_from_config(argv[1]);
+//    Shader* m_shader=new Shader("shaders/plain.vs","shaders/plain.fs");
+//
+//    Mesh_Loader mesh_loader;
+//    mesh_loader.load_from_obj("cases/1_triangle.obj");
+//    m_positions=mesh_loader.get_positions();
+//    m_indices=mesh_loader.get_indices();
+    make_buffers();
+
+    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    while(!glfwWindowShouldClose(window)){
+
+
+	glClearColor(0.2,0.3,0.1,1);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	m_shader->use();
+	glBindVertexArray(m_vao);
+	glDrawElements(GL_TRIANGLES,m_indices.size(),GL_UNSIGNED_INT,0);
+
+	glfwPollEvents();
+	glfwSwapBuffers(window);
+    }
+
+}

@@ -1,0 +1,6 @@
+{
+    "mesh_file":"1_triangle.obj",
+    "vertex_shader":"plain.vs",
+    "fragment_shader":"plain.fs"
+}
+
