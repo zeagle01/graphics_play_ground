@@ -1,5 +1,8 @@
 #the build directory
-build/
+build*/
 
 #.swap files
 *.swp
+
+#.vscode
+.*
