@@ -7,12 +7,14 @@ add_library(shellet
     src/Mesh_Loader.cpp
     src/Shader.cpp
     src/Scene.cpp
+    #src/Plot_Data_IO.cpp
     )
 add_executable(shellet_test 
     test/test_main.cpp
     test/Mesh_Loader_Test.cpp
     test/Shader_Test.cpp
     test/Scene_Test.cpp
+    test/Plot_Data_IO_Test.cpp
     src/Scene.cpp#for glad load  reason
     )
 
