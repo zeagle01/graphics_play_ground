@@ -45,6 +45,19 @@ class Plot_Data_IO{
                             const T *VE,
                             const Print_Mode pm=Print_Mode::OR);
 
+        // tecplot triangle mesh
+        template <typename T>
+        void write_tecplot_triangle_mesh(const std::string &file,
+                                         const std::vector<T> &X,
+                                         const std::vector<int32_t> &indices,
+                                         const Print_Mode pm = Print_Mode::OR);
+        template <typename T>
+        void write_tecplot_FEM_mesh(const std::string &file,
+                          const size_t &vNum,
+                          const std::function<void(int32_t, std::vector<T> &)> getVariableValue,
+                          const std::vector<int32_t> &indices,
+                          const Print_Mode pm = Print_Mode::OR);
+
         template <typename T>
         void write_tecplot_triangle_mesh(const std::string &file,
                                          const std::vector<T> &X,
