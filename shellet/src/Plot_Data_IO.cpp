@@ -195,6 +195,61 @@ void Plot_Data_IO::write_tecplot_triangle_mesh(const std::string &file,
 }
 
 template <typename T>
+void Plot_Data_IO::write_tecplot_structure_data(const std ::string &file,
+                                                const T *data,
+                                                const std::initializer_list<int> &dim){
+    // std::ofstream fout(file);
+
+    auto stream_asocciate = get_or_create_ofstream(file, Plot_Data_IO::Print_Mode::OR);
+    std::ofstream &fout = stream_asocciate->get_fout();
+    std::vector<int> dim_v(dim);
+    if (dim_v.size() > 4 ||dim_v.size()<2)
+    {
+        return;
+    }
+    std::vector<std::string> coods_variables{"x", "y", "z"};
+    std::vector<std::string> ijk{"i", "j", "k"};
+    std::string variable_line = "variables=";
+    std::string zone_line = "zone ";
+
+    int coods_num             = dim_v.size() - 1;
+    int variable_num          = dim_v.back();
+    int col_num               = coods_num +variable_num;
+    int grid_point_size       = 1;
+    for (int i = 0; i < coods_num; i++)
+    {
+        variable_line += "\"" + coods_variables[i] + "\",";
+        std::stringstream ss;
+        ss << ijk[i] << "=" << dim_v[i] << ", ";
+        zone_line += ss.str();
+        grid_point_size *= dim_v[i];
+    }
+    for (int i = 0; i < variable_num; i++)
+    {
+        std::stringstream ss;
+        ss << "\""
+           << "v" << i << "\", ";
+        variable_line += ss.str();
+    }
+    zone_line += "f=point";
+
+    fout << variable_line << std::endl;
+    fout << zone_line << std::endl;
+    for (int i = 0; i < grid_point_size; i++)
+    {
+        for (int j = 0; j < coods_num; j++)
+        {
+            fout << data[i * col_num + j] << " ";
+        }
+        for (int j = 0; j < variable_num; j++)
+        {
+            fout << data[i * col_num + coods_num + j] << " ";
+        }
+        fout << std::endl;
+    }
+}
+
+template <typename T>
 void Plot_Data_IO::write_tecplot_FEM_mesh(const std::string &file,
                                           const size_t &vNum,
                                           const std::function<void(int32_t, std::vector<T> &)> getVariableValue,

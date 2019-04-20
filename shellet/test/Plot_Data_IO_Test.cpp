@@ -42,3 +42,29 @@ TEST(Plot_Data_IO_Test,test_write_tecplot_triangle_mesh){
     //todo:
     //read from file and make expectations
 } 
+
+TEST(Plot_Data_IO_Test,test_write_tecplot_structure_data_4_1){
+    std::vector<float> data{
+        0, 0,
+        1, 0,
+        2, 1,
+        3, 1};
+    auto  io=Plot_Data_IO::get_instance();
+    io->write_tecplot_structure_data<float>("test_write_tecplot_structure_data_4_1.plt",&data[0],{4,1});
+
+    //todo:
+    //read from file and make expectations
+} 
+
+TEST(Plot_Data_IO_Test,test_write_tecplot_structure_data_2_2_1){
+        std::vector<float> data{
+            0, 0, 0,
+            1, 0, 0,
+            0, 1, 1,
+            1, 1, 1};
+        auto io = Plot_Data_IO::get_instance();
+    io->write_tecplot_structure_data<float>("test_write_tecplot_structure_data_2_2_1.plt",&data[0],{2,2,1});
+
+    //todo:
+    //read from file and make expectations
+}

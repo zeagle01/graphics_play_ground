@@ -57,6 +57,12 @@ class Plot_Data_IO{
                           const std::vector<int32_t> &indices,
                           const Print_Mode pm = Print_Mode::OR);
 
+        // layout of data: x,[y,z],value
+        template <typename T>
+        void write_tecplot_structure_data(const std ::string &file,
+                                          const T *data,
+                                          const std::initializer_list<int> &dim);
+
         template <typename T>
         void read_tensor(const std::string &file,
                          std::vector<T> &tensor,
