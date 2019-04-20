@@ -27,6 +27,13 @@ class Plot_Data_IO{
                                     const std::initializer_list<int> &dim,
                                     const Print_Mode pm = Print_Mode::OR);
 
+        // write as flattened
+        template <typename T>
+        void write_shaped_tensor(const std ::string &file,
+                                 const std::function<T(const std::vector<int> &index_tuple)> getData,
+                                 const std::initializer_list<int> &dim,
+                                 const Print_Mode pm = Print_Mode::OR);
+
         template <typename T>
         void write_key_file(const std ::string &file,
                             const Polygon_Type polygon_type,
@@ -58,17 +65,6 @@ class Plot_Data_IO{
                           const std::vector<int32_t> &indices,
                           const Print_Mode pm = Print_Mode::OR);
 
-        template <typename T>
-        void write_tecplot_triangle_mesh(const std::string &file,
-                                         const std::vector<T> &X,
-                                         const std::vector<int32_t> &indices,
-                                         const Print_Mode pm = Print_Mode::OR);
-        template <typename T>
-        void write_tecplot_FEM_mesh(const std::string &file,
-                          const size_t &vNum,
-                          const std::function<void(int32_t, std::vector<T> &)> getVariableValue,
-                          const std::vector<int32_t> &indices,
-                          const Print_Mode pm = Print_Mode::OR);
 
         // layout of data: x,[y,z],value
         template <typename T>
