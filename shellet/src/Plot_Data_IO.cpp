@@ -172,6 +172,73 @@ void Plot_Data_IO::write_key_file(const std::string &file,
 }
 
 template <typename T>
+void Plot_Data_IO::write_tecplot_triangle_mesh(const std::string &file,
+                                          const std::vector<T> &X,
+                                          const std::vector<int32_t> &indices,
+                                          const Print_Mode pm)
+{
+
+    if (X.empty()) {
+        return;
+    }
+    size_t varNum = 3;
+    size_t vNum=X.size() / 3;
+    std::function<void(int32_t vi, std::vector<T> & variables)> get_variables = [&](int32_t vi, std::vector<T> &variables) {
+        variables.resize(varNum);
+        variables[0] = X[vi * 3 + 0];
+        variables[1] = X[vi * 3 + 1];
+        variables[2] = X[vi * 3 + 2];
+    };
+    write_tecplot_FEM_mesh(file, vNum,
+                 get_variables,
+                 indices, pm);
+}
+
+template <typename T>
+void Plot_Data_IO::write_tecplot_FEM_mesh(const std::string &file,
+                                          const size_t &vNum,
+                                          const std::function<void(int32_t, std::vector<T> &)> getVariableValue,
+                                          const std::vector<int32_t> &indices,
+                                          const Print_Mode pm ){
+    std::vector<T> rec;
+    getVariableValue(0, rec);
+    size_t varNum = rec.size();
+
+    auto stream_asocciate   = get_or_create_ofstream(file, pm);
+    std::ofstream &fout =stream_asocciate->get_fout();
+
+    std::stringstream header;
+
+    if (varNum == 0) {
+        return;
+    }
+
+    header << "zone n=" << vNum << ",e=" << indices.size() / 3
+           << ",f=fepoint,et=triangle,strandid=" << stream_asocciate->strand_id
+           << ",solutiontime=" << stream_asocciate->strand_id << "\n";
+
+    fout << header.str();
+    for (size_t vi = 0; vi < vNum; vi++) {
+        std::vector<T> vars;
+        getVariableValue(vi, vars);
+        for (size_t vari = 0; vari < varNum; vari++) {
+            fout << vars[vari] << " ";
+        }
+        fout << std::endl;
+    }
+
+    for (int32_t i = 0; i < indices.size() / 3; i++) {
+        for (int32_t j = 0; j < 3; j++) {
+            fout << indices[i * 3 + j] + 1 << " ";
+        }
+        fout << std::endl;
+    }
+
+
+
+                                          }
+
+template <typename T>
 void Plot_Data_IO::read_tensor(const std::string &file, std::vector<T> &tensor, std::vector<int32_t> &dim)
 {
     tensor.clear();
