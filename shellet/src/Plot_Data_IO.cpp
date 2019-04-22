@@ -60,19 +60,7 @@ void Plot_Data_IO::write_flattened_tensor(const std ::string &file, const T *dat
     }
 }
 
-template <typename T>
-void Plot_Data_IO::write_shaped_tensor(const std ::string &file,
-                                       const std::function<T(const std::vector<int> &index_tuple)> getData,
-                                       const std::initializer_list<int> &dim,
-                                       const Print_Mode pm)
-{
-    auto stream_asocciate = get_or_create_ofstream(file, pm);
-    std::ofstream &fout = stream_asocciate->get_fout();
-    if (stream_asocciate->num_accesed == 0)
-    {
-        std::vector<int> shape(dim);
-        write_tensor_shape(fout, shape);
-    }
+std::vector<std::vector<int>> compute_index_tupe_through_shape(const std::initializer_list<int> &dim){
     std::vector<int> shape(dim);
     std::vector<std::vector<int>> index_tuple;
     index_tuple.push_back(std::vector<int>());
@@ -92,6 +80,44 @@ void Plot_Data_IO::write_shaped_tensor(const std ::string &file,
         }
         index_tuple = index_tuple_new;
     }
+
+    return index_tuple;
+}
+
+
+template <typename T>
+void Plot_Data_IO::write_shaped_tensor(const std ::string &file,
+                                       const std::function<T(const std::vector<int> &index_tuple)> getData,
+                                       const std::initializer_list<int> &dim,
+                                       const Print_Mode pm)
+{
+    auto stream_asocciate = get_or_create_ofstream(file, pm);
+    std::ofstream &fout = stream_asocciate->get_fout();
+    if (stream_asocciate->num_accesed == 0)
+    {
+        std::vector<int> shape(dim);
+        write_tensor_shape(fout, shape);
+    }
+//    std::vector<int> shape(dim);
+//    std::vector<std::vector<int>> index_tuple;
+//    index_tuple.push_back(std::vector<int>());
+//    for (int shape_i = 0; shape_i < shape.size(); shape_i++)
+//    {
+//        std::vector<std::vector<int>> index_tuple_new;
+//        for (int index_tuple_j = 0; index_tuple_j < index_tuple.size(); index_tuple_j++)
+//        {
+//            std::vector<std::vector<int>> index_tuple_j_cartisian_multiply_by_shape_i;
+//            for (int shape_i_k = 0; shape_i_k < shape[shape_i]; shape_i_k++)
+//            {
+//                std::vector<int> index_tuple_j_append_shape_i_k(index_tuple[index_tuple_j]);
+//                index_tuple_j_append_shape_i_k.push_back(shape_i_k);
+//                index_tuple_j_cartisian_multiply_by_shape_i.push_back(index_tuple_j_append_shape_i_k);
+//            }
+//            index_tuple_new.insert(index_tuple_new.end(), index_tuple_j_cartisian_multiply_by_shape_i.begin(), index_tuple_j_cartisian_multiply_by_shape_i.end());
+//        }
+//        index_tuple = index_tuple_new;
+//    }
+    auto index_tuple=compute_index_tupe_through_shape(dim);
     for (int i = 0; i < index_tuple.size(); i++)
     {
         fout << getData(index_tuple[i]) << std::endl;
