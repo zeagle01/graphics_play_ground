@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.12)
 
 include(cmake/HunterGate.cmake)
 HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.18.12.tar.gz"
-    SHA1 "7e8c74787e08c476484d3e5106524fe7a5a0cc56"
+    URL "https://github.com/ruslo/hunter/archive/v0.23.214.tar.gz"
+    SHA1 "e14bc153a7f16d6a5eeec845fb0283c8fad8c358"
 )
 
 project(graphics_play_ground)
