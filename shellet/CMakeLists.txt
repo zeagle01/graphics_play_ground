@@ -50,7 +50,8 @@ target_link_libraries(shellet PRIVATE jsoncpp_lib_static)
 
 hunter_add_package(Boost COMPONENTS system filesystem)
 find_package(Boost CONFIG REQUIRED system filesystem)
-target_link_libraries(shellet PRIVATE Boost::system Boost::filesystem)
+target_link_libraries(shellet PRIVATE  Boost::filesystem Boost::system)
+target_link_libraries(shellet_test PRIVATE  Boost::filesystem Boost::system)
 
 
 #find_package(glad CONFIG REQUIRED)
