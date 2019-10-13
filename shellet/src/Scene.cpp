@@ -57,14 +57,20 @@ void Scene::init_from_config(const std::string& config_file){
     std::string current_config_path = config_file;
     //std::string current_config_path = boost::filesystem::system_complete(config_file).c_str();
     std::ifstream fin(current_config_path);
-    fin>>root;
+	if (fin.good()) {
+		LOG(INFO) << "config file: " << config_file << "opend!";
+		fin >> root;
+	}
+	else {
+		LOG(ERROR) << "can't open config file" << config_file;
+	}
 
     std::string current_config_dir=boost::filesystem::system_complete(config_file).parent_path().string()+"/"; 
     m_mesh_file=current_config_dir+root["mesh_file"].asString();
     m_vertex_shader_file=current_config_dir+root["vertex_shader"].asString();
     m_fragment_shader_file=current_config_dir+root["fragment_shader"].asString();
 
-     m_shader=new Shader(m_vertex_shader_file,m_fragment_shader_file);
+	m_shader = new Shader(m_vertex_shader_file, m_fragment_shader_file);
 
     Mesh_Loader mesh_loader;
     mesh_loader.load_from_obj(m_mesh_file);
@@ -82,7 +88,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void Scene::main_loop(int argc,char** argv){
 
-    LOG(INFO)<<"hi log";
+    LOG(INFO)<<"into  main loop";
 
 
     glfwInit();
@@ -90,7 +96,7 @@ void Scene::main_loop(int argc,char** argv){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
     glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
 
-
+	
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
@@ -100,8 +106,11 @@ void Scene::main_loop(int argc,char** argv){
     GLFWwindow* window=glfwCreateWindow(800,600,"hi graphic world",NULL,NULL); 
 
     if(window==nullptr){
-	LOG(ERROR)<<"window create failed";
-    }
+		LOG(ERROR)<<"window create failed";
+	}
+	else {
+		LOG(INFO)<<"window create succeed!";
+	}
 
     glfwMakeContextCurrent(window);
 
@@ -110,8 +119,11 @@ void Scene::main_loop(int argc,char** argv){
 
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-	LOG(ERROR)<<"glad load failed";
-    }
+		LOG(ERROR)<<"glad load failed";
+	}
+	else {
+		LOG(INFO)<<"glad load succeed!";
+	}
 
     init_from_config(argv[1]);
 

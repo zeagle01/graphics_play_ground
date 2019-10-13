@@ -30,12 +30,19 @@ Shader::Shader(const std::string& vertex_shader_file, const std::string& fragmen
     std::ifstream f_s_fin;
     v_s_fin.open(vertex_shader_file);
     if (!v_s_fin) {
-	LOG(ERROR)<<"fail to open vertex source file" ;
-    }
+		LOG(ERROR)<<"fail to open vertex source file:"<<vertex_shader_file ;
+	}
+	else {
+		LOG(INFO)<<"open vertex source file:"<<vertex_shader_file ;
+	}
+
     f_s_fin.open(fragment_shader_file);
     if (!f_s_fin) {
-	LOG(ERROR)<<"fail to open fragment source file" ;
-    }
+		LOG(ERROR)<<"fail to open fragment source file" ;
+	}
+	else {
+		LOG(INFO)<<"open fragment source file" <<fragment_shader_file;
+	}
     std::stringstream v_s_stream, f_s_stream;
     v_s_stream << v_s_fin.rdbuf();
     f_s_stream << f_s_fin.rdbuf();
@@ -54,12 +61,13 @@ Shader::Shader(const std::string& vertex_shader_file, const std::string& fragmen
     GLchar infoLog[512];
     glGetShaderiv(verts_shader, GL_COMPILE_STATUS, &success);
     if (!success) {
-	glGetShaderInfoLog(verts_shader, 512, NULL, infoLog);
-	//std::cout << "error vertex shader compilation at " << vertex_shader_file << std::endl;
-	//std::cout << infoLog << std::endl;
-	LOG(ERROR)<<"error vertex shader compilation at " <<vertex_shader_file;
-	LOG(ERROR)<<infoLog;
-    }
+		glGetShaderInfoLog(verts_shader, 512, NULL, infoLog);
+		LOG(ERROR)<<"error vertex shader compilation at " <<vertex_shader_file;
+		LOG(ERROR)<<infoLog;
+	}
+	else {
+		LOG(INFO)<<"vertex shader compilation:" <<vertex_shader_file;
+	}
 
 
     GLuint fragement_shader;
@@ -68,12 +76,13 @@ Shader::Shader(const std::string& vertex_shader_file, const std::string& fragmen
     glCompileShader(fragement_shader);
     glGetShaderiv(fragement_shader, GL_COMPILE_STATUS, &success);
     if (!success) {
-	glGetShaderInfoLog(fragement_shader, 512, NULL, infoLog);
-	//std::cout << "error fragment shader compilation at " << fragment_shader_file << std::endl;
-	//std::cout << infoLog << std::endl;
-	LOG(ERROR)<<"error fragment shader compilation at " <<fragment_shader_file;
-	LOG(ERROR)<<infoLog;
-    }
+		glGetShaderInfoLog(fragement_shader, 512, NULL, infoLog);
+		LOG(ERROR)<<"error fragment shader compilation at " <<fragment_shader_file;
+		LOG(ERROR)<<infoLog;
+	}
+	else {
+		LOG(INFO) << "fragment shader compilation:" << fragment_shader_file;
+	}
 
 
     shader_program = glCreateProgram();
@@ -83,12 +92,13 @@ Shader::Shader(const std::string& vertex_shader_file, const std::string& fragmen
 
     glGetShaderiv(shader_program, GL_LINK_STATUS, &success);
     if (!success) {
-	glGetShaderInfoLog(shader_program, 512, NULL, infoLog);
-	//		std::cout << "error shader program linking" << std::endl;
-	//		std::cout << infoLog << std::endl;
-	LOG(ERROR)<<"error shader program linking" ;
-	LOG(ERROR)<<infoLog;
-    }
+		glGetShaderInfoLog(shader_program, 512, NULL, infoLog);
+		LOG(ERROR)<<"error shader program linking" ;
+		LOG(ERROR)<<infoLog;
+	}
+	else {
+		LOG(INFO)<<" shader program linking succeed!" ;
+	}
 
     glDeleteShader(verts_shader);
     glDeleteShader(fragement_shader);
