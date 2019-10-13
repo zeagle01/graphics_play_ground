@@ -66,6 +66,11 @@ hunter_add_package(Glog)
 find_package(glog CONFIG REQUIRED)
 target_link_libraries(shellet PUBLIC glog::glog)
 
+hunter_add_package(gflags)
+find_package(gflags CONFIG REQUIRED)
+target_link_libraries(shellet PUBLIC gflags)
+
+
 
 hunter_add_package(GTest)
 find_package(GMock CONFIG REQUIRED)

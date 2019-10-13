@@ -11,6 +11,10 @@ add_executable(show_obj main.cpp)
 
 target_link_libraries(show_obj PRIVATE shellet)
 
+hunter_add_package(Boost COMPONENTS system filesystem)
+find_package(Boost CONFIG REQUIRED system filesystem)
+target_link_libraries(show_obj PRIVATE  Boost::filesystem Boost::system)
+
 
 add_custom_command(TARGET show_obj
     POST_BUILD
