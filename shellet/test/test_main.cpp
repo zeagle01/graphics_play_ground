@@ -9,6 +9,8 @@
 int main(int argc,char** argv){
 
 
+	//std::string currentPath = boost::filesystem::system_complete(".").string();
+
 	boost::filesystem::create_directory("log");
 	FLAGS_log_dir = "./log/";
 
@@ -18,8 +20,6 @@ int main(int argc,char** argv){
     ::testing::InitGoogleMock(&argc,argv);
 
 
-    //::testing::InitGoogleTest(&argc,argv);
-    //::testing::InitGoogleMock(&argc,argv);
 
     return  RUN_ALL_TESTS();
 

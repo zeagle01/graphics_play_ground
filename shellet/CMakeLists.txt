@@ -19,6 +19,9 @@ add_executable(shellet_test
     )
 
 
+set_property(TARGET shellet_test PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:shellet_test>)
+set_property(TARGET shellet PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:shellet>)
+
 target_include_directories(shellet PUBLIC 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include/shellet>

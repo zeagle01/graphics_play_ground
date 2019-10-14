@@ -12,6 +12,9 @@
 
 int main(int argc,char** argv){
 
+
+	//std::string currentPath = boost::filesystem::system_complete(".").string();
+
 	boost::filesystem::create_directory("log");
 	FLAGS_log_dir = "./log/";
 
