@@ -125,7 +125,14 @@ void Scene::main_loop(int argc,char** argv){
 		LOG(INFO)<<"glad load succeed!";
 	}
 
-    init_from_config(argv[1]);
+	if (argv[1]) {
+		LOG(INFO) << "init from config file: " << argv[1]  ;
+		init_from_config(argv[1]);
+	}
+	else {
+		LOG(FATAL) << "specify a scene config file first!";
+	}
+
 
     make_buffers();
 
