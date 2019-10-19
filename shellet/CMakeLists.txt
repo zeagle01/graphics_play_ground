@@ -7,6 +7,11 @@ add_library(shellet
     src/Mesh_Loader.cpp
     src/Shader.cpp
     src/Scene.cpp
+    src/Scene.h
+	src/Simulator.cpp
+	src/Simulator.h
+	src/Simulation_Data.cpp
+	src/Simulation_Data.h
 	src/PD_Simulator.cpp
 	src/PD_Simulator.h
     #src/Plot_Data_IO.cpp

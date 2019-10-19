@@ -1,6 +1,9 @@
 {
     "mesh_file":"1_triangle.obj",
     "vertex_shader":"plain.vs",
-    "fragment_shader":"plain.fs"
+  "fragment_shader": "plain.fs",
+  "simulator": "projective_dynamic",
+  "gravity_acceleration": 9.8
+
 }
 

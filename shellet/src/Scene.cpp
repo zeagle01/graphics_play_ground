@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Shader.h"
 #include "Mesh_Loader.h"
+#include "PD_Simulator.h"
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
@@ -13,6 +14,7 @@
 
 #include <iostream>
 #include <boost/filesystem.hpp>
+
 
 int Scene::get_vertex_num()const {
     return m_positions.size()/3;
@@ -76,6 +78,10 @@ void Scene::init_from_config(const std::string& config_file){
     mesh_loader.load_from_obj(m_mesh_file);
     m_positions=mesh_loader.get_positions();
     m_indices=mesh_loader.get_indices();
+
+	//
+	simulator = std::make_shared<PD_Simulator>();
+	simulator->setGravity(root["gravity_acceleration"].asFloat());
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -143,8 +149,17 @@ void Scene::main_loop(int argc,char** argv){
         glClearColor(0.2,0.3,0.1,1);
         glClear(GL_COLOR_BUFFER_BIT);
 
+		simulator->update(m_positions,  m_indices );
+
         m_shader->use();
         glBindVertexArray(m_vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER,m_vbo);
+		glBufferData(GL_ARRAY_BUFFER,sizeof(float)*m_positions.size(),m_positions.data(),GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,m_ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(int)*m_indices.size(),m_indices.data(),GL_STATIC_DRAW);
+
         glDrawElements(GL_TRIANGLES,m_indices.size(),GL_UNSIGNED_INT,0);
 
         glfwPollEvents();
