@@ -1,9 +1,12 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "Shader.h"
-
 #include <vector>
+#include <memory>
+
+#include "Shader.h"
+#include "Simulator.h"
+
 class Scene{
     private:
     Shader* shader;
@@ -16,6 +19,8 @@ class Scene{
     int m_vao;
 
     Shader* m_shader;
+	std::shared_ptr<Simulator> simulator;
+
 
     std::vector<float> m_positions;
     std::vector<int> m_indices;
