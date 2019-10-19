@@ -15,13 +15,25 @@ public:
 
 
 public:
-	virtual void setGravity(float g)override;
+
+	virtual void setMesh(const std::vector<float>& positions,const std::vector<int>& triangle_indices);
+	virtual void setGravity(const std::vector<float>& g)override;
+	virtual void setMass(const float mass)override;
+	virtual void setDeltaT(const float dt)override;
+
  
 
 public:
 	void init(std::vector<float>& positions,std::vector<int>& triangle_indices);
 
 	void computeEdge();
+
+protected:
+	void external_force_init(std::vector<float>& external_forces,const int vertexNum);
+	void apply_gravity(std::vector<float>& external_forces, const std::vector<float>& mass, const std::vector<float> gravity_acceleration );
+	void compute_guess_positions(std::vector<float>& guess_X, const std::vector<float>& X,const std::vector<float>& V, const std::vector<float>& mass, const std::vector<float>& external_forces, const float dt);
+	void store_last_positions(std::vector<float>& last_X, std::vector<float>& X);
+	void update_velocities(std::vector<float>& velocities,const  std::vector<float>& X,const std::vector<float>& X0,const float dt);
 
 private:
 	std::shared_ptr<Simulation_Data> simulation_data;

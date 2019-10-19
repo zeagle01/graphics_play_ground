@@ -13,7 +13,14 @@ public:
 	std::vector<int> TV;
 	std::vector<int> EV;
 
-	float gravity_acceleration;
+	std::vector<float> last_positions;
+	std::vector<float> velocities;
+	std::vector<float> mass;
+	std::vector<float> external_forces;
+
+
+	std::vector<float> gravity_acceleration;
+	float dt;
 };
 
 

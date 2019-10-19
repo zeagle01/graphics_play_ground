@@ -79,9 +79,23 @@ void Scene::init_from_config(const std::string& config_file){
     m_positions=mesh_loader.get_positions();
     m_indices=mesh_loader.get_indices();
 
+
 	//
 	simulator = std::make_shared<PD_Simulator>();
-	simulator->setGravity(root["gravity_acceleration"].asFloat());
+	//mesh
+	simulator->setMesh(m_positions, m_indices);
+	//gravity
+	Json::Value gravity_node= root["gravity_acceleration"];
+	std::vector<float> gravity_values;
+	for (int i = 0; i < gravity_node.size(); i++) {
+		gravity_values.push_back(gravity_node[i].asFloat());
+	}
+	simulator->setGravity(gravity_values);
+	//mass
+	simulator->setMass(root["uniform_mass"].asFloat());
+	//dt
+	simulator->setDeltaT(root["delta_t"].asFloat());
+
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
