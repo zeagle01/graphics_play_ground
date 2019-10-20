@@ -14,6 +14,8 @@ add_library(shellet
 	src/Simulation_Data.h
 	src/PD_Simulator.cpp
 	src/PD_Simulator.h
+	src/Array.hpp
+	src/predef_types.h
     #src/Plot_Data_IO.cpp
     )
 add_executable(shellet_test 
