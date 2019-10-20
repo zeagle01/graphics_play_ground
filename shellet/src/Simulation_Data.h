@@ -9,19 +9,19 @@
 #include <vector>
 
 #include "predef_types.h"
-#include "Array.hpp"
 
 class Simulation_Data {
 public:
 
 
-	a3f positions;
-	a3i triangle_indices;
+	m3xf positions;
+	m3Xi triangle_indices;
 
-	a3f last_positions;
-	a3f velocities;
-	vXf mass;
-	a3f external_forces;
+	m3xf last_positions;
+	m3xf velocities;
+	m3xf external_forces;
+
+	vxf mass;
 	v3f gravity_acceleration;
 
 	float dt;

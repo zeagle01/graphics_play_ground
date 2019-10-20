@@ -9,8 +9,15 @@
 typedef Eigen::Vector3f v3f;
 typedef Eigen::Vector3i v3i;
 
-typedef Eigen::VectorXf vXf;
+typedef Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic> mxxf;
+typedef Eigen::Matrix<int,Eigen::Dynamic,Eigen::Dynamic> mxxi;
+
+typedef Eigen::Matrix<float,3,Eigen::Dynamic> m3xf;
+typedef Eigen::Matrix<int,3,Eigen::Dynamic> m3Xi;
+
+typedef Eigen::VectorXf vxf;
 typedef Eigen::VectorXi vXi;
+
 
 
 
