@@ -29,11 +29,6 @@ public:
 	void computeEdge();
 
 protected:
-	void external_force_init(std::vector<float>& external_forces,const int vertexNum);
-	void apply_gravity(std::vector<float>& external_forces, const std::vector<float>& mass, const std::vector<float> gravity_acceleration );
-	void compute_guess_positions(std::vector<float>& guess_X, const std::vector<float>& X,const std::vector<float>& V, const std::vector<float>& mass, const std::vector<float>& external_forces, const float dt);
-	void store_last_positions(std::vector<float>& last_X, std::vector<float>& X);
-	void update_velocities(std::vector<float>& velocities,const  std::vector<float>& X,const std::vector<float>& X0,const float dt);
 
 	void external_force_init(std::vector<Eigen::Vector3f>& external_forces,const int vertexNum);
 	void apply_gravity(std::vector<Eigen::Vector3f>& external_forces, const Eigen::VectorXf& mass, const Eigen::Vector3f& gravity_acceleration );
