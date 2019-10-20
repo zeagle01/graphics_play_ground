@@ -27,19 +27,21 @@ public:
 		return data.empty();
 	}
 
-	template<typename continuousT>
+	template<int dim,typename continuousT>
 	void assignFromContinuousStorage(const continuousT* b, const int size) {
 
-		data.resize(size / 3);
-		for (int i = 0; i < size / 3; i++) {
-			data[i] = T(b[i*3+0], b[i * 3 + 1], b[i * 3 + 2]);
+		data.resize(size / dim);
+		for (int i = 0; i < size / dim; i++) {
+			for (int j = 0; j < dim; j++) {
+				data[i][j] = b[i * dim + j];
+			}
 		}
 
 	}
 
-	template<typename continuousT>
+	template<int dim,typename continuousT>
 	std::vector<continuousT> convert_2_std_vector() {
-		return 	std::vector<continuousT>(&data[0][0], &data[0][0] + size() * 3);
+		return 	std::vector<continuousT>(&data[0][0], &data[0][0] + size() * dim);
 	}
 
 	int size()const  {

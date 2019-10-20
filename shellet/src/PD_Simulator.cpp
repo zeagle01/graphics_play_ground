@@ -16,14 +16,13 @@ void PD_Simulator::update(std::vector<float>& positions,std::vector<int>& triang
 	apply_gravity( simulation_data->external_forces, simulation_data-> mass, simulation_data-> gravity_acceleration);
 
 
-	//std::vector<Eigen::Vector3f> S(positions.size()/3);
 	if (simulation_data->velocities.empty()) {
 		simulation_data->velocities.resize(vNum,Eigen::Vector3f::Zero());
 	}
 	compute_guess_positions(simulation_data->positions, simulation_data->last_positions, simulation_data->velocities ,  simulation_data->mass,simulation_data->external_forces, simulation_data->dt);
 
-	//positions = std::vector<float>(simulation_data->positions_NEW[0][0], simulation_data->positions_NEW[0][0] + vNum * 3);
-	positions = simulation_data->positions.convert_2_std_vector<float>();
+
+	positions = simulation_data->positions.convert_2_std_vector<3,float>();
 
 	update_velocities(simulation_data->velocities, simulation_data->positions, simulation_data->last_positions, simulation_data->dt);
 
@@ -67,8 +66,8 @@ void PD_Simulator::update_velocities(a3f& velocities, const  a3f& X, const a3f& 
 
 //setters:
 void PD_Simulator::setMesh(const std::vector<float>& positions, const std::vector<int>& triangle_indices) {
-	simulation_data->positions.assignFromContinuousStorage( &positions[0],positions.size());
-	simulation_data->triangle_indices.assignFromContinuousStorage(&triangle_indices[0], triangle_indices.size());
+	simulation_data->positions.assignFromContinuousStorage<3>( &positions[0],positions.size());
+	simulation_data->triangle_indices.assignFromContinuousStorage<3>(&triangle_indices[0], triangle_indices.size());
 
 }
 
