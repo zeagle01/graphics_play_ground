@@ -87,4 +87,6 @@ find_package(GMock CONFIG REQUIRED)
 target_link_libraries(shellet_test PRIVATE GMock::gmock)
 
 
-
+hunter_add_package(Eigen)
+find_package(Eigen3 CONFIG REQUIRED)
+target_link_libraries(shellet PUBLIC Eigen3::Eigen)
