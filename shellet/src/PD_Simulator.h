@@ -39,6 +39,7 @@ protected:
 	void update_velocities(m3xf& velocities,const  m3xf& X,const m3xf& X0,const float dt);
 
 	void compute_edge_constraints();
+	void compute_edge_indices(const m3xi& face_indices);
 
 private:
 	std::shared_ptr<Simulation_Data> simulation_data;

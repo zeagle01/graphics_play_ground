@@ -46,24 +46,26 @@ void PD_Simulator::apply_gravity(m3xf& external_forces, const vxf& mass, const v
 	external_forces = gravity_acceleration * mass.transpose();
 }
 void PD_Simulator::compute_guess_positions(m3xf& guess_X, const m3xf& X, const m3xf& V, const vxf& mass, const m3xf& external_forces, const float dt) {
-
 		guess_X = X + dt * V + dt * dt * external_forces * mass.asDiagonal().inverse();
-
 }
 void PD_Simulator::store_last_positions(m3xf& last_X, const m3xf& X) {
 	last_X = X;
 }
 void PD_Simulator::update_velocities(m3xf& velocities, const  m3xf& X, const m3xf& X0, const float dt) {
-
 		velocities = (X - X0) / dt;
-
 }
 
 
+void PD_Simulator::compute_edge_indices(const m3xi& face_indices) {
+	//int tNum=
+	//std::sort(face_indices.col(0),face_indices.col())
+
+
+}
 
 void PD_Simulator::compute_edge_constraints() {
 //	if (edge_topology_is_computed) {
-//		//compute_edge_topology();
+//		compute_edge_topology();
 //	}
 
 //	for (int i = 0; i < edge_indices.size(); i++) {
@@ -77,7 +79,7 @@ void PD_Simulator::compute_edge_constraints() {
 //setters:
 void PD_Simulator::setMesh(const std::vector<float>& positions, const std::vector<int>& triangle_indices) {
 	simulation_data->positions = m3xf::Map(&positions[0], 3, positions.size() / 3);
-	simulation_data->triangle_indices = m3Xi::Map(&triangle_indices[0], 3, triangle_indices.size() / 3);
+	simulation_data->triangle_indices = m3xi::Map(&triangle_indices[0], 3, triangle_indices.size() / 3);
 
 }
 

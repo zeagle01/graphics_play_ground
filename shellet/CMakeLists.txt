@@ -15,15 +15,23 @@ add_library(shellet
 	src/PD_Simulator.cpp
 	src/PD_Simulator.h
 	src/predef_types.h
+	src/Topology_Computer.h
+	src/Topology_Computer.cpp
     #src/Plot_Data_IO.cpp
     )
 add_executable(shellet_test 
     test/test_main.cpp
     test/Mesh_Loader_Test.cpp
+    test/Mesh_Loader_Test.h
     test/Shader_Test.cpp
+    test/Shader_Test.h
     test/Scene_Test.cpp
+    test/Scene_Test.h
     test/Plot_Data_IO_Test.cpp
     src/Scene.cpp#for glad load  reason
+	test/Topology_Computer_Test.h
+	test/Topology_Computer_Test.cpp
+
     )
 
 

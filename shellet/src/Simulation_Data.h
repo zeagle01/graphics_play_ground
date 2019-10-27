@@ -15,7 +15,10 @@ public:
 
 
 	m3xf positions;
-	m3Xi triangle_indices;
+	m3xi triangle_indices;
+
+	m2xi edge_indices;
+
 
 	m3xf last_positions;
 	m3xf velocities;
