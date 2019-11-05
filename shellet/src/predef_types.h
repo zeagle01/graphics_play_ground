@@ -22,7 +22,9 @@ typedef Eigen::Matrix<float,2,Eigen::Dynamic> m2xf;
 typedef Eigen::Matrix<int,2,Eigen::Dynamic> m2xi;
 
 typedef Eigen::VectorXf vxf;
-typedef Eigen::VectorXi vXi;
+typedef Eigen::VectorXi vxi;
+
+typedef Eigen::ArrayXi axi;
 
 
 

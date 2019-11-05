@@ -4,6 +4,7 @@
 
 #include "Simulator.h"
 #include "Simulation_Data.h"
+#include "Topology_Computer.h"
 
 #include <vector>
 #include <memory>
@@ -11,7 +12,9 @@
 class PD_Simulator :public Simulator {
 public:
 	virtual void update(std::vector<float>& positions,std::vector<int>& triangle_indices);
-	PD_Simulator() :simulation_data(std::make_shared<Simulation_Data>()) {}
+	PD_Simulator() :simulation_data(std::make_shared<Simulation_Data>()),
+		topology_computer(std::make_shared<Topology_Computer>())
+	{}
 
 
 public:
@@ -43,6 +46,7 @@ protected:
 
 private:
 	std::shared_ptr<Simulation_Data> simulation_data;
+	std::shared_ptr<Topology_Computer> topology_computer;
 
 };
 

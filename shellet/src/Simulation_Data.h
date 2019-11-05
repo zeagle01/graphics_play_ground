@@ -28,6 +28,8 @@ public:
 	v3f gravity_acceleration;
 
 	float dt;
+
+	bool edge_topology_changed=true;
 };
 
 
