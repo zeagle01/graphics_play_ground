@@ -18,6 +18,7 @@ public:
 	m3xi triangle_indices;
 
 	m2xi edge_indices;
+	vxf edge_rest_length;
 
 
 	m3xf last_positions;

@@ -2,7 +2,10 @@
 #include "PD_Simulator.h"
 
 #include <cmath>
-#include "Eigen/Dense"
+#include "Eigen/Eigen"
+
+
+
 
 //public:
 void PD_Simulator::update(std::vector<float>& positions,std::vector<int>& triangle_indices) {
@@ -25,10 +28,62 @@ void PD_Simulator::update(std::vector<float>& positions,std::vector<int>& triang
 	if (simulation_data->edge_topology_changed) {
 		topology_computer->precompute( simulation_data->triangle_indices);
 		topology_computer->get_edge_indices(simulation_data->edge_indices);
+
+		//
+		int e_num=simulation_data->edge_indices.cols();
+		simulation_data->edge_rest_length.resize(e_num);
+		for (int ei = 0; ei < e_num; ei++) {
+			float w[]{ 1,-1 };
+			v2i ev= simulation_data->edge_indices.col(ei);
+			v3f eX[] = { simulation_data->positions.col(ev[0]),simulation_data->positions.col(ev[1]) };
+			v3f d = w[0] * eX[0] + w[1] * eX[1];
+			simulation_data->edge_rest_length[ei] = d.norm();
+		}
+
 		simulation_data->edge_topology_changed = false;
 	}
-
 	m3xf b;
+	smf A;
+	{
+		static bool first = true;
+		if (first) {
+			using eigen_triplet = Eigen::Triplet<double>;
+			std::vector<eigen_triplet > coefficients;
+			A=smf(vNum*3, vNum*3);
+			float dt = simulation_data->dt;
+			for (int i = 0; i < vNum; i++) {
+				float mass_i=simulation_data->mass[i];
+				coefficients.push_back(eigen_triplet(i, i, mass_i/dt/dt));
+			}
+
+			for (int ei = 0; ei < simulation_data->edge_indices.cols(); ei++) {
+
+			}
+
+			A.setFromTriplets(coefficients.begin(), coefficients.end());
+
+		}
+		first = false;
+		float dt = simulation_data->dt;
+		m3xf b = simulation_data->mass.asDiagonal() * simulation_data->positions / dt / dt;
+	}
+
+	//a3xf ff;
+	
+	//edge constraits
+	for (int ei = 0; ei < simulation_data->edge_indices.cols(); ei++) {
+		float w[]{ 1,-1 };
+		v2i ev= simulation_data->edge_indices.col(ei);
+		v3f eX[] = { simulation_data->positions.col(ev[0]),simulation_data->positions.col(ev[1]) };
+		v3f predicte_p = w[0] * eX[0] + w[1] * eX[1];
+		float l = predicte_p.norm();
+		predicte_p = predicte_p / l * simulation_data->edge_rest_length[ei];
+		b.col(ev[0]) += w[0]*predicte_p;
+		b.col(ev[1]) += w[1]*predicte_p;
+	}
+
+
+
 	for (int it = 0; it < 20; it++) {
 		for (int vi = 0; vi < simulation_data->positions.size(); vi++) {
 

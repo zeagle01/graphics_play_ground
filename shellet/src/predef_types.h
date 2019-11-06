@@ -3,8 +3,11 @@
 
 #ifndef PREDEF_TYPES_H
 #define PREDEF_TYPES_H
-#include "Eigen/Dense"
+#include "Eigen/Eigen"
 
+
+typedef Eigen::Vector2f v2f;
+typedef Eigen::Vector2i v2i;
 
 typedef Eigen::Vector3f v3f;
 typedef Eigen::Vector3i v3i;
@@ -25,6 +28,9 @@ typedef Eigen::VectorXf vxf;
 typedef Eigen::VectorXi vxi;
 
 typedef Eigen::ArrayXi axi;
+
+
+typedef Eigen::SparseMatrix<float> smf;
 
 
 
