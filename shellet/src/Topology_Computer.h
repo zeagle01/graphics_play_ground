@@ -11,7 +11,7 @@
 
 class Topology_Computer {
 public:
-	void compute_edge_indices(m2xi& edge_indices,const m3xi& triangle_indices);
+	//void compute_edge_indices(m2xi& edge_indices,const m3xi& triangle_indices);
 	void get_edge_indices(m2xi& edge_indices);
 	std::function<std::vector<int>(const int )>  get_one_ring();
 	void precompute(const m3xi& triangle_indices);

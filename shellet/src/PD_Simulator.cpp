@@ -22,9 +22,17 @@ void PD_Simulator::update(std::vector<float>& positions,std::vector<int>& triang
 	compute_guess_positions(simulation_data->positions, simulation_data->last_positions, simulation_data->velocities ,  simulation_data->mass,simulation_data->external_forces, simulation_data->dt);
 
 
+	if (simulation_data->edge_topology_changed) {
+		topology_computer->precompute( simulation_data->triangle_indices);
+		topology_computer->get_edge_indices(simulation_data->edge_indices);
+		simulation_data->edge_topology_changed = false;
+	}
+
+	m3xf b;
 	for (int it = 0; it < 20; it++) {
-		compute_edge_constraints();
-		//jacobi_solve();
+		for (int vi = 0; vi < simulation_data->positions.size(); vi++) {
+
+		}
 	}
 
 	positions =std::vector<float>( simulation_data->positions.data(),simulation_data->positions.data()+3*vNum);
@@ -64,14 +72,6 @@ void PD_Simulator::compute_edge_indices(const m3xi& face_indices) {
 }
 
 void PD_Simulator::compute_edge_constraints() {
-//	if (edge_topology_is_computed) {
-//		compute_edge_topology();
-//	}
-
-//	for (int i = 0; i < edge_indices.size(); i++) {
-//
-//	}
-
 }
 
 
