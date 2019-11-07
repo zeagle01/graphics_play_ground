@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include "Eigen/Eigen"
+#include <iostream>
 
 
 
@@ -24,80 +25,8 @@ void PD_Simulator::update(std::vector<float>& positions,std::vector<int>& triang
 	}
 	compute_guess_positions(simulation_data->positions, simulation_data->last_positions, simulation_data->velocities ,  simulation_data->mass,simulation_data->external_forces, simulation_data->dt);
 
-
-	if (simulation_data->edge_topology_changed) {
-		topology_computer->precompute( simulation_data->triangle_indices);
-		topology_computer->get_edge_indices(simulation_data->edge_indices);
-
-		//
-		int e_num=simulation_data->edge_indices.cols();
-		simulation_data->edge_rest_length.resize(e_num);
-		for (int ei = 0; ei < e_num; ei++) {
-			float w[]{ 1,-1 };
-			v2i ev= simulation_data->edge_indices.col(ei);
-			v3f eX[] = { simulation_data->positions.col(ev[0]),simulation_data->positions.col(ev[1]) };
-			v3f d = w[0] * eX[0] + w[1] * eX[1];
-			simulation_data->edge_rest_length[ei] = d.norm();
-		}
-
-		simulation_data->edge_topology_changed = false;
-	}
-
-	float spring_k = 1e4;
-	m3xf b0;
-	m3xf b;
-	smf A;
-	{
-		static bool first = true;
-		if (first) {
-			using eigen_triplet = Eigen::Triplet<double>;
-			std::vector<eigen_triplet > coefficients;
-			A=smf(vNum, vNum);
-			float dt = simulation_data->dt;
-			for (int i = 0; i < vNum; i++) {
-				float mass_i=simulation_data->mass[i];
-				coefficients.push_back(eigen_triplet(i, i, mass_i/dt/dt));
-			}
-
-			for (int ei = 0; ei < simulation_data->edge_indices.cols(); ei++) {
-				v2i ev = simulation_data->edge_indices.col(ei);
-				coefficients.push_back(eigen_triplet(ev[0], ev[0], spring_k));
-				coefficients.push_back(eigen_triplet(ev[0], ev[1], -spring_k));
-				coefficients.push_back(eigen_triplet(ev[1], ev[1], spring_k));
-				coefficients.push_back(eigen_triplet(ev[1], ev[0], -spring_k));
-			}
-
-			A.setFromTriplets(coefficients.begin(), coefficients.end());
-			b0 = simulation_data->mass.asDiagonal() * simulation_data->positions / dt / dt;
-
-		}
-		//first = false;
-	}
-
-	//a3xf ff;
-	
-
-
-	Eigen::SimplicialCholesky<smf> chol(A);  // performs a Cholesky factorization of A
-
-	for (int it = 0; it < 20; it++) {
-
-		b = b0;
-		//edge constraits
-		for (int ei = 0; ei < simulation_data->edge_indices.cols(); ei++) {
-			float w[]{ 1,-1 };
-			v2i ev= simulation_data->edge_indices.col(ei);
-			v3f eX[] = { simulation_data->positions.col(ev[0]),simulation_data->positions.col(ev[1]) };
-			v3f predicte_p = w[0] * eX[0] + w[1] * eX[1];
-			float l = predicte_p.norm();
-			predicte_p = predicte_p / l * simulation_data->edge_rest_length[ei];
-			b.col(ev[0]) += w[0]*predicte_p*spring_k;
-			b.col(ev[1]) += w[1]*predicte_p*spring_k;
-		}
-		simulation_data->positions.row(0)  = chol.solve(b.transpose().col(0));
-		simulation_data->positions.row(1)  = chol.solve(b.transpose().col(1));
-		simulation_data->positions.row(2)  = chol.solve(b.transpose().col(2));
-	}
+	//compute_edge_indices( simulation_data->triangle_indices);
+	compute_edge_constraints();
 
 	positions =std::vector<float>( simulation_data->positions.data(),simulation_data->positions.data()+3*vNum);
 
@@ -131,13 +60,63 @@ void PD_Simulator::update_velocities(m3xf& velocities, const  m3xf& X, const m3x
 
 
 void PD_Simulator::compute_edge_indices(const m3xi& face_indices) {
-	//int tNum=
-	//std::sort(face_indices.col(0),face_indices.col())
-
 
 }
 
 void PD_Simulator::compute_edge_constraints() {
+
+	int vNum = simulation_data->positions.cols();
+	using eigen_triplet = Eigen::Triplet<float>;
+
+
+	if (simulation_data->edge_topology_changed) {
+		topology_computer->precompute( simulation_data->triangle_indices);
+		topology_computer->get_edge_indices(simulation_data->edge_indices);
+		simulation_data->edge_topology_changed = false;
+	}
+
+	int e_num = simulation_data->edge_indices.cols();
+	smf E(vNum, e_num);
+	std::vector<eigen_triplet > E_coefficients;
+	for (int ei = 0; ei < e_num; ei++) {
+		v2i ev = simulation_data->edge_indices.col(ei);
+		float w[]{ 1,-1 };
+		E_coefficients.push_back(eigen_triplet(ei, ev[0], w[0]));
+		E_coefficients.push_back(eigen_triplet(ei, ev[1], w[1]));
+	}
+	E.setFromTriplets(E_coefficients.begin(), E_coefficients.end());
+
+	bool static first = true;
+	if (first) {
+		simulation_data->edge_rest_length = (E.transpose() * simulation_data->positions.transpose()).rowwise().norm();
+		first = false;
+	}
+
+	float spring_k = 1e4;
+	std::vector<eigen_triplet > coefficients;
+	//A=smf(vNum, vNum);
+	float dt = simulation_data->dt;
+	smf A = spring_k * E * E.transpose();
+	A += (simulation_data->mass / dt / dt).asDiagonal();
+	mx3f b0 = (simulation_data->mass/ dt / dt).asDiagonal() * simulation_data->positions.transpose() ;
+
+	//a3xf ff;
+	
+
+
+	Eigen::SimplicialCholesky<smf> chol(A);  // performs a Cholesky factorization of A
+
+	for (int it = 0; it < 20; it++) {
+
+		mx3f b = b0;
+		//edge constraits
+		auto p = E.transpose() * simulation_data->positions.transpose();
+		auto lengh_p = p.rowwise().norm();
+
+		b += spring_k * E*simulation_data->edge_rest_length.asDiagonal()*lengh_p.asDiagonal().inverse()*p;
+		simulation_data->positions.transpose()  = chol.solve(b);
+	}
+
 }
 
 
