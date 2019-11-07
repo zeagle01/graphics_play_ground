@@ -42,6 +42,9 @@ void PD_Simulator::update(std::vector<float>& positions,std::vector<int>& triang
 
 		simulation_data->edge_topology_changed = false;
 	}
+
+	float spring_k = 1e4;
+	m3xf b0;
 	m3xf b;
 	smf A;
 	{
@@ -49,7 +52,7 @@ void PD_Simulator::update(std::vector<float>& positions,std::vector<int>& triang
 		if (first) {
 			using eigen_triplet = Eigen::Triplet<double>;
 			std::vector<eigen_triplet > coefficients;
-			A=smf(vNum*3, vNum*3);
+			A=smf(vNum, vNum);
 			float dt = simulation_data->dt;
 			for (int i = 0; i < vNum; i++) {
 				float mass_i=simulation_data->mass[i];
@@ -57,37 +60,43 @@ void PD_Simulator::update(std::vector<float>& positions,std::vector<int>& triang
 			}
 
 			for (int ei = 0; ei < simulation_data->edge_indices.cols(); ei++) {
-
+				v2i ev = simulation_data->edge_indices.col(ei);
+				coefficients.push_back(eigen_triplet(ev[0], ev[0], spring_k));
+				coefficients.push_back(eigen_triplet(ev[0], ev[1], -spring_k));
+				coefficients.push_back(eigen_triplet(ev[1], ev[1], spring_k));
+				coefficients.push_back(eigen_triplet(ev[1], ev[0], -spring_k));
 			}
 
 			A.setFromTriplets(coefficients.begin(), coefficients.end());
+			b0 = simulation_data->mass.asDiagonal() * simulation_data->positions / dt / dt;
 
 		}
-		first = false;
-		float dt = simulation_data->dt;
-		m3xf b = simulation_data->mass.asDiagonal() * simulation_data->positions / dt / dt;
+		//first = false;
 	}
 
 	//a3xf ff;
 	
-	//edge constraits
-	for (int ei = 0; ei < simulation_data->edge_indices.cols(); ei++) {
-		float w[]{ 1,-1 };
-		v2i ev= simulation_data->edge_indices.col(ei);
-		v3f eX[] = { simulation_data->positions.col(ev[0]),simulation_data->positions.col(ev[1]) };
-		v3f predicte_p = w[0] * eX[0] + w[1] * eX[1];
-		float l = predicte_p.norm();
-		predicte_p = predicte_p / l * simulation_data->edge_rest_length[ei];
-		b.col(ev[0]) += w[0]*predicte_p;
-		b.col(ev[1]) += w[1]*predicte_p;
-	}
 
 
+	Eigen::SimplicialCholesky<smf> chol(A);  // performs a Cholesky factorization of A
 
 	for (int it = 0; it < 20; it++) {
-		for (int vi = 0; vi < simulation_data->positions.size(); vi++) {
 
+		b = b0;
+		//edge constraits
+		for (int ei = 0; ei < simulation_data->edge_indices.cols(); ei++) {
+			float w[]{ 1,-1 };
+			v2i ev= simulation_data->edge_indices.col(ei);
+			v3f eX[] = { simulation_data->positions.col(ev[0]),simulation_data->positions.col(ev[1]) };
+			v3f predicte_p = w[0] * eX[0] + w[1] * eX[1];
+			float l = predicte_p.norm();
+			predicte_p = predicte_p / l * simulation_data->edge_rest_length[ei];
+			b.col(ev[0]) += w[0]*predicte_p*spring_k;
+			b.col(ev[1]) += w[1]*predicte_p*spring_k;
 		}
+		simulation_data->positions.row(0)  = chol.solve(b.transpose().col(0));
+		simulation_data->positions.row(1)  = chol.solve(b.transpose().col(1));
+		simulation_data->positions.row(2)  = chol.solve(b.transpose().col(2));
 	}
 
 	positions =std::vector<float>( simulation_data->positions.data(),simulation_data->positions.data()+3*vNum);
@@ -110,6 +119,8 @@ void PD_Simulator::apply_gravity(m3xf& external_forces, const vxf& mass, const v
 }
 void PD_Simulator::compute_guess_positions(m3xf& guess_X, const m3xf& X, const m3xf& V, const vxf& mass, const m3xf& external_forces, const float dt) {
 		guess_X = X + dt * V + dt * dt * external_forces * mass.asDiagonal().inverse();
+
+		guess_X.col(0) = v3f(0, 0, 0);
 }
 void PD_Simulator::store_last_positions(m3xf& last_X, const m3xf& X) {
 	last_X = X;
