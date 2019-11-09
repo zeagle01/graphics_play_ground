@@ -17,6 +17,7 @@ add_library(shellet
 	src/predef_types.h
 	src/Topology_Computer.h
 	src/Topology_Computer.cpp
+	src/camara.h
     #src/Plot_Data_IO.cpp
     )
 add_executable(shellet_test 
@@ -99,3 +100,7 @@ target_link_libraries(shellet_test PRIVATE GMock::gmock)
 hunter_add_package(Eigen)
 find_package(Eigen3 CONFIG REQUIRED)
 target_link_libraries(shellet PUBLIC Eigen3::Eigen)
+
+hunter_add_package(Glm)
+find_package(glm CONFIG REQUIRED)
+target_link_libraries(shellet PUBLIC glm)
