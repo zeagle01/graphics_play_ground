@@ -14,6 +14,8 @@ add_library(shellet
 	src/Simulation_Data.h
 	src/PD_Simulator.cpp
 	src/PD_Simulator.h
+	src/FEM_Simulator.cpp
+	src/FEM_Simulator.h
 	src/predef_types.h
 	src/Topology_Computer.h
 	src/Topology_Computer.cpp
