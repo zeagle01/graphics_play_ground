@@ -69,49 +69,52 @@ void PD_Simulator::compute_edge_constraints() {
 	using eigen_triplet = Eigen::Triplet<float>;
 
 
-	if (simulation_data->edge_topology_changed) {
+	bool static first = true;
+	if (first) {
 		topology_computer->precompute( simulation_data->triangle_indices);
 		topology_computer->get_edge_indices(simulation_data->edge_indices);
-		simulation_data->edge_topology_changed = false;
 	}
 
 	int e_num = simulation_data->edge_indices.cols();
-	smf E(vNum, e_num);
-	std::vector<eigen_triplet > E_coefficients;
-	for (int ei = 0; ei < e_num; ei++) {
-		v2i ev = simulation_data->edge_indices.col(ei);
-		float w[]{ 1,-1 };
-		E_coefficients.push_back(eigen_triplet(ei, ev[0], w[0]));
-		E_coefficients.push_back(eigen_triplet(ei, ev[1], w[1]));
+	static smf E(vNum, e_num);
+	if (first) {
+		std::vector<eigen_triplet > E_coefficients;
+		for (int ei = 0; ei < e_num; ei++) {
+			v2i ev = simulation_data->edge_indices.col(ei);
+			float w[]{ 1,-1 };
+			E_coefficients.push_back(eigen_triplet(ei, ev[0], w[0]));
+			E_coefficients.push_back(eigen_triplet(ei, ev[1], w[1]));
+		}
+		E.setFromTriplets(E_coefficients.begin(), E_coefficients.end());
 	}
-	E.setFromTriplets(E_coefficients.begin(), E_coefficients.end());
 
-	bool static first = true;
 	if (first) {
 		simulation_data->edge_rest_length = (E.transpose() * simulation_data->positions.transpose()).rowwise().norm();
-		first = false;
 	}
 
 	float spring_k = 1e4;
-	std::vector<eigen_triplet > coefficients;
-	//A=smf(vNum, vNum);
 	float dt = simulation_data->dt;
-	smf A = spring_k * E * E.transpose();
-	A += (simulation_data->mass / dt / dt).asDiagonal();
-	mx3f b0 = (simulation_data->mass/ dt / dt).asDiagonal() * simulation_data->positions.transpose() ;
 
-	//a3xf ff;
-	
+	static smf A;
+	if (first) {
+		A = spring_k * E * E.transpose();
+		A += (simulation_data->mass / dt / dt).asDiagonal();
+	}
+	first = false;
+
 
 
 	Eigen::SimplicialCholesky<smf> chol(A);  // performs a Cholesky factorization of A
-
+	mx3f b0 = (simulation_data->mass / dt / dt).asDiagonal() * simulation_data->positions.transpose();
 	for (int it = 0; it < 20; it++) {
 
 		mx3f b = b0;
 		//edge constraits
 		auto p = E.transpose() * simulation_data->positions.transpose();
 		auto lengh_p = p.rowwise().norm();
+
+//		std::cout << A << std::endl;
+//		std::cout << b << std::endl;
 
 		b += spring_k * E*simulation_data->edge_rest_length.asDiagonal()*lengh_p.asDiagonal().inverse()*p;
 		simulation_data->positions.transpose()  = chol.solve(b);
