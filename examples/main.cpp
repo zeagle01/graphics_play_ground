@@ -8,6 +8,7 @@
 #include "gflags/gflags.h"
 #include "glog/logging.h"
 #include "boost/filesystem.hpp"
+#include <memory>
 
 
 int main(int argc,char** argv){
@@ -22,8 +23,8 @@ int main(int argc,char** argv){
 	google::InitGoogleLogging(argv[0]);
 
 
-    Scene s;
-    s.main_loop(argc,argv);
+    std::shared_ptr<Scene>s=Scene::getSingleton();
+    s->main_loop(argc,argv);
     return 0;
 
 }

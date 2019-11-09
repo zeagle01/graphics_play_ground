@@ -15,6 +15,20 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 
+#include "camara.h"
+#include "predef_types.h"
+
+
+std::shared_ptr<Scene> Scene::singleton = nullptr;
+std::shared_ptr<Scene> Scene::getSingleton() {
+
+	if (!singleton) {
+		singleton = std::make_shared<Scene>();
+	}
+	return singleton;
+
+
+}
 
 int Scene::get_vertex_num()const {
     return m_positions.size()/3;
@@ -45,11 +59,15 @@ void Scene::make_buffers(){
 
 }
 
+std::shared_ptr<camara_np::Camara> Scene::getCamara() {
+	return camara;
+}
+
 void Scene::init(int argc,char** argv){
     FLAGS_log_dir=".";
     google::InitGoogleLogging(argv[0]);
 
-    m_shader=new Shader("vertex.vs","fragment.frag");
+    //m_shader=new Shader("vertex.vs","fragment.frag");
 
 }
 
@@ -72,7 +90,8 @@ void Scene::init_from_config(const std::string& config_file){
     m_vertex_shader_file=current_config_dir+root["vertex_shader"].asString();
     m_fragment_shader_file=current_config_dir+root["fragment_shader"].asString();
 
-	m_shader = new Shader(m_vertex_shader_file, m_fragment_shader_file);
+	m_shader = std::make_shared<Shader>(m_vertex_shader_file, m_fragment_shader_file);
+	camara = std::make_shared<camara_np::Walking_Camara>();
 
     Mesh_Loader mesh_loader;
     mesh_loader.load_from_obj(m_mesh_file);
@@ -105,6 +124,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
 }
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+
+	auto scene=Scene::getSingleton();
+	auto camara = scene->getCamara();
+	camara->on_mouse_move(xpos, ypos);
+
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	
+	auto scene=Scene::getSingleton();
+	auto camara = scene->getCamara();
+	camara->mouse_click_handle(button, action, 0, 0);
+}
+
 
 void Scene::main_loop(int argc,char** argv){
 
@@ -156,6 +191,10 @@ void Scene::main_loop(int argc,char** argv){
 
     make_buffers();
 
+	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+
     glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
     while(!glfwWindowShouldClose(window)){
 
@@ -165,7 +204,37 @@ void Scene::main_loop(int argc,char** argv){
 
 		simulator->update(m_positions,  m_indices );
 
+
+		auto cam_pos = camara->cam_pos;
+		auto cam_front = camara->cam_front;
+		auto cam_up = camara->cam_up;
+
         m_shader->use();
+
+		GLuint var_loc;
+		m4f model;
+		model = m4f::Identity()*0.1;
+		var_loc = m_shader->get_uniform_variable("model");
+		glUniformMatrix4fv(var_loc, 1, GL_FALSE, model.data());
+
+		m4f view;
+//		view<< 1, 0, 0, 0.5,
+//				0, 1, 0, 0.5,
+//				0, 0, 1, 0,
+//				0, 0, 0, 1 ;
+
+		view = m4f::Identity();
+		view.block<3, 1>(0, 0)=((cam_front-cam_pos).cross(cam_up-cam_pos)).normalized();
+		view.block<3, 1>(0, 1)=(cam_front-cam_pos).normalized();
+		view.block<3, 1>(0, 2)=(cam_up-cam_pos).normalized();
+		var_loc = m_shader->get_uniform_variable("view");
+		glUniformMatrix4fv(var_loc, 1, GL_FALSE, view.data());
+
+		m4f projection=m4f::Identity();
+		//projection = glm::perspective(45.0f, GLfloat(Width) / GLfloat(Height), 0.1f, 100.0f);
+		var_loc = m_shader->get_uniform_variable("projection");
+		glUniformMatrix4fv(var_loc, 1, GL_FALSE, projection.data());
+
         glBindVertexArray(m_vao);
 
 		glBindBuffer(GL_ARRAY_BUFFER,m_vbo);

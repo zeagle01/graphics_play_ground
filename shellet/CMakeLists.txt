@@ -101,6 +101,3 @@ hunter_add_package(Eigen)
 find_package(Eigen3 CONFIG REQUIRED)
 target_link_libraries(shellet PUBLIC Eigen3::Eigen)
 
-hunter_add_package(Glm)
-find_package(glm CONFIG REQUIRED)
-target_link_libraries(shellet PUBLIC glm)
