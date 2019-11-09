@@ -23,7 +23,7 @@ void PD_Simulator::update(std::vector<float>& positions,std::vector<int>& triang
 	if (!simulation_data->velocities.data()) {
 		simulation_data->velocities=m3xf::Zero(3,vNum);
 	}
-	compute_guess_positions(simulation_data->positions, simulation_data->last_positions, simulation_data->velocities ,  simulation_data->mass,simulation_data->external_forces, simulation_data->dt);
+	compute_inertial_positions(simulation_data->positions, simulation_data->last_positions, simulation_data->velocities ,  simulation_data->mass,simulation_data->external_forces, simulation_data->dt);
 
 	//compute_edge_indices( simulation_data->triangle_indices);
 	compute_edge_constraints();
@@ -46,7 +46,7 @@ void PD_Simulator::external_force_init(m3xf& external_forces, const int vertexNu
 void PD_Simulator::apply_gravity(m3xf& external_forces, const vxf& mass, const v3f& gravity_acceleration) {
 	external_forces = gravity_acceleration * mass.transpose();
 }
-void PD_Simulator::compute_guess_positions(m3xf& guess_X, const m3xf& X, const m3xf& V, const vxf& mass, const m3xf& external_forces, const float dt) {
+void PD_Simulator::compute_inertial_positions(m3xf& guess_X, const m3xf& X, const m3xf& V, const vxf& mass, const m3xf& external_forces, const float dt) {
 		guess_X = X + dt * V + dt * dt * external_forces * mass.asDiagonal().inverse();
 
 		guess_X.col(0) = v3f(0, 0, 0);
