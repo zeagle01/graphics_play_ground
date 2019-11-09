@@ -82,8 +82,8 @@ void PD_Simulator::compute_edge_constraints() {
 		for (int ei = 0; ei < e_num; ei++) {
 			v2i ev = simulation_data->edge_indices.col(ei);
 			float w[]{ 1,-1 };
-			E_coefficients.push_back(eigen_triplet(ei, ev[0], w[0]));
-			E_coefficients.push_back(eigen_triplet(ei, ev[1], w[1]));
+			E_coefficients.push_back(eigen_triplet( ev[0],ei, w[0]));
+			E_coefficients.push_back(eigen_triplet( ev[1],ei, w[1]));
 		}
 		E.setFromTriplets(E_coefficients.begin(), E_coefficients.end());
 	}
