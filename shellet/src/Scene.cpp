@@ -120,9 +120,13 @@ void Scene::init_from_config(const std::string& config_file){
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     LOG(INFO)<<key;
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
-        glfwSetWindowShouldClose(window, GL_TRUE);
-    }
+
+	auto scene=Scene::getSingleton();
+	auto camara = scene->getCamara();
+	camara->key_handle(key, scancode, action, mode);
+//    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
+//        glfwSetWindowShouldClose(window, GL_TRUE);
+//    }
 }
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 
@@ -218,19 +222,32 @@ void Scene::main_loop(int argc,char** argv){
 		glUniformMatrix4fv(var_loc, 1, GL_FALSE, model.data());
 
 		m4f view;
-//		view<< 1, 0, 0, 0.5,
-//				0, 1, 0, 0.5,
-//				0, 0, 1, 0,
-//				0, 0, 0, 1 ;
-
-		view = m4f::Identity();
-		view.block<3, 1>(0, 0)=((cam_front-cam_pos).cross(cam_up-cam_pos)).normalized();
-		view.block<3, 1>(0, 1)=(cam_front-cam_pos).normalized();
-		view.block<3, 1>(0, 2)=(cam_up-cam_pos).normalized();
+		m4f view_rotate;
+		view_rotate = m4f::Identity();
+		view_rotate.block<1, 3>(0, 0)=cam_front.cross(cam_up);
+		view_rotate.block<1, 3>(1, 0)=cam_front;
+		view_rotate.block<1, 3>(2, 0)=cam_up;
+		m4f view_translate=m4f::Identity();
+		view_translate.block<3, 1>(0, 3)=-cam_pos;
+		view = view_rotate * view_translate;
 		var_loc = m_shader->get_uniform_variable("view");
 		glUniformMatrix4fv(var_loc, 1, GL_FALSE, view.data());
 
 		m4f projection=m4f::Identity();
+//		float n_abs =0.001 ,f_abs = 100,l=-1,r=1,t=1,b=-1;
+//		projection << 
+//			2*n_abs/(r-l), 0, r+l/r-l, 0,
+//			0, 2*n_abs/(t-b), (t+b)/(t-b), 0,
+//			0, 0, (n_abs+f_abs)/(n_abs-f_abs), -2*f_abs*n_abs/(n_abs-f_abs),
+//			0, 0, -1, 0 ;
+
+//		float n = -0.1, f = -10;
+//		projection <<
+//			n, 0, 0, 0,
+//			0, n, 0, 0,
+//			0, 0, n+f, -f*n,
+//			0, 0, 1, 0 ;
+
 		//projection = glm::perspective(45.0f, GLfloat(Width) / GLfloat(Height), 0.1f, 100.0f);
 		var_loc = m_shader->get_uniform_variable("projection");
 		glUniformMatrix4fv(var_loc, 1, GL_FALSE, projection.data());
