@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import solve
+from  Half_Edge import *
 
 
 
@@ -34,7 +35,8 @@ triangles_indices=np.array([
     ]
 ])
 
-
+topo=Half_Edge()
+topo.construct_from_triangles(3,triangles_indices.tolist())
 
 
 def point_in_triange(p,t):

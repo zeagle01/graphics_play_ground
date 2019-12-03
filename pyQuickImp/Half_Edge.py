@@ -43,6 +43,7 @@ class Half_Edge:
                     vvi=vv[ev[1]].index(ev[0])
                     hoi[tvi] = vhi[ev[1]][vvi]
                     hi[tvi] = self.get_opposite_h(hoi[tvi])
+                    self.ht[hi[tvi]]=ti
                 else:
                     self.hv.append(ev[1])
                     self.hv.append(ev[0])
@@ -72,6 +73,21 @@ class Half_Edge:
         e_num=len(ret)//2
         return np.reshape(ret,(e_num,2)).tolist()
 
+    def get_one_ring(self,v):
+        ret=[]
+        h=self.vh[v]
+        h0=h
+        while True:
+            ret.append(self.hv[h])
+            if self.ht[h]==-1:
+                break
+            h=self.hn[h]
+            h=self.hn[h]
+            h=self.get_opposite_h(h)
+            if h==h0:
+                break
+
+        return ret
 
 
 
@@ -92,6 +108,10 @@ class Half_Edge_Test(unittest.TestCase):
         self.assertTrue(np.array_equal(self.half_edge.get_edges(),[[1,0],[2,1],[0,2],[3,2],[0,3]]))
 
 
+    def test_one_ring(self):
+        self.half_edge.construct_from_triangles(4,[[0,1,2],[0,2,3]])
+        self.assertTrue(np.array_equal(self.half_edge.get_one_ring(0),[1,2,3]))
+        self.assertTrue(np.array_equal(self.half_edge.get_one_ring(1),[2,0]))
 
 
 
