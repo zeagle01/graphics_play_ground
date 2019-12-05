@@ -20,23 +20,14 @@ points=np.random.rand(16,2)
 
 M=np.max(points)
 
-triangles=np.array([
+bounding_triangles=np.array(
     [
         [3*M,0],
         [0, 3*M],
         [-3 * M, -3 * M],
     ]
-])
-triangles_indices=np.array([
-    [
-        0,
-        1,
-        2
-    ]
-])
+)
 
-topo=Half_Edge()
-topo.construct_from_triangles(3,triangles_indices.tolist())
 
 
 def point_in_triange(p,t):
@@ -83,33 +74,69 @@ def draw_triangles(ax,triangles):
         ax.plot(t_points[:,0],t_points[:,1],'grey')
     plt.pause(display_delay)
 
-for i,p in enumerate(points):
+def dummy_split():
+    for i,p in enumerate(points):
+        #plt.clf()
+        ax[0].clear()
+        ax[1].clear()
+        ax[0].scatter(p[0],p[1])
+        ti,t=find_triangle_point_reside(p,triangles)
+        draw_triangle(ax[0],t)
+        draw_triangles(ax[1],triangles)
+        draw_triangle(ax[1],t)
+        ax[1].scatter(points[0:i+1,0], points[0:i+1,1])
 
-    #plt.clf()
-    ax[0].clear()
-    ax[1].clear()
-    ax[0].scatter(p[0],p[1])
-    ti,t=find_triangle_point_reside(p,triangles)
-    draw_triangle(ax[0],t)
-    draw_triangles(ax[1],triangles)
-    draw_triangle(ax[1],t)
-    ax[1].scatter(points[0:i+1,0], points[0:i+1,1])
+        if(t is not None):
+            nt0=np.array([[p, t[0], t[1]]])
+            draw_triangle(ax[0], nt0[0])
+            nt1=np.array([[p, t[1], t[2]]])
+            draw_triangle(ax[0], nt1[0])
+            nt2=np.array([[p, t[2], t[0]]])
+            draw_triangle(ax[0], nt2[0])
+            triangles=np.concatenate((triangles,nt0))
+            triangles=np.concatenate((triangles,nt1))
+            triangles=np.concatenate((triangles,nt2))
+            triangles[ti]=None
 
-    if(t is not None):
-        nt0=np.array([[p, t[0], t[1]]])
-        draw_triangle(ax[0], nt0[0])
-        nt1=np.array([[p, t[1], t[2]]])
-        draw_triangle(ax[0], nt1[0])
-        nt2=np.array([[p, t[2], t[0]]])
-        draw_triangle(ax[0], nt2[0])
-        triangles=np.concatenate((triangles,nt0))
-        triangles=np.concatenate((triangles,nt1))
-        triangles=np.concatenate((triangles,nt2))
-        triangles[ti]=None
+def denauley_triangulate(X):
+    topo = Half_Edge()
+    TV0 = np.array([ [ 0, 1, 2 ] ])
+    topo.construct_from_triangles( TV0.tolist())
+
+    X = np.concatenate((bounding_triangles, X))
 
 
+    for xi in range(3,len(X)):
+        x=X[xi]
+        ax[0].clear()
+        ax[1].clear()
+        ax[0].scatter(x[0],x[1])
+        TV=np.array(topo.get_triangles())
+        ti,t=find_triangle_point_reside(x,X[TV])
+        draw_triangle(ax[0],t)
+        draw_triangles(ax[1],X[TV])
+        draw_triangle(ax[1],t)
+        ax[1].scatter(X[3:xi+1,0], X[3:xi+1,1])
+        if(t is not None):
+            #nt0=np.array([[x, t[0], t[1]]])
+            #draw_triangle(ax[0], nt0[0])
+            #nt1=np.array([[x, t[1], t[2]]])
+            #draw_triangle(ax[0], nt1[0])
+            #nt2=np.array([[x, t[2], t[0]]])
+            #draw_triangle(ax[0], nt2[0])
+            TV = np.array(topo.get_triangles())
+            v_new=topo.add_vertex_in_triangle(ti)
+            for tvi in range(3):
+                pass
+            legalize()
+            #TV[ti]
+            #triangles=np.concatenate((triangles,nt0))
+            #triangles=np.concatenate((triangles,nt1))
+            #triangles=np.concatenate((triangles,nt2))
+            #triangles[ti]=None
 
 
+denauley_triangulate(points)
 
 
 

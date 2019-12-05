@@ -9,6 +9,7 @@ class Half_Edge:
         self.ht = []
         self.vh = []
         self.th = []
+        self.TV=[]
 
     def get_opposite_h(self,hi):
         ei=hi//2
@@ -28,10 +29,12 @@ class Half_Edge:
                     break
 
 
-    def construct_from_triangles(self,v_num,TV):
-        self.vh=[-1]*v_num
-        vv = [[] for i in range(v_num)]
-        vhi = [[] for i in range(v_num)]
+    def construct_from_triangles(self,TV):
+        self.v_num=np.max(TV)+1
+        self.TV=TV
+        self.vh=[-1]*self.v_num
+        vv = [[] for i in range(self.v_num)]
+        vhi = [[] for i in range(self.v_num)]
         for ti,tv in enumerate(TV):
             hi = [-1] * 3
             hoi=[-1]*3
@@ -66,6 +69,38 @@ class Half_Edge:
 
         self.make_one_ring_begin()
 
+    def add_vertex_in_triangle(self,ti):
+
+        v_new=self.v_num
+        self.v_num+=1
+        h=self.th[ti]
+        h_num0=len(self.hv)
+        t_num0=len(self.TV)
+        h_next_i=[[] for i in range(3)]
+
+        for hi in range(3):
+            v0=self.hv[h]
+            v1=self.hv[self.get_opposite_h(h)]
+            self.TV.append([v1,v0,v_new])
+            self.hv.append(v_new)
+            self.hv.append(v0)
+            self.hn.append(-1)
+            self.hn.append(-1)
+            self.ht.append(t_num0+hi)
+            self.ht.append(t_num0+hi+1)
+            hi_pre=(hi+2)%3
+            h_next_i[hi]=[h,h_num0+hi*2,h_num0+hi_pre*2+1]
+
+            h=self.hn[h]
+        for hni in h_next_i:
+            for i in range(3):
+                i_next=(i+1)%3
+                self.hn[hni[i]]=hni[i_next]
+        return v_new
+
+    def get_triangles(self):
+        return self.TV
+
     def get_edges(self):
         ret=[]
         for v in self.hv:
@@ -97,21 +132,29 @@ class Half_Edge_Test(unittest.TestCase):
     def setUp(self) -> None :
         self.half_edge=Half_Edge()
 
-#    def test_edge_with_triangle(self):
-#        self.half_edge.construct_from_triangles(3,[[0,1,2]])
-#        act=self.half_edge.get_edges()
-#        exp=[[1,0],[2,1],[0,2]]
-#        self.assertTrue(np.array_equal(act,exp))
+    def test_edge_with_triangle(self):
+        self.half_edge.construct_from_triangles([[0,1,2]])
+        act=self.half_edge.get_edges()
+        exp=[[1,0],[2,1],[0,2]]
+        self.assertTrue(np.array_equal(act,exp))
 
     def test_edge_with_2by2_squre(self):
-        self.half_edge.construct_from_triangles(4,[[0,1,2],[0,2,3]])
+        self.half_edge.construct_from_triangles([[0,1,2],[0,2,3]])
         self.assertTrue(np.array_equal(self.half_edge.get_edges(),[[1,0],[2,1],[0,2],[3,2],[0,3]]))
 
 
     def test_one_ring(self):
-        self.half_edge.construct_from_triangles(4,[[0,1,2],[0,2,3]])
+        self.half_edge.construct_from_triangles([[0,1,2],[0,2,3]])
         self.assertTrue(np.array_equal(self.half_edge.get_one_ring(0),[1,2,3]))
         self.assertTrue(np.array_equal(self.half_edge.get_one_ring(1),[2,0]))
+
+    def test_insert_vertex_in_triangle(self):
+        self.half_edge.construct_from_triangles([[0,1,2]])
+        self.half_edge.add_vertex_in_triangle(0)
+        self.assertTrue(np.array_equal(self.half_edge.get_one_ring(0),[1,3,2]))
+        self.assertTrue(np.array_equal(self.half_edge.get_one_ring(1),[2,3,0]))
+        self.assertTrue(np.array_equal(self.half_edge.get_one_ring(2),[0,3,1]))
+
 
 
 
