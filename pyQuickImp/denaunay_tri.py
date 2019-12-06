@@ -98,6 +98,13 @@ def dummy_split():
             triangles=np.concatenate((triangles,nt2))
             triangles[ti]=None
 
+
+def  legalize(topo,v_new,vi,vj):
+    h=topo.vh[vi]
+    ho=topo.get_opposite_h(h)
+    t_neighbor=topo.ht[ho]
+
+
 def denauley_triangulate(X):
     topo = Half_Edge()
     TV0 = np.array([ [ 0, 1, 2 ] ])
@@ -124,11 +131,12 @@ def denauley_triangulate(X):
             #draw_triangle(ax[0], nt1[0])
             #nt2=np.array([[x, t[2], t[0]]])
             #draw_triangle(ax[0], nt2[0])
-            TV = np.array(topo.get_triangles())
             v_new=topo.add_vertex_in_triangle(ti)
+            TV = np.array(topo.get_triangles())
             for tvi in range(3):
-                pass
-            legalize()
+                tvi_next=(tvi+1)%3
+                tv=TV[ti]
+                legalize(topo,v_new,tv[tvi],tv[tvi_next])
             #TV[ti]
             #triangles=np.concatenate((triangles,nt0))
             #triangles=np.concatenate((triangles,nt1))
