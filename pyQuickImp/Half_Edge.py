@@ -10,6 +10,8 @@ class Half_Edge:
         self.vh = []
         self.th = []
         self.TV=[]
+        self.t_deleted=[]
+        self.v_deleted=[]
 
     def get_opposite_h(self,hi):
         ei=hi//2
@@ -32,6 +34,7 @@ class Half_Edge:
     def construct_from_triangles(self,TV):
         self.v_num=np.max(TV)+1
         self.TV=TV
+        self.t_deleted=[False]*len(self.TV)
         self.vh=[-1]*self.v_num
         vv = [[] for i in range(self.v_num)]
         vhi = [[] for i in range(self.v_num)]
@@ -78,10 +81,12 @@ class Half_Edge:
         t_num0=len(self.TV)
         h_next_i=[[] for i in range(3)]
 
+        self.t_deleted[t_num0-1]=True
         for hi in range(3):
             v0=self.hv[h]
             v1=self.hv[self.get_opposite_h(h)]
             self.TV.append([v1,v0,v_new])
+            self.t_deleted.append(False)
             self.hv.append(v_new)
             self.hv.append(v0)
             self.hn.append(-1)
@@ -90,16 +95,34 @@ class Half_Edge:
             self.ht.append(t_num0+hi+1)
             hi_pre=(hi+2)%3
             h_next_i[hi]=[h,h_num0+hi*2,h_num0+hi_pre*2+1]
+            self.th.append(h_num0+hi*2)
 
             h=self.hn[h]
         for hni in h_next_i:
             for i in range(3):
                 i_next=(i+1)%3
                 self.hn[hni[i]]=hni[i_next]
+        self.vh.append(h_next_i[0][2])
         return v_new
 
+
+
     def get_triangles(self):
+        ret=[]
+        for ti,t in enumerate(self.TV):
+            if not self.t_deleted[ti]:
+                ret.append(t)
+        return ret
+
+    def get_all_triangles(self):
         return self.TV
+
+
+    def get_triangle_vetex(self,ti):
+        if ti<0:
+            return -1
+        else:
+            return self.TV[ti]
 
     def get_edges(self):
         ret=[]

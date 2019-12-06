@@ -7,6 +7,7 @@ from  Half_Edge import *
 
 
 display_delay=0.005
+np.random.seed(0)
 points=np.random.rand(16,2)
 
 #n=[2,2]
@@ -50,8 +51,10 @@ def point_in_triange(p,t):
 
 
 
-def find_triangle_point_reside(p,triangles):
+def find_triangle_point_reside(p,triangles,is_deleted):
     for ti,t in enumerate(triangles):
+        if is_deleted[ti]:
+            continue
         isNun=np.any(np.isnan(t))
         if not isNun and point_in_triange(p,t):
             return ti,t
@@ -99,10 +102,40 @@ def dummy_split():
             triangles[ti]=None
 
 
-def  legalize(topo,v_new,vi,vj):
+def need_flip(X,v_new,vi,vj,opposite_v):
+    A=np.array([
+        [X[v_new][0],X[v_new][1],X[v_new][0]**2+X[v_new][1]**2,1],
+        [X[vi][0], X[vi][1], X[vi][0] ** 2 + X[vi][1] ** 2, 1],
+        [X[vj][0], X[vj][1], X[vj][0] ** 2 + X[vj][1] ** 2, 1],
+        [X[opposite_v][0], X[opposite_v][1], X[opposite_v][0] ** 2 + X[opposite_v][1] ** 2, 1],
+    ]
+    )
+
+    det_A=np.linalg.det(A)
+    if det_A>0:
+        return False
+    else :
+        return True
+
+
+def  legalize(X,topo,v_new,vi,vj):
     h=topo.vh[vi]
     ho=topo.get_opposite_h(h)
     t_neighbor=topo.ht[ho]
+    neighbor_tv=topo.get_triangle_vetex(t_neighbor)
+    if neighbor_tv==-1:
+        return
+    opposite_v=neighbor_tv[0]+neighbor_tv[1]+neighbor_tv[2]-vi-vj
+    if need_flip(X,v_new,vi,vj,opposite_v):
+        #topo.flip_edge(vi,vj,v_new,opposite_v)
+        legalize(X,topo, v_new, vi, opposite_v)
+        legalize(X,topo, v_new, vj, opposite_v)
+
+
+
+
+
+
 
 
 def denauley_triangulate(X):
@@ -118,8 +151,8 @@ def denauley_triangulate(X):
         ax[0].clear()
         ax[1].clear()
         ax[0].scatter(x[0],x[1])
-        TV=np.array(topo.get_triangles())
-        ti,t=find_triangle_point_reside(x,X[TV])
+        TV=np.array(topo.get_all_triangles())
+        ti,t=find_triangle_point_reside(x,X[TV],topo.t_deleted)
         draw_triangle(ax[0],t)
         draw_triangles(ax[1],X[TV])
         draw_triangle(ax[1],t)
@@ -132,11 +165,17 @@ def denauley_triangulate(X):
             #nt2=np.array([[x, t[2], t[0]]])
             #draw_triangle(ax[0], nt2[0])
             v_new=topo.add_vertex_in_triangle(ti)
-            TV = np.array(topo.get_triangles())
+            h=topo.vh[v_new]
             for tvi in range(3):
-                tvi_next=(tvi+1)%3
-                tv=TV[ti]
-                legalize(topo,v_new,tv[tvi],tv[tvi_next])
+                hi=h
+                vi=topo.hv[hi]
+                hj=topo.get_opposite_h(h)
+                hj=topo.hn[hj]
+                vj=topo.hv[hj]
+                legalize(X,topo,v_new,vi,vj)
+                h = topo.hn[h]
+                h = topo.hn[h]
+                h= topo.get_opposite_h(h)
             #TV[ti]
             #triangles=np.concatenate((triangles,nt0))
             #triangles=np.concatenate((triangles,nt1))
