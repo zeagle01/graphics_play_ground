@@ -108,6 +108,32 @@ class Half_Edge:
         self.vh.append(h_next_i[0][2])
         return v_new
 
+    def flip_edge(self,v_from0,v_from1,v_to0,v_to1):
+        t0_h=[0]*3;
+        t1_h=[0]*3;
+        t0_h0=self.get_h(v_from0,v_from1)
+        t1_h0=self.get_h(v_from1,v_from0)
+
+        t0=self.ht[t0_h0]
+        t1=self.ht[t1_h0]
+        self.t_deleted[t0]=True
+        self.t_deleted[t1]=True
+
+        t0_h[0]=t0_h0;
+        t0_h[1]=self.hn[t0_h[0]]
+        t0_h[2]=self.hn[t0_h[1]]
+
+        t1_h[0]=t1_h0;
+        t1_h[1]=self.hn[t1_h[0]]
+        t1_h[2]=self.hn[t1_h[1]]
+
+        new_hn0=[t1_h[0],t1_h[2],t0_h[1]]
+        new_hn1=[t0_h[0],t0_h[2],t1_h[1]]
+        for i in range(3):
+            i_next=(i+1)%3
+            self.hn[new_hn0[i]]=new_hn0[i_next]
+            self.hn[new_hn1[i]]=new_hn1[i_next]
+
 
 
     def get_triangles(self):

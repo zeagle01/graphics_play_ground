@@ -111,6 +111,18 @@ def need_flip(X,v_new,vi,vj,opposite_v):
     ]
     )
 
+    if vi<=2 and  vj >2:
+        return True
+    elif vj<=2 and vi>2:
+        return True
+    elif opposite_v<=2 and vi>2 and vj>2:
+        return False
+    elif opposite_v<2:
+        return False
+    if vi <opposite_v and vj< opposite_v:
+        return False
+
+
     det_A=np.linalg.det(A)
     if det_A>0:
         return False
@@ -139,7 +151,7 @@ def  legalize(ax,X,topo,v_new,vi,vj):
     draw_triangle(ax,X[neighbor_tv],[0,1,0,1])
     opposite_v=neighbor_tv[0]+neighbor_tv[1]+neighbor_tv[2]-vi-vj
     if need_flip(X,v_new,vi,vj,opposite_v):
-        #topo.flip_edge(vi,vj,v_new,opposite_v)
+        topo.flip_edge(vi,vj,v_new,opposite_v)
         legalize(ax,X,topo, v_new, vi, opposite_v)
         legalize(ax,X,topo, v_new, vj, opposite_v)
 
