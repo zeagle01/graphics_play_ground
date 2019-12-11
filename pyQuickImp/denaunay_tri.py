@@ -61,20 +61,20 @@ def find_triangle_point_reside(p,triangles,is_deleted):
     return (-1,None)
 
 
-fig1,ax=plt.subplots(2,2)
+fig1,ax=plt.subplots(1,1)
 ax=np.array(ax)
 ax=ax.reshape(-1)
 
 
-def draw_triangle(ax,t):
+def draw_triangle(ax,t,color):
     t_points=np.array([t[0],t[1],t[2],t[0]])
-    ax.plot(t_points[:,0],t_points[:,1],'black')
+    ax.plot(t_points[:,0],t_points[:,1],color=color)
     plt.pause(display_delay)
 
-def draw_triangles(ax,triangles):
+def draw_triangles(ax,triangles,color):
     for t in triangles:
         t_points=np.array([t[0],t[1],t[2],t[0]])
-        ax.plot(t_points[:,0],t_points[:,1],'grey')
+        ax.plot(t_points[:,0],t_points[:,1],color=color)
     plt.pause(display_delay)
 
 def dummy_split():
@@ -118,18 +118,30 @@ def need_flip(X,v_new,vi,vj,opposite_v):
         return True
 
 
-def  legalize(X,topo,v_new,vi,vj):
-    h=topo.vh[vi]
+def  legalize(ax,X,topo,v_new,vi,vj):
+
+    TV=topo.get_all_triangles()
+    ti=[v_new,vi,vj]
+    draw_triangle(ax,X[ti],[0,0,1,1])
+
+    vij=(vi,vj)
+    ax.plot(X[vij,0],X[vij,1],color=[1,0,0,1])
+    plt.pause(display_delay)
+    h=topo.get_h(vj,vi)
+    if h is None:
+        return
     ho=topo.get_opposite_h(h)
     t_neighbor=topo.ht[ho]
     neighbor_tv=topo.get_triangle_vetex(t_neighbor)
-    if neighbor_tv==-1:
+    if neighbor_tv is None:
         return
+    TV=topo.get_all_triangles()
+    draw_triangle(ax,X[neighbor_tv],[0,1,0,1])
     opposite_v=neighbor_tv[0]+neighbor_tv[1]+neighbor_tv[2]-vi-vj
     if need_flip(X,v_new,vi,vj,opposite_v):
         #topo.flip_edge(vi,vj,v_new,opposite_v)
-        legalize(X,topo, v_new, vi, opposite_v)
-        legalize(X,topo, v_new, vj, opposite_v)
+        legalize(ax,X,topo, v_new, vi, opposite_v)
+        legalize(ax,X,topo, v_new, vj, opposite_v)
 
 
 
@@ -145,18 +157,26 @@ def denauley_triangulate(X):
 
     X = np.concatenate((bounding_triangles, X))
 
+    #draw_triangles(ax[2], X[TV0])
+    #ax[2].scatter(X[:,0],X[:,1])
+    #ax[2].text(-0.1,-0.1,'$P$')
 
     for xi in range(3,len(X)):
         x=X[xi]
         ax[0].clear()
-        ax[1].clear()
-        ax[0].scatter(x[0],x[1])
+        #ax[1].clear()
+
+        ax[0].scatter(X[:, 0], X[:, 1],color='grey')
+        ax[0].text(-0.1, -0.1, '$P$')
+        ax[0].scatter(x[0],x[1],color='red')
+        ax[0].text(x[0],x[1],'$p_r$')
         TV=np.array(topo.get_all_triangles())
+        draw_triangles(ax[0], X[TV],'grey')
         ti,t=find_triangle_point_reside(x,X[TV],topo.t_deleted)
-        draw_triangle(ax[0],t)
-        draw_triangles(ax[1],X[TV])
-        draw_triangle(ax[1],t)
-        ax[1].scatter(X[3:xi+1,0], X[3:xi+1,1])
+        draw_triangle(ax[0],t,'black')
+        #draw_triangles(ax[1],X[TV])
+        #draw_triangle(ax[1],t)
+        #ax[1].scatter(X[3:xi+1,0], X[3:xi+1,1])
         if(t is not None):
             #nt0=np.array([[x, t[0], t[1]]])
             #draw_triangle(ax[0], nt0[0])
@@ -172,15 +192,10 @@ def denauley_triangulate(X):
                 hj=topo.get_opposite_h(h)
                 hj=topo.hn[hj]
                 vj=topo.hv[hj]
-                legalize(X,topo,v_new,vi,vj)
+                legalize(ax[0],X,topo,v_new,vi,vj)
                 h = topo.hn[h]
                 h = topo.hn[h]
                 h= topo.get_opposite_h(h)
-            #TV[ti]
-            #triangles=np.concatenate((triangles,nt0))
-            #triangles=np.concatenate((triangles,nt1))
-            #triangles=np.concatenate((triangles,nt2))
-            #triangles[ti]=None
 
 
 denauley_triangulate(points)

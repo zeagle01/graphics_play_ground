@@ -83,6 +83,9 @@ class Half_Edge:
 
         self.t_deleted[t_num0-1]=True
         for hi in range(3):
+
+            hi_pre=(hi+2)%3
+            hi_next=(hi+1)%3
             v0=self.hv[h]
             v1=self.hv[self.get_opposite_h(h)]
             self.TV.append([v1,v0,v_new])
@@ -92,8 +95,8 @@ class Half_Edge:
             self.hn.append(-1)
             self.hn.append(-1)
             self.ht.append(t_num0+hi)
-            self.ht.append(t_num0+hi+1)
-            hi_pre=(hi+2)%3
+            self.ht.append(t_num0+hi_next)
+            self.ht[h]=t_num0+hi;
             h_next_i[hi]=[h,h_num0+hi*2,h_num0+hi_pre*2+1]
             self.th.append(h_num0+hi*2)
 
@@ -120,7 +123,7 @@ class Half_Edge:
 
     def get_triangle_vetex(self,ti):
         if ti<0:
-            return -1
+            return None
         else:
             return self.TV[ti]
 
@@ -130,6 +133,22 @@ class Half_Edge:
             ret.append(v)
         e_num=len(ret)//2
         return np.reshape(ret,(e_num,2)).tolist()
+
+    def get_h(self,v_from,v_to):
+        h=self.vh[v_from]
+        h0=h
+        while True:
+            if self.hv[h]==v_to:
+                return h
+            if self.ht[h]==-1:
+                break
+            h=self.hn[h]
+            h=self.hn[h]
+            h=self.get_opposite_h(h)
+            if h==h0:
+                break
+        return None
+
 
     def get_one_ring(self,v):
         ret=[]
