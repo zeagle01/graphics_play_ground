@@ -1,4 +1,3 @@
-import unittest
 import numpy as np
 
 
@@ -135,6 +134,16 @@ class Half_Edge:
         t0_h0=self.get_h(v_from0,v_from1)
         t1_h0=self.get_h(v_from1,v_from0)
 
+        if self.vh[v_from0]==t0_h0:
+            h=self.get_opposite_h(t0_h0)
+            h=self.hn[h]
+            self.vh[v_from0]=h
+
+        if self.vh[v_from1]==t1_h0:
+            h=self.get_opposite_h(t1_h0)
+            h=self.hn[h]
+            self.vh[v_from1]=h
+
         t_num0=len(self.TV)
 
         self.flip_edge_adjust_hv(t0_h0,t1_h0,v_from0,v_from1,v_to0,v_to1)
@@ -159,6 +168,8 @@ class Half_Edge:
             i_next=(i+1)%3
             self.hn[new_hn0[i]]=new_hn0[i_next]
             self.hn[new_hn1[i]]=new_hn1[i_next]
+            self.ht[new_hn0[i]]=t_num0
+            self.ht[new_hn1[i]]=t_num0+1
 
 
 
@@ -171,6 +182,32 @@ class Half_Edge:
 
     def get_all_triangles(self):
         return self.TV
+
+    def subtract_vertex_from_triangle(self,t,v0,v1):
+        v=self.TV[t][0]
+        +self.TV[t][1]
+        +self.TV[t][2]
+        -v0-v1
+        return v
+
+
+    def get_triangle_by_vertex(self,v0,v1,v2):
+        h=self.get_h(v0,v1)
+        t=self.ht[h]
+#        tv=self.TV[t]
+#        tv_to_find=[v0,v1,v2]
+#        found=np.array_equal(tv.sort(),tv_to_find.sort())
+#        if found:
+#            return t
+#        else:
+#            return None
+        other_v=self.subtract_vertex_from_triangle(t,v0,v1)
+        if other_v==v2:
+            return t
+        else:
+            return self.ht[self.get_opposite_h(h)]
+
+
 
     def get_neighbor_triangle(self,t,v0,v1):
         h=self.get_h(v0,v1)

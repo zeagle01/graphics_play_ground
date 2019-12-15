@@ -1,13 +1,8 @@
+import unittest
 from Half_Edge import *
+from container_assert_helpers import  *
 
 
-def assertArrayEquals(testCase,act_arr,exp_arr):
-    testCase.assertTrue(np.array_equal(act_arr,exp_arr))
-
-def assertArrayEqualsUnordedly(testCase,act_arr,exp_arr):
-    unorder_act_arr=act_arr.sort()
-    unorder_exp_arr=exp_arr.sort()
-    testCase.assertTrue(np.array_equal(unorder_act_arr,unorder_exp_arr))
 
 
 class Half_Edge_With_One_Triangle_Test(unittest.TestCase):
@@ -64,6 +59,30 @@ class Half_Edge_With_2by2_Square_Flip_Test(unittest.TestCase):
         self.assertEqual(self.half_edge.get_neighbor_triangle(3,1,3),2)
 
 
+    def test_one_ring(self):
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(0), [1,3])
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(1), [0,2,3])
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(2), [1,3])
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(3), [0,1,2])
+
+class Half_Edge_Add_Vertex_To_Triangle_Test(unittest.TestCase):
+    def setUp(self) -> None :
+        self.half_edge=Half_Edge()
+        self.half_edge.construct_from_triangles([[0,1,2]])
+        self.half_edge.add_vertex_in_triangle(0)
+
+    def test_edge(self):
+        assertArrayEquals(self,self.half_edge.get_edges(),[[1,0],[2,1],[0,2],[3,1],[3,2],[3,0]])
+
+    def test_trianlge(self):
+        assertArrayEquals(self,self.half_edge.get_triangles(),[[0,1,3],[1,2,3],[2,0,3]])
+
+
+    def test_one_ring(self):
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(0), [1,2,3])
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(1), [0,2,3])
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(2), [0,1,3])
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(3), [0,1,2])
 
 
 
