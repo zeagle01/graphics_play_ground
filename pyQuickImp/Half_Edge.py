@@ -196,35 +196,3 @@ class Half_Edge:
 
 
 
-class Half_Edge_Test(unittest.TestCase):
-    def setUp(self) -> None :
-        self.half_edge=Half_Edge()
-
-    def test_edge_with_triangle(self):
-        self.half_edge.construct_from_triangles([[0,1,2]])
-        act=self.half_edge.get_edges()
-        exp=[[1,0],[2,1],[0,2]]
-        self.assertTrue(np.array_equal(act,exp))
-
-    def test_edge_with_2by2_squre(self):
-        self.half_edge.construct_from_triangles([[0,1,2],[0,2,3]])
-        self.assertTrue(np.array_equal(self.half_edge.get_edges(),[[1,0],[2,1],[0,2],[3,2],[0,3]]))
-
-
-    def test_one_ring(self):
-        self.half_edge.construct_from_triangles([[0,1,2],[0,2,3]])
-        self.assertTrue(np.array_equal(self.half_edge.get_one_ring(0),[1,2,3]))
-        self.assertTrue(np.array_equal(self.half_edge.get_one_ring(1),[2,0]))
-
-    def test_insert_vertex_in_triangle(self):
-        self.half_edge.construct_from_triangles([[0,1,2]])
-        self.half_edge.add_vertex_in_triangle(0)
-        self.assertTrue(np.array_equal(self.half_edge.get_one_ring(0),[1,3,2]))
-        self.assertTrue(np.array_equal(self.half_edge.get_one_ring(1),[2,3,0]))
-        self.assertTrue(np.array_equal(self.half_edge.get_one_ring(2),[0,3,1]))
-
-
-
-
-if __name__ == '__main__':
-    unittest.main()

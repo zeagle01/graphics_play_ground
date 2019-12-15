@@ -1,0 +1,52 @@
+from Half_Edge import *
+
+
+def assertArrayEquals(testCase,act_arr,exp_arr):
+    testCase.assertTrue(np.array_equal(act_arr,exp_arr))
+
+def assertArrayEqualsUnordedly(testCase,act_arr,exp_arr):
+    unorder_act_arr=act_arr.sort()
+    unorder_exp_arr=exp_arr.sort()
+    testCase.assertTrue(np.array_equal(unorder_act_arr,unorder_exp_arr))
+
+
+class Half_Edge_With_One_Triangle_Test(unittest.TestCase):
+    def setUp(self) -> None :
+        self.half_edge=Half_Edge()
+        self.half_edge.construct_from_triangles([[0,1,2]])
+
+    def test_edge(self):
+        act=self.half_edge.get_edges()
+        exp=[[1,0],[2,1],[0,2]]
+        assertArrayEquals(self,act,exp)
+
+
+    def test_insert_vertex_in_triangle(self):
+        self.half_edge.add_vertex_in_triangle(0)
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(0), [1,2,3])
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(1), [0,2,3])
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(2), [0,1,3])
+
+
+class Half_Edge_With_2by2_Square_Test(unittest.TestCase):
+    def setUp(self) -> None :
+        self.half_edge=Half_Edge()
+        self.half_edge.construct_from_triangles([[0,1,2],[0,2,3]])
+
+
+    def test_edge_with_2by2_squre(self):
+        assertArrayEquals(self,self.half_edge.get_edges(),[[1,0],[2,1],[0,2],[3,2],[0,3]])
+
+
+    def test_one_ring(self):
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(0), [1,2,3])
+        assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(1), [0,2])
+
+
+    def test_flip_edge(self):
+        self.half_edge.flip_edge(0,2,1,3)
+
+
+
+if __name__ == '__main__':
+    unittest.main()
