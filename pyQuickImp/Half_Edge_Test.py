@@ -47,6 +47,25 @@ class Half_Edge_With_2by2_Square_Test(unittest.TestCase):
         self.half_edge.flip_edge(0,2,1,3)
 
 
+class Half_Edge_With_2by2_Square_Flip_Test(unittest.TestCase):
+    def setUp(self) -> None :
+        self.half_edge=Half_Edge()
+        self.half_edge.construct_from_triangles([[0,1,2],[0,2,3]])
+        self.half_edge.flip_edge(0, 2, 1, 3)
+
+    def test_edge(self):
+        assertArrayEquals(self,self.half_edge.get_edges(),[[1,0],[2,1],[1,3],[3,2],[0,3]])
+
+    def test_trianlge(self):
+        assertArrayEquals(self,self.half_edge.get_triangles(),[[0,1,3],[2,3,1]])
+
+    def test_neighbor_triangle(self):
+        self.assertEqual(self.half_edge.get_neighbor_triangle(2,1,3),3)
+        self.assertEqual(self.half_edge.get_neighbor_triangle(3,1,3),2)
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

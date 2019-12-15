@@ -108,16 +108,42 @@ class Half_Edge:
         self.vh.append(h_next_i[0][2])
         return v_new
 
-    def flip_edge(self,v_from0,v_from1,v_to0,v_to1):
-        t0_h=[0]*3;
-        t1_h=[0]*3;
-        t0_h0=self.get_h(v_from0,v_from1)
-        t1_h0=self.get_h(v_from1,v_from0)
 
+    def flip_edge_adjust_hv(self,t0_h0,t1_h0,v_from0,v_from1,v_to0,v_to1):
+        self.hv[t0_h0]=v_to1
+        self.hv[t1_h0]=v_to0
+
+    def flip_edge_adjust_trianlge(self,t0_h0,t1_h0,v_from0,v_from1,v_to0,v_to1):
         t0=self.ht[t0_h0]
         t1=self.ht[t1_h0]
         self.t_deleted[t0]=True
         self.t_deleted[t1]=True
+        self.TV.append([v_from0,v_to0,v_to1])
+        self.TV.append([v_from1,v_to1,v_to0])
+        self.t_deleted.append(False)
+        self.t_deleted.append(False)
+
+
+    def flip_edge_adjust_ht(self,t0_h0,t1_h0,t0,t1):
+        self.ht[t0_h0]=t0
+        self.ht[t1_h0]=t1
+
+    def flip_edge(self,v_from0,v_from1,v_to0,v_to1):
+        t0_h=[0]*3;
+        t1_h=[0]*3;
+
+        t0_h0=self.get_h(v_from0,v_from1)
+        t1_h0=self.get_h(v_from1,v_from0)
+
+        t_num0=len(self.TV)
+
+        self.flip_edge_adjust_hv(t0_h0,t1_h0,v_from0,v_from1,v_to0,v_to1)
+
+        self.flip_edge_adjust_trianlge(t0_h0,t1_h0,v_from0,v_from1,v_to0,v_to1)
+
+        self.flip_edge_adjust_ht(t0_h0,t1_h0,t_num0,t_num0+1)
+
+
 
         t0_h[0]=t0_h0;
         t0_h[1]=self.hn[t0_h[0]]
@@ -146,6 +172,12 @@ class Half_Edge:
     def get_all_triangles(self):
         return self.TV
 
+    def get_neighbor_triangle(self,t,v0,v1):
+        h=self.get_h(v0,v1)
+        if self.ht[h]==t:
+            return self.ht[self.get_opposite_h(h)]
+        else:
+            return self.ht[h]
 
     def get_triangle_vetex(self,ti):
         if ti<0:
