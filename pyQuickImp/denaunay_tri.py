@@ -216,8 +216,10 @@ def denauley_triangulate(X):
 
         draw_point_index(ax[0], X[0:xi+1])
 
+        TV_exist=np.array(topo.get_triangles())
+        draw_triangles(ax[0], X[TV_exist],'grey')
+
         TV=np.array(topo.get_all_triangles())
-        draw_triangles(ax[0], X[TV],'grey')
         ti,t=find_triangle_point_reside(x,X[TV],topo.t_deleted)
         draw_triangle(ax[0],t,cg.get_next_color())
         if(t is not None):

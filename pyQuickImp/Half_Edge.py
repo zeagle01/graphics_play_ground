@@ -75,14 +75,19 @@ class Half_Edge:
 
         v_new=self.v_num
         self.v_num+=1
-        h=self.th[ti]
+        th=[]
+        th.append(self.th[ti])
+        th.append(self.hn[th[0]])
+        th.append(self.hn[th[1]])
+
         h_num0=len(self.hv)
         t_num0=len(self.TV)
         h_next_i=[[] for i in range(3)]
 
-        self.t_deleted[t_num0-1]=True
+        self.t_deleted[ti]=True
         for hi in range(3):
 
+            h=th[hi]
             hi_pre=(hi+2)%3
             hi_next=(hi+1)%3
             v0=self.hv[h]
@@ -99,7 +104,7 @@ class Half_Edge:
             h_next_i[hi]=[h,h_num0+hi*2,h_num0+hi_pre*2+1]
             self.th.append(h_num0+hi*2)
 
-            h=self.hn[h]
+            #h=self.hn[h]
         for hni in h_next_i:
             for i in range(3):
                 i_next=(i+1)%3
@@ -119,6 +124,8 @@ class Half_Edge:
         self.t_deleted[t1]=True
         self.TV.append([v_from0,v_to0,v_to1])
         self.TV.append([v_from1,v_to1,v_to0])
+        self.th.append(t0_h0)
+        self.th.append(t1_h0)
         self.t_deleted.append(False)
         self.t_deleted.append(False)
 
@@ -144,6 +151,14 @@ class Half_Edge:
             h=self.hn[h]
             self.vh[v_from1]=h
 
+        t0_h[0]=t0_h0;
+        t0_h[1]=self.hn[t0_h[0]]
+        t0_h[2]=self.hn[t0_h[1]]
+
+        t1_h[0]=t1_h0;
+        t1_h[1]=self.hn[t1_h[0]]
+        t1_h[2]=self.hn[t1_h[1]]
+
         t_num0=len(self.TV)
 
         self.flip_edge_adjust_hv(t0_h0,t1_h0,v_from0,v_from1,v_to0,v_to1)
@@ -154,13 +169,6 @@ class Half_Edge:
 
 
 
-        t0_h[0]=t0_h0;
-        t0_h[1]=self.hn[t0_h[0]]
-        t0_h[2]=self.hn[t0_h[1]]
-
-        t1_h[0]=t1_h0;
-        t1_h[1]=self.hn[t1_h[0]]
-        t1_h[2]=self.hn[t1_h[1]]
 
         new_hn0=[t1_h[0],t1_h[2],t0_h[1]]
         new_hn1=[t0_h[0],t0_h[2],t1_h[1]]
@@ -168,8 +176,8 @@ class Half_Edge:
             i_next=(i+1)%3
             self.hn[new_hn0[i]]=new_hn0[i_next]
             self.hn[new_hn1[i]]=new_hn1[i_next]
-            self.ht[new_hn0[i]]=t_num0
-            self.ht[new_hn1[i]]=t_num0+1
+            self.ht[new_hn0[i]]=t_num0+1
+            self.ht[new_hn1[i]]=t_num0
 
 
 
@@ -184,10 +192,7 @@ class Half_Edge:
         return self.TV
 
     def subtract_vertex_from_triangle(self,t,v0,v1):
-        v=self.TV[t][0]
-        +self.TV[t][1]
-        +self.TV[t][2]
-        -v0-v1
+        v=self.TV[t][0] +self.TV[t][1] +self.TV[t][2] -v0-v1
         return v
 
 
