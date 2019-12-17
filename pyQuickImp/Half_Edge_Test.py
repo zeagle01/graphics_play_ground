@@ -65,6 +65,10 @@ class Half_Edge_With_2by2_Square_Flip_Test(unittest.TestCase):
         assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(2), [1,3])
         assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(3), [0,1,2])
 
+    def test_neighbor_triangle(self):
+        self.assertEqual(self.half_edge.get_neighbor_triangle(2,1,3),3)
+        self.assertEqual(self.half_edge.get_neighbor_triangle(3,1,3),2)
+
 class Half_Edge_Add_Vertex_To_Triangle_Test(unittest.TestCase):
     def setUp(self) -> None :
         self.half_edge=Half_Edge()
@@ -83,6 +87,11 @@ class Half_Edge_Add_Vertex_To_Triangle_Test(unittest.TestCase):
         assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(1), [0,2,3])
         assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(2), [0,1,3])
         assertArrayEqualsUnordedly(self, self.half_edge.get_one_ring(3), [0,1,2])
+
+    def test_neighbor_triangle(self):
+        self.assertEqual(self.half_edge.get_neighbor_triangle(1,1,3),2)
+        self.assertEqual(self.half_edge.get_neighbor_triangle(2,2,3),3)
+        self.assertEqual(self.half_edge.get_neighbor_triangle(3,3,0),1)
 
 
 
