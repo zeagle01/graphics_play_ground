@@ -17,17 +17,28 @@ class Half_Edge:
         pos=hi%2
         return ei*2+(pos+1)%2;
 
+    def make_one_ring_begin_by_vertex(self,v):
+        h=self.vh[v]
+        h0 = h
+        while True:
+            h = self.get_opposite_h(h)
+            if self.ht[h] == -1:
+                break
+            h = self.hn[h]
+            if h == h0:
+                break
 
     def make_one_ring_begin(self):
-        for h in self.vh:
-            h0=h
-            while True:
-                h=self.get_opposite_h(h)
-                if self.ht[h]==-1:
-                    break
-                h=self.hn[h]
-                if h==h0:
-                    break
+        for vi,h in enumerate(self.vh):
+            self.make_one_ring_begin_by_vertex( vi)
+            #h0=h
+            #while True:
+            #    h=self.get_opposite_h(h)
+            #    if self.ht[h]==-1:
+            #        break
+            #    h=self.hn[h]
+            #    if h==h0:
+            #        break
 
 
     def construct_from_triangles(self,TV):
@@ -110,6 +121,14 @@ class Half_Edge:
                 i_next=(i+1)%3
                 self.hn[hni[i]]=hni[i_next]
         self.vh.append(h_next_i[0][2])
+
+        #self.make_one_ring_begin_by_vertex(v_new)
+        tv=self.TV[ti]
+        self.make_one_ring_begin_by_vertex(v_new)
+        self.make_one_ring_begin_by_vertex(tv[0])
+        self.make_one_ring_begin_by_vertex(tv[1])
+        self.make_one_ring_begin_by_vertex(tv[2])
+
         return v_new
 
 
@@ -178,6 +197,12 @@ class Half_Edge:
             self.hn[new_hn1[i]]=new_hn1[i_next]
             self.ht[new_hn0[i]]=t_num0+1
             self.ht[new_hn1[i]]=t_num0
+
+
+        self.make_one_ring_begin_by_vertex(v_from0)
+        self.make_one_ring_begin_by_vertex(v_from1)
+        self.make_one_ring_begin_by_vertex(v_to0)
+        self.make_one_ring_begin_by_vertex(v_to1)
 
 
 

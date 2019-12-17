@@ -62,7 +62,7 @@ def find_triangle_point_reside(p,triangles,is_deleted):
     return (-1,None)
 
 
-fig1,ax=plt.subplots(1,1)
+fig1,ax=plt.subplots(1,2)
 ax=np.array(ax)
 ax=ax.reshape(-1)
 
@@ -103,18 +103,36 @@ def dummy_split():
             triangles[ti]=None
 
 
+def segment_intersect(s0,s1):
+    d0=np.array([s1[0]-s0[0],s1[1]-s0[0]])
+    d1=np.array([s1[0]-s0[1],s1[1]-s0[1]])
+    c0=np.linalg.det(d0)
+    c1=np.linalg.det(d1)
+    if c0*c1>0:
+        return False
+    else:
+        return True
+
 def need_flip(X,v_new,vi,vj,opposite_v):
     A=np.array([
-        [X[v_new][0],X[v_new][1],X[v_new][0]**2+X[v_new][1]**2,1],
-        [X[vi][0], X[vi][1], X[vi][0] ** 2 + X[vi][1] ** 2, 1],
-        [X[vj][0], X[vj][1], X[vj][0] ** 2 + X[vj][1] ** 2, 1],
-        [X[opposite_v][0], X[opposite_v][1], X[opposite_v][0] ** 2 + X[opposite_v][1] ** 2, 1],
+        [1,X[vi][0], X[vi][1], X[vi][0] ** 2 + X[vi][1] ** 2],
+        [1,X[vj][0], X[vj][1], X[vj][0] ** 2 + X[vj][1] ** 2],
+        [1,X[opposite_v][0], X[opposite_v][1], X[opposite_v][0] ** 2 + X[opposite_v][1] ** 2],
+        [1, X[v_new][0], X[v_new][1], X[v_new][0] ** 2 + X[v_new][1] ** 2],
     ]
     )
+    Gamma=np.array([
+        [1,X[vi][0],X[vi][1]],
+        [1, X[vj][0], X[vj][1]],
+        [1, X[opposite_v][0], X[opposite_v][1]]
+    ])
 
+    min_v=min(vi,vj)
     if vi<=2 and vj<=2:
         return False
-    elif opposite_v<min(vi,vj):
+    #elif vi>2 and vj>2:
+    #    pass
+    elif min_v<=2 and opposite_v<min_v:
         return False
 
 #    if vi<=2 and  vj >2:
@@ -128,12 +146,15 @@ def need_flip(X,v_new,vi,vj,opposite_v):
 #    if vi <opposite_v and vj< opposite_v:
 #        return False
 
+    if not segment_intersect([X[vi],X[vj]],[X[v_new],X[opposite_v]]):
+        return False
 
     det_A=np.linalg.det(A)
-    if det_A>0:
-        return False
-    else :
+    det_Gamma=np.linalg.det(Gamma)
+    if det_A*det_Gamma<0:#inside circle
         return True
+    else :
+        return False
 
 
 def  legalize(ax,cg,X,topo,v_new,vi,vj):
@@ -147,6 +168,9 @@ def  legalize(ax,cg,X,topo,v_new,vi,vj):
     plt.pause(display_delay)
 
     t=topo.get_triangle_by_vertex(vi,vj,v_new)
+    if t ==-1:
+        return
+
     t_neighbor=topo.get_neighbor_triangle( t, vi, vj)
 
 #    h=topo.get_h(vj,vi)
@@ -188,6 +212,23 @@ def draw_point_index(ax,X):
     for xi,x in enumerate(X):
         ax.text(x[0],x[1],'$'+str(xi)+"$")
 
+def get_final_triangle(topo):
+    TV=topo.get_all_triangles();
+    t_deleted=topo.t_deleted
+    ret=[]
+    for ti,t in enumerate(TV):
+        if t_deleted[ti]:
+            continue
+        helper_v=False
+        for v in t:
+            if v<3:
+                helper_v=True
+                break;
+        if helper_v:
+            continue
+        ret.append(t)
+    return ret
+
 
 def denauley_triangulate(X):
     topo = Half_Edge()
@@ -204,7 +245,13 @@ def denauley_triangulate(X):
         cg = color_getter()
         x=X[xi]
         ax[0].clear()
-        #ax[1].clear()
+        ax[1].clear()
+
+        TV_final=get_final_triangle(topo)
+        if len(TV_final)!=0:
+            TV_final=np.array(TV_final)
+            draw_triangles(ax[1], X[TV_final],'black')
+            draw_point_index(ax[1], X[2:xi+1])
 
         ax[0].scatter(X[:, 0], X[:, 1],color='grey')
         #ax[0].text(-0.1, -0.1, '$P$')
@@ -218,6 +265,8 @@ def denauley_triangulate(X):
 
         TV_exist=np.array(topo.get_triangles())
         draw_triangles(ax[0], X[TV_exist],'grey')
+
+
 
         TV=np.array(topo.get_all_triangles())
         ti,t=find_triangle_point_reside(x,X[TV],topo.t_deleted)
