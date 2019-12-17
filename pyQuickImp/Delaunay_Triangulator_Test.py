@@ -38,8 +38,7 @@ class Delaunay_Triangulator_Add_Two_Test(unittest.TestCase):
 
 
     def test_exsit_triangle(self):
-        #assertArrayEqualsUnordedly(self,self.trianglutor.get_exist_triangles(),[[0,1,3],[1,2,3],[0,2,3]])
-        pass
+        assertArrayEqualsUnordedly(self,self.trianglutor.get_exist_triangles(),[[1,2,3],[0,2,3],[0,1,4],[1,3,4],[0,3,4]])
 
 
 if __name__ == '__main__':
