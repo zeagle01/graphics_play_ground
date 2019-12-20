@@ -7,8 +7,8 @@ from  Half_Edge import *
 
 
 
-display_delay=0.005
-np.random.seed(0)
+display_delay=0.05
+np.random.seed(10)
 points=np.random.rand(16,2)
 
 #n=[2,2]
@@ -62,7 +62,7 @@ def find_triangle_point_reside(p,triangles,is_deleted):
     return (-1,None)
 
 
-fig1,ax=plt.subplots(1,2)
+fig1,ax=plt.subplots(1,3)
 ax=np.array(ax)
 ax=ax.reshape(-1)
 
@@ -161,10 +161,10 @@ def  legalize(ax,cg,X,topo,v_new,vi,vj):
 
     TV=topo.get_all_triangles()
     ti=[v_new,vi,vj]
-    draw_triangle(ax,X[ti],cg.get_next_color())
+    draw_triangle(ax[0],X[ti],cg.get_next_color())
 
     vij=(vi,vj)
-    ax.plot(X[vij,0],X[vij,1],color=cg.get_next_color())
+    ax[0].plot(X[vij,0],X[vij,1],color=cg.get_next_color())
     plt.pause(display_delay)
 
     t=topo.get_triangle_by_vertex(vi,vj,v_new)
@@ -182,10 +182,11 @@ def  legalize(ax,cg,X,topo,v_new,vi,vj):
     if neighbor_tv is None:
         return
     TV=topo.get_all_triangles()
-    draw_triangle(ax,X[neighbor_tv],cg.get_next_color())
+    draw_triangle(ax[0],X[neighbor_tv],cg.get_next_color())
     opposite_v=neighbor_tv[0]+neighbor_tv[1]+neighbor_tv[2]-vi-vj
     if need_flip(X,v_new,vi,vj,opposite_v):
         topo.flip_edge(vi,vj,v_new,opposite_v)
+        draw_topo_change(ax[1], X, v_new , topo, 2)
         legalize(ax,cg,X,topo, v_new, vi, opposite_v)
         legalize(ax,cg,X,topo, v_new, vj, opposite_v)
 
@@ -230,6 +231,21 @@ def get_final_triangle(topo):
     return ret
 
 
+def draw_topo_change(ax,X,xi,topo,n):
+    ax.clear()
+    #TV_final = np.array(get_final_triangle(topo))
+    TV_final = np.array(topo.get_triangles())
+
+    ax.scatter(X[3:xi, 0], X[3:xi, 1], color='black')
+    if len(TV_final) != 0:
+        draw_triangles(ax, X[TV_final], 'grey')
+        #TV=np.array(topo.get_all_triangles())
+        if n!=0:
+            TV=TV_final[-n:]
+            if len(TV)==n:
+                draw_triangles(ax, X[TV], 'black')
+
+
 def denauley_triangulate(X):
     topo = Half_Edge()
     TV0 = np.array([ [ 0, 1, 2 ] ])
@@ -245,13 +261,14 @@ def denauley_triangulate(X):
         cg = color_getter()
         x=X[xi]
         ax[0].clear()
-        ax[1].clear()
-
+        draw_topo_change(ax[1], X,xi, topo,0)
+        ax[2].clear()
         TV_final=get_final_triangle(topo)
+
         if len(TV_final)!=0:
             TV_final=np.array(TV_final)
-            draw_triangles(ax[1], X[TV_final],'black')
-            draw_point_index(ax[1], X[2:xi+1])
+            draw_triangles(ax[2], X[TV_final],'black')
+            draw_point_index(ax[2], X[2:xi+1])
 
         ax[0].scatter(X[:, 0], X[:, 1],color='grey')
         #ax[0].text(-0.1, -0.1, '$P$')
@@ -273,6 +290,7 @@ def denauley_triangulate(X):
         draw_triangle(ax[0],t,cg.get_next_color())
         if(t is not None):
             v_new=topo.add_vertex_in_triangle(ti)
+            draw_topo_change(ax[1], X, xi+1, topo, 3)
             h=topo.vh[v_new]
             for tvi in range(3):
                 hi=h
@@ -280,7 +298,7 @@ def denauley_triangulate(X):
                 hj=topo.get_opposite_h(h)
                 hj=topo.hn[hj]
                 vj=topo.hv[hj]
-                legalize(ax[0],cg,X,topo,v_new,vi,vj)
+                legalize(ax,cg,X,topo,v_new,vi,vj)
                 h = topo.hn[h]
                 h = topo.hn[h]
                 h= topo.get_opposite_h(h)
