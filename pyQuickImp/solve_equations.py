@@ -65,8 +65,8 @@ A=np.array(
 #       [4,-1,1],
 #       [4, -8, 1],
 #       [-2, 1, 5],
-       [5,2],
-       [2, 3]
+       [100,2],
+       [2, 4]
    ]
 )
 
@@ -76,11 +76,18 @@ b=np.array(
 )
 
 #x_0=np.array([1,2,2])
-x_0=np.array([0,0])
+x_0=np.array([-0.1,0.1])
 
-x=np.linalg.solve(A,b)
+x_exact=np.linalg.solve(A,b)
+
+gx=np.linspace(-0.1,0.1,100)
+gy=np.linspace(0.1,0.3,100)
+G=np.meshgrid(gx,gy)
+G=np.array(G).transpose()
+f=1/2*np.einsum('...k,...k',np.einsum('...k,ik',G,A),G)-np.einsum('k,...k',b,G)
 
 fig,ax=plt.subplots(1,2)
+ax[0].contour(G[:,:,0],G[:,:,1],f)
 ax[1].set_yscale('log')
 
 lambd,Evtor=np.linalg.eig(A)
