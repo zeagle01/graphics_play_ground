@@ -1,7 +1,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import test
+import unittest
 
 
 
@@ -25,13 +25,39 @@ class RigidBody:
 
 
 
-
-rb=RigidBody()
-#print(rb.mass)
-#print(rb.X)
-#print(rb.I_Body)
+def State_to_Array(rb,y):
+    pass
 
 
+def Array_to_State(rb,y):
+    pass
+
+
+def Array_to_Bodies(y):
+    pass
+
+def Bodies_to_Array(y):
+    pass
+
+
+def Compute_Force_and_Torque(t,rb):
+    pass
+
+
+def dydt(t,y,ydot):
+    pass
 
 
 
+class RigidBodyTest(unittest.TestCase):
+    def test_RigidBody(self):
+        rb = RigidBody()
+        print(rb.mass)
+        print(rb.X)
+        print(rb.I_Body)
+
+
+
+
+if __name__ == '__main__':
+    unittest.main()
