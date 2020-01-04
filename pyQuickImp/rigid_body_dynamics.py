@@ -13,7 +13,7 @@ class RigidBody:
         self.I_BodyInv=np.eye(3)
 
         self.X=np.zeros(3)
-        self.R=np.eye(3)
+        self.q=R.from_matrix(np.eye(3)).as_quat()
         self.P=np.zeros(3)
         self.L=np.zeros(3)
 
@@ -28,28 +28,29 @@ class RigidBody:
         #frame=R.from_rotvec(self.R)
         #ret=frame.as_matrix()
 
-        ret=np.array([self.X,self.X+self.R[0],
-                      self.X,self.X+self.R[1],
-                      self.X,self.X+self.R[2]
+        ret=np.array([self.X,self.X+R.from_quat(self.q).as_matrix()[0],
+                      self.X,self.X+R.from_quat(self.q).as_matrix()[1],
+                      self.X,self.X+R.from_quat(self.q).as_matrix()[2]
                       ])
         return ret
 
 
 def State_to_Array(rb,y):
     y[0:3]=rb.X[:]
-    y[3:12]=rb.R.flatten()
-    y[12:15]=rb.P
-    y[15:18]=rb.L
+    y[3:7]=rb.q
+    y[7:10]=rb.P
+    y[10:13]=rb.L
 
 
 def Array_to_State(rb,y):
     rb.X=y[0:3]
-    rb.R=y[3:12].reshape((3,3))
-    rb.P=y[12:15]
-    rb.L=y[15:18]
+    rb.q=y[3:7]
+    rb.P=y[7:10]
+    rb.L=y[10:13]
 
     rb.v=rb.P/rb.mass
-    rb.I_Inv=np.dot(rb.R,np.dot(rb.I_BodyInv,rb.R.transpose()))
+    rb_R=R.from_quat(rb.q).as_matrix()
+    rb.I_Inv=np.dot(rb_R,np.dot(rb.I_BodyInv,rb_R.transpose()))
     rb.omega=np.dot(rb.I_Inv,rb.L)
 
 
@@ -67,6 +68,13 @@ def ode(x0,n,t,t_step,DxDt):
 
 
 
+def quaternion_multiply(quaternion1, quaternion0):
+    w0, x0, y0, z0 = quaternion0
+    w1, x1, y1, z1 = quaternion1
+    return np.array([-x1 * x0 - y1 * y0 - z1 * z0 + w1 * w0,
+                     x1 * w0 + y1 * z0 - z1 * y0 + w1 * x0,
+                     -x1 * z0 + y1 * w0 + z1 * x0 + w1 * y0,
+                     x1 * y0 - y1 * x0 + z1 * w0 + w1 * z0] )
 
 
 
@@ -90,6 +98,7 @@ class Displayer:
         MVP=R.from_rotvec([1,-1,0.5])
         x=MVP.apply(x)
         return x[:,0:2]
+
 
 
 
@@ -127,23 +136,18 @@ class Simulator:
         return ret
 
     def compute_force_and_torque(self,t,b):
-        b.force=np.array([0,0,0])
+        b.force=np.array([1,0,0])
         b.torque=np.array([0,0,1])
         #pass
 
+
     def DDt_state_to_array(self,b,x_dot):
         x_dot[0:3]=b.v
-        Rdot=np.dot(self.vector_up_to_matrix(b.omega),b.R)
-        x_dot[3:12]=Rdot.flatten()
-        x_dot[12:15]=b.force
-        x_dot[15:18]=b.torque
+        omega_hat=np.array([0,*(b.omega)])
+        x_dot[3:7]=0.5*quaternion_multiply(omega_hat,b.q)
+        x_dot[7:10]=b.force
+        x_dot[10:13]=b.torque
 
-    def vector_up_to_matrix(self,v):
-        return np.array([
-           [0,-v[2],v[1]] ,
-            [v[2], 0, -v[0]],
-            [-v[1], v[0], 0]
-        ])
 
     def run_simulation(self):
         x0=np.zeros(self.N_UNKNOWN_NUM)
