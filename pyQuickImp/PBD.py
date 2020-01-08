@@ -41,7 +41,7 @@ def EM_To_Q(v,reparam):
     sinp=np.sin(0.5*theta)
     q[3]=cosp
     if theta<MIN_ANGLE:
-        q[0:3]=v*0.5-theta*theta/48.0
+        q[0:3]=v*(0.5-theta*theta/48.0)
     else:
         q[0:3]=v*sinp/theta
     return q,rep
@@ -64,6 +64,70 @@ def Q_to_Matrix(q):
     ])
     return R
 
+############## dRdv ##########
+def partial_q_partial_v(v,i):
+    theta=np.linalg.norm(v)
+    cosp=np.cos(0.5*theta)
+    sinp=np.sin(0.5*theta)
+
+    dqdx=np.empty(4)
+    i1 = (i + 1) % 3
+    i2 = (i + 2) % 3
+    if theta<MIN_ANGLE:
+        Tsinc=0.5-theta*theta/48.0
+        vTerm=v[i]*(theta*theta/40.0-1.0)/24.0
+        dqdx[3]=-0.5*v[i]*Tsinc
+        dqdx[i]=v[i]*vTerm+Tsinc
+        dqdx[i1]=v[i1]*vTerm
+        dqdx[i2]=v[i2]*vTerm
+    else:
+        ang=1.0/theta
+        ang2=ang*ang*v[i]
+        sang=sinp*ang
+        cterm=ang2*(0.5*cosp-sang)
+
+        dqdx[i]=cterm*v[i]+sang
+        dqdx[i1]=cterm*v[i1]
+        dqdx[i2]=cterm*v[i2]
+        dqdx[3]=-0.5*v[i]*sang
+
+    return dqdx
+
+
+def partial_R_partial_v(q,dqdvi):
+    prod=np.empty(9)
+    dRdvi=np.eye(3)
+    prod[0]=-4*q[0]*dqdvi[0]
+    prod[1]=-4*q[1]*dqdvi[1]
+    prod[2]=-4*q[2]*dqdvi[2]
+    prod[3]=2*(q[1]*dqdvi[0]+q[0]*dqdvi[1])
+    prod[4]=2*(q[3]*dqdvi[2]+q[2]*dqdvi[3])
+    prod[5]=2*(q[2]*dqdvi[0]+q[0]*dqdvi[2])
+    prod[6]=2*(q[3]*dqdvi[1]+q[1]*dqdvi[3])
+    prod[7]=2*(q[2]*dqdvi[1]+q[1]*dqdvi[2])
+    prod[8]=2*(q[3]*dqdvi[0]+q[0]*dqdvi[3])
+
+    dRdvi[0,0]=prod[1]+prod[2]
+    dRdvi[0,1]=prod[3]-prod[4]
+    dRdvi[0,2]=prod[5]+prod[6]
+
+    dRdvi[1,0]=prod[3]+prod[4]
+    dRdvi[1,1]=prod[0]+prod[2]
+    dRdvi[1,2]=prod[7]-prod[8]
+
+    dRdvi[2,0]=prod[5]-prod[6]
+    dRdvi[2,1]=prod[7]+prod[8]
+    dRdvi[2,2]=prod[0]+prod[1]
+
+    return dRdvi
+
+
+
+def partial_R_partial_EM(v,i):
+    q,rep=EM_To_Q(v,1)
+    dqdvi=partial_q_partial_v(v,i)
+    dRdvi=partial_R_partial_v(q,dqdvi)
+    return dRdvi,rep
 
 
 class Pin_Constraints:
@@ -71,7 +135,7 @@ class Pin_Constraints:
         self.stencil = stencil
     def precompute(self,X,W):
         self.X0=X[self.stencil[0]]
-    def apply(self,X,W):
+    def apply(self,X,v,W):
         p=self.X0-X[self.stencil[0]]
         c=1.0
         X[self.stencil[0]]+=c*p
@@ -84,7 +148,24 @@ class Vertex_Ridgid_Body_Constraints:
         self.stencil = stencil
     def precompute(self,X,W):
         pass
-    def apply(self,X,W):
+    def apply(self,X,v,W):
+        r=np.array([-0.5,0,0])
+        x=np.array([X[self.stencil[0]],X[self.stencil[1]]])
+
+        q, rep = EM_To_Q(v[self.stencil[1]], 1)
+        R = Q_to_Matrix(q)
+
+        p_ridgid=X[self.stencil[1]]+np.dot(R,r);
+        p=np.array([X[self.stencil[0]],p_ridgid])
+        C=p[1]-p[0]
+        J_x=np.eye(3)
+        X[self.stencil[0]]+=np.dot(J_x.transpose(),C)
+        X[self.stencil[1]]-=np.dot(J_x.transpose(),C)
+        dRdv=np.array([partial_R_partial_EM(v[self.stencil[1]],0)[0],
+                       partial_R_partial_EM(v[self.stencil[1]],1)[0],
+                       partial_R_partial_EM(v[self.stencil[1]],2)[0]])
+        J_R=np.array([np.dot(dRdv[0],r),np.dot(dRdv[1],r),np.dot(dRdv[2],r)])
+        v[self.stencil[1]]-=np.dot(J_R.transpose(),C)
         pass
 
 
@@ -93,7 +174,7 @@ class Spring_Constraints:
         self.stencil = stencil
     def precompute(self,X,W):
         self.L=np.linalg.norm(X[self.stencil[1]]-X[self.stencil[0]])
-    def apply(self,X,W):
+    def apply(self,X,v,W):
         p = X[self.stencil[1]] - X[self.stencil[0]]
         l = np.linalg.norm(p)
         l0 = self.L
@@ -112,6 +193,7 @@ class Dynamic:
         self.X= np.array([[0,0,0],[1,0,0],[1.5,0,0]])
         self.stencils=np.array([[0,1],[1,2]])
         self.R=np.zeros_like(self.X)
+        self.omega=np.zeros_like(self.X)
 
         self.constraints=[]
         self.constraints.append(Pin_Constraints(np.array([0])))
@@ -142,7 +224,7 @@ class Dynamic:
         self.X=self.X+self.dt*self.V
         for it in range(10):
             for c in self.constraints:
-                c.apply(self.X,self.W)
+                c.apply(self.X,self.R,self.W)
 
 
         self.V=(self.X-X0)/self.dt
