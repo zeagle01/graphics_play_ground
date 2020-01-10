@@ -1,6 +1,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial.transform import Rotation as rot
 
 
 fig,ax=plt.subplots(1,2)
@@ -130,6 +131,21 @@ def partial_R_partial_EM(v,i):
     return dRdvi,rep
 
 
+###########################################################
+def quaternion_multiply(quaternion1, quaternion0):
+    w0, x0, y0, z0 = quaternion0
+    w1, x1, y1, z1 = quaternion1
+    return np.array([-x1 * x0 - y1 * y0 - z1 * z0 + w1 * w0,
+                     x1 * w0 + y1 * z0 - z1 * y0 + w1 * x0,
+                     -x1 * z0 + y1 * w0 + z1 * x0 + w1 * y0,
+                     x1 * y0 - y1 * x0 + z1 * w0 + w1 * z0] )
+
+
+
+
+
+
+
 class Pin_Constraints:
     def __init__(self, stencil):
         self.stencil = stencil
@@ -220,7 +236,11 @@ class Dynamic:
 
         X0=np.copy(self.X)
         dV=np.einsum('i,j',self.W,self.g)
-        self.V=self.V+dV*self.dt
+        q0=np.copy((rot.from_rotvec(self.R)).as_quat())
+
+        self.V+=dV*self.dt
+        self.R+=self.omega*self.dt
+
         self.X=self.X+self.dt*self.V
         for it in range(10):
             for c in self.constraints:
@@ -228,6 +248,12 @@ class Dynamic:
 
 
         self.V=(self.X-X0)/self.dt
+        q=(rot.from_rotvec(self.R)).as_quat()
+        for i in range(len(q)):
+            q_conjugate=np.array([q0[i][3],*(-q0[i][0:3])])
+            q_i=np.array([q[i][3],*(q[i][0:3])])
+            self.omega[i]=2./self.dt*quaternion_multiply(q_i,q_conjugate)[1:4]
+
 
         ax[0].clear()
         ax[0].set_xlim([-2.5, 2.5])
