@@ -162,8 +162,10 @@ class Pin_Constraints:
 class Vertex_Ridgid_Body_Constraints:
     def __init__(self, stencil):
         self.stencil = stencil
+
     def precompute(self,X,W):
         pass
+
     def apply(self,X,v,W):
         r=np.array([-0.5,0,0])
         x=np.array([X[self.stencil[0]],X[self.stencil[1]]])
@@ -184,6 +186,33 @@ class Vertex_Ridgid_Body_Constraints:
         v[self.stencil[1]]-=np.dot(J_R.transpose(),C)
         pass
 
+
+class Vertex_Ridgid_Body_Quaternion_Constraints:
+    def __init__(self, stencil):
+        self.stencil = stencil
+
+    def precompute(self,X,W):
+        pass
+
+    def apply(self,X,q,W):
+        r=np.array([-0.5,0,0])
+        x=np.array([X[self.stencil[0]],X[self.stencil[1]]])
+
+        q, rep = EM_To_Q(v[self.stencil[1]], 1)
+        R = Q_to_Matrix(q)
+
+        p_ridgid=X[self.stencil[1]]+np.dot(R,r);
+        p=np.array([X[self.stencil[0]],p_ridgid])
+        C=p[1]-p[0]
+        J_x=np.eye(3)
+        X[self.stencil[0]]+=np.dot(J_x.transpose(),C)
+        X[self.stencil[1]]-=np.dot(J_x.transpose(),C)
+        dRdv=np.array([partial_R_partial_EM(v[self.stencil[1]],0)[0],
+                       partial_R_partial_EM(v[self.stencil[1]],1)[0],
+                       partial_R_partial_EM(v[self.stencil[1]],2)[0]])
+        J_R=np.array([np.dot(dRdv[0],r),np.dot(dRdv[1],r),np.dot(dRdv[2],r)])
+        v[self.stencil[1]]-=np.dot(J_R.transpose(),C)
+        pass
 
 class Spring_Constraints:
     def __init__(self, stencil):
@@ -208,16 +237,12 @@ class Dynamic:
         #self.stencils=np.array([[0,1],[1,2],[2,3]])
         self.X= np.array([[0,0,0],[1,0,0],[1.5,0,0]])
         self.stencils=np.array([[0,1],[1,2]])
-        self.R=np.zeros_like(self.X)
+        self.R_vec=np.zeros_like(self.X)
+        self.R_quaternion=np.zeros((len(self.X),4))
         self.omega=np.zeros_like(self.X)
 
-        self.constraints=[]
-        self.constraints.append(Pin_Constraints(np.array([0])))
-        for i in range(1):
-            self.constraints.append(Spring_Constraints(self.stencils[i]))
-
-        for i in range(1,2):
-            self.constraints.append(Vertex_Ridgid_Body_Constraints(self.stencils[i]))
+        self.build_spring_constraints()
+        #self.build_rigid_constraints()
 
 
 
@@ -226,6 +251,20 @@ class Dynamic:
         self.dt=1/10
         self.W=np.ones(len(self.X))
         self.g=np.array([0,-10,0])
+
+    def build_spring_constraints(self):
+        self.constraints=[]
+        self.constraints.append(Pin_Constraints(np.array([0])))
+        for i in range(2):
+            self.constraints.append(Spring_Constraints(self.stencils[i]))
+
+    def build_rigid_constraints(self):
+        self.constraints=[]
+        self.constraints.append(Pin_Constraints(np.array([0])))
+        for i in range(1):
+            self.constraints.append(Spring_Constraints(self.stencils[i]))
+        for i in range(1,2):
+            self.constraints.append(Vertex_Ridgid_Body_Quaternion_Constraints(self.stencils[i]))
 
     def precompute(self):
         self.L=np.linalg.norm(self.X[self.stencils[:,1]]-self.X[self.stencils[:,0]],axis=1)
@@ -236,19 +275,19 @@ class Dynamic:
 
         X0=np.copy(self.X)
         dV=np.einsum('i,j',self.W,self.g)
-        q0=np.copy((rot.from_rotvec(self.R)).as_quat())
+        q0=np.copy((rot.from_rotvec(self.R_vec)).as_quat())
 
         self.V+=dV*self.dt
-        self.R+=self.omega*self.dt
+        self.R_vec+=self.omega*self.dt
 
         self.X=self.X+self.dt*self.V
         for it in range(10):
             for c in self.constraints:
-                c.apply(self.X,self.R,self.W)
+                c.apply(self.X,self.R_vec,self.W)
 
 
         self.V=(self.X-X0)/self.dt
-        q=(rot.from_rotvec(self.R)).as_quat()
+        q=(rot.from_rotvec(self.R_vec)).as_quat()
         for i in range(len(q)):
             q_conjugate=np.array([q0[i][3],*(-q0[i][0:3])])
             q_i=np.array([q[i][3],*(q[i][0:3])])
@@ -260,13 +299,53 @@ class Dynamic:
         ax[0].set_ylim([-4, 1])
         ax[0].plot(self.X.transpose()[0],self.X.transpose()[1],'-x')
 
-        for vi,v in enumerate(self.R):
+        for vi,v in enumerate(self.R_vec):
             q,rep=EM_To_Q(v,1)
             R=Q_to_Matrix(q)
             frame=np.array([self.X[vi],self.X[vi]+R[0],
-                          self.X[vi],self.X[vi]+R[1],
-                          self.X[vi],self.X[vi]+R[2]
-                          ])
+                            self.X[vi],self.X[vi]+R[1],
+                            self.X[vi],self.X[vi]+R[2]
+                            ])
+            xp=frame[:,0:2]
+            ax[0].plot(*(xp[0:2].transpose()), 'red')
+            ax[0].plot(*(xp[2:4].transpose()), 'green')
+            ax[0].plot(*(xp[4:6].transpose()), 'blue')
+        plt.pause(0.01)
+
+    def quaternion(self):
+        X0=np.copy(self.X)
+        dV=np.einsum('i,j',self.W,self.g)
+        #q0=np.copy((rot.from_rotvec(self.R_vec)).as_quat())
+
+        self.V+=dV*self.dt
+        self.R_quaternion+=self.omega*self.dt
+
+        self.X=self.X+self.dt*self.V
+        for it in range(10):
+            for c in self.constraints:
+                c.apply(self.X,self.R_vec,self.W)
+
+
+        self.V=(self.X-X0)/self.dt
+        q=(rot.from_rotvec(self.R_vec)).as_quat()
+        for i in range(len(q)):
+            q_conjugate=np.array([q0[i][3],*(-q0[i][0:3])])
+            q_i=np.array([q[i][3],*(q[i][0:3])])
+            self.omega[i]=2./self.dt*quaternion_multiply(q_i,q_conjugate)[1:4]
+
+
+        ax[0].clear()
+        ax[0].set_xlim([-2.5, 2.5])
+        ax[0].set_ylim([-4, 1])
+        ax[0].plot(self.X.transpose()[0],self.X.transpose()[1],'-x')
+
+        for vi,v in enumerate(self.R_vec):
+            q,rep=EM_To_Q(v,1)
+            R=Q_to_Matrix(q)
+            frame=np.array([self.X[vi],self.X[vi]+R[0],
+                            self.X[vi],self.X[vi]+R[1],
+                            self.X[vi],self.X[vi]+R[2]
+                            ])
             xp=frame[:,0:2]
             ax[0].plot(*(xp[0:2].transpose()), 'red')
             ax[0].plot(*(xp[2:4].transpose()), 'green')
@@ -274,10 +353,26 @@ class Dynamic:
         plt.pause(0.01)
 
 
+def onpress(event):
+    print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
+          ('double' if event.dblclick else 'single', event.button,
+           event.x, event.y, event.xdata, event.ydata))
+
+def onmove(event):
+    print('move', event.x, event.y, event.xdata, event.ydata)
+
+
+def onrelease(event):
+    printf("release")
+
+cid = fig.canvas.mpl_connect('button_press_event', onpress)
+cid = fig.canvas.mpl_connect('motion_notify_event', onmove)
+cid = fig.canvas.mpl_connect('button_release', onrelease)
 
 dy=Dynamic()
 dy.precompute()
 for it in range(1000):
     dy.pbd()
+
 
 plt.show()
