@@ -74,7 +74,7 @@ def crossM(v):
         ]
     )
 
-def LeftQ(q):
+def LeftQ_sl(q):
 
     ret=np.zeros((4,4))
     ret[0,3]=q[3]
@@ -82,14 +82,38 @@ def LeftQ(q):
     ret[0,0:3]=-q[0:3]
     ret[1:4,0:3]=q[3]*np.identity(3)+crossM(q[0:3])
     return ret
+#
+#def RightQ(q):
+#    ret=np.zeros((4,4))
+#    ret[0,3]=q[3]
+#    ret[1:4,3]=q[0:3]
+#    ret[0,0:3]=-q[0:3]
+#    ret[1:4,0:3]=q[3]*np.identity(3)-crossM(q[0:3])
+#    return ret
 
-def RightQ(q):
+
+#scalar first
+def LeftQ_sf(q):
     ret=np.zeros((4,4))
-    ret[0,3]=q[3]
-    ret[1:4,3]=q[0:3]
-    ret[0,0:3]=-q[0:3]
-    ret[1:4,0:3]=q[3]*np.identity(3)-crossM(q[0:3])
+    ret[0,0]=q[0]
+    ret[1:4,0]=q[1:4]
+    ret[0,1:4]=-q[1:4]
+    ret[1:4,1:4]=q[0]*np.identity(3)+crossM(q[1:4])
     return ret
+
+##scalar last
+#def LeftQ_sl(q):
+#    permutation=np.array([
+#        [0,0,0,1],
+#        [1, 0, 0, 0],
+#        [0, 1, 0, 0],
+#        [0, 0, 1, 0]
+#         ]
+#    )
+#    q_sf=np.dot(permutation,q)
+#    ret=LeftQ_sf(q_sf)
+#    ret=np.dot(permutation.transpose(),ret)
+#    return ret
 
 
 class Dynamic:
@@ -101,8 +125,10 @@ class Dynamic:
 
         self.q=np.zeros((len(self.X),4))
         self.q[:,3]=1;
-        self.omega=np.ones_like(self.X)
+        self.omega=np.zeros_like(self.X)
+        #self.omega[:,2]=1e0
         self.tau=np.zeros_like(self.X)
+        #self.tau[:,2]=1
 
         self.inertial=np.zeros((len(self.X),3,3))
         self.inv_inertial=np.zeros_like(self.inertial)
@@ -151,7 +177,7 @@ class Dynamic:
 
         self.X=self.X+self.dt*self.V
         for i in range(len(self.q)):
-            LQ=LeftQ(self.q[i])
+            LQ=LeftQ_sl(self.q[i])
             omega_tilde=np.array([*self.omega[i],0])
             dd=np.dot(LQ,omega_tilde)
             self.q[i]+=dd*self.dt*0.5
@@ -164,8 +190,8 @@ class Dynamic:
 
         self.V=(self.X-X0)/self.dt
         for i in range(len(self.q)):
-            LQ=LeftQ(self.q[i])
-            tt=np.dot(LQ.transpose(),self.q[i])
+            LQ=LeftQ_sl(self.q[i])
+            tt=np.dot(LQ.transpose(),q0[i])
             tt=2*tt/self.dt
             self.omega[i]=tt[0:3]
 
