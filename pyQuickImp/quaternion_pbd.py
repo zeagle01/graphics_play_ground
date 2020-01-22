@@ -90,10 +90,11 @@ class Vertex_Ridgid_Body_Constraints:
         p=np.array([X[self.stencil[0]],p_ridgid])
         C=p[1]-p[0]
         J_x=np.eye(3)
-        X[self.stencil[0]]+=np.dot(J_x.transpose(),C)
-        X[self.stencil[1]]-=np.dot(J_x.transpose(),C)
+        c=1e-1
+        X[self.stencil[0]]+=np.dot(J_x.transpose(),C)*c
+        X[self.stencil[1]]-=np.dot(J_x.transpose(),C)*c
         J_q=derivativeRp(q[self.stencil[1]],r)
-        q[self.stencil[1]]-=np.dot(J_q.transpose(),C)*1e-1
+        q[self.stencil[1]]-=np.dot(J_q.transpose(),C)*c
         q[self.stencil[1]]/=np.linalg.norm(q[self.stencil[1]])
         pass
 
