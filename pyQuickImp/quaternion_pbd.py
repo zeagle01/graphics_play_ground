@@ -6,6 +6,41 @@ from scipy.spatial.transform import Rotation as rot
 
 fig,ax=plt.subplots(1,2)
 
+def crossM(v):
+    return np.array(
+        [
+            [0,v[2],-v[1]],
+            [-v[2],0,v[0]],
+            [v[1],-v[0],0]
+        ]
+    )
+
+def quaternion_multiply(p,q):
+    ret=np.zeros(4)
+    ps=p[3]
+    pv=p[0:3]
+    qs=q[3]
+    qv=q[0:3]
+    ret[0:3]=ps*qv+qs*pv+np.cross(pv,qv)
+    ret[3]=ps*qs-np.dot(pv,qv)
+    return ret
+
+def quaternion_conjugate(q):
+    return np.array([*-q[0:3], q[3]])
+
+
+def derivativeRp(q,p):
+    ret=np.zeros((3,4))
+    qs=q[3]
+    qv=q[0:3]
+    ret[:,3]=2*qs*p-2*np.cross(p,qv)
+    ret[:,0:3]=2*np.dot(p,qv)*np.identity(3)\
+               +2*np.einsum('i,j',qv,p)  -2*np.einsum('i,j',p,qv)\
+               -2*qs*crossM(p)
+    return ret
+
+
+
 class Pin_Constraints:
     def __init__(self, stencil):
         self.stencil = stencil
@@ -45,75 +80,28 @@ class Vertex_Ridgid_Body_Constraints:
     def precompute(self,X,W):
         pass
 
-    def apply(self,X,v,W):
-#        r=np.array([-0.5,0,0])
-#        x=np.array([X[self.stencil[0]],X[self.stencil[1]]])
+    def apply(self,X,q,W):
+        r=np.array([-0.5,0,0])
+        x=np.array([X[self.stencil[0]],X[self.stencil[1]]])
+
 #
-#        q, rep = EM_To_Q(v[self.stencil[1]], 1)
-#        R = Q_to_Matrix(q)
-#
-#        p_ridgid=X[self.stencil[1]]+np.dot(R,r);
-#        p=np.array([X[self.stencil[0]],p_ridgid])
-#        C=p[1]-p[0]
-#        J_x=np.eye(3)
-#        X[self.stencil[0]]+=np.dot(J_x.transpose(),C)
-#        X[self.stencil[1]]-=np.dot(J_x.transpose(),C)
-#        dRdv=np.array([partial_R_partial_EM(v[self.stencil[1]],0)[0],
-#                       partial_R_partial_EM(v[self.stencil[1]],1)[0],
-#                       partial_R_partial_EM(v[self.stencil[1]],2)[0]])
-#        J_R=np.array([np.dot(dRdv[0],r),np.dot(dRdv[1],r),np.dot(dRdv[2],r)])
-#        v[self.stencil[1]]-=np.dot(J_R.transpose(),C)
+        R=rot.from_quat(q[self.stencil[1]]).as_matrix()
+        p_ridgid=X[self.stencil[1]]+np.dot(R,r);
+        p=np.array([X[self.stencil[0]],p_ridgid])
+        C=p[1]-p[0]
+        J_x=np.eye(3)
+        X[self.stencil[0]]+=np.dot(J_x.transpose(),C)
+        X[self.stencil[1]]-=np.dot(J_x.transpose(),C)
+        J_q=derivativeRp(q[self.stencil[1]],r)
+        q[self.stencil[1]]-=np.dot(J_q.transpose(),C)*1e-1
+        q[self.stencil[1]]/=np.linalg.norm(q[self.stencil[1]])
         pass
 
 
-def crossM(v):
-    return np.array([
-        [0,v[2],-v[1]],
-        [-v[2], 0, v[0]],
-        [v[1], -v[0], 0]
-        ]
-    )
-
-def LeftQ_sl(q):
-
-    ret=np.zeros((4,4))
-    ret[0,3]=q[3]
-    ret[1:4,3]=q[0:3]
-    ret[0,0:3]=-q[0:3]
-    ret[1:4,0:3]=q[3]*np.identity(3)+crossM(q[0:3])
-    return ret
-#
-#def RightQ(q):
-#    ret=np.zeros((4,4))
-#    ret[0,3]=q[3]
-#    ret[1:4,3]=q[0:3]
-#    ret[0,0:3]=-q[0:3]
-#    ret[1:4,0:3]=q[3]*np.identity(3)-crossM(q[0:3])
-#    return ret
 
 
-#scalar first
-def LeftQ_sf(q):
-    ret=np.zeros((4,4))
-    ret[0,0]=q[0]
-    ret[1:4,0]=q[1:4]
-    ret[0,1:4]=-q[1:4]
-    ret[1:4,1:4]=q[0]*np.identity(3)+crossM(q[1:4])
-    return ret
 
-##scalar last
-#def LeftQ_sl(q):
-#    permutation=np.array([
-#        [0,0,0,1],
-#        [1, 0, 0, 0],
-#        [0, 1, 0, 0],
-#        [0, 0, 1, 0]
-#         ]
-#    )
-#    q_sf=np.dot(permutation,q)
-#    ret=LeftQ_sf(q_sf)
-#    ret=np.dot(permutation.transpose(),ret)
-#    return ret
+
 
 
 class Dynamic:
@@ -128,12 +116,12 @@ class Dynamic:
         self.omega=np.zeros_like(self.X)
         #self.omega[:,2]=1e0
         self.tau=np.zeros_like(self.X)
-        #self.tau[:,2]=1
+        #self.tau[:,2]=1e1
 
         self.inertial=np.zeros((len(self.X),3,3))
         self.inv_inertial=np.zeros_like(self.inertial)
         for i in range(len(self.X)):
-            self.inertial[i]=np.diag((1,2,3))
+            self.inertial[i]=np.diag((1,1,1))
             self.inv_inertial[i]=np.linalg.inv(self.inertial[i])
 
 
@@ -169,17 +157,16 @@ class Dynamic:
         dV=np.einsum('i,j',self.W,self.g)
         q0=np.copy(self.q)
 
-        self.V+=dV*self.dt
+        self.V=self.V+dV*self.dt
         tt=np.einsum('...k,...k',self.inertial ,self.omega)
         tt=self.tau-np.cross(self.omega,tt)
         tt=np.einsum('...k,...k',self.inv_inertial,tt)
-        self.omega+=tt*self.dt
+        self.omega=self.omega+tt*self.dt
 
         self.X=self.X+self.dt*self.V
         for i in range(len(self.q)):
-            LQ=LeftQ_sl(self.q[i])
             omega_tilde=np.array([*self.omega[i],0])
-            dd=np.dot(LQ,omega_tilde)
+            dd=quaternion_multiply(self.q[i],omega_tilde)
             self.q[i]+=dd*self.dt*0.5
             self.q[i]/=np.linalg.norm(self.q[i])
 
@@ -190,8 +177,8 @@ class Dynamic:
 
         self.V=(self.X-X0)/self.dt
         for i in range(len(self.q)):
-            LQ=LeftQ_sl(self.q[i])
-            tt=np.dot(LQ.transpose(),q0[i])
+            q_conjugate=quaternion_conjugate(self.q[i])
+            tt=quaternion_multiply(q_conjugate,q0[i])
             tt=2*tt/self.dt
             self.omega[i]=tt[0:3]
 
@@ -203,8 +190,8 @@ class Dynamic:
         ax[0].set_ylim([-4, 1])
         ax[0].plot(self.X.transpose()[0],self.X.transpose()[1],'-x')
 
+        R = rot.from_quat(self.q).as_matrix()
         for vi,v in enumerate(self.q):
-            R=rot.from_quat(self.q).as_matrix()
             frame=np.array([self.X[vi],self.X[vi]+R[vi][0],
                             self.X[vi],self.X[vi]+R[vi][1],
                             self.X[vi],self.X[vi]+R[vi][2]
