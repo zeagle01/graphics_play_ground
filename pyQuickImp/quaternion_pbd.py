@@ -173,6 +173,26 @@ class Dynamic:
             tt=2*tt/self.dt
             self.omega[i]=tt[0:3]
 
+
+    def draw(self):
+        ax[0].clear()
+        ax[0].set_xlim([-2.5, 2.5])
+        ax[0].set_ylim([-4, 1])
+        ax[0].plot(self.X.transpose()[0],self.X.transpose()[1],'-x')
+
+        R = rot.from_quat(self.q).as_matrix()
+        for vi,v in enumerate(self.q):
+            frame=np.array([self.X[vi],self.X[vi]+R[vi][0],
+                            self.X[vi],self.X[vi]+R[vi][1],
+                            self.X[vi],self.X[vi]+R[vi][2]
+                            ])
+            xp=frame[:,0:2]
+            ax[0].plot(*(xp[0:2].transpose()), 'red')
+            ax[0].plot(*(xp[2:4].transpose()), 'green')
+            ax[0].plot(*(xp[4:6].transpose()), 'blue')
+        plt.pause(0.01)
+
+
     def pbd(self):
 
         X0=np.copy(self.X)
@@ -193,25 +213,9 @@ class Dynamic:
         self.V=(self.X-X0)/self.dt ##update velocity
         self.update_angular_velocity(q0)
 
-        ## update omega
+        self.draw()
 
 
-        ax[0].clear()
-        ax[0].set_xlim([-2.5, 2.5])
-        ax[0].set_ylim([-4, 1])
-        ax[0].plot(self.X.transpose()[0],self.X.transpose()[1],'-x')
-
-        R = rot.from_quat(self.q).as_matrix()
-        for vi,v in enumerate(self.q):
-            frame=np.array([self.X[vi],self.X[vi]+R[vi][0],
-                            self.X[vi],self.X[vi]+R[vi][1],
-                            self.X[vi],self.X[vi]+R[vi][2]
-                            ])
-            xp=frame[:,0:2]
-            ax[0].plot(*(xp[0:2].transpose()), 'red')
-            ax[0].plot(*(xp[2:4].transpose()), 'green')
-            ax[0].plot(*(xp[4:6].transpose()), 'blue')
-        plt.pause(0.01)
 
 
 
