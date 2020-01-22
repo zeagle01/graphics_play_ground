@@ -312,45 +312,6 @@ class Dynamic:
             ax[0].plot(*(xp[4:6].transpose()), 'blue')
         plt.pause(0.01)
 
-    def quaternion(self):
-        X0=np.copy(self.X)
-        dV=np.einsum('i,j',self.W,self.g)
-        #q0=np.copy((rot.from_rotvec(self.R_vec)).as_quat())
-
-        self.V+=dV*self.dt
-        self.R_quaternion+=self.omega*self.dt
-
-        self.X=self.X+self.dt*self.V
-        for it in range(10):
-            for c in self.constraints:
-                c.apply(self.X,self.R_vec,self.W)
-
-
-        self.V=(self.X-X0)/self.dt
-        q=(rot.from_rotvec(self.R_vec)).as_quat()
-        for i in range(len(q)):
-            q_conjugate=np.array([q0[i][3],*(-q0[i][0:3])])
-            q_i=np.array([q[i][3],*(q[i][0:3])])
-            self.omega[i]=2./self.dt*quaternion_multiply(q_i,q_conjugate)[1:4]
-
-
-        ax[0].clear()
-        ax[0].set_xlim([-2.5, 2.5])
-        ax[0].set_ylim([-4, 1])
-        ax[0].plot(self.X.transpose()[0],self.X.transpose()[1],'-x')
-
-        for vi,v in enumerate(self.R_vec):
-            q,rep=EM_To_Q(v,1)
-            R=Q_to_Matrix(q)
-            frame=np.array([self.X[vi],self.X[vi]+R[0],
-                            self.X[vi],self.X[vi]+R[1],
-                            self.X[vi],self.X[vi]+R[2]
-                            ])
-            xp=frame[:,0:2]
-            ax[0].plot(*(xp[0:2].transpose()), 'red')
-            ax[0].plot(*(xp[2:4].transpose()), 'green')
-            ax[0].plot(*(xp[4:6].transpose()), 'blue')
-        plt.pause(0.01)
 
 
 def onpress(event):
