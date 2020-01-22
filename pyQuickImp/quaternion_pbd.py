@@ -153,16 +153,22 @@ class Dynamic:
             c.precompute(self.X,self.W)
 
     def apply_torque(self):
-        tt=np.einsum('...k,...k',self.inertial ,self.omega)
-        tt=self.tau-np.cross(self.omega,tt)
-        tt=np.einsum('...k,...k',self.inv_inertial,tt)
-        self.omega=self.omega+tt*self.dt
+        #tt=np.einsum('...k,...k',self.inertial ,self.omega)
+        #tt=self.tau-np.cross(self.omega,tt)
+        #tt=np.einsum('...k,...k',self.inv_inertial,tt)
+        #self.omega=self.omega+tt*self.dt
+
+        ## world
+        R=rot.from_quat(self.q).as_matrix()
+        invI=np.einsum('...i,...ij',R,self.inv_inertial)
+        invI=np.einsum('...i,...i',invI,R)
+        self.omega=self.omega+np.einsum('...k,...k',invI,self.tau)*self.dt
 
     def orientation_integrate(self):
         for i in range(len(self.q)):
             omega_tilde=np.array([*self.omega[i],0])
-            dd=quaternion_multiply(self.q[i],omega_tilde)
-            self.q[i]+=dd*self.dt*0.5
+            #self.q[i]+=quaternion_multiply(self.q[i],omega_tilde)*self.dt*0.5
+            self.q[i]+=quaternion_multiply(omega_tilde,self.q[i])*self.dt*0.5
             self.q[i]/=np.linalg.norm(self.q[i])
 
 
