@@ -90,7 +90,7 @@ class Vertex_Ridgid_Body_Constraints:
         p=np.array([X[self.stencil[0]],p_ridgid])
         C=p[1]-p[0]
         J_x=np.eye(3)
-        c=1e-1
+        c=1e-3
         X[self.stencil[0]]+=np.dot(J_x.transpose(),C)*c
         X[self.stencil[1]]-=np.dot(J_x.transpose(),C)*c
         J_q=derivativeRp(q[self.stencil[1]],r)
@@ -134,7 +134,7 @@ class Dynamic:
 
 
         self.V=np.zeros_like(self.X)
-        self.dt=1/10
+        self.dt=1/100
         self.W=np.ones(len(self.X))
         self.g=np.array([0,-10,0])
 
@@ -152,36 +152,46 @@ class Dynamic:
         for c in self.constraints:
             c.precompute(self.X,self.W)
 
-    def pbd(self):
-
-        X0=np.copy(self.X)
-        dV=np.einsum('i,j',self.W,self.g)
-        q0=np.copy(self.q)
-
-        self.V=self.V+dV*self.dt
+    def apply_torque(self):
         tt=np.einsum('...k,...k',self.inertial ,self.omega)
         tt=self.tau-np.cross(self.omega,tt)
         tt=np.einsum('...k,...k',self.inv_inertial,tt)
         self.omega=self.omega+tt*self.dt
 
-        self.X=self.X+self.dt*self.V
+    def orientation_integrate(self):
         for i in range(len(self.q)):
             omega_tilde=np.array([*self.omega[i],0])
             dd=quaternion_multiply(self.q[i],omega_tilde)
             self.q[i]+=dd*self.dt*0.5
             self.q[i]/=np.linalg.norm(self.q[i])
 
-        for it in range(10):
-            for c in self.constraints:
-                c.apply(self.X,self.q,self.W)
 
-
-        self.V=(self.X-X0)/self.dt
+    def update_angular_velocity(self,q0):
         for i in range(len(self.q)):
             q_conjugate=quaternion_conjugate(self.q[i])
             tt=quaternion_multiply(q_conjugate,q0[i])
             tt=2*tt/self.dt
             self.omega[i]=tt[0:3]
+
+    def pbd(self):
+
+        X0=np.copy(self.X)
+        q0=np.copy(self.q)
+
+        dV=np.einsum('i,j',self.W,self.g)##apply force
+        self.V=self.V+dV*self.dt
+        self.apply_torque()
+
+        self.X=self.X+self.dt*self.V ##position integrate
+        self.orientation_integrate()
+
+        for it in range(10):
+            for c in self.constraints:
+                c.apply(self.X,self.q,self.W)
+
+
+        self.V=(self.X-X0)/self.dt ##update velocity
+        self.update_angular_velocity(q0)
 
         ## update omega
 
