@@ -90,23 +90,89 @@ class Vertex_Ridgid_Body_Constraints:
         p=np.array([X[self.stencil[0]],p_ridgid])
         C=p[1]-p[0]
         J_x=np.eye(3)
-        c=1e-3
+        c=1e-1
         X[self.stencil[0]]+=np.dot(J_x.transpose(),C)*c
         X[self.stencil[1]]-=np.dot(J_x.transpose(),C)*c
         J_q=derivativeRp(q[self.stencil[1]],r)
-        q[self.stencil[1]]-=np.dot(J_q.transpose(),C)*c
+        delta_q=np.dot(J_q.transpose(),C)
+        q[self.stencil[1]]-=delta_q*c
         q[self.stencil[1]]/=np.linalg.norm(q[self.stencil[1]])
         pass
 
 
 
 
+class Camara():
+    def __init__(self):
+        cid = fig.canvas.mpl_connect('button_press_event', self.onpress)
+        cid = fig.canvas.mpl_connect('motion_notify_event', self.onmove)
+        cid = fig.canvas.mpl_connect('button_release', self.onrelease)
+        self.x=0
+        self.y=0
+        self.view_matrix=np.eye(4)
+        self.projective_matrix=np.eye(4)
+        self.theta=0
 
+
+    def get_VP(self):
+        return np.dot(self.projective_matrix,self.view_matrix().transpose())
+
+    def get_view_matrix(self):
+        return self.view_matrix
+
+    def get_projective_matrix(self):
+        return self.projective_matrix
+
+    def onpress(self,event):
+        #delta_x=event.x-self.x
+        delta_x=1e0
+        print(delta_x)
+        self.theta+=delta_x*1e-1
+        self.view_matrix[0:3:2,0:3:2]=np.array([
+            [np.cos(self.theta),-np.sin(self.theta)],
+            [np.sin(self.theta), np.cos(self.theta)]
+        ])
+        #print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
+        #      ('double' if event.dblclick else 'single', event.button,
+        #       event.x, event.y, event.xdata, event.ydata))
+
+
+    def onmove(self,event):
+        self.x=event.x
+        self.y=event.y
+        print('move', event.x, event.y, event.xdata, event.ydata)
+
+
+    def onrelease(self,event):
+        print("release")
+
+
+def to_homogeneous_point(v):
+    return np.array([*v,1])
+
+
+def to_homogeneous_vector(v):
+    return np.array([*v,0])
+
+
+
+def MVP_transform(M,V,P,x):
+    y=np.zeros((len(x),4))
+    for i in range(len(y)):
+        y[i]=to_homogeneous_point(x[i])
+
+    y=np.einsum('ij,...j',M,y)
+    y=np.einsum('ij,...j',V,y)
+    y=np.einsum('ij,...j',P,y)
+    return y
 
 
 
 class Dynamic:
     def __init__(self):
+
+        self.cam = Camara()
+
         #self.X= np.array([[0,0,0],[1,0,0],[2,0,0],[2,0,0]])
         #self.stencils=np.array([[0,1],[1,2],[2,3]])
         self.X= np.array([[0,0,0],[1,0,0],[1.5,0,0]])
@@ -134,7 +200,7 @@ class Dynamic:
 
 
         self.V=np.zeros_like(self.X)
-        self.dt=1/100
+        self.dt=1/10
         self.W=np.ones(len(self.X))
         self.g=np.array([0,-10,0])
 
@@ -192,6 +258,7 @@ class Dynamic:
                             self.X[vi],self.X[vi]+R[vi][1],
                             self.X[vi],self.X[vi]+R[vi][2]
                             ])
+            frame=MVP_transform(np.eye(4),self.cam.get_view_matrix(),self.cam.get_projective_matrix(),frame)
             xp=frame[:,0:2]
             ax[0].plot(*(xp[0:2].transpose()), 'red')
             ax[0].plot(*(xp[2:4].transpose()), 'green')
@@ -224,22 +291,6 @@ class Dynamic:
 
 
 
-
-def onpress(event):
-    print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
-          ('double' if event.dblclick else 'single', event.button,
-           event.x, event.y, event.xdata, event.ydata))
-
-def onmove(event):
-    print('move', event.x, event.y, event.xdata, event.ydata)
-
-
-def onrelease(event):
-    printf("release")
-
-cid = fig.canvas.mpl_connect('button_press_event', onpress)
-cid = fig.canvas.mpl_connect('motion_notify_event', onmove)
-cid = fig.canvas.mpl_connect('button_release', onrelease)
 
 dy=Dynamic()
 dy.precompute()
