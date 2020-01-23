@@ -250,7 +250,8 @@ class Dynamic:
         ax[0].clear()
         ax[0].set_xlim([-2.5, 2.5])
         ax[0].set_ylim([-4, 1])
-        ax[0].plot(self.X.transpose()[0],self.X.transpose()[1],'-x')
+        mvpX=MVP_transform(np.eye(4),self.cam.get_view_matrix(),self.cam.get_projective_matrix(),self.X)
+        ax[0].plot(mvpX.transpose()[0],mvpX.transpose()[1],'-x')
 
         R = rot.from_quat(self.q).as_matrix()
         for vi,v in enumerate(self.q):
