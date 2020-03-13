@@ -16,7 +16,8 @@ int main(int argc,char** argv){
 	//std::string currentPath = boost::filesystem::system_complete(".").string();
 
 	boost::filesystem::create_directory("log");
-	FLAGS_log_dir = "./log/";
+	FLAGS_log_dir = "./log/";//out put dir
+	FLAGS_alsologtostderr = 1;//also print to console
 
 	gflags::ParseCommandLineFlags(&argc, &argv, true);
 	google::InitGoogleLogging(argv[0]);

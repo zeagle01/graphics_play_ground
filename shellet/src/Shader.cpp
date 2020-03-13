@@ -30,10 +30,10 @@ Shader::Shader(const std::string& vertex_shader_file, const std::string& fragmen
     std::ifstream f_s_fin;
     v_s_fin.open(vertex_shader_file);
     if (!v_s_fin) {
-		LOG(ERROR)<<"fail to open vertex source file:"<<vertex_shader_file ;
+		LOG(ERROR)<<"fail to open vertex source file: "<<vertex_shader_file ;
 	}
 	else {
-		LOG(INFO)<<"open vertex source file:"<<vertex_shader_file ;
+		LOG(INFO)<<"open vertex source file: "<<vertex_shader_file ;
 	}
 
     f_s_fin.open(fragment_shader_file);
@@ -41,7 +41,7 @@ Shader::Shader(const std::string& vertex_shader_file, const std::string& fragmen
 		LOG(ERROR)<<"fail to open fragment source file" ;
 	}
 	else {
-		LOG(INFO)<<"open fragment source file" <<fragment_shader_file;
+		LOG(INFO)<<"open fragment source file: " <<fragment_shader_file;
 	}
     std::stringstream v_s_stream, f_s_stream;
     v_s_stream << v_s_fin.rdbuf();
@@ -81,7 +81,7 @@ Shader::Shader(const std::string& vertex_shader_file, const std::string& fragmen
 		LOG(ERROR)<<infoLog;
 	}
 	else {
-		LOG(INFO) << "fragment shader compilation:" << fragment_shader_file;
+		LOG(INFO) << "fragment shader compilation: " << fragment_shader_file;
 	}
 
 
