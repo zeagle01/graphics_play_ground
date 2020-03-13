@@ -1,0 +1,18 @@
+echo "change dir to  `pwd`"
+wd=`pwd`
+
+buildDir=$wd/../build
+cd $buildDir
+echo "change dir to  `pwd`"
+cmake ..
+cmake --build $buildDir
+targetDir=$buildDir/examples/Debug
+
+cd $targetDir
+echo "change dir to  `pwd`"
+
+./show_obj.exe cases/1_triangle.json
+
+
+
+
