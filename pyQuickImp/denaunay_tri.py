@@ -78,29 +78,6 @@ def draw_triangles(ax,triangles,color):
         ax.plot(t_points[:,0],t_points[:,1],color=color)
     plt.pause(display_delay)
 
-def dummy_split():
-    for i,p in enumerate(points):
-        #plt.clf()
-        ax[0].clear()
-        ax[1].clear()
-        ax[0].scatter(p[0],p[1])
-        ti,t=find_triangle_point_reside(p,triangles)
-        draw_triangle(ax[0],t)
-        draw_triangles(ax[1],triangles)
-        draw_triangle(ax[1],t)
-        ax[1].scatter(points[0:i+1,0], points[0:i+1,1])
-
-        if(t is not None):
-            nt0=np.array([[p, t[0], t[1]]])
-            draw_triangle(ax[0], nt0[0])
-            nt1=np.array([[p, t[1], t[2]]])
-            draw_triangle(ax[0], nt1[0])
-            nt2=np.array([[p, t[2], t[0]]])
-            draw_triangle(ax[0], nt2[0])
-            triangles=np.concatenate((triangles,nt0))
-            triangles=np.concatenate((triangles,nt1))
-            triangles=np.concatenate((triangles,nt2))
-            triangles[ti]=None
 
 
 def segment_intersect(s0,s1):
