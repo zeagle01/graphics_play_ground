@@ -27,7 +27,7 @@ public:
 
 public:
 	static std::shared_ptr<Simulator> new_instance(std::string type);
-public:
+private:
 	using Simulator_Constructor = std::function<std::shared_ptr<Simulator>()>;
 	static std::map<std::string, Simulator_Constructor> m_constructors;
 	static void fill_types();

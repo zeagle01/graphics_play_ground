@@ -19,7 +19,7 @@ public:
 
 public:
 
-	virtual void setMesh(const std::vector<float>& positions,const std::vector<int>& triangle_indices);
+	virtual void setMesh(const std::vector<float>& positions,const std::vector<int>& triangle_indices) override;
 	virtual void setGravity(const std::vector<float>& g)override;
 	virtual void setMass(const float mass)override;
 	virtual void setDeltaT(const float dt)override;

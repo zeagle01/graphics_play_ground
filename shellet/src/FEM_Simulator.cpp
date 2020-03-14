@@ -3,7 +3,13 @@
 #include "FEM_Simulator.h"
 
 
-void FEM_Simulator::update(std::vector<float>& positions, std::vector<int>& triangle_indices) {
+void FEM_Simulator::update(std::vector<float>& positions, std::vector<int>& triangle_indices) 
+{
+
+    //TODO
+    //implicit matrix assemble
+
+    //solve
 
 }
 

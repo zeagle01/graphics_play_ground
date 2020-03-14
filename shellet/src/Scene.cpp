@@ -135,7 +135,7 @@ void Scene::init_from_config(const std::string& config_file){
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-    LOG(INFO)<<key;
+    DLOG(INFO)<<key;
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
