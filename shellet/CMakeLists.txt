@@ -33,7 +33,7 @@ add_executable(shellet_test
     src/Scene.cpp#for glad load  reason
 	test/Topology_Computer_Test.h
 	test/Topology_Computer_Test.cpp
-
+	test/Simulator_Test.cpp
     )
 
 
