@@ -1,6 +1,7 @@
 
 #include "Simulator.h"
 #include "PD_Simulator.h"
+#include "FEM_Simulator.h"
 #include "glog/logging.h"
 
 
@@ -13,6 +14,12 @@ void Simulator::fill_types()
     m_constructors["PD"]=[&]()
     {
         auto sub= std::make_shared<PD_Simulator>();
+        return std::dynamic_pointer_cast<Simulator>(sub);
+    };
+
+    m_constructors["FEM"]=[&]()
+    {
+        auto sub= std::make_shared<FEM_Simulator>();
         return std::dynamic_pointer_cast<Simulator>(sub);
     };
 
