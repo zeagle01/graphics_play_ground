@@ -81,11 +81,15 @@ void Scene::init_from_config(const std::string& config_file){
 
 
 	//
-	simulator = std::make_shared<PD_Simulator>();
-	//mesh
-	simulator->setMesh(m_positions, m_indices);
 	//gravity
 	Json::Value gravity_node= root["gravity_acceleration"];
+
+    auto solver_type_node = root["simulator"];
+
+    simulator = Simulator::new_instance(solver_type_node.asString());
+	//mesh
+	simulator->setMesh(m_positions, m_indices);
+
 	std::vector<float> gravity_values;
 	for (int i = 0; i < gravity_node.size(); i++) {
 		gravity_values.push_back(gravity_node[i].asFloat());
