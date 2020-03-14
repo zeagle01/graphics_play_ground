@@ -30,6 +30,8 @@ public:
 private:
 	std::shared_ptr<Topology_Computer> topology_computer;
 
+public:
+	void compute_new_stretched_positions(const std::vector<float> &x0, std::vector<float>& x);
 };
 
 

@@ -34,6 +34,7 @@ add_executable(shellet_test
 	test/Topology_Computer_Test.h
 	test/Topology_Computer_Test.cpp
 	test/Simulator_Test.cpp
+	test/FEM_Simulator_Test.cpp
     )
 
 
