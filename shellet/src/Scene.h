@@ -7,6 +7,9 @@
 #include "Shader.h"
 #include "Simulator.h"
 
+#include "json/json.h"
+
+
 class Scene{
     private:
     Shader* shader;
@@ -38,6 +41,13 @@ class Scene{
 
     int get_vertex_num()const ;
     int get_triangle_num()const ;
+
+private:
+    Json::Value m_config_root;
+
+    void build_config_root(const std::string& file);
+
+    void config_simulator();
 
 };
 

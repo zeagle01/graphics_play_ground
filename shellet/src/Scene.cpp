@@ -9,7 +9,6 @@
 
 #include "glog/logging.h"
 
-#include "json/json.h"
 #include <fstream>
 
 #include <iostream>
@@ -53,24 +52,43 @@ void Scene::init(int argc,char** argv){
 
 }
 
+void Scene::config_simulator()
+{
+    auto solver_type_node = m_config_root["simulator"];
 
-void Scene::init_from_config(const std::string& config_file){
-    Json::Value root;
-    std::string current_config_path = config_file;
+    simulator = Simulator::new_instance(solver_type_node.asString());
+    if(simulator)
+    {
+        LOG(INFO)<<"simulator created: "<<solver_type_node.asString();
+    }
+    else
+    {
+        LOG(ERROR)<<"simulator created failed! ";
+    }
+
+}
+
+
+void Scene::build_config_root(const std::string& file)
+{
     //std::string current_config_path = boost::filesystem::system_complete(config_file).c_str();
-    std::ifstream fin(current_config_path);
+    std::ifstream fin(file);
 	if (fin.good()) {
-		LOG(INFO) << "config file: " << config_file << "opend!";
-		fin >> root;
+		LOG(INFO) << "config file: " << file << "opend!";
+		fin >> m_config_root;
 	}
 	else {
-		LOG(ERROR) << "can't open config file" << config_file;
+		LOG(ERROR) << "can't open config file" << file;
 	}
+}
+
+void Scene::init_from_config(const std::string& config_file){
+    build_config_root(config_file);
 
     std::string current_config_dir=boost::filesystem::system_complete(config_file).parent_path().string()+"/"; 
-    m_mesh_file=current_config_dir+root["mesh_file"].asString();
-    m_vertex_shader_file=current_config_dir+root["vertex_shader"].asString();
-    m_fragment_shader_file=current_config_dir+root["fragment_shader"].asString();
+    m_mesh_file=current_config_dir+m_config_root["mesh_file"].asString();
+    m_vertex_shader_file=current_config_dir+m_config_root["vertex_shader"].asString();
+    m_fragment_shader_file=current_config_dir+m_config_root["fragment_shader"].asString();
 
 	m_shader = new Shader(m_vertex_shader_file, m_fragment_shader_file);
 
@@ -82,11 +100,19 @@ void Scene::init_from_config(const std::string& config_file){
 
 	//
 	//gravity
-	Json::Value gravity_node= root["gravity_acceleration"];
+	Json::Value gravity_node= m_config_root["gravity_acceleration"];
 
-    auto solver_type_node = root["simulator"];
+    auto solver_type_node = m_config_root["simulator"];
 
     simulator = Simulator::new_instance(solver_type_node.asString());
+    if(simulator)
+    {
+        LOG(INFO)<<"simulator created: "<<solver_type_node.asString();
+    }
+    else
+    {
+        LOG(ERROR)<<"simulator created failed! ";
+    }
 	//mesh
 	simulator->setMesh(m_positions, m_indices);
 
@@ -96,9 +122,9 @@ void Scene::init_from_config(const std::string& config_file){
 	}
 	simulator->setGravity(gravity_values);
 	//mass
-	simulator->setMass(root["uniform_mass"].asFloat());
+	simulator->setMass(m_config_root["uniform_mass"].asFloat());
 	//dt
-	simulator->setDeltaT(root["delta_t"].asFloat());
+	simulator->setDeltaT(m_config_root["delta_t"].asFloat());
 
 }
 
