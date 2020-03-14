@@ -68,6 +68,22 @@ void Scene::config_simulator()
 
 }
 
+void Scene::config_shader()
+{
+
+    auto vertex_shader_file = m_config_dir + m_config_root["vertex_shader"].asString();
+    auto fragment_shader_file = m_config_dir + m_config_root["fragment_shader"].asString();
+    m_shader = new Shader(vertex_shader_file, fragment_shader_file);
+}
+
+void Scene::config_mesh()
+{
+
+    Mesh_Loader mesh_loader;
+    mesh_loader.load_from_obj(m_config_dir+m_config_root["mesh_file"].asString());
+    m_positions=mesh_loader.get_positions();
+    m_indices=mesh_loader.get_indices();
+}
 
 void Scene::build_config_root(const std::string& file)
 {
@@ -76,51 +92,40 @@ void Scene::build_config_root(const std::string& file)
 	if (fin.good()) {
 		LOG(INFO) << "config file: " << file << "opend!";
 		fin >> m_config_root;
-	}
+        m_config_dir = boost::filesystem::system_complete(file).parent_path().string() + "/";
+    }
 	else {
 		LOG(ERROR) << "can't open config file" << file;
+	}
+}
+
+void Scene::config_gravity()
+{
+	Json::Value gravity_node= m_config_root["gravity_acceleration"];
+	for (int i = 0; i < gravity_node.size(); i++) {
+		m_gravity.push_back(gravity_node[i].asFloat());
 	}
 }
 
 void Scene::init_from_config(const std::string& config_file){
     build_config_root(config_file);
 
-    std::string current_config_dir=boost::filesystem::system_complete(config_file).parent_path().string()+"/"; 
-    m_mesh_file=current_config_dir+m_config_root["mesh_file"].asString();
-    m_vertex_shader_file=current_config_dir+m_config_root["vertex_shader"].asString();
-    m_fragment_shader_file=current_config_dir+m_config_root["fragment_shader"].asString();
+    config_shader();
 
-	m_shader = new Shader(m_vertex_shader_file, m_fragment_shader_file);
+    //mesh
+    config_mesh();
 
-    Mesh_Loader mesh_loader;
-    mesh_loader.load_from_obj(m_mesh_file);
-    m_positions=mesh_loader.get_positions();
-    m_indices=mesh_loader.get_indices();
+    config_simulator();
 
 
 	//
 	//gravity
-	Json::Value gravity_node= m_config_root["gravity_acceleration"];
+    config_gravity();
 
-    auto solver_type_node = m_config_root["simulator"];
 
-    simulator = Simulator::new_instance(solver_type_node.asString());
-    if(simulator)
-    {
-        LOG(INFO)<<"simulator created: "<<solver_type_node.asString();
-    }
-    else
-    {
-        LOG(ERROR)<<"simulator created failed! ";
-    }
-	//mesh
-	simulator->setMesh(m_positions, m_indices);
+    simulator->setMesh(m_positions, m_indices);
 
-	std::vector<float> gravity_values;
-	for (int i = 0; i < gravity_node.size(); i++) {
-		gravity_values.push_back(gravity_node[i].asFloat());
-	}
-	simulator->setGravity(gravity_values);
+    simulator->setGravity(m_gravity);
 	//mass
 	simulator->setMass(m_config_root["uniform_mass"].asFloat());
 	//dt

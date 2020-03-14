@@ -28,9 +28,8 @@ class Scene{
     std::vector<float> m_positions;
     std::vector<int> m_indices;
 
-    std::string m_mesh_file;
-    std::string m_vertex_shader_file;
-    std::string m_fragment_shader_file;;
+	std::vector<float> m_gravity;
+
 
     public:
     
@@ -44,10 +43,14 @@ class Scene{
 
 private:
     Json::Value m_config_root;
+    std::string m_config_dir;
 
     void build_config_root(const std::string& file);
 
     void config_simulator();
+    void config_shader();
+    void config_mesh();
+    void config_gravity();
 
 };
 
