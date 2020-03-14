@@ -2,6 +2,8 @@
 
 #include "FEM_Simulator.h"
 
+#include <algorithm>
+
 
 void FEM_Simulator::update(std::vector<float>& positions, std::vector<int>& triangle_indices) 
 {
@@ -9,8 +11,13 @@ void FEM_Simulator::update(std::vector<float>& positions, std::vector<int>& tria
     //TODO
     //implicit matrix assemble
 
-    //solve
-
+//    static float time = 0.0;
+//    //solve
+//    for(size_t i=0;i<positions.size();i++)
+//    {
+//        positions[i%3+1]+=std::sin(time);
+//    }
+//    time += 0.001;
 }
 
 
