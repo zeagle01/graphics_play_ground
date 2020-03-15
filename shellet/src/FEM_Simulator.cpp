@@ -16,16 +16,6 @@
 void FEM_Simulator::update(std::vector<float>& positions, std::vector<int>& triangle_indices) 
 {
 
-    //TODO
-    //implicit matrix assemble
-
-//    static float time = 0.0;
-//    //solve
-//    for(size_t i=0;i<positions.size();i++)
-//    {
-//        positions[i%3+1]+=std::sin(time);
-//    }
-//    time += 0.001;
     compute_new_stretched_positions(positions);
 }
 
@@ -63,6 +53,8 @@ void FEM_Simulator::compute_new_stretched_positions( std::vector<float>& x)
     size_t v_num=x.size() / 3;
 
     m_forces = m3xf::Zero(3, v_num);
+
+    m_positions = m3xf::Map(x.data(), 3,v_num);
 
     size_t t_num = m_indices.size() / 3;
     std::vector<m22f> dm_list(t_num);

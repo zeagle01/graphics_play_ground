@@ -43,6 +43,7 @@ void FEM_Simulator_Test::SetUp()
     m_x = m_x0;
     m_x[2 * 3 + 1] = 2;
     m_sim->setMesh(m_x0, m_indices);
+    m_sim->setDeltaT(0.01);
 }
 
 
