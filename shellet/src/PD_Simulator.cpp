@@ -47,9 +47,8 @@ void PD_Simulator::apply_gravity(m3xf& external_forces, const vxf& mass, const v
 	external_forces = gravity_acceleration * mass.transpose();
 }
 void PD_Simulator::compute_inertial_positions(m3xf& guess_X, const m3xf& X, const m3xf& V, const vxf& mass, const m3xf& external_forces, const float dt) {
-		guess_X = X + dt * V + dt * dt * external_forces * mass.asDiagonal().inverse();
-
-		guess_X.col(0) = v3f(0, 0, 0);
+	guess_X = X + dt * V + dt * dt * external_forces * mass.asDiagonal().inverse();
+	guess_X.col(0) = v3f(0, 0, 0);
 }
 void PD_Simulator::store_last_positions(m3xf& last_X, const m3xf& X) {
 	last_X = X;

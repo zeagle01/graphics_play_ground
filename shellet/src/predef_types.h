@@ -12,6 +12,14 @@ typedef Eigen::Vector2i v2i;
 typedef Eigen::Vector3f v3f;
 typedef Eigen::Vector3i v3i;
 
+typedef Eigen::Matrix<float,3,3> m33f;
+typedef Eigen::Matrix<float,2,2> m22f;
+typedef Eigen::Matrix<float,3,2> m32f;
+typedef Eigen::Matrix<float,2,3> m23f;
+
+
+
+
 typedef Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic> mxxf;
 typedef Eigen::Matrix<int,Eigen::Dynamic,Eigen::Dynamic> mxxi;
 

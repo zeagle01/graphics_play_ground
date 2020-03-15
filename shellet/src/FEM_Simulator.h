@@ -5,6 +5,8 @@
 #include "Simulator.h"
 #include "Topology_Computer.h"
 
+#include "predef_types.h"
+
 #include <vector>
 #include <memory>
 
@@ -30,8 +32,16 @@ public:
 private:
 	std::shared_ptr<Topology_Computer> topology_computer;
 
+	m3xf m_forces ;
+	m3xf m_velocities ;
+	m3xf m_positions ;
+	m2xf m_init_positions ;
+	std::vector<int> m_indices;
+
+	float dt;
+
 public:
-	void compute_new_stretched_positions(const std::vector<float> &x0, std::vector<float>& x);
+	void compute_new_stretched_positions( std::vector<float>& x);
 };
 
 

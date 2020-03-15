@@ -9,7 +9,7 @@
       0
     ],
     "uniform_mass": 1,
-    "delta_t": 0.033
+    "delta_t": 0.001
 
 }
 
