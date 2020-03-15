@@ -34,11 +34,16 @@ void FEM_Simulator::setMesh(const std::vector<float>& positions, const std::vect
     m_forces = m3xf::Zero(3, v_num);
     m_velocities = m3xf::Zero(3, v_num);
     m_indices = triangle_indices;
+
+
+    m_delta_velocities = m3xf::Zero(3, v_num);
 }
+
 void FEM_Simulator::setGravity(const std::vector<float>& g) 
 {
 
 }
+
 void FEM_Simulator::setMass(const float mass) 
 {
 
@@ -96,7 +101,7 @@ void FEM_Simulator::compute_new_stretched_positions( std::vector<float>& x)
 
         float a = 0.5 * std::abs(dm.determinant());
         m33f f;
-        f.block(0,0,3,2) = a * F * delta * dm_inv;
+        f.block(0,0,3,2) = a * F * delta * dm_inv.transpose();
         f.col(2)=-f.col(0)-f.col(1);
 
         for (size_t j = 0; j < 3; j++)
@@ -108,5 +113,24 @@ void FEM_Simulator::compute_new_stretched_positions( std::vector<float>& x)
 	m_velocities +=m_forces*dt;
     m_positions+=m_velocities*dt;
     x.assign(m_positions.data(),m_positions.data()+3*v_num);
+
+}
+
+void FEM_Simulator::implicit_method()
+{
+
+    using eigen_triplet = Eigen::Triplet<float>;
+    std::vector<eigen_triplet> coo_list;
+
+    size_t t_num = m_indices.size() / 3;
+    for (size_t i = 0; i < t_num; i++)
+    {
+        //m33f m=
+        //        v2i ev = simulation_data->edge_indices.col(ei);
+        //        float w[]{1, -1};
+        //        E_coefficients.push_back(eigen_triplet(ev[0], ei, w[0]));
+        //        E_coefficients.push_back(eigen_triplet(ev[1], ei, w[1]));
+    }
+//    E.setFromTriplets(E_coefficients.begin(), E_coefficients.end());
 
 }

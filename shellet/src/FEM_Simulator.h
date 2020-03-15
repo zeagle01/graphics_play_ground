@@ -34,14 +34,20 @@ private:
 
 	m3xf m_forces ;
 	m3xf m_velocities ;
+
 	m3xf m_positions ;
 	m2xf m_init_positions ;
 	std::vector<int> m_indices;
+
+
+//implicit
+	m3xf m_delta_velocities;
 
 	float dt;
 
 public:
 	void compute_new_stretched_positions( std::vector<float>& x);
+	void implicit_method();
 };
 
 
