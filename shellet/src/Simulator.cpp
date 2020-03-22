@@ -6,34 +6,26 @@
 
 
 
-
-std::map<std::string, Simulator::Simulator_Constructor> Simulator::m_constructors=std::map<std::string, Simulator::Simulator_Constructor>();
-
-void Simulator::fill_types()
-{
-    m_constructors["PD"]=[&]()
-    {
-        auto sub= std::make_shared<PD_Simulator>();
-        return std::dynamic_pointer_cast<Simulator>(sub);
-    };
-
-    m_constructors["FEM"]=[&]()
-    {
-        auto sub= std::make_shared<FEM_Simulator>();
-        return std::dynamic_pointer_cast<Simulator>(sub);
-    };
-
-}
 std::shared_ptr<Simulator> Simulator::new_instance(std::string type)
 {
-    if(m_constructors.empty())
-    {
-        fill_types();
-    }
 
-    if(m_constructors.count(type))
+	using Simulator_Constructor = std::function<std::shared_ptr<Simulator>()>;
+    static std::map<std::string, Simulator_Constructor> constructors{};
+    if (constructors.empty())
     {
-        return m_constructors[type]();
+        constructors["PD"] = [&]() {
+            auto sub = std::make_shared<PD_Simulator>();
+            return std::dynamic_pointer_cast<Simulator>(sub);
+        };
+
+        constructors["FEM"] = [&]() {
+            auto sub = std::make_shared<FEM_Simulator>();
+            return std::dynamic_pointer_cast<Simulator>(sub);
+        };
+    }
+    if(constructors.count(type))
+    {
+        return constructors[type]();
     }
     else
     {
