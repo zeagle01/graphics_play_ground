@@ -31,3 +31,7 @@ add_custom_command(TARGET show_obj
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/shellet/src/shaders $<TARGET_FILE_DIR:show_obj>/shaders
     COMMENT "copy shaders to main" VERBATIM
     )
+
+
+
+add_subdirectory(vk_render)

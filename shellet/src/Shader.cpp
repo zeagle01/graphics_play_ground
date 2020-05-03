@@ -112,7 +112,12 @@ void Shader::use() {
 
 GLint Shader::get_uniform_variable(const std::string & variable_name)
 {
-    return glGetUniformLocation(shader_program, variable_name.c_str());
+    GLint location= glGetUniformLocation(shader_program, variable_name.c_str());
+    if(location==GL_INVALID_INDEX)
+    {
+        LOG(ERROR)<<"can't find uniform!";
+    }
+    return location;
 }
 
 GLint Shader::get_program() {
