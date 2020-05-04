@@ -4,6 +4,7 @@
 #include "gflags/gflags.h"
 #include <filesystem>
 #include <stdexcept>
+#include <cstdlib>
 
 int main(int argc, char** argv)
 {
@@ -23,29 +24,11 @@ int main(int argc, char** argv)
 	catch (const std::exception & e)
 	{
 		LOG(ERROR) << e.what();
+		return EXIT_FAILURE;
 	}
 
 
-//	
-//	glfwInit();
-//
-//	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-//	GLFWwindow* window = glfwCreateWindow(800, 600, "vulkan window", nullptr, nullptr);
-//	uint32_t extension_count;
-//	vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, nullptr);
-//
-//	LOG(INFO) << extension_count << " extension_count";
-//
-//
-//	glm::mat4 matrix;
-//	glm::vec4 vec;
-//	auto test = matrix * vec;
-//
-//	while (!glfwWindowShouldClose(window))
-//	{
-//		glfwPollEvents();
-//	}
 
 
-    return 0;
+    return EXIT_SUCCESS;
 }
