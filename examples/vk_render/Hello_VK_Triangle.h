@@ -34,13 +34,18 @@ private:
 
 
 
+
 	void populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT& create_info);
+
+private:
+	bool is_device_suitable(VkPhysicalDevice device);
+
 private:
 	const unsigned int kWidth = 800;
 	const unsigned int kHeight = 600;
 	GLFWwindow* m_window;
 	VkInstance m_vk_instance;
-	VkPhysicalDevice m_physical_device;
+	VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
 
 	VkDebugUtilsMessengerEXT m_debug_messenger;
 

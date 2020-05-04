@@ -73,8 +73,45 @@ void Hello_VK_Triangle::init_vulkan()
 	setup_debug_messenger();
 	pick_physical_device();
 }
+
+bool Hello_VK_Triangle::is_device_suitable(VkPhysicalDevice device)
+{
+	VkPhysicalDeviceProperties properties;
+	vkGetPhysicalDeviceProperties(device, &properties);
+
+	VkPhysicalDeviceFeatures features;
+	vkGetPhysicalDeviceFeatures(device, &features);
+	return properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU 
+		&& features.geometryShader;
+
+}
+
 void Hello_VK_Triangle::pick_physical_device()
 {
+	uint32_t device_count = 0;
+	vkEnumeratePhysicalDevices(m_vk_instance, &device_count, nullptr);
+	LOG(INFO) << device_count << " device found";
+	if (device_count == 0)
+	{
+		throw::std::runtime_error("there is no GPU that support vulkan!");
+	}
+	std::vector<VkPhysicalDevice> devices(device_count);
+	vkEnumeratePhysicalDevices(m_vk_instance, &device_count, devices.data());
+	for (const auto& device : devices)
+	{
+		if (is_device_suitable(device))
+		{
+			m_physical_device = device;
+			LOG(INFO) << "use device " << (void*)&m_physical_device;
+			break;
+		}
+	}
+
+	if (m_physical_device == VK_NULL_HANDLE)
+	{
+		throw std::runtime_error("no suitable device!");
+	}
+
 
 }
 
@@ -174,7 +211,7 @@ void Hello_VK_Triangle::craete_vk_instance()
 		}
 
 		populate_debug_messenger_create_info(debug_create_info);
-		instance_create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debug_create_info;
+		//instance_create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debug_create_info;
 	}
 	else
 	{
