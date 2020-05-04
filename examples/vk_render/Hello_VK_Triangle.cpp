@@ -31,10 +31,12 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 void Hello_VK_Triangle::run()
 {
+	LOG(INFO) << "<<< run";
 	init_window();
 	init_vulkan();
 	main_loop();
 	cleanup();
+	LOG(INFO) << ">>> run";
 }
 
 void Hello_VK_Triangle::init_window()
@@ -69,9 +71,16 @@ void Hello_VK_Triangle::init_window()
 
 void Hello_VK_Triangle::init_vulkan()
 {
+	LOG(INFO) << "<<< init vulkan";
+	LOG(INFO) << "craete_vk_instance";
 	craete_vk_instance();
+	LOG(INFO) << "setup_debug_messenger";
 	setup_debug_messenger();
+	LOG(INFO) << "pick_physical_device";
 	pick_physical_device();
+	LOG(INFO) << "create_logic_device";
+	create_logic_device();
+	LOG(INFO) << ">>> init vulkan";
 }
 
 bool Hello_VK_Triangle::is_device_suitable(VkPhysicalDevice device)
@@ -81,8 +90,18 @@ bool Hello_VK_Triangle::is_device_suitable(VkPhysicalDevice device)
 
 	VkPhysicalDeviceFeatures features;
 	vkGetPhysicalDeviceFeatures(device, &features);
+
+	Queue_Family_Indices indices = find_queue_families(device);
+
+
 	return properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU 
-		&& features.geometryShader;
+		&& features.geometryShader
+		&& indices.graphics_family.has_value();
+
+}
+
+void Hello_VK_Triangle::create_logic_device()
+{
 
 }
 
@@ -113,6 +132,28 @@ void Hello_VK_Triangle::pick_physical_device()
 	}
 
 
+}
+
+
+Queue_Family_Indices Hello_VK_Triangle::find_queue_families(VkPhysicalDevice device)
+{
+	Queue_Family_Indices indices;
+
+	uint32_t queue_family_count;
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, nullptr);
+
+	std::vector<VkQueueFamilyProperties> queue_family_properties(queue_family_count);
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, queue_family_properties.data());
+	for (size_t i = 0; i < queue_family_properties.size(); i++)
+	{
+		if (queue_family_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+		{
+			LOG(INFO) << i << " th queue family support graphics bit";
+			indices.graphics_family = i;
+		}
+	}
+
+	return indices;
 }
 
 void Hello_VK_Triangle::check_extension_support()

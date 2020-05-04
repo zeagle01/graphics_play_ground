@@ -4,11 +4,18 @@
 
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <optional>
 
 
 
 struct GLFWwindow;
 struct VkDebugUtilsMessengerCreateInfoEXT;
+
+
+struct Queue_Family_Indices
+{
+	std::optional<uint32_t> graphics_family;
+};
 
 class Hello_VK_Triangle
 {
@@ -26,6 +33,7 @@ private:
 	void craete_vk_instance();
 	void setup_debug_messenger();
 	void pick_physical_device();
+	void create_logic_device();
 
 	void check_extension_support();
 	bool check_validation_layer_support();
@@ -39,6 +47,7 @@ private:
 
 private:
 	bool is_device_suitable(VkPhysicalDevice device);
+	Queue_Family_Indices find_queue_families(VkPhysicalDevice device);
 
 private:
 	const unsigned int kWidth = 800;
@@ -46,6 +55,7 @@ private:
 	GLFWwindow* m_window;
 	VkInstance m_vk_instance;
 	VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
+	VkDevice m_device;//logic device;
 
 	VkDebugUtilsMessengerEXT m_debug_messenger;
 
