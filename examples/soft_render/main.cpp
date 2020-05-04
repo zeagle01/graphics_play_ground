@@ -4,11 +4,13 @@
 #include <iostream>
 #include <algorithm>
 #include <thread>
+#include <Mesh_Loader.h>
 
 
 
 void line(int x0, int y0, int x1, int y1, COLORREF color,HDC dc)
 {
+
 	bool steep = false;
 	if (std::abs(x0 - x1) < std::abs(y0 - y1))
 	{
@@ -49,23 +51,45 @@ int main()
 	GetWindowRect(my_console, &r);
 	MoveWindow(my_console, r.left, r.top, width, height, TRUE);
 
+	Mesh_Loader mesh_loader;
+    mesh_loader.load_from_obj("cases/african_head.obj");
+    //mesh_loader.load_from_obj("cases/flag.obj");
+	auto positions = mesh_loader.get_positions();
+	auto indices = mesh_loader.get_indices();
 
 	float t = 0.f;
-	while (true)
-	{
+//	while (true)
+//	{
 		system("cls");
-		float mag = 0.3 * width;
-		float offset = mag*std::sin(t);
 
-		line(200 + offset, 300, 500, 200, RGB(255, 255, 255), my_dc);
-		line(300, 500 + offset, 200, 200, RGB(0, 255, 100), my_dc);
+		for (size_t ti = 0; ti < indices.size()/3; ti++)
+		{
+			for (int vi = 0; vi < 3; vi++)
+			{
+				int vi_next = (vi + 1) % 3;
+				int v = indices[ti * 3 + vi];
+				int v_next = indices[ti * 3 + vi_next];
+
+				int x0 = (positions[v * 3 + 0] + 1.0) * width * 0.5;
+				int y0 = (1.f - positions[v * 3 + 1]) * height * 0.5;
+				int x1 = (positions[v_next * 3 + 0] + 1.0) * width * 0.5;
+				int y1 = (1.f - positions[v_next * 3 + 1]) * height * 0.5;
+
+				line(x0, y0, x1, y1, RGB(255, 100, 0), my_dc);
+			}
+
+		}
+
 		t += .01;
 
 //		using namespace std::literals;
 //		std::this_thread::sleep_for(2000ms);
-	}
+//	}
 
 	ReleaseDC(my_console, my_dc);
+
+	int c;
+	std::cin >> c;
 
 	return 0;
 }
