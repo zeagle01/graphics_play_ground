@@ -11,6 +11,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <algorithm>
+
 static std::string read_source_from_file(const std::string& file)
 {
 	std::ifstream fin(file);
@@ -126,40 +128,62 @@ int main(int argc, char** argv)
 	std::vector<float> position
 	{
 		-0.5f,-0.5f,
-		0.0f,0.5f,
-		0.5,-0.5f
+		0.5f,-0.5f,
+
+		0.5f,0.5f,
+		-0.5f,0.5f,
 	};
+
+
+	std::vector<int> indices
+	{
+		0,1,2,
+		2,3,0
+	};
+
 	unsigned int buffer;
 	glGenBuffers(1, &buffer);
-
 	glBindBuffer(GL_ARRAY_BUFFER,buffer);
 
 	int position_attrib = glGetAttribLocation(shader,"position");
-	glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float),position.data(),GL_DYNAMIC_DRAW);
-
+	glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float), position.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(position_attrib);
-
 	glVertexAttribPointer(position_attrib, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0);
 
+	unsigned int ibo;
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_DYNAMIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER,0);
-
+	int frame = 0;
 	while (!glfwWindowShouldClose(window))
 	{
 
 		glClear(GL_COLOR_BUFFER_BIT);
+		float f = 0.1;
+		float a = 0.02;
+		for (size_t i = 0; i < position.size() / 3; i++)
+		{
+			position[i * 2 + 0] += a * std::sin(frame * f);
+		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		glDrawArrays(GL_TRIANGLES, 0, position.size() / 2);
-		//glDrawElements(GL_TRIANGLES,3,)
+		glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float), position.data(), GL_DYNAMIC_DRAW);
 
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		indices[0] = frame % 2;
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_DYNAMIC_DRAW);
+
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		frame++;
 	}
 
-	glDeleteShader(shader);
+	glDeleteProgram(shader);
 	glfwTerminate();
 
 	return 0;
