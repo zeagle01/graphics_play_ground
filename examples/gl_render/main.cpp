@@ -7,6 +7,71 @@
 #include <filesystem>
 
 
+#include <string>
+#include <fstream>
+#include <sstream>
+
+static std::string read_source_from_file(const std::string& file)
+{
+	std::ifstream fin(file);
+	if (!fin.good())
+	{
+		LOG(ERROR) << "faile to open file";
+	}
+
+	std::stringstream ss;
+	ss << fin.rdbuf();
+	return ss.str();
+}
+
+static unsigned int compile_shader(std::string& shader,unsigned int type)
+{
+
+	unsigned int id = glCreateShader(type);
+	const char* src = shader.data();
+	glShaderSource(id, 1, &src, nullptr);
+	glCompileShader(id);
+
+	int result;
+	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		int lengh;
+		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &lengh);
+		std::string log_s(lengh,' ');
+		glGetShaderInfoLog(id, lengh, &lengh, &log_s[0]);
+		auto shader_name=(type == GL_VERTEX_SHADER) ? "vertex" : "fragment";
+		LOG(ERROR) << "faile to compile " << shader_name;
+		LOG(ERROR) << log_s;
+	}
+
+	return id;
+
+}
+
+static auto create_shader(std::string& vertex_shader, std::string& fragment_shader)
+{
+	auto program = glCreateProgram();
+	auto vs = compile_shader(vertex_shader, GL_VERTEX_SHADER);
+	auto fs = compile_shader(fragment_shader, GL_FRAGMENT_SHADER);
+
+	glAttachShader(program, vs);
+	glAttachShader(program, fs);
+
+	glLinkProgram(program);
+
+	glValidateProgram(program);
+
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+
+	return program;
+}
+
+
+
+
+
 int main(int argc, char** argv)
 {
 
@@ -54,6 +119,9 @@ int main(int argc, char** argv)
 
 	LOG(INFO) << "gl version " << glGetString(GL_VERSION);
 
+	auto shader = create_shader(read_source_from_file("cases/gl_render.vs"), read_source_from_file("cases/gl_render.fs"));
+
+	glUseProgram(shader);
 
 	std::vector<float> position
 	{
@@ -66,7 +134,7 @@ int main(int argc, char** argv)
 
 	glBindBuffer(GL_ARRAY_BUFFER,buffer);
 
-	int position_attrib = 0;
+	int position_attrib = glGetAttribLocation(shader,"position");
 	glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float),position.data(),GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(position_attrib);
@@ -91,6 +159,7 @@ int main(int argc, char** argv)
 		glfwPollEvents();
 	}
 
+	glDeleteShader(shader);
 	glfwTerminate();
 
 	return 0;

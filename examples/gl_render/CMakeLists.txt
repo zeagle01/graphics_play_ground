@@ -24,3 +24,10 @@ find_package(gflags CONFIG REQUIRED)
 target_link_libraries(gl_render PUBLIC gflags)
 
 
+set_property(TARGET gl_render PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:gl_render>)
+add_custom_command(TARGET gl_render
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../cases $<TARGET_FILE_DIR:gl_render>/cases
+    COMMENT "copy cases" VERBATIM
+    )
+
