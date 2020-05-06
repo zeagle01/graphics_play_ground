@@ -36,3 +36,4 @@ add_custom_command(TARGET show_obj
 
 add_subdirectory(vk_render)
 add_subdirectory(soft_render)
+add_subdirectory(gl_render)
