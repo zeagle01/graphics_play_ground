@@ -24,7 +24,7 @@ include(FetchContent)
 ###########glm
 FetchContent_Declare(
   glm_repo
-  GIT_REPOSITORY https://github.com/g-truc/glm.git
+  GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/external/glm
   GIT_TAG        master
 )
 FetchContent_MakeAvailable(glm_repo)
