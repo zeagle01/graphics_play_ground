@@ -13,6 +13,33 @@
 
 #include <algorithm>
 
+
+#define ASSERT(x) if(!(x)) __debugbreak();
+#define GL_Call(function)\
+	gl_clear_error();\
+	function;\
+	ASSERT(gl_check_error(#function,__FILE__,__LINE__))\
+
+static void gl_clear_error()
+{
+	while (glGetError() != GL_NO_ERROR)
+	{
+	}
+
+}
+static bool gl_check_error(const std::string & function, const std::string & file, int line)
+{
+
+	while (auto error = glGetError())
+	{
+
+		LOG(ERROR) << "file: " <<file <<" function: "<<function<<" line: " <<line;
+		LOG(ERROR) << "[OpenGL Error]: " << error;
+		return false;
+	}
+	return true;
+}
+
 static std::string read_source_from_file(const std::string& file)
 {
 	std::ifstream fin(file);
@@ -96,6 +123,9 @@ int main(int argc, char** argv)
 	}
 
 
+//	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+//	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+//	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	GLFWwindow* window;
 	window = glfwCreateWindow(800, 600, "gl window", nullptr, nullptr);
 
@@ -111,6 +141,8 @@ int main(int argc, char** argv)
 	glfwMakeContextCurrent(window);
 	LOG(INFO) << "gl context " ;
 
+	glfwSwapInterval(1);
+
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
 		LOG(ERROR)<<"glad load failed";
@@ -123,7 +155,7 @@ int main(int argc, char** argv)
 
 	auto shader = create_shader(read_source_from_file("cases/gl_render.vs"), read_source_from_file("cases/gl_render.fs"));
 
-	glUseProgram(shader);
+	GL_Call(glUseProgram(shader));
 
 	std::vector<float> position
 	{
@@ -141,49 +173,64 @@ int main(int argc, char** argv)
 		2,3,0
 	};
 
+	unsigned int vao;
+	GL_Call(glGenVertexArrays(1, &vao));
+	GL_Call(glBindVertexArray(vao));
+
+
 	unsigned int buffer;
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER,buffer);
+	GL_Call(glGenBuffers(1, &buffer));
+	GL_Call(glBindBuffer(GL_ARRAY_BUFFER,buffer));
 
 	int position_attrib = glGetAttribLocation(shader,"position");
-	glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float), position.data(), GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(position_attrib);
-	glVertexAttribPointer(position_attrib, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0);
+	GL_Call(glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float), position.data(), GL_DYNAMIC_DRAW));
+	GL_Call(glEnableVertexAttribArray(position_attrib));
+	GL_Call(glVertexAttribPointer(position_attrib, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0));
 
 	unsigned int ibo;
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_DYNAMIC_DRAW);
+	GL_Call(glGenBuffers(1, &ibo));
+	GL_Call(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
+	GL_Call(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_DYNAMIC_DRAW));
+
+	std::vector<float> uniform_color{ 1,0,0,1 };
 
 	int frame = 0;
 	while (!glfwWindowShouldClose(window))
 	{
 
-		glClear(GL_COLOR_BUFFER_BIT);
+		GL_Call(glClear(GL_COLOR_BUFFER_BIT));
 		float f = 0.1;
 		float a = 0.02;
 		for (size_t i = 0; i < position.size() / 3; i++)
 		{
 			position[i * 2 + 0] += a * std::sin(frame * f);
 		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float), position.data(), GL_DYNAMIC_DRAW);
-
 		indices[0] = frame % 2;
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_DYNAMIC_DRAW);
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		for (size_t i = 0; i < uniform_color.size(); i++)
+		{
+			uniform_color[i] = (std::sin(frame * f + i) + 1.) * 0.5;
+		}
+
+		GL_Call(auto location = glGetUniformLocation(shader, "u_color"));
+		glUniform4f(location, uniform_color[0], uniform_color[1], uniform_color[2], uniform_color[3]);
+
+		GL_Call(glBindBuffer(GL_ARRAY_BUFFER, vao));
+		GL_Call(glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float), position.data(), GL_DYNAMIC_DRAW));
+
+		GL_Call(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
+		GL_Call(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_DYNAMIC_DRAW));
+
+		GL_Call(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
 		//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		GL_Call(glfwSwapBuffers(window));
+		GL_Call(glfwPollEvents());
 		frame++;
 	}
 
-	glDeleteProgram(shader);
+	GL_Call(glDeleteProgram(shader));
 	glfwTerminate();
 
 	return 0;
