@@ -13,32 +13,12 @@
 
 #include <algorithm>
 
+#include "renderer.h"
 
-#define ASSERT(x) if(!(x)) __debugbreak();
-#define GL_Call(function)\
-	gl_clear_error();\
-	function;\
-	ASSERT(gl_check_error(#function,__FILE__,__LINE__))\
 
-static void gl_clear_error()
-{
-	while (glGetError() != GL_NO_ERROR)
-	{
-	}
+#include "vertex_buffer.h" 
+#include "index_buffer.h"
 
-}
-static bool gl_check_error(const std::string & function, const std::string & file, int line)
-{
-
-	while (auto error = glGetError())
-	{
-
-		LOG(ERROR) << "file: " <<file <<" function: "<<function<<" line: " <<line;
-		LOG(ERROR) << "[OpenGL Error]: " << error;
-		return false;
-	}
-	return true;
-}
 
 static std::string read_source_from_file(const std::string& file)
 {
@@ -167,7 +147,7 @@ int main(int argc, char** argv)
 	};
 
 
-	std::vector<int> indices
+	std::vector<unsigned int> indices
 	{
 		0,1,2,
 		2,3,0
@@ -178,19 +158,15 @@ int main(int argc, char** argv)
 	GL_Call(glBindVertexArray(vao));
 
 
-	unsigned int buffer;
-	GL_Call(glGenBuffers(1, &buffer));
-	GL_Call(glBindBuffer(GL_ARRAY_BUFFER,buffer));
+	Vertex_Buffer vbo(position.data(),position.size());
 
 	int position_attrib = glGetAttribLocation(shader,"position");
-	GL_Call(glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float), position.data(), GL_DYNAMIC_DRAW));
+	//GL_Call(glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float), position.data(), GL_DYNAMIC_DRAW));
 	GL_Call(glEnableVertexAttribArray(position_attrib));
 	GL_Call(glVertexAttribPointer(position_attrib, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0));
 
-	unsigned int ibo;
-	GL_Call(glGenBuffers(1, &ibo));
-	GL_Call(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
-	GL_Call(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_DYNAMIC_DRAW));
+
+	Index_Buffer ibo(indices.data(), indices.size());
 
 	std::vector<float> uniform_color{ 1,0,0,1 };
 
@@ -215,11 +191,10 @@ int main(int argc, char** argv)
 		GL_Call(auto location = glGetUniformLocation(shader, "u_color"));
 		glUniform4f(location, uniform_color[0], uniform_color[1], uniform_color[2], uniform_color[3]);
 
-		GL_Call(glBindBuffer(GL_ARRAY_BUFFER, vao));
-		GL_Call(glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float), position.data(), GL_DYNAMIC_DRAW));
+		vbo.set_data(position.data(), position.size());
 
-		GL_Call(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
-		GL_Call(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_DYNAMIC_DRAW));
+
+		ibo.set_data(indices.data(), indices.size());
 
 		GL_Call(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 

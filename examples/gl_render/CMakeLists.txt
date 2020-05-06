@@ -3,7 +3,15 @@ cmake_minimum_required(VERSION 3.12)
 
 project(gl_render)
 
-add_executable(gl_render main.cpp)
+add_executable(gl_render 
+main.cpp
+renderer.cpp
+renderer.h
+vertex_buffer.h
+vertex_buffer.cpp
+index_buffer.h
+index_buffer.cpp
+)
 
 target_compile_features(gl_render PRIVATE cxx_std_20)
 
