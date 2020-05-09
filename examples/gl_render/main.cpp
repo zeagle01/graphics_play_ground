@@ -7,9 +7,6 @@
 #include <filesystem>
 
 
-#include <string>
-#include <fstream>
-#include <sstream>
 
 #include <algorithm>
 
@@ -21,63 +18,8 @@
 #include "vertex_array.h"
 #include "vertex_buffer_layout.h"
 
+#include "shader.h"
 
-static std::string read_source_from_file(const std::string& file)
-{
-	std::ifstream fin(file);
-	if (!fin.good())
-	{
-		LOG(ERROR) << "faile to open file";
-	}
-
-	std::stringstream ss;
-	ss << fin.rdbuf();
-	return ss.str();
-}
-
-static unsigned int compile_shader(std::string& shader,unsigned int type)
-{
-
-	unsigned int id = glCreateShader(type);
-	const char* src = shader.data();
-	glShaderSource(id, 1, &src, nullptr);
-	glCompileShader(id);
-
-	int result;
-	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-	if (result == GL_FALSE)
-	{
-		int lengh;
-		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &lengh);
-		std::string log_s(lengh,' ');
-		glGetShaderInfoLog(id, lengh, &lengh, &log_s[0]);
-		auto shader_name=(type == GL_VERTEX_SHADER) ? "vertex" : "fragment";
-		LOG(ERROR) << "faile to compile " << shader_name;
-		LOG(ERROR) << log_s;
-	}
-
-	return id;
-
-}
-
-static auto create_shader(std::string& vertex_shader, std::string& fragment_shader)
-{
-	auto program = glCreateProgram();
-	auto vs = compile_shader(vertex_shader, GL_VERTEX_SHADER);
-	auto fs = compile_shader(fragment_shader, GL_FRAGMENT_SHADER);
-
-	glAttachShader(program, vs);
-	glAttachShader(program, fs);
-
-	glLinkProgram(program);
-
-	glValidateProgram(program);
-
-	glDeleteShader(vs);
-	glDeleteShader(fs);
-
-	return program;
-}
 
 
 
@@ -135,9 +77,9 @@ int main(int argc, char** argv)
 
 	LOG(INFO) << "gl version " << glGetString(GL_VERSION);
 
-	auto shader = create_shader(read_source_from_file("cases/gl_render.vs"), read_source_from_file("cases/gl_render.fs"));
-
-	GL_Call(glUseProgram(shader));
+	Shader shader;
+	shader.create_shader_from_file("cases/gl_render.vs", "cases/gl_render.fs");
+	shader.bind();
 
 	std::vector<float> position
 	{
@@ -173,6 +115,7 @@ int main(int argc, char** argv)
 	{
 
 		GL_Call(glClear(GL_COLOR_BUFFER_BIT));
+
 		float f = 0.1;
 		float a = 0.02;
 		for (size_t i = 0; i < position.size() / 3; i++)
@@ -186,8 +129,7 @@ int main(int argc, char** argv)
 			uniform_color[i] = (std::sin(frame * f + i) + 1.) * 0.5;
 		}
 
-		GL_Call(auto location = glGetUniformLocation(shader, "u_color"));
-		glUniform4f(location, uniform_color[0], uniform_color[1], uniform_color[2], uniform_color[3]);
+		shader.set_uniform_4f("u_color", uniform_color[0], uniform_color[1], uniform_color[2], uniform_color[3]);
 
 		va.bind();
 		vbo.bind();
@@ -206,7 +148,6 @@ int main(int argc, char** argv)
 		frame++;
 	}
 
-	GL_Call(glDeleteProgram(shader));
 	glfwTerminate();
 
 	return 0;

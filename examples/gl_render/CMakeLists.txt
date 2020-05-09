@@ -16,6 +16,8 @@ vertex_array.h
 vertex_array.cpp
 vertex_buffer_layout.h
 vertex_buffer_layout.cpp
+shader.h
+shader.cpp
 )
 
 target_compile_features(gl_render PRIVATE cxx_std_20)
