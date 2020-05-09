@@ -18,6 +18,8 @@
 
 #include "vertex_buffer.h" 
 #include "index_buffer.h"
+#include "vertex_array.h"
+#include "vertex_buffer_layout.h"
 
 
 static std::string read_source_from_file(const std::string& file)
@@ -153,21 +155,17 @@ int main(int argc, char** argv)
 		2,3,0
 	};
 
-	unsigned int vao;
-	GL_Call(glGenVertexArrays(1, &vao));
-	GL_Call(glBindVertexArray(vao));
 
 
 	Vertex_Buffer vbo(position.data(),position.size());
-
-	int position_attrib = glGetAttribLocation(shader,"position");
-	//GL_Call(glBufferData(GL_ARRAY_BUFFER, position.size() * sizeof(float), position.data(), GL_DYNAMIC_DRAW));
-	GL_Call(glEnableVertexAttribArray(position_attrib));
-	GL_Call(glVertexAttribPointer(position_attrib, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0));
-
-
 	Index_Buffer ibo(indices.data(), indices.size());
 
+
+	Vertex_Array va;
+	Vertex_Buffer_Layout layout;
+	layout.push<float>(2);
+	va.add_buffer(vbo, layout);
+	
 	std::vector<float> uniform_color{ 1,0,0,1 };
 
 	int frame = 0;
@@ -190,6 +188,9 @@ int main(int argc, char** argv)
 
 		GL_Call(auto location = glGetUniformLocation(shader, "u_color"));
 		glUniform4f(location, uniform_color[0], uniform_color[1], uniform_color[2], uniform_color[3]);
+
+		va.bind();
+		vbo.bind();
 
 		vbo.set_data(position.data(), position.size());
 
