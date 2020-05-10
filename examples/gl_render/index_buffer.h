@@ -19,4 +19,6 @@ public:
 
 	void set_data(const unsigned int* data, unsigned int element_num);
 
+	unsigned int get_count()const ;
+
 };

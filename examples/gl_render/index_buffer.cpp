@@ -38,3 +38,8 @@ void Index_Buffer::set_data(const unsigned int* data, unsigned int element_num)
 	bind();
 	GL_Call(glBufferData(GL_ELEMENT_ARRAY_BUFFER, element_num * sizeof(unsigned int), data, GL_DYNAMIC_DRAW));
 }
+
+unsigned int Index_Buffer::get_count() const
+{
+	return m_element_num;
+}

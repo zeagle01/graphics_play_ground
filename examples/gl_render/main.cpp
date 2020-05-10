@@ -110,11 +110,12 @@ int main(int argc, char** argv)
 	
 	std::vector<float> uniform_color{ 1,0,0,1 };
 
+	Renderer renderer;
 	int frame = 0;
 	while (!glfwWindowShouldClose(window))
 	{
 
-		GL_Call(glClear(GL_COLOR_BUFFER_BIT));
+		renderer.clear();
 
 		float f = 0.1;
 		float a = 0.02;
@@ -131,17 +132,14 @@ int main(int argc, char** argv)
 
 		shader.set_uniform_4f("u_color", uniform_color[0], uniform_color[1], uniform_color[2], uniform_color[3]);
 
+
 		va.bind();
 		vbo.bind();
-
 		vbo.set_data(position.data(), position.size());
-
-
 		ibo.set_data(indices.data(), indices.size());
 
-		GL_Call(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
-		//glBindBuffer(GL_ARRAY_BUFFER, 0);
+		renderer.draw(va, ibo, shader);
 
 		GL_Call(glfwSwapBuffers(window));
 		GL_Call(glfwPollEvents());
