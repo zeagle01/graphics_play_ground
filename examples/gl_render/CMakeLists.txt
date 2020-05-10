@@ -18,6 +18,11 @@ vertex_buffer_layout.h
 vertex_buffer_layout.cpp
 shader.h
 shader.cpp
+texture.h
+texture.cpp
+
+#${CMAKE_SOURCE_DIR}/external/stb/stb_image.h
+${CMAKE_SOURCE_DIR}/external/stb/stb_image.cpp
 )
 
 target_compile_features(gl_render PRIVATE cxx_std_20)
@@ -25,6 +30,8 @@ target_compile_features(gl_render PRIVATE cxx_std_20)
 
 target_link_libraries(gl_render PRIVATE glad)
 
+
+target_include_directories(gl_render PRIVATE ${CMAKE_SOURCE_DIR}/external/stb)
 
 find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(gl_render PUBLIC glfw)
@@ -40,9 +47,16 @@ target_link_libraries(gl_render PUBLIC gflags)
 
 
 set_property(TARGET gl_render PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:gl_render>)
+
 add_custom_command(TARGET gl_render
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../cases $<TARGET_FILE_DIR:gl_render>/cases
     COMMENT "copy cases" VERBATIM
+    )
+
+add_custom_command(TARGET gl_render
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:gl_render>/resources
+    COMMENT "copy resources" VERBATIM
     )
 

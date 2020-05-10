@@ -19,6 +19,7 @@
 #include "vertex_buffer_layout.h"
 
 #include "shader.h"
+#include "texture.h"
 
 
 
@@ -77,17 +78,14 @@ int main(int argc, char** argv)
 
 	LOG(INFO) << "gl version " << glGetString(GL_VERSION);
 
-	Shader shader;
-	shader.create_shader_from_file("cases/gl_render.vs", "cases/gl_render.fs");
-	shader.bind();
 
 	std::vector<float> position
 	{
-		-0.5f,-0.5f,
-		0.5f,-0.5f,
+		-0.5f,-0.5f,0.0f,0.0f,
+		0.5f,-0.5f,1.0f,0.0f,
 
-		0.5f,0.5f,
-		-0.5f,0.5f,
+		0.5f,0.5f,1.0f,1.0f,
+		-0.5f,0.5f,0.0f,1.0f
 	};
 
 
@@ -97,7 +95,14 @@ int main(int argc, char** argv)
 		2,3,0
 	};
 
+	std::vector<float> uniform_color{ 1,0,0,1 };
 
+	GL_Call(glEnable(GL_BLEND));
+	GL_Call(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+	Shader shader;
+	shader.create_shader_from_file("cases/gl_render.vs", "cases/gl_render.fs");
+	shader.bind();
 
 	Vertex_Buffer vbo(position.data(),position.size());
 	Index_Buffer ibo(indices.data(), indices.size());
@@ -106,9 +111,13 @@ int main(int argc, char** argv)
 	Vertex_Array va;
 	Vertex_Buffer_Layout layout;
 	layout.push<float>(2);
+	layout.push<float>(2);
 	va.add_buffer(vbo, layout);
 	
-	std::vector<float> uniform_color{ 1,0,0,1 };
+	Texture texture("resources/textures/awesomeface.png");
+	int active_texture_slot = 0;
+	texture.bind(active_texture_slot);
+	shader.set_uniform_1i("u_texture", active_texture_slot);
 
 	Renderer renderer;
 	int frame = 0;
