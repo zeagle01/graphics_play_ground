@@ -150,7 +150,12 @@ int main(int argc, char** argv)
 
 	glm::mat4 proj = glm::ortho(-2.f, 2.f, -2.f, 2.f, -1.f, 1.f);
 	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-0.1f, 0, 0));
-	glm::vec3 model_translate = glm::vec3(0.2f, 0.2f, 0);
+	std::vector<glm::vec3> model_translates =
+	{
+		glm::vec3(0.8f, 0.9f, 0),
+		glm::vec3(0.0f, 0.2f, 0),
+		glm::vec3(-0.8f, -0.9f, 0)
+	};
 
 
 	while (!glfwWindowShouldClose(window))
@@ -173,15 +178,14 @@ int main(int argc, char** argv)
 
 		for (size_t i = 0; i < uniform_color.size(); i++)
 		{
-			uniform_color[i] = (std::sin(frame * f + i) + 1.) * 0.5;
+			uniform_color[i] = (std::sin(frame * f + i) + 1.) * 0.5 + 0.2f;
 		}
 
 
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), model_translate);
-		glm::mat4 mvp = proj * view * model;
 
 		shader.set_uniform_4f("u_color", uniform_color[0], uniform_color[1], uniform_color[2], uniform_color[3]);
-		shader.set_uniform_mat4f("u_MVP", &mvp[0][0]);
+
+
 
 
 		va.bind();
@@ -190,7 +194,18 @@ int main(int argc, char** argv)
 		ibo.set_data(indices.data(), indices.size());
 
 
-		renderer.draw(va, ibo, shader);
+		for (int i = 0; i < model_translates.size(); i++)
+		{
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), model_translates[i]);
+			glm::mat4 mvp = proj * view * model;
+			shader.set_uniform_mat4f("u_MVP", &mvp[0][0]);
+
+			va.bind();
+			vbo.bind();
+			vbo.set_data(position.data(), position.size());
+			ibo.set_data(indices.data(), indices.size());
+			renderer.draw(va, ibo, shader);
+		}
 
 		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 		if (show_demo_window)
@@ -198,7 +213,7 @@ int main(int argc, char** argv)
 
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
-			ImGui::SliderFloat3("float", &model_translate.x, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+			ImGui::SliderFloat3("float", &model_translates[0].x, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		}
 
