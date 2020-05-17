@@ -26,6 +26,9 @@
 #include "imgui_impl_opengl3.h"
 
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 
 
 int main(int argc, char** argv)
@@ -143,6 +146,13 @@ int main(int argc, char** argv)
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	int frame = 0;
+
+
+	glm::mat4 proj = glm::ortho(-2.f, 2.f, -2.f, 2.f, -1.f, 1.f);
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-0.1f, 0, 0));
+	glm::vec3 model_translate = glm::vec3(0.2f, 0.2f, 0);
+
+
 	while (!glfwWindowShouldClose(window))
 	{
 
@@ -166,7 +176,12 @@ int main(int argc, char** argv)
 			uniform_color[i] = (std::sin(frame * f + i) + 1.) * 0.5;
 		}
 
+
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), model_translate);
+		glm::mat4 mvp = proj * view * model;
+
 		shader.set_uniform_4f("u_color", uniform_color[0], uniform_color[1], uniform_color[2], uniform_color[3]);
+		shader.set_uniform_mat4f("u_MVP", &mvp[0][0]);
 
 
 		va.bind();
@@ -183,25 +198,8 @@ int main(int argc, char** argv)
 
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
-			static float f = 0.0f;
-			static int counter = 0;
-
-			ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-			ImGui::Checkbox("Another Window", &show_another_window);
-
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-			if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-				counter++;
-			ImGui::SameLine();
-			ImGui::Text("counter = %d", counter);
-
+			ImGui::SliderFloat3("float", &model_translate.x, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::End();
 		}
 
 		// 3. Show another simple window.
