@@ -23,6 +23,24 @@ texture.cpp
 
 #${CMAKE_SOURCE_DIR}/external/stb/stb_image.h
 ${CMAKE_SOURCE_DIR}/external/stb/stb_image.cpp
+
+#imgui
+${CMAKE_SOURCE_DIR}/external/imgui-master/imconfig.h
+${CMAKE_SOURCE_DIR}/external/imgui-master/imgui.cpp
+${CMAKE_SOURCE_DIR}/external/imgui-master/imgui.h
+${CMAKE_SOURCE_DIR}/external/imgui-master/imgui_demo.cpp
+${CMAKE_SOURCE_DIR}/external/imgui-master/imgui_draw.cpp
+${CMAKE_SOURCE_DIR}/external/imgui-master/imgui_internal.h
+${CMAKE_SOURCE_DIR}/external/imgui-master/imgui_widgets.cpp
+${CMAKE_SOURCE_DIR}/external/imgui-master/imstb_rectpack.h
+${CMAKE_SOURCE_DIR}/external/imgui-master/imstb_textedit.h
+${CMAKE_SOURCE_DIR}/external/imgui-master/imstb_truetype.h
+
+${CMAKE_SOURCE_DIR}/external/imgui-master/examples/imgui_impl_glfw.h
+${CMAKE_SOURCE_DIR}/external/imgui-master/examples/imgui_impl_glfw.cpp
+
+${CMAKE_SOURCE_DIR}/external/imgui-master/examples/imgui_impl_opengl3.h
+${CMAKE_SOURCE_DIR}/external/imgui-master/examples/imgui_impl_opengl3.cpp
 )
 
 target_compile_features(gl_render PRIVATE cxx_std_20)
@@ -31,7 +49,6 @@ target_compile_features(gl_render PRIVATE cxx_std_20)
 target_link_libraries(gl_render PRIVATE glad)
 
 
-target_include_directories(gl_render PRIVATE ${CMAKE_SOURCE_DIR}/external/stb)
 
 find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(gl_render PUBLIC glfw)
@@ -41,9 +58,31 @@ target_link_libraries(gl_render PUBLIC glfw)
 find_package(glog CONFIG REQUIRED)
 target_link_libraries(gl_render PUBLIC glog::glog)
 
+###########stb
+target_include_directories(gl_render PRIVATE ${CMAKE_SOURCE_DIR}/external/stb)
+
 ###########gflags
 find_package(gflags CONFIG REQUIRED)
 target_link_libraries(gl_render PUBLIC gflags)
+
+include(FetchContent)
+
+#########imgui
+target_include_directories(gl_render PRIVATE ${CMAKE_SOURCE_DIR}/external/imgui-master)
+target_include_directories(gl_render PRIVATE ${CMAKE_SOURCE_DIR}/external/imgui-master/examples)
+
+#########glm
+FetchContent_Declare(
+  glm_repo
+  GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/external/glm
+  GIT_TAG        master
+)
+FetchContent_MakeAvailable(glm_repo)
+target_link_libraries(gl_render PRIVATE glm)
+
+
+
+
 
 
 set_property(TARGET gl_render PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:gl_render>)
