@@ -21,6 +21,11 @@ shader.cpp
 texture.h
 texture.cpp
 
+test.cpp
+test.h
+test_clear_color.cpp
+test_clear_color.h
+
 #${CMAKE_SOURCE_DIR}/external/stb/stb_image.h
 ${CMAKE_SOURCE_DIR}/external/stb/stb_image.cpp
 
