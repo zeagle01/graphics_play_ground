@@ -30,6 +30,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "test_clear_color.h"
+#include "test.h"
 
 
 int main(int argc, char** argv)
@@ -108,22 +109,50 @@ int main(int argc, char** argv)
 
 	int frame = 0;
 
-	test::Test_Clear_Color test;
+	std::unique_ptr<test::Test> current_test = nullptr;
+	std::unique_ptr<test::Test_Menu> menu = std::make_unique< test::Test_Menu>(current_test);
+
+	menu->register_test<test::Test_Clear_Color>("clear color");
+
+	//test::Test_Clear_Color test;
 
 	while (!glfwWindowShouldClose(window))
 	{
 
+		GL_Call(glClearColor(0., 0., 0., 1.));//default color;
 		renderer.clear();
 
-		test.on_update(0.0f);
-		test.on_render();
+		//test.on_update(0.0f);
+		//test.on_render();
 
 		// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		test.on_imgui_render();
+		if (current_test)
+		{
+			current_test->on_update(0.0f);
+			current_test->on_render();
+
+			ImGui::Begin("Test");
+			current_test->on_imgui_render();
+			if (ImGui::Button("<-"))
+			{
+				current_test.reset(nullptr);
+			}
+			ImGui::End();
+		}
+		else
+		{
+			menu->on_update(0.0f);
+			menu->on_render();
+			ImGui::Begin("Test");
+			menu->on_imgui_render();
+			ImGui::End();
+
+		}
+
 
 		// Rendering
 		ImGui::Render();

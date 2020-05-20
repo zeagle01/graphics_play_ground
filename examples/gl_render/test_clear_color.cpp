@@ -13,12 +13,13 @@ namespace test
 	Test_Clear_Color::Test_Clear_Color() :
 		m_color{ 1.f,1.0f,0.f,1.0f }
 	{
-
+		LOG(INFO) << "clear_color_test construct!";
 	}
 
 	Test_Clear_Color::~Test_Clear_Color()
 	{
 
+		LOG(INFO) << "clear_color_test deleted!";
 	}
 
 	void Test_Clear_Color::on_update(float deltaTime)
