@@ -31,6 +31,7 @@
 
 #include "test_clear_color.h"
 #include "test_texture2d.h"
+#include "test_batch_rendering.h"
 #include "test.h"
 
 
@@ -114,6 +115,7 @@ int main(int argc, char** argv)
 
 	menu->register_test<test::Test_Clear_Color>("clear color");
 	menu->register_test<test::Test_Texture2D>("Texture2d");
+	menu->register_test<test::Test_Batch_Rendering>("Batch Rendering");
 
 	//test::Test_Clear_Color test;
 
