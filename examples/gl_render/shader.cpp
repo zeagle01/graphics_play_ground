@@ -127,3 +127,9 @@ void Shader::set_uniform_1i(const std::string& name, int v)
 	auto location = get_uniform_location(name);
     glUniform1i(location, v);
 }
+
+void Shader::set_uniform_1iv(const std::string &name,const unsigned int count,const int* v)
+{
+	auto location = get_uniform_location(name);
+	glUniform1iv(location, count, v);
+}

@@ -25,6 +25,7 @@ public:
     void set_uniform_4f(const std::string &name, float v0, float v1, float v2, float v3);
 	void set_uniform_mat4f(const std::string& name, float* mat4);
     void set_uniform_1i(const std::string &name,int v);
+    void set_uniform_1iv(const std::string &name,const unsigned int count,const int* v);
 
     void create_shader_from_file(const std::string &vertex_shader,const  std::string &fragment_shader);
 
