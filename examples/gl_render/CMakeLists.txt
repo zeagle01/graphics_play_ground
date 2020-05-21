@@ -25,6 +25,8 @@ test.cpp
 test.h
 test_clear_color.cpp
 test_clear_color.h
+test_texture2d.cpp
+test_texture2d.h
 
 #${CMAKE_SOURCE_DIR}/external/stb/stb_image.h
 ${CMAKE_SOURCE_DIR}/external/stb/stb_image.cpp

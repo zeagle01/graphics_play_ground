@@ -2,6 +2,7 @@
 
 
 #include "vertex_array.h"  
+#include "vertex_buffer.h"
 #include "glad/glad.h"
 #include "renderer.h"
 

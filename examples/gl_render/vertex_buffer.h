@@ -11,6 +11,7 @@ private:
 
 public:
 	Vertex_Buffer(const void* data,unsigned int size);
+	Vertex_Buffer() = default;
 	virtual ~Vertex_Buffer();
 
 	void bind()const ;

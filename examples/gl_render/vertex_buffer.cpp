@@ -25,12 +25,12 @@ Vertex_Buffer::~Vertex_Buffer()
 
 void Vertex_Buffer::bind() const
 {
-	glBindBuffer(GL_ARRAY_BUFFER, m_renderer_id);
+	GL_Call( glBindBuffer(GL_ARRAY_BUFFER, m_renderer_id));
 }
 
 void Vertex_Buffer::unbind()const
 {
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	GL_Call(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
 void Vertex_Buffer::set_data(const void* data, unsigned int size)

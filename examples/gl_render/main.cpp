@@ -30,6 +30,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "test_clear_color.h"
+#include "test_texture2d.h"
 #include "test.h"
 
 
@@ -107,12 +108,12 @@ int main(int argc, char** argv)
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 
-	int frame = 0;
 
 	std::unique_ptr<test::Test> current_test = nullptr;
 	std::unique_ptr<test::Test_Menu> menu = std::make_unique< test::Test_Menu>(current_test);
 
 	menu->register_test<test::Test_Clear_Color>("clear color");
+	menu->register_test<test::Test_Texture2D>("Texture2d");
 
 	//test::Test_Clear_Color test;
 
@@ -160,9 +161,6 @@ int main(int argc, char** argv)
 
 		GL_Call(glfwSwapBuffers(window));
 		GL_Call(glfwPollEvents());
-
-
-		frame++;
 	}
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();

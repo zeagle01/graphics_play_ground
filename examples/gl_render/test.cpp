@@ -13,12 +13,12 @@ namespace test
 		:m_current_test(current_test)
 	{
 
-		LOG(INFO) << "test_menu construct!";
+		LOG(INFO) << "test_menu " << (void*)this << " construct!";
 	}
 
 	Test_Menu::~Test_Menu()
 	{
-		LOG(INFO) << "test_menu deleted!";
+		LOG(INFO) << "test_menu " << (void*)this << " destruct!";
 	}
 
 	void Test_Menu::on_update(float deltaTime)
