@@ -12,7 +12,6 @@ private:
 
 public:
 	Index_Buffer(const unsigned int* data,unsigned int element_num);
-	Index_Buffer() = default;
 	virtual ~Index_Buffer();
 
 	void bind()const;

@@ -15,12 +15,15 @@ Index_Buffer::Index_Buffer(const unsigned int* data, unsigned int element_num) :
 
 	GL_Call(glBufferData(GL_ELEMENT_ARRAY_BUFFER, element_num * sizeof(unsigned int), data, GL_DYNAMIC_DRAW));
 
+	LOG(INFO) << "Index_Buffer " << (void*)this << " construct";
 
 }
 
 Index_Buffer::~Index_Buffer()
 {
 	glDeleteBuffers(1,&m_renderer_id);
+
+	LOG(INFO) << "Index_Buffer " << (void*)this << " destruct";
 }
 
 void Index_Buffer::bind()const

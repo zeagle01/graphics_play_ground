@@ -15,12 +15,14 @@ Vertex_Buffer::Vertex_Buffer(const void* data, unsigned int size)
 
 	GL_Call(glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), data, GL_DYNAMIC_DRAW));
 
+	LOG(INFO) << "Vertex_Buffer " << (void*)this << "construct!";
 
 }
 
 Vertex_Buffer::~Vertex_Buffer()
 {
 	glDeleteBuffers(1,&m_renderer_id);
+	LOG(INFO) << "Vertex_Buffer " << (void*)this << "destruct!";
 }
 
 void Vertex_Buffer::bind() const

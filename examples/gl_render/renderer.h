@@ -21,6 +21,9 @@ bool gl_check_error(const std::string & function, const std::string & file, int 
 
 
 
+
+
+
 class Renderer
 {
 	private:

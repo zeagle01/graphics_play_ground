@@ -5,6 +5,7 @@
 #include "vertex_buffer.h"
 #include "glad/glad.h"
 #include "renderer.h"
+#include "glog/logging.h"
 
 void Vertex_Array::add_buffer(const Vertex_Buffer& buffer, const Vertex_Buffer_Layout& buffer_layout)
 {
@@ -26,9 +27,15 @@ void Vertex_Array::add_buffer(const Vertex_Buffer& buffer, const Vertex_Buffer_L
 }
 
 
+Vertex_Array::~Vertex_Array()
+{
+	LOG(INFO) << "Vertex_Array " << (void*)this << "destruct!";
+}
+
 Vertex_Array::Vertex_Array()
 {
 	GL_Call(glGenVertexArrays(1, &m_render_id));
+	LOG(INFO) << "Vertex_Array " << (void*)this << "construct!";
 }
 void Vertex_Array::bind()const
 {
