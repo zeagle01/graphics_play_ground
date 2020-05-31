@@ -3,7 +3,6 @@
 
 namespace clumsy_engine
 {
-	void print();
 
 	class Application
 	{
