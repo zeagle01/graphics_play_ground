@@ -10,17 +10,23 @@ add_library(clumsy_engine SHARED
 include/clumsy_engine/clumsy_engine.h
 include/clumsy_engine/application.h
 include/clumsy_engine/entry_point.h
+include/clumsy_engine/log.h
 src/application.cpp
+src/log.cpp
 )
 
+include(GenerateExportHeader)
+generate_export_header(clumsy_engine)
 
 target_include_directories(clumsy_engine
 PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/clumsy_engine>
+$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/spdlog/include>
+$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 $<INSTALL_INTERFACE:include>
 PRIVATE
-${CMAKE_CURRENT_BINARY_DIR}
+#${CMAKE_CURRENT_BINARY_DIR}
 src
 )
 
