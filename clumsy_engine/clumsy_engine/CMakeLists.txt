@@ -7,14 +7,17 @@ project(clumsy_engine)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS YES CACHE BOOL "export all symbols")
 
 add_library(clumsy_engine SHARED
-include/clumsy_engine/test.h
-src/test.cpp
+include/clumsy_engine/clumsy_engine.h
+include/clumsy_engine/application.h
+include/clumsy_engine/entry_point.h
+src/application.cpp
 )
 
 
 target_include_directories(clumsy_engine
 PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/clumsy_engine>
 $<INSTALL_INTERFACE:include>
 PRIVATE
 ${CMAKE_CURRENT_BINARY_DIR}
