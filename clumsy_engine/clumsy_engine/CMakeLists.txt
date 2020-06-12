@@ -12,6 +12,14 @@ include/clumsy_engine/application.h
 include/clumsy_engine/entry_point.h
 include/clumsy_engine/log.h
 src/application.cpp
+src/event.cpp
+src/event.h
+src/key_event.cpp
+src/key_event.h
+src/mouse_event.h
+src/mouse_event.cpp
+src/application_event.h
+src/application_event.cpp
 src/log.cpp
 )
 
