@@ -21,7 +21,6 @@ class Projector:
 
 ####### data input
 real=np.float32
-t=real(0.)
 X=np.array([
     [0,0,0],
     [0.5,0,0],
@@ -39,24 +38,197 @@ projector=Projector()
 
 
 ################ constraints
+class Spring_Constraint:
+    def __init__(self,x,w,stiff,l0):
+        self.x=x
+        self.w=w
+        self.stiff=stiff
+        self.l0=l0
+
+    def compute_A(self):
+        a=self.stiff*np.einsum('i,j',self.w,self.w)
+        return a
+
+    def compute_p(self):
+        p=np.einsum('i,ij',self.w,self.x)
+        lp=np.linalg.norm(p)
+        p*=self.l0/lp
+        return p
+
+    def compute_b(self):
+        p=self.compute_p()
+        b=self.stiff*np.einsum('i,j',self.w,p)
+        return b
+
+class Spring_Solver:
+    def __init__(self,sim_data):
+        self.sim_data=sim_data
+        self.w=np.array([1,-1])
+        self.stiff=real(1e3)
+
+    def pre_compute(self):
+        ##to generalize
+        self.stencils= [
+            [0,1],
+            [1, 2],
+            [2, 3],
+            [3, 0],
+            [0, 2],
+        ]
+        self.l0=np.zeros(len(self.stencils),dtype=real)
+        for i,stencil in enumerate(self.stencils):
+            d=np.einsum('i,ij',self.w,self.sim_data.X_rest[stencil])
+            self.l0[i]=np.linalg.norm(d)
+
+    def generate_constraints(self):
+        self.constraints=[]
+        for i,stencil in enumerate(self.stencils):
+            constraint=Spring_Constraint(self.sim_data.X[stencil],self.w,self.stiff,self.l0[i])
+            self.constraints.append(constraint)
+
+    def get_stencils(self):
+        return self.stencils;
+
+    def get_constraints(self):
+        return self.constraints
 
 
+class Inertial_Constraint:
+    def __init__(self,x,v,m,h):
+        self.x=x
+        self.v=v
+        self.m=m
+        self.h=h
 
+    def compute_A(self):
+        return np.array([[self.m/self.h/self.h]])
+
+    def compute_b(self):
+        #return self.m/self.h/self.h*(self.x+np.array([0,-0.1,0]))
+        return self.m/self.h/self.h*(self.x+self.v*self.h+np.array([0,-1.1,0]))
+
+class Inertial_Solver:
+    def __init__(self,sim_data):
+        self.sim_data=sim_data
+
+    def pre_compute(self):
+        v_num=self.sim_data.X.shape[0]
+        self.stencils=np.arange(v_num)
+        self.stencils=self.stencils.reshape((v_num,1))
+
+    def generate_constraints(self):
+        self.constraints=[]
+        m=real(1)
+        for stencil in self.stencils:
+            self.constraints.append(Inertial_Constraint(self.sim_data.X[stencil],self.sim_data.V[stencil],m,self.sim_data.h))
+
+    def get_stencils(self):
+        return self.stencils;
+    def get_constraints(self):
+        return self.constraints
+
+
+class Sim_Data:
+    def __init__(self,X,T,h):
+        self.X=X
+        self.X0=X.copy()
+        self.X_rest=X.copy()
+        self.V=np.zeros_like(X)
+        self.T=T
+        self.h=h
+
+class PD_Solver:
+    def __init__(self,sim_data):
+        self.sim_data=sim_data
+
+        self.constraint_solvers=[]
+        self.constraint_solvers.append(Inertial_Solver(self.sim_data))
+        self.constraint_solvers.append(Spring_Solver(self.sim_data))
+
+        for constraint_solver in self.constraint_solvers:
+            constraint_solver.pre_compute()
+
+
+    def update(self):
+        self.generate_constraints()
+        self.sim_data.X0=self.sim_data.X.copy()
+        for i in range(50):
+            self.assemble_matrix()
+            self.solve()
+        self.sim_data.V=(self.sim_data.X-self.sim_data.X0)/self.sim_data.h
+        return self.get_position()
+
+    def generate_constraints(self):
+        for constraint_solver in self.constraint_solvers:
+            constraint_solver.generate_constraints()
+
+    def put(self,vi,vj,v,J,A):
+        if vj not in J[vi]:
+            J[vi].append(vj)
+            A[vi].append(v)
+        else:
+            ind=J[vi].index(vj)
+            A[vi][ind]+=v
+
+    def assemble_matrix(self):
+        v_num=self.sim_data.X.shape[0]
+        self.J=[[] for i in range(v_num)]
+        self.A=[[] for i in range(v_num)]
+        self.b=np.zeros((v_num,3))
+        for constraint_solver in self.constraint_solvers:
+            stencils=constraint_solver.get_stencils()
+            constraints=constraint_solver.get_constraints()
+            for stencil,constraint in zip(stencils,constraints):
+                local_A = constraint.compute_A()
+                local_b = constraint.compute_b()
+                for vi_loc,vi in enumerate(stencil):
+                    self.b[vi]+=local_b[vi_loc]
+                    for vj_loc,vj in enumerate(stencil):
+                        self.put(vi,vj,local_A[vi_loc][vj_loc],self.J,self.A)
+
+    def solve(self):
+        v_num=self.sim_data.X.shape[0]
+        for row in range(v_num):
+            if row==0:
+                continue
+            off=np.zeros(3)
+            diag_loc=None
+            for col_loc,col in enumerate(self.J[row]):
+                if col==row:
+                    diag_loc=col_loc
+                else:
+                    off+=self.A[row][col_loc]*self.sim_data.X[col]
+            self.sim_data.X[row]=(self.b[row]-off)/self.A[row][diag_loc]
+
+
+    def get_position(self):
+        return self.sim_data.X
 
 
 fig,ax=plt.subplots(1,1)
 plt.ion()
+
+h=real(1e-1)
+
+sim_data=Sim_Data(X,T,h)
+solver=PD_Solver(sim_data)
+
+t=real(0.)
 while True:
     ax.cla()
     ax.set_xlim([-1,1])
     ax.set_ylim([-1,1])
+    #update X here
+    #X[:,0]+=np.sin(t)
+    X=solver.update()
+
     plotX=projector.project(X)
     for xi,x in enumerate(plotX.transpose()):
         ax.text(x[0],x[1],str(xi))
     for tri in T:
         ax.fill(plotX[0,tri],plotX[1,tri],'-o',fill=False)
-    t+=0.1
-    plt.pause(0.1)
+    t+=h
+    plt.pause(0.01)
 
 plt.ioff()
 plt.show()
