@@ -23,6 +23,9 @@ src/application_event.cpp
 src/log.cpp
 )
 
+
+target_precompile_headers(clumsy_engine PUBLIC src/pch.h)
+
 include(GenerateExportHeader)
 generate_export_header(clumsy_engine)
 
