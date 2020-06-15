@@ -73,7 +73,7 @@ class Spring_Solver:
     def __init__(self,sim_data):
         self.sim_data=sim_data
         self.w=np.array([1,-1])
-        self.stiff=real(1e3)
+        self.stiff=sim_data.c_stretch
 
     def pre_compute(self):
         ##to generalize
@@ -149,7 +149,7 @@ class Bending_Constraint:
 class Bending_Solver:
     def __init__(self,sim_data):
         self.sim_data=sim_data
-        self.stiff=real(1.)
+        self.stiff=sim_data.c_bending
 
     def pre_compute(self):
         ##to generalize
@@ -172,18 +172,19 @@ class Bending_Solver:
 
 
 class Inertial_Constraint:
-    def __init__(self,x,v,m,h):
+    def __init__(self,x,v,m,h,g):
         self.x=x
         self.v=v
         self.m=m
         self.h=h
+        self.g=g
 
     def compute_A(self):
         return np.array([[self.m/self.h/self.h]])
 
     def compute_b(self):
         #return self.m/self.h/self.h*(self.x+np.array([0,-0.1,0]))
-        return self.m/self.h/self.h*(self.x+self.v*self.h+np.array([0,-1.1,0]))
+        return self.m/self.h/self.h*(self.x+self.v*self.h)+self.h*self.h*np.array([0,self.g,0],dtype=real)
 
 class Inertial_Solver:
     def __init__(self,sim_data):
@@ -196,9 +197,8 @@ class Inertial_Solver:
 
     def generate_constraints(self):
         self.constraints=[]
-        m=real(1)
         for stencil in self.stencils:
-            self.constraints.append(Inertial_Constraint(self.sim_data.X[stencil],self.sim_data.V[stencil],m,self.sim_data.h))
+            self.constraints.append(Inertial_Constraint(self.sim_data.X[stencil],self.sim_data.V[stencil],self.sim_data.m,self.sim_data.h,self.sim_data.c_gravity))
 
     def get_stencils(self):
         return self.stencils;
@@ -207,13 +207,22 @@ class Inertial_Solver:
 
 
 class Sim_Data:
-    def __init__(self,X,T,h):
+    def __init__(self,X,T):
         self.X=X
         self.X0=X.copy()
         self.X_rest=X.copy()
         self.V=np.zeros_like(X)
         self.T=T
-        self.h=h
+
+#independent
+        self.h=real(1.)
+        self.m=real(1.)
+        self.l=real(1.)
+
+#dependent
+        self.c_stretch=real(1e1)
+        self.c_bending=real(1e1)
+        self.c_gravity=real(-1)
 
 class PD_Solver:
     def __init__(self,sim_data):
@@ -287,9 +296,8 @@ class PD_Solver:
 fig,ax=plt.subplots(1,1)
 plt.ion()
 
-h=real(1e-1)
 
-sim_data=Sim_Data(X,T,h)
+sim_data=Sim_Data(X,T)
 solver=PD_Solver(sim_data)
 
 t=real(0.)
@@ -298,7 +306,7 @@ while True:
     ax.set_xlim([-1,1])
     ax.set_ylim([-1,1])
     #update X here
-    X[:,0]+=0.01*np.sin(t)
+    X[:,0]+=0.01*np.sin(0.1*t)
     X=solver.update()
 
     plotX=projector.project(X)
@@ -306,7 +314,7 @@ while True:
         ax.text(x[0],x[1],str(xi))
     for tri in T:
         ax.fill(plotX[0,tri],plotX[1,tri],'-o',fill=False)
-    t+=h
+    t+=sim_data.h
     plt.pause(0.01)
 
 plt.ioff()
