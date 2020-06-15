@@ -8,11 +8,20 @@ class Projector:
         self.M = np.identity(4)
         self.V = np.identity(4)
         self.P = np.identity(4)
+        self.t=real(0)
     
     def project(self,X):
         out=np.empty((4,X.shape[0]))
         out[0:3,:]=X.transpose()
         out[3,:]=np.ones(X.shape[0])
+
+
+        self.t+=real(0.05)
+        self.V[0:3:2,0:3:2]=np.array([
+            [np.cos(self.t), -np.sin(self.t)],
+            [np.sin(self.t), np.cos(self.t)]
+        ])
+
 
         mvp=np.einsum('ij,jk,kl',self.P,self.V,self.M)
         out=np.einsum('ij,jk',mvp,out)
@@ -93,6 +102,75 @@ class Spring_Solver:
         return self.constraints
 
 
+
+class Bending_Constraint:
+    def __init__(self,x,stiff):
+        self.x=x
+        self.stiff=stiff
+
+    def cot(self,x0,x1,x2):
+        d=np.array([x1-x0,x2-x0])
+        l0=np.dot(d[0],d[0])
+        l1=np.dot(d[0],d[1]/np.linalg.norm(d[1]))
+        l1=l1*l1
+        ret=np.sqrt((l0-l1)/l1)
+
+        return ret
+
+    def area(self,x0,x1,x2):
+        cro=np.cross(x1-x0,x2-x0)
+        return np.linalg.norm(0.5*cro)
+
+    def compute_A(self):
+        E=np.array([
+            [1,1,0,0],
+            [1, 0, 1, 0],
+            [1, 0, 0, 1],
+            [0, 1, 1, 0],
+            [0, 1, 0, 1]
+        ],dtype=real)
+        L=np.array([
+            0,
+            -self.cot(self.x[0],self.x[1],self.x[2]),
+            -self.cot(self.x[0], self.x[1], self.x[3]),
+            -self.cot(self.x[1], self.x[0], self.x[2]),
+            -self.cot(self.x[1], self.x[0], self.x[3])
+        ])
+        L[0]=np.sum(-L[1:])
+        K=np.einsum('i,ij',L,E)
+        M=self.area(self.x[0],self.x[1],self.x[2])+self.area(self.x[0],self.x[1],self.x[3])
+        Q=self.stiff/M*np.einsum('i,j',K,K)
+        return Q
+
+    def compute_b(self):
+        b=np.zeros((4,3))
+        return b
+
+class Bending_Solver:
+    def __init__(self,sim_data):
+        self.sim_data=sim_data
+        self.stiff=real(1.)
+
+    def pre_compute(self):
+        ##to generalize
+        self.stencils= [
+            [0,2,1,3]
+        ]
+
+    def generate_constraints(self):
+        self.constraints=[]
+        for i,stencil in enumerate(self.stencils):
+            constraint=Bending_Constraint(self.sim_data.X[stencil],self.stiff)
+            self.constraints.append(constraint)
+
+    def get_stencils(self):
+        return self.stencils;
+
+    def get_constraints(self):
+        return self.constraints
+
+
+
 class Inertial_Constraint:
     def __init__(self,x,v,m,h):
         self.x=x
@@ -144,6 +222,7 @@ class PD_Solver:
         self.constraint_solvers=[]
         self.constraint_solvers.append(Inertial_Solver(self.sim_data))
         self.constraint_solvers.append(Spring_Solver(self.sim_data))
+        self.constraint_solvers.append(Bending_Solver(self.sim_data))
 
         for constraint_solver in self.constraint_solvers:
             constraint_solver.pre_compute()
@@ -219,7 +298,7 @@ while True:
     ax.set_xlim([-1,1])
     ax.set_ylim([-1,1])
     #update X here
-    #X[:,0]+=np.sin(t)
+    X[:,0]+=0.01*np.sin(t)
     X=solver.update()
 
     plotX=projector.project(X)
