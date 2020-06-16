@@ -110,12 +110,15 @@ class Bending_Constraint:
 
     def cot(self,x0,x1,x2):
         d=np.array([x1-x0,x2-x0])
-        l0=np.dot(d[0],d[0])
-        l1=np.dot(d[0],d[1]/np.linalg.norm(d[1]))
-        l1=l1*l1
-        ret=np.sqrt((l0-l1)/l1)
+#        l0=np.dot(d[0],d[0])
+#        l1=np.dot(d[0],d[1]/np.linalg.norm(d[1]))
+#        l1=l1*l1
+#        ret=np.sqrt((l0-l1)/l1)
 
-        return ret
+        cro=np.cross(d[0],d[1])
+        cro=np.linalg.norm(cro)
+        dot=np.dot(d[0],d[1])
+        return cro/dot
 
     def area(self,x0,x1,x2):
         cro=np.cross(x1-x0,x2-x0)
