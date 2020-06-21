@@ -10,4 +10,6 @@ sandbox_app.cpp)
 
 target_link_libraries(sand_box PRIVATE clumsy_engine)
 
+target_compile_features(sand_box PRIVATE cxx_std_20)
+
 set_target_properties(sand_box PROPERTIES FOLDER "clumsy_engine")

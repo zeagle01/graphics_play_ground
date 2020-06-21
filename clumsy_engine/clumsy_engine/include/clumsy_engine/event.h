@@ -19,7 +19,7 @@ namespace clumsy_engine
 	enum Event_Category
 	{
 		None = 0,
-		Application = 1 << 0,
+		Application_Cate = 1 << 0,
 		Input = 1 << 1,
 		Keyboard = 1 << 2,
 		Mouse = 1 << 3,

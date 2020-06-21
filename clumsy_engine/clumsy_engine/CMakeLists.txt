@@ -6,15 +6,9 @@ project(clumsy_engine)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS YES CACHE BOOL "export all symbols")
 
-add_library(clumsy_engine SHARED
-include/clumsy_engine/clumsy_engine.h
-include/clumsy_engine/application.h
-include/clumsy_engine/entry_point.h
-include/clumsy_engine/log.h
-include/clumsy_engine/profiler.h
+set(source_files 
 src/application.cpp
 src/event.cpp
-src/event.h
 src/key_event.cpp
 src/key_event.h
 src/mouse_event.h
@@ -23,8 +17,32 @@ src/application_event.h
 src/application_event.cpp
 src/profiler.cpp
 src/log.cpp
+src/window.cpp
+src/platform/windows/Windows_window.h
+src/platform/windows/Windows_window.cpp
+src/helper_utils.h
 )
 
+set(include_files
+include/clumsy_engine/clumsy_engine.h
+include/clumsy_engine/application.h
+include/clumsy_engine/entry_point.h
+include/clumsy_engine/log.h
+include/clumsy_engine/profiler.h
+include/clumsy_engine/window.h
+include/clumsy_engine/event.h
+)
+
+add_library(clumsy_engine SHARED
+${include_files}
+${source_files}
+)
+
+
+
+
+
+target_compile_features(clumsy_engine PRIVATE cxx_std_20)
 
 target_precompile_headers(clumsy_engine PUBLIC src/pch.h)
 
@@ -42,6 +60,19 @@ PRIVATE
 #${CMAKE_CURRENT_BINARY_DIR}
 src
 )
+
+
+
+
+
+find_package(glfw3 CONFIG REQUIRED)
+target_link_libraries(clumsy_engine PUBLIC glfw)
+
+
+
+
+
+
 
 include(GNUInstallDirs)
 install(

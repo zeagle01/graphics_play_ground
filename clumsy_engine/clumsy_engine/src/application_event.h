@@ -14,7 +14,7 @@ namespace clumsy_engine
 	public:
 		Window_Resize_Event(int w, int h) :m_width(w), m_height(h) {}
 		EVENT_CLASS_TYPE(Window_Resize)
-			EVENT_CLASS_CATEGORY(Event_Category::Application)
+			EVENT_CLASS_CATEGORY(Event_Category::Application_Cate)
 
 
 			std::string to_string() const override
@@ -34,7 +34,7 @@ namespace clumsy_engine
     {
         public:
 EVENT_CLASS_TYPE(Window_Close)
-EVENT_CLASS_CATEGORY(Event_Category::Application)
+EVENT_CLASS_CATEGORY(Event_Category::Application_Cate)
 
     };
 
@@ -42,7 +42,7 @@ EVENT_CLASS_CATEGORY(Event_Category::Application)
     {
         public:
 EVENT_CLASS_TYPE(App_Tick)
-EVENT_CLASS_CATEGORY(Event_Category::Application)
+EVENT_CLASS_CATEGORY(Event_Category::Application_Cate)
 
     };
 
@@ -50,7 +50,7 @@ EVENT_CLASS_CATEGORY(Event_Category::Application)
     {
         public:
 EVENT_CLASS_TYPE(App_Render)
-EVENT_CLASS_CATEGORY(Event_Category::Application)
+EVENT_CLASS_CATEGORY(Event_Category::Application_Cate)
 
     };
 
