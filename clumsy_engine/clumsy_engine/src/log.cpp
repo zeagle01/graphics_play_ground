@@ -3,6 +3,8 @@
 #include "log.h"
 #include <string>
 
+#include "profiler.h"
+
 
 namespace clumsy_engine
 {
@@ -10,6 +12,10 @@ namespace clumsy_engine
 	std::shared_ptr<spdlog::logger> Log::s_client_logger ;
 	void Log::init()
 	{
+
+
+		RECORD_FUNCTION_DURATION();
+
 		std::string format = "%^%T:%f %n: %v%$";
 		//std::string format = "%+";
 		s_core_logger = spdlog::stdout_color_mt("core");

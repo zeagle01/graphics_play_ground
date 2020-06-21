@@ -5,11 +5,16 @@
 
 #include "application.h"
 #include "log.h"
+#include "profiler.h"
 
 extern clumsy_engine::Application* clumsy_engine::create_application();
 
 int main(int argc,char** argv)
 {
+
+	BEGIN_PROFILING();
+
+
 	clumsy_engine::Log::init();
 
 	CE_CORE_TRACE("core trace");
@@ -21,6 +26,10 @@ int main(int argc,char** argv)
 	CE_WARN("core warn a={0}",a);
 
 	auto app = clumsy_engine::create_application();
+
+	END_PROFILING();
+
 	app->run();
 	delete app;
+
 }

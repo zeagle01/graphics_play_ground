@@ -11,6 +11,7 @@ include/clumsy_engine/clumsy_engine.h
 include/clumsy_engine/application.h
 include/clumsy_engine/entry_point.h
 include/clumsy_engine/log.h
+include/clumsy_engine/profiler.h
 src/application.cpp
 src/event.cpp
 src/event.h
@@ -20,6 +21,7 @@ src/mouse_event.h
 src/mouse_event.cpp
 src/application_event.h
 src/application_event.cpp
+src/profiler.cpp
 src/log.cpp
 )
 
