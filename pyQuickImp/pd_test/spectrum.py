@@ -316,23 +316,49 @@ x=[]
 y=[]
 y1=[]
 y2=[]
+
+def get_spectrum_radiu():
+    solver = PD_Solver(sim_data)
+    w, v = solver.update()
+    rho = np.max(np.abs(w))
+    return rho
+
+def get_spectrum_radiu_with_bending(c_bending):
+    sim_data.c_bending=c_bending
+    return get_spectrum_radiu()
+
+
 for eks in range(-12,22):
     sim_data.c_stretch=2**eks
     rho=0
     sim_data.c_bending=1e-3
     x.append(sim_data.c_stretch)
     y1.append(sim_data.c_stretch)
-    y2.append(sim_data.c_stretch*0.07)
-    while rho<1:
-        solver=PD_Solver(sim_data)
-        w,v=solver.update()
-        rho=np.max(np.abs(w))
+    y2.append(sim_data.c_stretch*0.03)
+    while True:
+        rho=get_spectrum_radiu()
+        if rho >1:
+            break
         sim_data.c_bending *=2.0
+
+#binary solve
+    c_bending_critic_interval=[sim_data.c_bending/2,sim_data.c_bending]
+    while True:
+        c_bending_critic = 0.5 * (c_bending_critic_interval[0] + c_bending_critic_interval[1])
+        rho=get_spectrum_radiu_with_bending(c_bending_critic)
+        if rho>1:
+            c_bending_critic_interval[1]=c_bending_critic
+        else:
+            c_bending_critic_interval[0]=c_bending_critic
+        err=(c_bending_critic_interval[1]-c_bending_critic_interval[0])/c_bending_critic_interval[0]
+        if err<1e-3:
+            break
+
     y.append(sim_data.c_bending)
 
 ax.plot(x,y,'-o',label='$k_b$')
 ax.plot(x,y1,'-o',label='$k_s$')
-ax.plot(x,y2,'-o',label='$0.07k_s$')
+ax.plot(x,y2,'-o',label='$0.03k_s$')
 
 ax.legend()
 plt.show()
