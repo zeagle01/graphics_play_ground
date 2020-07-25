@@ -84,7 +84,7 @@ EVENT_CLASS_TYPE(Mouse_Button_Pressed)
         public:
 Mouse_Button_Released_Event(int button):Mouse_Button_Event(button){}
 
-EVENT_CLASS_TYPE(Mouse_Button_Released)
+EVENT_CLASS_TYPE(Mouse_Button_Rleased)
 
 		std::string to_string() const override
         {

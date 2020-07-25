@@ -58,17 +58,17 @@ namespace clumsy_engine
 
 	class Dispatcher
 	{
-		template<typename Event>
-		using Event_Fn = std::function<bool(Event&)>;
+		template<typename Ev>
+		using Event_Fn = std::function<bool(Ev&)>;
 	public:
 		Dispatcher(Event& event) : m_event(event) {}
 
 		template<typename Ev>
 		bool dispatch(Event_Fn<Ev> func) 
 		{
-			if (m_event::get_dynamic_type() == Ev::get_static_type())
+			if (m_event.get_dynamic_type() == Ev::get_static_type())
 			{
-				m_event.m_is_handled = func(m_event);
+				m_event.m_is_handled = func((Ev&)m_event);
 				return true;
 			}
 			return false;

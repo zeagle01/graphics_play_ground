@@ -6,8 +6,8 @@
 #include "application.h"
 #include "log.h"
 #include "profiler.h"
+#include <memory>
 
-extern clumsy_engine::Application* clumsy_engine::create_application();
 
 int main(int argc,char** argv)
 {
@@ -25,11 +25,10 @@ int main(int argc,char** argv)
 	int a = 1;
 	CE_WARN("core warn a={0}",a);
 
-	auto app = clumsy_engine::create_application();
+	std::unique_ptr<clumsy_engine::Application> app = clumsy_engine::create_application();
 
 	END_PROFILING();
 
 	app->run();
-	delete app;
 
 }

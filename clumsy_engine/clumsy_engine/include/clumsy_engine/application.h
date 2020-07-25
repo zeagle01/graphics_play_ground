@@ -16,9 +16,11 @@ namespace clumsy_engine
 
 		void run();
 	private:
+		bool on_event(Event& e);
+
 		std::unique_ptr<Window> m_window;
 		bool m_is_running;
 	};
 
-	Application* create_application();
+	extern std::unique_ptr<clumsy_engine::Application> create_application();
 }

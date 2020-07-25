@@ -5,6 +5,7 @@
 #include <functional>
 #include "event.h"
 #include <string>
+#include <memory>
 
 
 
@@ -35,7 +36,7 @@ namespace clumsy_engine
 		virtual bool is_verticla_sync()const = 0;
 
 
-		static Window& create(const Window_Property& p = { .title = "clumsy_engine",.width = 800,.height = 600 });
+		static std::unique_ptr<Window> create(const Window_Property& p = { .title = "clumsy_engine",.width = 800,.height = 600 });
 	};
 
 }
