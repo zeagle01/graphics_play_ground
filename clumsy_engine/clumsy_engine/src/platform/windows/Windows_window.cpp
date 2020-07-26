@@ -4,11 +4,13 @@
 #include "Windows_window.h"
 #include "log.h"
 #include "helper_utils.h"
-#include "GLFW/glfw3.h"
 
 #include "mouse_event.h"
 #include "key_event.h"
 #include "application_event.h"
+
+#include "glad/glad.h" //put glad first before other opengl include
+#include "GLFW/glfw3.h"
 
 namespace clumsy_engine
 {
@@ -58,7 +60,14 @@ namespace clumsy_engine
 		{
 			CE_CORE_TRACE("windows {0} is created!", (void*)m_window);
 		}
+
+
 		glfwMakeContextCurrent(m_window);
+
+		//right after make context current(need a context)
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		CE_CORE_ASSERT(status, "glad load failed");
+
 		glfwSetWindowUserPointer(m_window, &m_window_data);
 		set_vertical_sync(true);
 

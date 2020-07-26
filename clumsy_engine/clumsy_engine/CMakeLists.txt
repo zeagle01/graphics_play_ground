@@ -73,6 +73,7 @@ find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(clumsy_engine PUBLIC glfw)
 
 
+target_link_libraries(clumsy_engine PRIVATE glad)
 
 
 
