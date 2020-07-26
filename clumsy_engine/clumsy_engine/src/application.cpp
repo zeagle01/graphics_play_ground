@@ -2,10 +2,11 @@
 #include <iostream>
 #include "application.h"
 #include "log.h"
-#include <any>
-#include <map>
 #include "application_event.h"
 #include "GLFW/glfw3.h" 
+#include "layer_stack.h"
+#include "layer.h"
+#include "window.h"
 
 
 namespace clumsy_engine
@@ -20,6 +21,7 @@ namespace clumsy_engine
 
 	Application::Application()
 		:m_is_running(true)
+		,m_layer_stack(std::make_unique<Layer_Stack>())
 	{
 		m_window = Window::create();
 		m_window->set_event_callback(BIND_MEMBER(on_event));
@@ -44,12 +46,23 @@ namespace clumsy_engine
 		{
 			Dispatcher dispatcher(e);
 			dispatcher.dispatch<Window_Close_Event>(BIND_MEMBER(On_Window_Close));
+
 		}
 		else
 		{
 			if (m_event_fn.count(e.get_dynamic_type()))
 			{
 				m_event_fn[e.get_dynamic_type()](e);
+			}
+		}
+
+		for (auto it = m_layer_stack->end(); it != m_layer_stack->begin();)
+		{
+			(*(--it))->on_event(e);
+			
+			if (e.is_handled())
+			{
+				break;
 			}
 		}
 
@@ -72,6 +85,11 @@ namespace clumsy_engine
 			glClearColor(0.8, 0.1, 0.3, 0.2);
 			glClear(GL_COLOR_BUFFER_BIT);
 
+			for (auto& layer : *m_layer_stack)
+			{
+				layer->on_update();
+			}
+
 			m_window->on_update();
 		}
 
@@ -82,6 +100,16 @@ namespace clumsy_engine
 	{
 		m_is_running = false;
 		return true;
+	}
+
+	void Application::push_layer(std::shared_ptr<Layer> layer)
+	{
+		m_layer_stack->push_layer(layer);
+	}
+
+	void Application::push_overlay(std::shared_ptr<Layer> overlay)
+	{
+		m_layer_stack->push_overlay(overlay);
 	}
 
 }

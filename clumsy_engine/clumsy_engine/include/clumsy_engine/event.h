@@ -9,11 +9,12 @@ namespace clumsy_engine
 {
 	enum class Event_Type
 	{
-		Noen = 0,
+		None,
 		Window_Close, Window_Resize, WindowFocus, Window_Lost_Focus, Window_Moved,
 		App_Tick, App_Update, App_Render,
 		Key_Pressed, Key_Released,
-		Mouse_Button_Pressed, Mouse_Button_Rleased, Mouse_Moved, Mouse_Scrolled
+		Mouse_Button_Pressed, Mouse_Button_Rleased, Mouse_Moved, Mouse_Scrolled,
+		Event_Type_Size
 	};
 
 	enum Event_Category
@@ -50,6 +51,8 @@ namespace clumsy_engine
 		{
 			return get_category_flag() & category;
 		}
+
+		bool is_handled() { return m_is_handled; }
 
 	private:
 		bool m_is_handled = false;

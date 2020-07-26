@@ -4,7 +4,6 @@
 #include <memory>
 #include <map>
 #include <functional>
-#include "window.h"
 
 
 
@@ -13,6 +12,10 @@ namespace clumsy_engine
 
 	class Event;
 	class Window_Close_Event;
+	class Layer_Stack;
+	class Layer;
+	class Window;
+	enum class Event_Type;
 
 
 	class Application
@@ -22,6 +25,12 @@ namespace clumsy_engine
 		virtual ~Application();
 
 		void run();
+
+		void push_layer(std::shared_ptr<Layer> layer);
+		void push_overlay(std::shared_ptr<Layer> overlay);
+
+
+
 	private:
 		bool on_event(Event& e);
 
@@ -31,6 +40,7 @@ namespace clumsy_engine
 
 		bool m_is_running;
 
+		std::unique_ptr<Layer_Stack> m_layer_stack;
 
 	private:
 		bool On_Window_Close(Window_Close_Event& e);

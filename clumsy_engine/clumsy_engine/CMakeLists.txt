@@ -21,6 +21,9 @@ src/window.cpp
 src/platform/windows/Windows_window.h
 src/platform/windows/Windows_window.cpp
 src/helper_utils.h
+src/layer.cpp
+src/layer_stack.h
+src/layer_stack.cpp
 )
 
 set(include_files
@@ -31,6 +34,7 @@ include/clumsy_engine/log.h
 include/clumsy_engine/profiler.h
 include/clumsy_engine/window.h
 include/clumsy_engine/event.h
+include/clumsy_engine/layer.h
 )
 
 add_library(clumsy_engine SHARED
