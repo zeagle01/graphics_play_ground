@@ -1,9 +1,10 @@
 
 #include <iostream>
 #include "application.h"
-#include "application_event.h"
 #include "log.h"
-
+#include <any>
+#include <map>
+#include "application_event.h"
 #include "GLFW/glfw3.h" 
 
 
@@ -14,11 +15,20 @@ namespace clumsy_engine
 
 
 
+
+
+
 	Application::Application()
 		:m_is_running(true)
 	{
 		m_window = Window::create();
 		m_window->set_event_callback(BIND_MEMBER(on_event));
+
+		m_event_fn[Event_Type::Window_Close] = [&](Event& e)
+		{
+			Window_Close_Event& wc_e = (Window_Close_Event&)e;
+			return On_Window_Close(wc_e);
+		};
 	}
 
 	Application:: ~Application()
@@ -29,13 +39,20 @@ namespace clumsy_engine
 	bool Application::on_event(Event& e)
 	{
 
+		bool use_dispatcher = true;
+		if (use_dispatcher)
+		{
+			Dispatcher dispatcher(e);
+			dispatcher.dispatch<Window_Close_Event>(BIND_MEMBER(On_Window_Close));
+		}
+		else
+		{
+			if (m_event_fn.count(e.get_dynamic_type()))
+			{
+				m_event_fn[e.get_dynamic_type()](e);
+			}
+		}
 
-		Dispatcher dispatcher(e);
-
-		dispatcher.dispatch<Window_Close_Event>([&](Window_Close_Event& e) {
-			m_is_running = false;
-			return true;
-		});
 
 		CE_TRACE(e.to_string());
 
@@ -58,6 +75,13 @@ namespace clumsy_engine
 			m_window->on_update();
 		}
 
+	}
+
+
+	bool Application::On_Window_Close(Window_Close_Event& e)
+	{
+		m_is_running = false;
+		return true;
 	}
 
 }
