@@ -1,24 +1,5 @@
 
 
-X=[]
-T=[]
-
-with open("D:\sprojs\one_layer_button.obj") as fin:
-    lines=fin.readlines()
-    for line in lines:
-       words=line.split(" ")
-       if words[0]=='v':
-           x=[float(words[1]),float(words[2]),float(words[3])]
-           X.append(x)
-       if words[0]=='f':
-           t=[]
-           for i in range(3):
-               tv=words[i+1]
-               tv=tv.split('/')
-               t.append(int(tv[0]))
-           T.append(t)
-
-
 def float_to_str(number):
     #return '{:.8f}'.format(number)
     return str(number)+'f'
@@ -42,7 +23,7 @@ def read_obj(file):
                 for i in range(3):
                     tv = words[i + 1]
                     tv = tv.split('/')
-                    t.append(int(tv[0]-1))
+                    t.append(int(tv[0])-1)
                 T.append(t)
     return X,T
 
