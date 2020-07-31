@@ -90,7 +90,8 @@ class Spectrum_Experiment:
 ##################################
 fig,ax=plt.subplots(1,2)
 
-files=['mesh/triangle_stride2.obj','mesh/triangle_stride4.obj','mesh/triangle_stride8.obj','mesh/triangle_stride16.obj','mesh/triangle_stride32.obj']
+#files=['mesh/triangle_stride2.obj','mesh/triangle_stride4.obj','mesh/triangle_stride8.obj','mesh/triangle_stride16.obj','mesh/triangle_stride32.obj']
+files=['mesh/square_1.obj','mesh/square_4.obj','mesh/square_16.obj']
 
 ####### data input
 for file in files:
