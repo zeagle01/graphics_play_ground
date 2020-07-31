@@ -4,13 +4,6 @@ import numpy as np
 from constraint import *
 from convert_obj_to_XT import *
 
-#file='mesh/2by2_square.obj'
-#file='mesh/triangle_stride1.obj'
-file='mesh/triangle_stride.obj'
-####### data input
-X,T=read_obj(file)
-X=np.array(X)
-T=np.array(T)
 
 
 
@@ -40,61 +33,85 @@ class Spetrum_Checker(PD_Solver):
 
 
 
-fig,ax=plt.subplots(1,1)
-
-sim_data=Sim_Data(X,T)
-#b=-2
-#e=4
-#delta=1.0
-x=[]
-y=[]
-y1=[]
-y2=[]
-
-def get_spectrum_radiu():
-    solver = Spetrum_Checker(sim_data)
-    w, v = solver.update()
-    rho = np.max(np.abs(w))
-    return rho
-
-def get_spectrum_radiu_with_bending(c_bending):
-    sim_data.c_bending=c_bending
-    return get_spectrum_radiu()
+class Spectrum_Experiment:
+    def __init__(self,sim_data,b,e):
+        self.begin=b
+        self.end=e
+        self.sim_data=sim_data
+        self.x=[]
+        self.y=[]
 
 
-for eks in range(-12,22):
-    sim_data.c_stretch=2**eks
-    rho=0
-    sim_data.c_bending=1e-3
-    x.append(sim_data.c_stretch)
-    y1.append(sim_data.c_stretch)
-    y2.append(sim_data.c_stretch*0.03)
-    while True:
-        rho=get_spectrum_radiu()
-        if rho >1:
-            break
-        sim_data.c_bending *=2.0
 
-#binary solve
-    c_bending_critic_interval=[sim_data.c_bending/2,sim_data.c_bending]
-    while True:
-        c_bending_critic = 0.5 * (c_bending_critic_interval[0] + c_bending_critic_interval[1])
-        rho=get_spectrum_radiu_with_bending(c_bending_critic)
-        if rho>1:
-            c_bending_critic_interval[1]=c_bending_critic
-        else:
-            c_bending_critic_interval[0]=c_bending_critic
-        err=(c_bending_critic_interval[1]-c_bending_critic_interval[0])/c_bending_critic_interval[0]
-        if err<1e-3:
-            break
+    def find_ks_vs_kb(self):
+        self.x=[]
+        self.y=[]
+        for eks in range(self.begin, self.end):
+            self.sim_data.c_stretch = 2 ** eks
+            rho = 0
+            self.sim_data.c_bending = 1e-3
+            self.x.append(self.sim_data.c_stretch)
+            while True:
+                rho = self.get_spectrum_radiu()
+                if rho > 1:
+                    break
+                self.sim_data.c_bending *= 2.0
 
-    y.append(sim_data.c_bending)
+            # binary solve
+            c_bending_critic_interval = [self.sim_data.c_bending / 2, self.sim_data.c_bending]
+            while True:
+                c_bending_critic = 0.5 * (c_bending_critic_interval[0] + c_bending_critic_interval[1])
+                rho = self.get_spectrum_radiu_with_bending(c_bending_critic)
+                if rho > 1:
+                    c_bending_critic_interval[1] = c_bending_critic
+                else:
+                    c_bending_critic_interval[0] = c_bending_critic
+                err = (c_bending_critic_interval[1] - c_bending_critic_interval[0]) / c_bending_critic_interval[0]
+                if err < 1e-3:
+                    break
 
-ax.plot(x,y,'-o',label='$k_b$')
-ax.plot(x,y1,'-o',label='$k_s$')
-ax.plot(x,y2,'-o',label='$0.03k_s$')
+            self.y.append(self.sim_data.c_bending)
+        return self.x,self.y
 
-ax.legend()
+
+    def get_spectrum_radiu(self):
+        solver = Spetrum_Checker(self.sim_data)
+        w, v = solver.update()
+        rho = np.max(np.abs(w))
+        return rho
+
+    def get_spectrum_radiu_with_bending(self,c_bending):
+        self.sim_data.c_bending=c_bending
+        return self.get_spectrum_radiu()
+
+
+
+
+##################################
+fig,ax=plt.subplots(1,2)
+
+files=['mesh/triangle_stride2.obj','mesh/triangle_stride4.obj','mesh/triangle_stride8.obj','mesh/triangle_stride16.obj','mesh/triangle_stride32.obj']
+
+####### data input
+for file in files:
+    X,T=read_obj(file)
+    X=np.array(X)
+    T=np.array(T)
+
+    sim_data=Sim_Data(X,T)
+    se=Spectrum_Experiment(sim_data,-12,22)
+    x,y=se.find_ks_vs_kb()
+
+    ax[0].set_xscale('log')
+    ax[0].set_yscale('log')
+    ax[0].plot(x,y,'-o',label=file)
+
+    ax[1].set_xscale('log')
+    ax[1].set_yscale('log')
+    ax[1].plot(x,np.array(y)/np.array(x),'-o',label=file)
+
+ax[0].legend()
+ax[1].legend()
 plt.show()
 
 
