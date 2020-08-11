@@ -21,7 +21,10 @@ namespace clumsy_engine
 	class Application
 	{
 	public:
+		static Application& get_singleton();
+
 		Application();
+
 		virtual ~Application();
 
 		void run();
@@ -29,9 +32,12 @@ namespace clumsy_engine
 		void push_layer(std::shared_ptr<Layer> layer);
 		void push_overlay(std::shared_ptr<Layer> overlay);
 
+		Window& get_window() const;
+
 
 
 	private:
+
 		bool on_event(Event& e);
 
 		std::unique_ptr<Window> m_window;

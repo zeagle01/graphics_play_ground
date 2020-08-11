@@ -26,9 +26,9 @@ public:
 class SanBox_App:public clumsy_engine::Application
 {
 	public:
-		SanBox_App() 
-		{
-		}
+		//SanBox_App() 
+		//{
+		//}
 
 };
 
@@ -42,6 +42,8 @@ std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
 
 	std::shared_ptr<clumsy_engine::Layer> layer = std::make_shared<Layer_Demo>();
 	app->push_layer(layer);
+	layer = std::make_shared<clumsy_engine::Imgui_Layer>();
+	app->push_overlay(layer);
 
 	return app;
 }

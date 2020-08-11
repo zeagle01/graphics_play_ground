@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <memory>
 #include "application.h"
 #include "log.h"
 #include "application_event.h"
@@ -7,6 +8,7 @@
 #include "layer_stack.h"
 #include "layer.h"
 #include "window.h"
+#include "imgui_layer.h"
 
 
 namespace clumsy_engine
@@ -17,6 +19,11 @@ namespace clumsy_engine
 
 
 
+	Application& Application::get_singleton()
+	{
+		static std::unique_ptr<Application> s=std::make_unique<Application>();
+		return *s;
+	}
 
 
 	Application::Application()
@@ -105,11 +112,19 @@ namespace clumsy_engine
 	void Application::push_layer(std::shared_ptr<Layer> layer)
 	{
 		m_layer_stack->push_layer(layer);
+		layer->on_attach();
 	}
 
 	void Application::push_overlay(std::shared_ptr<Layer> overlay)
 	{
 		m_layer_stack->push_overlay(overlay);
+		overlay->on_attach();
 	}
+
+	Window& Application::get_window()const
+	{
+		return *m_window;
+	}
+
 
 }

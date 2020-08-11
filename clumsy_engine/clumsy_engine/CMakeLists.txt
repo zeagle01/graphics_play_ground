@@ -24,6 +24,7 @@ src/helper_utils.h
 src/layer.cpp
 src/layer_stack.h
 src/layer_stack.cpp
+src/imgui_layer.cpp
 )
 
 set(include_files
@@ -35,6 +36,7 @@ include/clumsy_engine/profiler.h
 include/clumsy_engine/window.h
 include/clumsy_engine/event.h
 include/clumsy_engine/layer.h
+include/clumsy_engine/imgui_layer.h
 )
 
 add_library(clumsy_engine SHARED
@@ -77,6 +79,9 @@ target_link_libraries(clumsy_engine PRIVATE glad)
 
 
 
+##########imgui
+include(${CMAKE_SOURCE_DIR}/cmake/imgui.cmake)
+link_to_imgui(clumsy_engine ${CMAKE_SOURCE_DIR}/external/imgui-master)
 
 
 include(GNUInstallDirs)
