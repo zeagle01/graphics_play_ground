@@ -24,6 +24,9 @@ namespace clumsy_engine
 			return ss.str();
 		}
 
+		int get_width() { return m_width; }
+		int get_height() { return m_height; }
+
 	private:
 		int m_width;
 		int m_height;

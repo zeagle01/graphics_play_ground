@@ -12,7 +12,7 @@ namespace clumsy_engine
 		None,
 		Window_Close, Window_Resize, WindowFocus, Window_Lost_Focus, Window_Moved,
 		App_Tick, App_Update, App_Render,
-		Key_Pressed, Key_Released,
+		Key_Pressed, Key_Released,Key_Typed,
 		Mouse_Button_Pressed, Mouse_Button_Rleased, Mouse_Moved, Mouse_Scrolled,
 		Event_Type_Size
 	};

@@ -14,6 +14,7 @@ namespace clumsy_engine
 
 	public:
 		EVENT_CLASS_CATEGORY(Event_Category::Keyboard|Event_Category::Input)
+			int get_key() { return m_key_code; }
 	protected:
 		Key_Event(int key_code) :m_key_code(key_code) {}
 		int m_key_code;
@@ -49,6 +50,22 @@ namespace clumsy_engine
 		{ 
 			std::stringstream ss;
 			ss << "Key_Release_Event: " << m_key_code;
+			return ss.str();
+		}
+	};
+
+	class Key_Typed_Event:public Key_Event
+	{
+	public:
+		Key_Typed_Event(int key_code) :Key_Event(key_code)  {}
+
+		EVENT_CLASS_TYPE(Key_Typed)
+
+
+		std::string to_string() const override
+		{ 
+			std::stringstream ss;
+			ss << "Key_Typed_Event: " << m_key_code ;
 			return ss.str();
 		}
 	};

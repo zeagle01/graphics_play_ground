@@ -25,6 +25,7 @@ src/layer.cpp
 src/layer_stack.h
 src/layer_stack.cpp
 src/imgui_layer.cpp
+src/handy_helpers.h
 )
 
 set(include_files

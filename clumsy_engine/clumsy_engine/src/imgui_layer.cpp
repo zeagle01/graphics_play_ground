@@ -8,6 +8,11 @@
 #include "application.h"
 #include "window.h"
 #include "log.h"
+#include "event.h"
+#include "mouse_event.h"
+#include "application_event.h"
+#include "key_event.h"
+#include "handy_helpers.h"
 
 namespace clumsy_engine
 {
@@ -91,7 +96,103 @@ namespace clumsy_engine
 
 		void Imgui_Layer::on_event(Event& e) 
 		{
+
+			Dispatcher dispatcher(e);
+
+			dispatcher.dispatch<Mouse_Button_Pressed_Event>(CE_BIND_MEMBER_FN(Imgui_Layer::on_mouse_button_pressed_event));
+			dispatcher.dispatch<Mouse_Button_Released_Event>(CE_BIND_MEMBER_FN(Imgui_Layer::on_mouse_button_release_event));
+			dispatcher.dispatch<Mouse_Moved_Event>(CE_BIND_MEMBER_FN(Imgui_Layer::on_mouse_moved_event));
+			dispatcher.dispatch<Mouse_Scrolled_Event>(CE_BIND_MEMBER_FN(Imgui_Layer::on_mouse_scrolled_event));
+			dispatcher.dispatch<Key_Pressed_Event>(CE_BIND_MEMBER_FN(Imgui_Layer::on_key_pressed_event));
+			dispatcher.dispatch<Key_Typed_Event>(CE_BIND_MEMBER_FN(Imgui_Layer::on_key_typed_event));
+			dispatcher.dispatch<Key_Release_Event>(CE_BIND_MEMBER_FN(Imgui_Layer::on_key_released_event));
+			dispatcher.dispatch<Window_Resize_Event>(CE_BIND_MEMBER_FN(Imgui_Layer::window_resize_event));
+
 		}
 
+
+		/////////////EVENTS/////////////
+
+		bool Imgui_Layer::on_mouse_button_pressed_event(Mouse_Button_Pressed_Event& e)
+		{
+			CE_CORE_INFO("im gui handle {0}", e.get_name());
+			ImGuiIO& io = ImGui::GetIO();
+			io.MouseDown[e.get_mouse_button()] = true;
+			return false;
+
+		}
+		bool Imgui_Layer::on_mouse_button_release_event(Mouse_Button_Released_Event& e)
+		{
+
+			CE_CORE_INFO("im gui handle {0}", e.get_name());
+			ImGuiIO& io = ImGui::GetIO();
+			io.MouseDown[e.get_mouse_button()] = false;
+			return false;
+		}
+		bool Imgui_Layer::on_mouse_moved_event(Mouse_Moved_Event& e)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			io.MousePos = ImVec2(e.get_x(), e.get_y());
+
+			return false;
+		}
+		bool Imgui_Layer::on_mouse_scrolled_event(Mouse_Scrolled_Event& e)
+		{
+
+			ImGuiIO& io = ImGui::GetIO();
+			io.MouseWheelH += e.get_x_offset();
+			io.MouseWheel += e.get_y_offset();
+
+			return false;
+		}
+		bool Imgui_Layer::on_key_pressed_event(Key_Pressed_Event& e)
+		{
+			CE_CORE_INFO("im gui handle {0}", e.get_name());
+			ImGuiIO& io = ImGui::GetIO();
+			io.KeysDown[e.get_key()] = true;
+
+			io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+			io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+			io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+			io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+
+
+			return false;
+		}
+		bool Imgui_Layer::on_key_released_event(Key_Release_Event& e)
+		{
+			CE_CORE_INFO("im gui handle {0}", e.get_name());
+			ImGuiIO& io = ImGui::GetIO();
+			io.KeysDown[e.get_key()] = false;
+			return false;
+
+		}
+
+		bool Imgui_Layer::on_key_typed_event(Key_Typed_Event& e)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+
+			int c = e.get_key();
+
+			if (c > 0 && c < 0x10000)
+			{
+				io.AddInputCharacter((unsigned short)c);
+			}
+
+			return false;
+		}
+
+		bool Imgui_Layer::window_resize_event(Window_Resize_Event& e)
+		{
+
+			CE_CORE_INFO("im gui handle {0}", e.get_name());
+
+			ImGuiIO& io = ImGui::GetIO();
+			io.DisplaySize = ImVec2(e.get_width(), e.get_height());	
+			io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+			glViewport(0, 0, e.get_width(), e.get_height());
+
+			return false;
+		}
 
 }

@@ -128,6 +128,12 @@ namespace clumsy_engine
 		}
 		);
 
+		glfwSetCharCallback(m_window, [](GLFWwindow* window, unsigned int unicode) {
+			Window_Data& window_data = *(Window_Data*)glfwGetWindowUserPointer(window);
+			Key_Typed_Event e(unicode);
+			window_data.event_callback(e);
+			});
+
 		glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window,int button,int action,int mods)
 		{
 			Window_Data& window_data = *(Window_Data*)glfwGetWindowUserPointer(window);

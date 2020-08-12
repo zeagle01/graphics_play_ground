@@ -21,6 +21,9 @@ namespace clumsy_engine
             return ss.str();
              }
 
+		int get_x() { return m_x; }
+		int get_y() { return m_y; }
+
         private:
         int m_x;
         int m_y;
@@ -42,6 +45,9 @@ namespace clumsy_engine
             return ss.str();
              }
 
+		int get_x_offset() { return m_x_offset; }
+		int get_y_offset() { return m_y_offset; }
+
         private:
         int m_x_offset;
         int m_y_offset;
@@ -49,18 +55,19 @@ namespace clumsy_engine
     };
 
 
-    class Mouse_Button_Event:public Event
-    {
-        public:
-Mouse_Button_Event(int button):m_button(button){}
-EVENT_CLASS_CATEGORY(Event_Category::Input|Event_Category::MouseButton)
+	class Mouse_Button_Event :public Event
+	{
+	public:
+		Mouse_Button_Event(int button) :m_button(button) {}
+		EVENT_CLASS_CATEGORY(Event_Category::Input | Event_Category::MouseButton)
+
+		int  get_mouse_button() { return m_button; }
+
+	protected:
+		int m_button;
 
 
-        protected:
-        int m_button;
-
-
-    };
+	};
 
     class Mouse_Button_Pressed_Event:public Mouse_Button_Event
     {
