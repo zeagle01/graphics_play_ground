@@ -1,7 +1,6 @@
 
 
-cmake_minimum_required(VERSION 3.12)
-
+cmake_minimum_required(VERSION 3.15)
 project(vk_render)
 
 
@@ -11,6 +10,8 @@ Hello_VK_Triangle.cpp
 Hello_VK_Triangle.h
 )
 target_compile_features(vk_render PRIVATE cxx_std_17)
+
+set_property(TARGET vk_render PROPERTY FOLDER examples)
 
 
 

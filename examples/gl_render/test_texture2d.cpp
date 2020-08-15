@@ -35,7 +35,9 @@ namespace test
 		GL_Call(glEnable(GL_BLEND));
 		GL_Call(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-		m_shader.create_shader_from_file("cases/gl_render.vs", "cases/gl_render.fs");
+		std::string resources_dir = "../../../resources/";
+
+		m_shader.create_shader_from_file(resources_dir + "shaders/gl_render.vs", resources_dir + "shaders/gl_render.fs");
 		m_shader.bind();
 
 		m_vbo = std::make_unique< Vertex_Buffer>(m_positions.data(), m_positions.size());
@@ -47,7 +49,7 @@ namespace test
 		layout.push<float>(2);
 		m_va->add_buffer(*m_vbo, layout);
 
-		m_texture = std::make_unique<Texture>("resources/textures/awesomeface.png");
+		m_texture = std::make_unique<Texture>(resources_dir + "textures/awesomeface.png");
 		int active_texture_slot = 0;
 		m_texture->bind(active_texture_slot);
 		m_shader.set_uniform_1i("u_texture", active_texture_slot);

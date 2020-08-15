@@ -1,0 +1,15 @@
+{
+    "mesh_file": "../../resources/meshes/1_triangle.obj",
+    "vertex_shader": "../../resources/shaders/plain.vs",
+    "fragment_shader": "../../resources/shaders/plain.fs",
+    "simulator": "PD",
+    "gravity_acceleration": [
+      0,
+      -5.0,
+      0
+    ],
+    "uniform_mass": 1,
+    "delta_t": 0.005
+
+}
+

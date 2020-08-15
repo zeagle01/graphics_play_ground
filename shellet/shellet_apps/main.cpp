@@ -7,7 +7,7 @@
 #include "Scene.h"
 #include "gflags/gflags.h"
 #include "glog/logging.h"
-#include "boost/filesystem.hpp"
+#include <filesystem>
 
 
 int main(int argc,char** argv){
@@ -15,7 +15,7 @@ int main(int argc,char** argv){
 
 	//std::string currentPath = boost::filesystem::system_complete(".").string();
 
-	boost::filesystem::create_directory("log");
+	std::filesystem::create_directory("log");
 	FLAGS_log_dir = "./log/";//out put dir
 	FLAGS_alsologtostderr = 1;//also print to console
 

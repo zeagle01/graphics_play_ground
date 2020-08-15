@@ -2,8 +2,7 @@
 
 
 
-cmake_minimum_required(VERSION 3.12)
-
+cmake_minimum_required(VERSION 3.15)
 
 project(soft_render)
 
@@ -13,10 +12,7 @@ target_compile_features(soft_render PRIVATE cxx_std_17)
 
 target_link_libraries(soft_render PRIVATE shellet)
 
+set_property(TARGET soft_render PROPERTY FOLDER examples)
+
 set_property(TARGET soft_render PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:soft_render>)
 
-add_custom_command(TARGET soft_render
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../cases $<TARGET_FILE_DIR:soft_render>/cases
-    COMMENT "copy cases" VERBATIM
-    )

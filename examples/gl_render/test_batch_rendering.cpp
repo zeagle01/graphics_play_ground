@@ -34,7 +34,10 @@ namespace test
 	{
 
 		m_shader = std::make_unique<Shader>();
-		m_shader->create_shader_from_file("cases/batch_rendering.vs", "cases/batch_rendering.fs");
+
+		std::string resources_dir = "../../../resources/";
+
+		m_shader->create_shader_from_file(resources_dir + "shaders/batch_rendering.vs", resources_dir + "shaders/batch_rendering.fs");
 
 		m_shader->bind();
 		
@@ -72,8 +75,9 @@ namespace test
 			}
 		}
 
-		m_textures.push_back(std::make_unique<Texture>("resources/textures/awesomeface.png"));
-		m_textures.push_back(std::make_unique<Texture>("resources/textures/red_square.png"));
+
+		m_textures.push_back(std::make_unique<Texture>(resources_dir + "textures/awesomeface.png"));
+		m_textures.push_back(std::make_unique<Texture>(resources_dir + "textures/red_square.png"));
 
 		for (size_t i = 0; i < m_textures.size(); i++)
 		{

@@ -1,6 +1,5 @@
 
-cmake_minimum_required(VERSION 3.12)
-
+cmake_minimum_required(VERSION 3.15)
 project(gl_render)
 
 add_executable(gl_render 
@@ -33,6 +32,10 @@ test_batch_rendering.h
 #${CMAKE_SOURCE_DIR}/external/stb/stb_image.h
 ${CMAKE_SOURCE_DIR}/external/stb/stb_image.cpp
 )
+
+
+set_property(TARGET gl_render  PROPERTY FOLDER examples)
+
 
 target_compile_features(gl_render PRIVATE cxx_std_20)
 
@@ -78,15 +81,15 @@ target_link_libraries(gl_render PRIVATE glm)
 
 set_property(TARGET gl_render PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:gl_render>)
 
-add_custom_command(TARGET gl_render
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../cases $<TARGET_FILE_DIR:gl_render>/cases
-    COMMENT "copy cases" VERBATIM
-    )
+#add_custom_command(TARGET gl_render
+#    POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../cases $<TARGET_FILE_DIR:gl_render>/cases
+#    COMMENT "copy cases" VERBATIM
+#    )
 
-add_custom_command(TARGET gl_render
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:gl_render>/resources
-    COMMENT "copy resources" VERBATIM
-    )
-
+#add_custom_command(TARGET gl_render
+#    POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:gl_render>/resources
+#    COMMENT "copy resources" VERBATIM
+#    )
+#

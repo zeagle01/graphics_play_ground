@@ -1,7 +1,6 @@
 
 cmake_minimum_required(VERSION 3.15)
 
-
 project(clumsy_engine)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS YES CACHE BOOL "export all symbols")
@@ -45,6 +44,8 @@ ${include_files}
 ${source_files}
 )
 
+
+set_target_properties(clumsy_engine PROPERTIES FOLDER clumsy_engine)
 
 
 

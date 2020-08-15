@@ -12,7 +12,8 @@
 #include <fstream>
 
 #include <iostream>
-#include <boost/filesystem.hpp>
+//#include <boost/filesystem.hpp>
+#include <filesystem>
 
 
 int Scene::get_vertex_num()const {
@@ -92,7 +93,7 @@ void Scene::build_config_root(const std::string& file)
 	if (fin.good()) {
 		LOG(INFO) << "config file: " << file << "opend!";
 		fin >> m_config_root;
-        m_config_dir = boost::filesystem::system_complete(file).parent_path().string() + "/";
+        m_config_dir = std::filesystem::absolute(file).parent_path().string() + "/";
     }
 	else {
 		LOG(ERROR) << "can't open config file" << file;
@@ -108,6 +109,7 @@ void Scene::config_gravity()
 }
 
 void Scene::init_from_config(const std::string& config_file){
+
     build_config_root(config_file);
 
     config_shader();
