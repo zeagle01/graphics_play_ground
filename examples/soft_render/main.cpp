@@ -7,7 +7,6 @@
 #include <Mesh_Loader.h>
 
 
-
 void line(int x0, int y0, int x1, int y1, COLORREF color,HDC dc)
 {
 
@@ -54,7 +53,7 @@ struct vec2i
 
 	vec2i operator-(const vec2i& other)
 	{
-		return { x + other.x,y + other.y };
+		return { x - other.x,y - other.y };
 	}
 
 	vec2i operator*(float scalar)
@@ -69,13 +68,24 @@ void fill_triangle(vec2i v0, vec2i v1, vec2i v2, COLORREF color, HDC dc)
 	if (v0.y > v2.y) std::swap(v0, v2);
 	if (v1.y > v2.y) std::swap(v1, v2);
 	//int total_height
-	for (int y = v0.y; y <= v1.y; y++)
+	for (int y = v0.y; y < v1.y; y++)
 	{
 		float t1 = float(y - v0.y) / float(v1.y - v0.y);
 		float t2 = float(y - v0.y) / float(v2.y - v0.y);
-		vec2i A = v0 + (v1 - v0) * t1;
-		vec2i B = v1 + (v2 - v0) * t2;
-		line(A.x, A.y, B.x, B.y, color, dc);
+		int xa = v0.x + (v1.x - v0.x) * t1;
+		int xb = v0.x + (v2.x - v0.x) * t2;
+
+		line(xa, y, xb, y, color, dc);
+	}
+
+	for (int y = v1.y; y < v2.y; y++)
+	{
+		float t1 = float(y - v1.y) / float(v2.y - v1.y);
+		float t2 = float(y - v0.y) / float(v2.y - v0.y);
+		int xa = v1.x + (v2.x - v1.x) * t1;
+		int xb = v0.x + (v2.x - v0.x) * t2;
+
+		line(xa, y, xb, y, color, dc);
 	}
 
 }
@@ -95,9 +105,10 @@ int main()
 	MoveWindow(my_console, r.left, r.top, width, height, TRUE);
 
 	Mesh_Loader mesh_loader;
-	//mesh_loader.load_from_obj("cases/african_head.obj");
-    //mesh_loader.load_from_obj("cases/flag.obj");
-    mesh_loader.load_from_obj("cases/1_triangle.obj");
+	std::string mesh_dir = "../../../resources/meshes/";
+	mesh_loader.load_from_obj(mesh_dir+"african_head.obj");
+    //mesh_loader.load_from_obj(mesh_dir+"flag.obj");
+    //mesh_loader.load_from_obj(mesh_dir+"1_triangle.obj");
 	auto positions = mesh_loader.get_positions();
 	auto indices = mesh_loader.get_indices();
 
@@ -123,7 +134,7 @@ int main()
 				line(x0, y0, x1, y1, RGB(255, 100, 0), my_dc);
 				tv.push_back({ x0,y0 });
 			}
-			fill_triangle(tv[0], tv[1], tv[2], RGB(100, 255, 0), my_dc);
+			fill_triangle(tv[0], tv[1], tv[2], RGB(100, 155, 80), my_dc);
 		}
 
 		t += .01;
