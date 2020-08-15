@@ -72,11 +72,6 @@ hunter_add_package(jsoncpp)
 find_package(jsoncpp CONFIG REQUIRED)
 target_link_libraries(shellet PRIVATE jsoncpp_lib_static)
 
-hunter_add_package(Boost COMPONENTS system filesystem)
-find_package(Boost CONFIG REQUIRED system filesystem)
-target_link_libraries(shellet PRIVATE  Boost::filesystem Boost::system)
-target_link_libraries(shellet_test PRIVATE  Boost::filesystem Boost::system)
-
 
 #find_package(glad CONFIG REQUIRED)
 target_link_libraries(shellet PUBLIC  glad)
@@ -99,6 +94,9 @@ target_link_libraries(shellet PUBLIC gflags)
 hunter_add_package(GTest)
 find_package(GMock CONFIG REQUIRED)
 target_link_libraries(shellet_test PRIVATE GMock::gmock)
+
+#include(${CMAKE_SOURCE_DIR}/cmake/gtest.cmake)
+#link_to_gtest(shellet_test ${CMAKE_SOURCE_DIR}/external/gtest)
 
 
 hunter_add_package(Eigen)
