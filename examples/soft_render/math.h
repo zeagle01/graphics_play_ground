@@ -65,10 +65,20 @@ namespace soft_render
 				int ri = 0;
 				for (auto it_row = it_col->begin(); it_row != it_col->end(); it_row++)
 				{
-					vecs[ri][ci] = *it_row;
+					vecs[ci][ri] = *it_row;
 					assert(ri < row);  ri++;
 				}
 				assert(ci < col);  ci++; 
+			} 
+		} 
+
+		mat(const std::initializer_list<vec<row, T>>& il)
+		{
+			int ci = 0;
+			for (auto it_col = il.begin(); it_col != il.end(); it_col++)
+			{ 
+				vecs[ci] = *it_col;
+				assert(ci < col);  ci++;
 			} 
 		} 
 		mat& operator=(const mat& other) {
@@ -85,7 +95,7 @@ namespace soft_render
 		{
 			vec<col, T> ret;
 			for (int ci = 0; ci < col; ci++) {
-				ret[ci] = vecs[ri][ci];
+				ret[ci] = vecs[ci][ri];
 			}
 			return ret;
 		}
@@ -232,6 +242,20 @@ namespace soft_render
 	template<size_t N, typename T>
 	static inline vec<N, T> operator+(const vec<N, T>& a, const vec<N, T>& b) { return operator+<N, 1, T>(a, b); }
 
+	//a-b
+	template<size_t N,size_t M,typename T>
+	static inline mat<N, M, T> operator-(const mat<N, M, T>& a, const mat<N, M, T>& b)
+	{
+		mat<N,M,T> ret;
+		for (int i = 0; i < N * M; i++)
+		{
+			ret.as_vec()[i] = a.as_vec()[i] - b.as_vec()[i];
+		}
+		return ret;
+	}
+	template<size_t N, typename T>
+	static inline vec<N, T> operator-(const vec<N, T>& a, const vec<N, T>& b) { return operator-<N, 1, T>(a, b); }
+
 	//a==b
 	template<size_t N,size_t M,typename T>
 	static inline bool operator==(const mat<N, M, T>& a, const mat<N, M, T>& b)
@@ -305,6 +329,19 @@ namespace soft_render
 	template<size_t N,  typename T>
 	static inline T dot(const vec<N, T>& a, const vec<N, T>& b) { return dot<N, 1, T>(a, b); }
 
+	//type conversion
+	template<size_t N, size_t M, typename src_T,typename dst_T>
+	static inline mat<N, M, dst_T> type_conversion(const mat<N, M, src_T>& a)
+	{
+		mat<N, M, dst_T> ret;
+		for (int i = 0; i < N*M; i++)
+		{
+			ret.as_vec()[i] = dst_T(a.as_vec()[i]);
+		}
+		return ret;
+	}
+	template<size_t N, typename src_T, typename dst_T>
+	static inline vec<N, dst_T> type_conversion(const vec<N, src_T>& a) { return type_conversion<N, 1, src_T, dst_T>(a); }
 
 
 	///////////////////////////////matrix only///////////////////////////////////
@@ -318,11 +355,11 @@ namespace soft_render
 			{
 				if (ri == ci)
 				{
-					ret[ri][ci] = 1.f;
+					ret[ci][ri] = 1.f;
 				}
 				else
 				{
-					ret[ri][ci] = 0.f;
+					ret[ci][ri] = 0.f;
 				}
 
 			}
@@ -340,7 +377,7 @@ namespace soft_render
 			{
 				int rr = ri < r ? ri : ri + 1;
 				int cc = ci < c ? ci : ci + 1;
-				ret[ri][ci] = a[rr][cc];
+				ret[ci][ri] = a[cc][rr];
 			}
 		}
 		return ret;
@@ -362,7 +399,7 @@ namespace soft_render
 			T sum = 0;
 			for (size_t i = 0; i < N; i++)
 			{
-				sum += a[0][i] * cofactor(a, 0, i);
+				sum += a[0][i] * cofactor(a, i, 0);
 			}
 			return sum;
 		}
@@ -381,7 +418,7 @@ namespace soft_render
 	constexpr inline T cofactor(const mat<N,N,T>& a,const int row,const int col)
 	{
 		T sign = (row + col) % 2 ? -1 : 1;
-		return a[row][col] * determinant<N - 1, T>::get(get_minor(a, row, col)) * sign;
+		return  determinant<N - 1, T>::get(get_minor(a, row, col)) * sign;
 	}
 
 	template<size_t N, typename T>
@@ -390,7 +427,7 @@ namespace soft_render
 		for (size_t ri = 0; ri < N; ri++) {
 			for (size_t ci = 0; ci < N; ci++)
 			{
-				ret[ri][ci] = cofactor(a, ri, ci);
+				ret[ci][ri] = cofactor(a, ri, ci);
 			}
 		}
 		return ret;
@@ -398,7 +435,9 @@ namespace soft_render
 
 	template<size_t N, typename T>
 	inline mat<N, N, T> invert(const mat<N, N, T>& a) {
+
 		mat<N, N, T> adj = adjoint(a);
+
 		T det = dot(a.get_row(0), adj.get_col(0));
 
 		assert(det != 0.f);
@@ -425,7 +464,7 @@ namespace soft_render
 		{
 			for (int ci = 0; ci < n; ci++)
 			{
-				ret[ri][ci] = dot(A.get_row(ri), B[ci]);
+				ret[ci][ri] = dot(A.get_row(ri), B[ci]);
 			}
 		}
 		return ret;
@@ -440,14 +479,16 @@ namespace soft_render
 
 
 	//////////////////////type alias///////////////////////
-	using vec2f = vec<3, float>;
+	using vec2f = vec<2, float>;
 	using vec3f = vec<3, float>;
 	using vec4f = vec<4, float>;
+
 	using vec2i = vec<2, int>;
 	using vec3i = vec<3, int>;
 	using vec4i = vec<4, int>;
 
 	using mat3x3f = mat<3, 3, float>;
+	using mat2x2f = mat<2, 2, float>;
 
 
 

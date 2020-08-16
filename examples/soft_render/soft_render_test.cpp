@@ -65,12 +65,25 @@ TEST(Matrix, init_list)
 	EXPECT_THAT(A[1][1], Eq(3));
 }
 
+TEST(Matrix, init_with_vecs)
+{
+
+	vec2f a{ 0,1 };
+	vec2f b{ 2,3 };
+	mat<2, 2, float> act{ {a,b} };
+
+	mat<2, 2, float> exp{ {0,1},{2,3} };
+
+	EXPECT_THAT(act, Eq(exp));
+}
+
 TEST(Matrix, get_identity)
 {
-	auto A = get_identity<3, 3, float>();
+	auto act = get_identity<3, 3, float>();
 
-	EXPECT_EQ(A[0][0], 1.f);
-	EXPECT_THAT(A[0][1], Eq(0.f));
+	mat3x3f exp{ {1,0,0},{0,1,0},{0,0,1} };
+
+	EXPECT_THAT(act, Eq(exp));
 }
 
 TEST(Matrix, add)
@@ -82,12 +95,35 @@ TEST(Matrix, add)
 	EXPECT_THAT(act, Eq(exp));
 }
 
+TEST(Matrix, determinant_2by2)
+{
+	mat2x2f A{ {1,2},{3,4} };
+
+	auto act = determinant<2, float>::get(A);
+
+	float exp = -2.f;
+
+	EXPECT_THAT(act, Eq(exp));
+}
+
 TEST(Matrix, solve)
 {
 	mat3x3f A = get_identity<3, 3, float>();
 
 	vec3f b{ 0,1,0 };
 	vec3f exp{ 0,1,0 };
+
+	auto act = solve(A, b);
+
+	EXPECT_THAT(act, Eq(exp));
+}
+
+TEST(Matrix, solve_2112)
+{
+	mat2x2f A{ {2,1},{1,2} };
+
+	vec2f b{ 3,3, };
+	vec2f exp{ 1,1 };
 
 	auto act = solve(A, b);
 

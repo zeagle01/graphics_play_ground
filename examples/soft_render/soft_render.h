@@ -124,7 +124,7 @@ namespace soft_render
 	{
 		std::map<int, float > float_vars;
 		std::map<int, vec2f > vec2_vars;
-		std::map<int, vec2f > vec3_vars;
+		std::map<int, vec3f > vec3_vars;
 		std::map<int, vec4f > vec4_vars;
 		//std::map<int, mat4x4 > mat_vars;
 	};
@@ -216,7 +216,13 @@ namespace soft_render
 
 		vec3f interpolate(vec2i v0, vec2i v1, vec2i v2, vec2i v)
 		{
-			return vec3f();
+			vec2f dv0 = type_conversion<2,int,float>(v0 - v2);
+			vec2f dv1 = type_conversion<2,int,float>(v1 - v2);
+			vec2f b = type_conversion<2, int, float>(v - v2);
+			mat2x2f A{ dv0,dv1 };
+
+			vec2f x = solve(A, b);
+			return vec3f{ x[0],x[1],1 - x[0] - x[1] };
 		}
 
 		void draw_triangle() 
