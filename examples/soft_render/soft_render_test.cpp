@@ -10,7 +10,7 @@
 
 
 using namespace testing;
-using namespace soft_render_2;
+using namespace soft_render;
 
 TEST(Vector, access)
 {
@@ -22,16 +22,16 @@ TEST(Vector, access)
 TEST(Vector, uniform_fill)
 {
 
-	vec<3, float> a=vec<3,float>::full(1.f);
+	vec<3, float> a = uniform_vec<3, float>(1.f);
 	EXPECT_THAT(a[1], Eq(1.f));
 
 }
 
 TEST(Vector, add)
 {
-	vec<3, float> a = vec<3, float>::full(1.f);
-	vec<3, float> b = vec<3, float>::full(1.f);
-	vec<3, float> exp = vec<3, float>::full(2.f);
+	vec<3, float> a = uniform_vec<3, float>(1.f);
+	vec<3, float> b = uniform_vec<3, float>(1.f);
+	vec<3, float> exp = uniform_vec<3, float>(2.f);
 	auto act = a + b;
 	EXPECT_THAT(act, Eq(exp));
 }
