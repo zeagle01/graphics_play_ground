@@ -42,14 +42,39 @@ namespace soft_render
 	{
 	public:
 		union {
-			struct { T x; T y; };
-			struct { T u; T v; };
+			struct { T x, y; };
+			struct { T u, v; };
 			T data[2];
 		};
 		VEC_BASIC()
 
 	};
 
+	template<typename T>
+	class vec<3, T>:public Sizable<3>
+	{
+	public:
+		union {
+			struct { T x, y, z; };
+			T data[3];
+		};
+		VEC_BASIC()
+
+	};
+
+	template<typename T>
+	class vec<4, T>:public Sizable<4>
+	{
+	public:
+		union {
+			struct { T x,y,z,w; };
+			T data[4];
+		};
+		VEC_BASIC()
+
+	};
+
+	//////////////helper function//////////////////
 	template<size_t N, typename T>
 	static inline vec<N, T> uniform_vec(T value) { vec<N, T> ret; for (int i = 0; i < N; i++) { ret[i] = value; } return ret; }
 
@@ -84,7 +109,7 @@ namespace soft_render
 
 
 
-	//type alias
+	//////////////////////type alias///////////////////////
 	using vec2f = vec<3, float>;
 	using vec3f = vec<3, float>;
 	using vec4f = vec<4, float>;
