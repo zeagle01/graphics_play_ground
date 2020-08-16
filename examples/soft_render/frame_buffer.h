@@ -32,6 +32,12 @@ namespace soft_render
 		virtual vec4f get_color_f(int x, int y)override { return m_color[x * m_height + y]; }
 		virtual void set_color_f(int x, int y, const vec4f& color) override { m_color[x * m_height + y] = color; }
 
+		virtual vec4i get_color_i(int x, int y) {
+			vec4f c_in_f = get_color_f(x, y);
+			return  { int(c_in_f[0] * 255),int(c_in_f[1] * 255),int(c_in_f[2] * 255),int(c_in_f[3] * 255) };
+		}
+		virtual void set_color_i(int x, int y,const vec4i& color) {};
+
 	private:
 		std::vector<vec4f> m_color;
 	};
