@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <memory>
 #include <thread>
+#include <algorithm>
 #include <Mesh_Loader.h>
 
 #include "soft_render.h"
@@ -34,7 +35,7 @@ namespace soft_render
 
 			m_out_device = std::make_unique<Out_Device>();
 			m_frame_buffer = std::make_unique<Array_Frame_Buffer>(width, height);
-			m_rasterizer = std::make_unique<Rasterizer>(*m_frame_buffer);
+			m_rasterizer = std::make_unique<Rasterizer>();
 		}
 
 		void fill_triangle(vec2i v0, vec2i v1, vec2i v2, vec4f color )
@@ -50,7 +51,7 @@ namespace soft_render
 				int xa = v0.x + (v1.x - v0.x) * t1;
 				int xb = v0.x + (v2.x - v0.x) * t2;
 
-				m_rasterizer->line(xa, y, xb, y, color);
+				m_rasterizer->loop_line({ xa, y }, { xb, y }, [&](int x, int y) {m_frame_buffer->set_color_f(x, y, color); });
 			}
 
 			for (int y = v1.y; y < v2.y; y++)
@@ -60,10 +61,12 @@ namespace soft_render
 				int xa = v1.x + (v2.x - v1.x) * t1;
 				int xb = v0.x + (v2.x - v0.x) * t2;
 
-				m_rasterizer->line(xa, y, xb, y, color);
+				m_rasterizer->loop_line({ xa, y }, { xb, y }, [&](int x, int y) {m_frame_buffer->set_color_f(x, y, color); });
+				//m_rasterizer->line(xa, y, xb, y, color);
 			}
 
 		}
+
 
 		void render()
 		{
@@ -96,11 +99,10 @@ namespace soft_render
 						int x1 = (positions[v_next * 3 + 0] + 1.0) * m_frame_buffer->get_width() * 0.5;
 						int y1 = (1.f - positions[v_next * 3 + 1]) * m_frame_buffer->get_height() * 0.5;
 
-						//line(x0, y0, x1, y1, RGB(255, 100, 0), my_dc);
-						m_rasterizer->line(x0, y0, x1, y1, { 0.f,1.f,0.5f,1.f });
+						//m_rasterizer->loop_line({ x0, y0 }, { x1, y1 }, [&](int x, int y) {m_frame_buffer->set_color_f(x, y, { 0.f,1.f,0.5f,1.f }); });
 						tv.push_back({ x0,y0 });
 					}
-					//fill_triangle(tv[0], tv[1], tv[2], { 1.f,1.f,0.5f,1.f });
+					m_rasterizer->triangle_fragment_loop(tv[0], tv[1], tv[2], [&](int x, int y) {m_frame_buffer->set_color_f(x, y, { 0.f,1.f,0.5f,1.f }); });
 				}
 
 				t += .01;
@@ -132,57 +134,134 @@ namespace soft_render
 
 
 
-	class Soft_Renderer
+	class PipeLine_Renderer
 	{
 	private:
 		std::vector<vec3f> m_positions;
 		std::vector<vec3i> m_indices;
-		std::function<vec4f(int vi, Shader_Context&)> m_vertex_shader;
+	private:
+		std::function <vec4f(Shader_Context&, Shader_Context&) > m_vertex_shader;
 		std::function<vec4f(Shader_Context&)> m_fragment_shader;
+		std::vector<Shader_Context> m_vertex_shader_in;
+		std::vector<Shader_Context> m_vertex_shader_out;
+		Shader_Context m_fragment_shader_in;
 
+	private:
+		std::unique_ptr<Rasterizer> m_rasterizer;
+		std::unique_ptr<Frame_Buffer> m_frame_buffer;
+		std::unique_ptr<Out_Device> m_out_device;
+		int m_width, m_height;
+		static constexpr int VAR_COLOR = 0;
+		static constexpr int VAR_POSITION = 0;
 
 	public: 
-		Soft_Renderer() 
+		PipeLine_Renderer() 
 		{
 
 
-			constexpr int VAR_COLOR = 0;
 
-			m_vertex_shader = [&](int vi, Shader_Context& vs_io)
+			/////////////////////////////////////mesh
+			Mesh_Loader mesh_loader;
+			std::string mesh_dir = "../../../resources/meshes/";
+			mesh_loader.load_from_obj(mesh_dir + "african_head.obj");
+			//mesh_loader.load_from_obj(mesh_dir+"flag.obj");
+			//mesh_loader.load_from_obj(mesh_dir+"1_triangle.obj");
+			auto positions = mesh_loader.get_positions();
+			auto indices = mesh_loader.get_indices();
+			m_positions.resize(positions.size() / 3);
+			m_indices.resize(indices.size() / 3);
+			memcpy(&m_positions[0][0], &positions[0], sizeof(float) * positions.size());
+			memcpy(&m_indices[0][0], &indices[0], sizeof(int) * indices.size());
+
+			/////////////////////////////////////shader
+			m_vertex_shader = [&](Shader_Context& vs_in, Shader_Context& fs_context)
 			{
-				return vec4f({ m_positions[vi][0],m_positions[vi][1],m_positions[vi][2],1 });
+				return vs_in.vec4_vars[VAR_POSITION];
 			};
 
 			m_fragment_shader = [&](Shader_Context& fs_in)
 			{
 				return fs_in.vec4_vars[VAR_COLOR];
 			};
+			m_vertex_shader_in.resize(m_positions.size());
+			m_vertex_shader_out.resize(m_positions.size());
+
+			for (int i = 0; i < m_positions.size(); i++)
+			{
+				m_vertex_shader_in[i].vec3_vars[VAR_POSITION] = m_positions[i];
+				m_vertex_shader_out[i].vec3_vars[VAR_COLOR] = m_positions[i];
+			}
+
+			m_fragment_shader_in.vec3_vars[VAR_COLOR] = vec3f();
+
+
+
+			/////////////////////////////////frame
+			m_width = 800;
+			m_height = 600;
+
+			m_out_device = std::make_unique<Out_Device>();
+			m_frame_buffer = std::make_unique<Array_Frame_Buffer>(m_width, m_height);
+			m_rasterizer = std::make_unique<Rasterizer>();
 		}
 
 		int* get_result() { return nullptr; }
 		void set_vertex_shader() {}
 		void render(){}
 
-		void draw_line() 
-		{  
-		
-		}
 
-		void draw_line(int x0,int y0,int x1,int y1);
+		void draw_line(vec2i v0, vec2i v1)
+		{}
+
+
+		vec3f interpolate(vec2i v0, vec2i v1, vec2i v2, vec2i v)
+		{
+			return vec3f();
+		}
 
 		void draw_triangle() 
 		{
-			Shader_Context vs_in[3];
+			vec2i pos_udc[3];
+			Shader_Context vertex_shader_out[3];
+
 			for (int ti = 0; ti < m_indices.size(); ti++)
 			{
 				for (int tvi = 0; tvi < 3; tvi++)
 				{
 					int vi = m_indices[ti][tvi];
-					vec4f pos = m_vertex_shader(vi, vs_in[tvi]);
+					vec4f pos = m_vertex_shader(m_vertex_shader_in[vi], m_vertex_shader_out[vi]);
+					pos_udc[tvi] = { int(pos[0] * m_width),int(pos[1] * m_height) };
+					vertex_shader_out[tvi] = m_vertex_shader_out[vi];
 				}
 
+				m_rasterizer->triangle_fragment_loop(pos_udc[0], pos_udc[1], pos_udc[2], [&](int x,int y) 
+					{
+						vec3f w = interpolate(pos_udc[0], pos_udc[1], pos_udc[2], { x,y });
+
+						for (auto& it : m_fragment_shader_in.float_vars)
+						{
+							int key = it.first;
+							it.second = w[0] * vertex_shader_out[0].float_vars[key] + w[1] * vertex_shader_out[1].float_vars[key] + w[2] * vertex_shader_out[2].float_vars[key];
+						}
+
+						for (auto& it : m_fragment_shader_in.vec2_vars)
+						{
+							int key = it.first;
+							it.second = w[0] * vertex_shader_out[0].vec2_vars[key] + w[1] * vertex_shader_out[1].vec2_vars[key] + w[2] * vertex_shader_out[2].vec2_vars[key];
+						}
+
+						for (auto& it : m_fragment_shader_in.vec3_vars)
+						{
+							int key = it.first;
+							it.second = w[0] * vertex_shader_out[0].vec3_vars[key] + w[1] * vertex_shader_out[1].vec3_vars[key] + w[2] * vertex_shader_out[2].vec3_vars[key];
+						}
 
 
+						vec4f color = m_fragment_shader(m_fragment_shader_in);
+
+						m_frame_buffer->set_color_f(x, y, color);
+					}
+				);
 
 			}
 
