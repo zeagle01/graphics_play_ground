@@ -23,6 +23,8 @@
 namespace soft_render
 {
 
+#define set_color_fn(fb,r,g,b)  [&](int x, int y) {fb->set_color_f(x, y, {r,g,b,1.f}); } 
+
 
 	class Plain_Renderer
 	{
@@ -163,9 +165,9 @@ namespace soft_render
 			/////////////////////////////////////mesh
 			Mesh_Loader mesh_loader;
 			std::string mesh_dir = "../../../resources/meshes/";
-			mesh_loader.load_from_obj(mesh_dir + "african_head.obj");
+			//mesh_loader.load_from_obj(mesh_dir + "african_head.obj");
 			//mesh_loader.load_from_obj(mesh_dir+"flag.obj");
-			//mesh_loader.load_from_obj(mesh_dir+"1_triangle.obj");
+			mesh_loader.load_from_obj(mesh_dir+"1_triangle.obj");
 			auto positions = mesh_loader.get_positions();
 			auto indices = mesh_loader.get_indices();
 			m_positions.resize(positions.size() / 3);
@@ -207,7 +209,10 @@ namespace soft_render
 
 		int* get_result() { return nullptr; }
 		void set_vertex_shader() {}
-		void render(){}
+		void render()
+		{
+			draw_triangle();
+		}
 
 
 		void draw_line(vec2i v0, vec2i v1)
@@ -239,37 +244,45 @@ namespace soft_render
 					pos_udc[tvi] = { int(pos[0] * m_width),int(pos[1] * m_height) };
 					vertex_shader_out[tvi] = m_vertex_shader_out[vi];
 				}
-
-				m_rasterizer->triangle_fragment_loop(pos_udc[0], pos_udc[1], pos_udc[2], [&](int x,int y) 
-					{
-						vec3f w = interpolate(pos_udc[0], pos_udc[1], pos_udc[2], { x,y });
-
-						for (auto& it : m_fragment_shader_in.float_vars)
-						{
-							int key = it.first;
-							it.second = w[0] * vertex_shader_out[0].float_vars[key] + w[1] * vertex_shader_out[1].float_vars[key] + w[2] * vertex_shader_out[2].float_vars[key];
-						}
-
-						for (auto& it : m_fragment_shader_in.vec2_vars)
-						{
-							int key = it.first;
-							it.second = w[0] * vertex_shader_out[0].vec2_vars[key] + w[1] * vertex_shader_out[1].vec2_vars[key] + w[2] * vertex_shader_out[2].vec2_vars[key];
-						}
-
-						for (auto& it : m_fragment_shader_in.vec3_vars)
-						{
-							int key = it.first;
-							it.second = w[0] * vertex_shader_out[0].vec3_vars[key] + w[1] * vertex_shader_out[1].vec3_vars[key] + w[2] * vertex_shader_out[2].vec3_vars[key];
-						}
+				for (int tvi = 0; tvi < 3; tvi++)
+				{
+					int tvi_next = (tvi + 1) % 3;
+					m_rasterizer->loop_line(pos_udc[tvi], pos_udc[tvi_next], set_color_fn(m_frame_buffer, 1., 0.5, 0.2));
+				}
 
 
-						vec4f color = m_fragment_shader(m_fragment_shader_in);
+				//m_rasterizer->triangle_fragment_loop(pos_udc[0], pos_udc[1], pos_udc[2], [&](int x,int y) 
+				//	{
+				//		vec3f w = interpolate(pos_udc[0], pos_udc[1], pos_udc[2], { x,y });
 
-						m_frame_buffer->set_color_f(x, y, color);
-					}
-				);
+				//		for (auto& it : m_fragment_shader_in.float_vars)
+				//		{
+				//			int key = it.first;
+				//			it.second = w[0] * vertex_shader_out[0].float_vars[key] + w[1] * vertex_shader_out[1].float_vars[key] + w[2] * vertex_shader_out[2].float_vars[key];
+				//		}
+
+				//		for (auto& it : m_fragment_shader_in.vec2_vars)
+				//		{
+				//			int key = it.first;
+				//			it.second = w[0] * vertex_shader_out[0].vec2_vars[key] + w[1] * vertex_shader_out[1].vec2_vars[key] + w[2] * vertex_shader_out[2].vec2_vars[key];
+				//		}
+
+				//		for (auto& it : m_fragment_shader_in.vec3_vars)
+				//		{
+				//			int key = it.first;
+				//			it.second = w[0] * vertex_shader_out[0].vec3_vars[key] + w[1] * vertex_shader_out[1].vec3_vars[key] + w[2] * vertex_shader_out[2].vec3_vars[key];
+				//		}
+
+
+				//		vec4f color = m_fragment_shader(m_fragment_shader_in);
+
+				//		m_frame_buffer->set_color_f(x, y, color);
+				//	}
+				//);
 
 			}
+
+			m_out_device->flush(*m_frame_buffer);
 
 		}
 	};

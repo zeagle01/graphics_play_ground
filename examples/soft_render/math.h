@@ -260,7 +260,7 @@ namespace soft_render
 	template<size_t N,size_t M,typename T>
 	static inline bool operator==(const mat<N, M, T>& a, const mat<N, M, T>& b)
 	{
-		for (int i = 0; i < N; i++)
+		for (int i = 0; i < N * M; i++)
 		{
 			if (a.as_vec()[i] != b.as_vec()[i])
 			{

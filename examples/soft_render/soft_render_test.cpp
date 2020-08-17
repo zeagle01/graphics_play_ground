@@ -41,7 +41,7 @@ TEST(Vector, draw)
 {
 	PipeLine_Renderer sr;
 	
-	sr.draw_triangle();
+	//sr.draw_triangle();
 
 	//TODO
 //	auto act = sr.get_result();

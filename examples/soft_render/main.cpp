@@ -30,6 +30,7 @@ int main(int argc, char** argv)
 
 
 	Plain_Renderer rander;
+	//PipeLine_Renderer rander;
 	rander.render();
 
 	int c;
