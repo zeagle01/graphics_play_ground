@@ -9,6 +9,7 @@
 #include "layer.h"
 #include "window.h"
 #include "imgui_layer.h"
+#include "input.h"
 
 
 namespace clumsy_engine
@@ -96,6 +97,10 @@ namespace clumsy_engine
 			{
 				layer->on_update();
 			}
+
+			auto [x, y] = Input::get_mouse_position();
+
+			CE_CORE_TRACE("{0},{1}", x, y);
 
 			m_window->on_update();
 		}

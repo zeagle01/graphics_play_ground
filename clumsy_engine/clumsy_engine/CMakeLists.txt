@@ -25,6 +25,10 @@ src/layer_stack.h
 src/layer_stack.cpp
 src/imgui_layer.cpp
 src/handy_helpers.h
+src/input.h
+src/input.cpp
+src/windows_input.h
+src/windows_input.cpp
 )
 
 set(include_files

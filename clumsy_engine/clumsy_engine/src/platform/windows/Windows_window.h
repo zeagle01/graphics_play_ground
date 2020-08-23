@@ -4,6 +4,7 @@
 #pragma once
 
 #include "window.h"
+#include <any>
 
 
 struct GLFWwindow;
@@ -24,6 +25,8 @@ namespace clumsy_engine
 		void set_event_callback(const Event_Callback& event_call_back) override;
 		void set_vertical_sync(bool enabled) override;
 		bool is_verticla_sync()const override;
+
+		virtual void* get_window_native() const override;
 
 	private:
 		virtual void init(const Window_Property& p);

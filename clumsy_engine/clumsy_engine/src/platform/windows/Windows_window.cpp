@@ -224,4 +224,9 @@ namespace clumsy_engine
 		return std::make_unique<Windows_Window>(p);
 	}
 
+	void* Windows_Window::get_window_native() const
+	{
+		return m_window;
+	}
+
 }

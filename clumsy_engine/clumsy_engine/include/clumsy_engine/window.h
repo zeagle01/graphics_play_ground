@@ -35,6 +35,8 @@ namespace clumsy_engine
 		virtual void set_vertical_sync(bool enabled) = 0;
 		virtual bool is_verticla_sync()const = 0;
 
+		virtual void* get_window_native() const = 0;
+
 
 		static std::unique_ptr<Window> create(const Window_Property& p = { .title = "clumsy_engine",.width = 800,.height = 600 });
 	};
