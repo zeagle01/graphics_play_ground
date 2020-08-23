@@ -19,11 +19,14 @@ namespace clumsy_engine
 
 
 
-
+	static std::unique_ptr<Application> s_singleton;
 	Application& Application::get_singleton()
 	{
-		static std::unique_ptr<Application> s=std::make_unique<Application>();
-		return *s;
+		if (!s_singleton)
+		{
+			s_singleton = std::make_unique<Application>();
+		}
+		return *s_singleton;
 	}
 
 
@@ -39,6 +42,7 @@ namespace clumsy_engine
 			Window_Close_Event& wc_e = (Window_Close_Event&)e;
 			return On_Window_Close(wc_e);
 		};
+		s_singleton.reset(this);
 	}
 
 	Application:: ~Application()
@@ -75,7 +79,7 @@ namespace clumsy_engine
 		}
 
 
-		CE_TRACE(e.to_string());
+		//CE_TRACE(e.to_string());
 
 		return true;
 	}
@@ -83,8 +87,8 @@ namespace clumsy_engine
 	void Application::run()
 	{
 
-		Window_Resize_Event e(100, 200);
-		CE_TRACE(e.to_string());
+//		Window_Resize_Event e(100, 200);
+//		CE_TRACE(e.to_string());
 		
 
 
@@ -98,9 +102,9 @@ namespace clumsy_engine
 				layer->on_update();
 			}
 
-			auto [x, y] = Input::get_mouse_position();
-
-			CE_CORE_TRACE("{0},{1}", x, y);
+//			auto [x, y] = Input::get_mouse_position();
+//
+//			CE_CORE_TRACE("{0},{1}", x, y);
 
 			m_window->on_update();
 		}

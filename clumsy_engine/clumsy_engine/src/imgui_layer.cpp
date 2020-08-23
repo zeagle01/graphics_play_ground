@@ -75,14 +75,15 @@ namespace clumsy_engine
 		{
 
 
-			//auto& app = Application::get_singleton();
+			auto& app = Application::get_singleton();
+			auto& window = app.get_window();
 
 			ImGuiIO& io=ImGui::GetIO();
 
 			//CE_CORE_INFO("{0} {1}", app.get_window().get_width(), app.get_window().get_height());
 
 			//io.DisplaySize = ImVec2(app.get_window().get_width()/2, app.get_window().get_height()/2);
-			io.DisplaySize = ImVec2(800, 600);
+			io.DisplaySize = ImVec2(window.get_width(), window.get_height());
 
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui::NewFrame();
