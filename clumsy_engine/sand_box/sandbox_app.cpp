@@ -13,7 +13,11 @@ public:
 	virtual void on_detach() {};
 	virtual void on_update() 
 	{
-		//CE_TRACE("layer {0} update ", (void*)this);
+		 
+		if (clumsy_engine::Input::is_key_pressed(CE_KEY_TAB))
+		{
+			CE_TRACE("layer {0} detect tab pressed on update", (void*)this);
+		}
 	};
 	virtual void on_event(clumsy_engine::Event& e) 
 	{

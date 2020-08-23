@@ -25,10 +25,9 @@ src/layer_stack.h
 src/layer_stack.cpp
 src/imgui_layer.cpp
 src/handy_helpers.h
-src/input.h
-src/input.cpp
 src/windows_input.h
 src/windows_input.cpp
+src/input.cpp
 )
 
 set(include_files
@@ -41,6 +40,9 @@ include/clumsy_engine/window.h
 include/clumsy_engine/event.h
 include/clumsy_engine/layer.h
 include/clumsy_engine/imgui_layer.h
+include/clumsy_engine/key_codes.h
+include/clumsy_engine/mouse_button_codes.h
+include/clumsy_engine/input.h
 )
 
 add_library(clumsy_engine SHARED
