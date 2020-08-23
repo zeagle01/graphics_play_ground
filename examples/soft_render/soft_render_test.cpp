@@ -95,6 +95,44 @@ TEST(Matrix, add)
 	EXPECT_THAT(act, Eq(exp));
 }
 
+TEST(Matrix, times_matrix)
+{
+	mat<3,3, float> a = uniform_fill<3,3, float>(2.f);
+	mat<3,3, float> b = uniform_fill<3,3, float>(2.f);
+	mat<3,3, float> exp = uniform_fill<3,3, float>(4.f);
+	auto act = a * b;
+	EXPECT_THAT(act, Eq(exp));
+}
+
+TEST(Matrix, times_vector)
+{
+	mat<3,1, float> a = uniform_fill<3,1, float>(2.f);
+	mat<3,1, float> b = uniform_fill<3,1, float>(2.f);
+	mat<3,1, float> exp = uniform_fill<3,1, float>(4.f);
+	auto act = a * b;
+	EXPECT_THAT(act, Eq(exp));
+}
+
+TEST(Matrix, matrix_multiply_matrix)
+{
+	mat<2, 2, float> a{ {1,2},{3,4} };
+	mat<2, 2, float> b = uniform_fill<2, 2, float>(1.f);
+	mat<2, 2, float> exp = { {4,6} ,{4,6} };
+	auto act = a % b;
+	EXPECT_THAT(act, Eq(exp));
+
+}
+
+TEST(Matrix, matrix_multiply_vector)
+{
+	mat<2, 2, float> a{ {1,2},{3,4} };
+	mat<2, 1, float> b = uniform_fill<2, 1, float>(1.f);
+	mat<2, 1, float> exp = { 4,6 };
+	auto act = a % b;
+	EXPECT_THAT(act, Eq(exp));
+
+}
+
 TEST(Matrix, determinant_2by2)
 {
 	mat2x2f A{ {1,2},{3,4} };

@@ -276,7 +276,7 @@ namespace soft_render
 	template<size_t N,size_t M,typename T>
 	static inline mat<N, M, T> operator*(const mat<N, M, T>& a, const mat<N, M, T>& b)
 	{
-		vec<N,M,T> ret;
+		mat<N,M,T> ret;
 		for (int i = 0; i < N * M; i++)
 		{
 			ret.as_vec()[i] = a.as_vec()[i] * b.as_vec()[i];
@@ -285,6 +285,7 @@ namespace soft_render
 	}
 	template<size_t N,typename T>
 	static inline vec<N, T> operator*(const vec<N, T>& a, const vec<N, T>& b) { return operator*<N,1,T>(a, b); }
+
 
 	//s*a
 	template<size_t N,size_t M,typename T>
@@ -470,6 +471,19 @@ namespace soft_render
 		return ret;
 	}
 
+	//operator reload version matrix_multiply
+	template<size_t n,typename T>
+	static inline mat<n, n, T> operator%(mat<n, n, T>& A, mat<n, n, T>& B)
+	{
+		return matrix_multiply<n, T>(A, B);
+	}
+	template<size_t n,typename T>
+	static inline vec<n, T> operator%(mat<n, n, T>& A,vec<n,  T>& b)
+	{
+		return matrix_multiply<n, T>(A, b);
+	}
+
+
 	template<size_t n,typename T>
 	static inline vec<n, T> solve(mat<n, n, T>& A, vec<n, T>& b)
 	{
@@ -487,6 +501,7 @@ namespace soft_render
 	using vec3i = vec<3, int>;
 	using vec4i = vec<4, int>;
 
+	using mat4x4f = mat<4, 4, float>;
 	using mat3x3f = mat<3, 3, float>;
 	using mat2x2f = mat<2, 2, float>;
 
