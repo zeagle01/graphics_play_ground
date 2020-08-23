@@ -39,7 +39,7 @@ TEST(Vector, add)
 
 TEST(Vector, draw)
 {
-	PipeLine_Renderer sr;
+	//PipeLine_Renderer sr;
 	
 	//sr.draw_triangle();
 

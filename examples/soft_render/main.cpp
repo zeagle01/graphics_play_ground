@@ -29,8 +29,8 @@ int main(int argc, char** argv)
 	getchar();
 
 
-	Plain_Renderer rander;
-	//PipeLine_Renderer rander;
+	//Plain_Renderer rander;
+	PipeLine_Renderer rander;
 	rander.render();
 
 	int c;

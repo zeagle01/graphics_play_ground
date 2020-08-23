@@ -26,6 +26,14 @@ namespace soft_render
 #define set_color_fn(fb,r,g,b)  [&](int x, int y) {fb->set_color_f(x, y, {r,g,b,1.f}); } 
 
 
+	inline vec2i to_normal_fragment(vec2f pos, vec2i width_height)
+	{
+		vec2i ret;
+		ret[0] = (pos[0] + 1.0) * width_height[0] * 0.5;
+		ret[1] = (1.f - pos[1]) * width_height[1] * 0.5;
+		return ret;
+	}
+
 	class Plain_Renderer
 	{
 	public:
@@ -87,6 +95,7 @@ namespace soft_render
 			{
 				system("cls");
 
+				vec2i width_height{ m_frame_buffer->get_width(),m_frame_buffer->get_height() };
 				for (size_t ti = 0; ti < indices.size() / 3; ti++)
 				{
 					std::vector<vec2i> tv;
@@ -96,15 +105,13 @@ namespace soft_render
 						int v = indices[ti * 3 + vi];
 						int v_next = indices[ti * 3 + vi_next];
 
-						int x0 = (positions[v * 3 + 0] + 1.0) * m_frame_buffer->get_width() * 0.5;
-						int y0 = (1.f - positions[v * 3 + 1]) * m_frame_buffer->get_height() * 0.5;
-						int x1 = (positions[v_next * 3 + 0] + 1.0) * m_frame_buffer->get_width() * 0.5;
-						int y1 = (1.f - positions[v_next * 3 + 1]) * m_frame_buffer->get_height() * 0.5;
+						vec2i x0 = to_normal_fragment({ positions[v * 3 + 0],positions[v * 3 + 1] }, width_height);
+						vec2i x1 = to_normal_fragment({ positions[v_next * 3 + 0],positions[v_next * 3 + 1] }, width_height);
 
-						//m_rasterizer->loop_line({ x0, y0 }, { x1, y1 }, [&](int x, int y) {m_frame_buffer->set_color_f(x, y, { 0.f,1.f,0.5f,1.f }); });
-						tv.push_back({ x0,y0 });
+						m_rasterizer->loop_line(x0, x1, [&](int x, int y) {m_frame_buffer->set_color_f(x, y, { 0.f,1.f,0.5f,1.f }); });
+						tv.push_back(x0);
 					}
-					m_rasterizer->triangle_fragment_loop(tv[0], tv[1], tv[2], [&](int x, int y) {m_frame_buffer->set_color_f(x, y, { 0.f,1.f,0.5f,1.f }); });
+					//m_rasterizer->triangle_fragment_loop(tv[0], tv[1], tv[2], [&](int x, int y) {m_frame_buffer->set_color_f(x, y, { 0.f,1.f,0.5f,1.f }); });
 				}
 
 				t += .01;
@@ -153,7 +160,7 @@ namespace soft_render
 		std::unique_ptr<Frame_Buffer> m_frame_buffer;
 		std::unique_ptr<Out_Device> m_out_device;
 		int m_width, m_height;
-		static constexpr int VAR_COLOR = 0;
+		static constexpr int VAR_COLOR = 1;
 		static constexpr int VAR_POSITION = 0;
 
 	public: 
@@ -165,9 +172,9 @@ namespace soft_render
 			/////////////////////////////////////mesh
 			Mesh_Loader mesh_loader;
 			std::string mesh_dir = "../../../resources/meshes/";
-			//mesh_loader.load_from_obj(mesh_dir + "african_head.obj");
+			mesh_loader.load_from_obj(mesh_dir + "african_head.obj");
 			//mesh_loader.load_from_obj(mesh_dir+"flag.obj");
-			mesh_loader.load_from_obj(mesh_dir+"1_triangle.obj");
+			//mesh_loader.load_from_obj(mesh_dir+"1_triangle.obj");
 			auto positions = mesh_loader.get_positions();
 			auto indices = mesh_loader.get_indices();
 			m_positions.resize(positions.size() / 3);
@@ -176,24 +183,31 @@ namespace soft_render
 			memcpy(&m_indices[0][0], &indices[0], sizeof(int) * indices.size());
 
 			/////////////////////////////////////shader
-			m_vertex_shader = [&](Shader_Context& vs_in, Shader_Context& fs_context)
+			m_vertex_shader = [&](Shader_Context& vs_in, Shader_Context& vs_out)
 			{
-				return vs_in.vec4_vars[VAR_POSITION];
+				auto pos = vs_in.vec3_vars[VAR_POSITION];
+				vs_out.vec3_vars[VAR_POSITION] = pos;
+				vs_out.vec3_vars[VAR_COLOR] = vs_in.vec3_vars[VAR_COLOR];
+				return vec4f{ pos[0],pos[1],pos[2],1.f };
 			};
 
 			m_fragment_shader = [&](Shader_Context& fs_in)
 			{
-				return fs_in.vec4_vars[VAR_COLOR];
+				auto color = fs_in.vec3_vars[VAR_COLOR];
+				return vec4f{ color[0],color[1],color[2],1.f };
 			};
+
 			m_vertex_shader_in.resize(m_positions.size());
 			m_vertex_shader_out.resize(m_positions.size());
 
+			//declare vertex  variable and upload data
 			for (int i = 0; i < m_positions.size(); i++)
 			{
 				m_vertex_shader_in[i].vec3_vars[VAR_POSITION] = m_positions[i];
-				m_vertex_shader_out[i].vec3_vars[VAR_COLOR] = m_positions[i];
+				m_vertex_shader_in[i].vec3_vars[VAR_COLOR] = m_positions[i];
 			}
 
+			//declare fragment variable
 			m_fragment_shader_in.vec3_vars[VAR_COLOR] = vec3f();
 
 
@@ -235,19 +249,26 @@ namespace soft_render
 			vec2i pos_udc[3];
 			Shader_Context vertex_shader_out[3];
 
+			vec2i width_height = { m_frame_buffer->get_width(),m_frame_buffer->get_height() };
+
 			for (int ti = 0; ti < m_indices.size(); ti++)
 			{
 				for (int tvi = 0; tvi < 3; tvi++)
 				{
 					int vi = m_indices[ti][tvi];
 					vec4f pos = m_vertex_shader(m_vertex_shader_in[vi], m_vertex_shader_out[vi]);
-					pos_udc[tvi] = { int(pos[0] * m_width),int(pos[1] * m_height) };
+
+					vec2i fragment_normal = to_normal_fragment({ pos[0],pos[1] }, width_height);
+
+					pos_udc[tvi] = fragment_normal;
+
 					vertex_shader_out[tvi] = m_vertex_shader_out[vi];
 				}
 				for (int tvi = 0; tvi < 3; tvi++)
 				{
 					int tvi_next = (tvi + 1) % 3;
 					m_rasterizer->loop_line(pos_udc[tvi], pos_udc[tvi_next], set_color_fn(m_frame_buffer, 1., 0.5, 0.2));
+					//m_out_device->flush(*m_frame_buffer);
 				}
 
 
