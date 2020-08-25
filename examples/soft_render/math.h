@@ -51,6 +51,9 @@ namespace soft_render
 	template<size_t N,typename T>
 	using vec = mat<N, 1, T>;
 
+	template<typename T>
+	using mat4x4 = mat<4, 4, T>;
+
 	template<size_t row,size_t col,typename T>
 	class mat :public Mat_Size<row, col>
 	{
@@ -330,6 +333,21 @@ namespace soft_render
 	template<size_t N,  typename T>
 	static inline T dot(const vec<N, T>& a, const vec<N, T>& b) { return dot<N, 1, T>(a, b); }
 
+	//cross product
+	template< typename T>
+	static inline vec<3,T> cross(const vec<3,T>& a, const vec<3,T>& b)
+	{
+		return { a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
+	}
+
+	//normalize
+	template<size_t N, size_t M, typename T>
+	static inline mat<N,M,T> normalize(const mat<N,M,T>& a)
+	{
+		T d = dot(a, a);
+		return  a / sqrt(d);
+	}
+
 	//type conversion
 	template<size_t N, size_t M, typename src_T,typename dst_T>
 	static inline mat<N, M, dst_T> type_conversion(const mat<N, M, src_T>& a)
@@ -492,6 +510,47 @@ namespace soft_render
 	}
 
 
+
+	//mat4x4 transform
+	template<typename T>
+	mat4x4<T> perspective_matrix(T fovy, T aspect, T znear, T zfar)
+	{
+		mat4x4<T> ret = uniform_fill<4,4,T>(0);
+		T fax = 1.0 / tan(fovy * 0.5);
+		ret[0][0] = fax / aspect;
+		ret[1][1] = fax ;
+		ret[2][2] = zfar / (zfar - znear);
+		ret[3][2] = -znear * zfar / (zfar - znear);
+		ret[2][3] = 1;
+		return ret;
+	}
+
+	template<typename T>
+	mat4x4<T> lookat_matrix(const mat<3, 1, T>& eye, const mat<3, 1, T>& at, const mat<3, 1, T>& up)
+	{
+
+		const mat<3, 1, T> zaxis = normalize(at - eye);
+		const mat<3, 1, T> xaxis = normalize(cross(up, zaxis));
+		const mat<3, 1, T> yaxis = cross(zaxis, xaxis);
+		mat4x4<T> ret
+		{
+			{xaxis.x, xaxis.y, xaxis.z, -dot(eye, xaxis)},
+			{yaxis.x, yaxis.y, yaxis.z, -dot(eye, yaxis)},
+			{zaxis.x, zaxis.y, zaxis.z, -dot(eye, zaxis)},
+			{0.0f, 0.0f, 0.0f, 1.0f}
+		};
+		return ret;
+	}
+
+
+
+
+
+
+
+
+
+
 	//////////////////////type alias///////////////////////
 	using vec2f = vec<2, float>;
 	using vec3f = vec<3, float>;
@@ -500,6 +559,9 @@ namespace soft_render
 	using vec2i = vec<2, int>;
 	using vec3i = vec<3, int>;
 	using vec4i = vec<4, int>;
+
+	template<typename T>
+	using mat4x4 = mat<4, 4, T>;
 
 	using mat4x4f = mat<4, 4, float>;
 	using mat3x3f = mat<3, 3, float>;

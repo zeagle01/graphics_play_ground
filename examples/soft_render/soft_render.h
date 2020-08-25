@@ -135,6 +135,7 @@ namespace soft_render
 		std::map<int, vec2f > vec2_vars;
 		std::map<int, vec3f > vec3_vars;
 		std::map<int, vec4f > vec4_vars;
+		std::map<int, mat4x4f > mat4_vars;
 		//std::map<int, mat4x4 > mat_vars;
 	};
 
@@ -149,8 +150,9 @@ namespace soft_render
 		std::vector<vec3f> m_positions;
 		std::vector<vec3i> m_indices;
 	private:
-		std::function <vec4f(Shader_Context&, Shader_Context&) > m_vertex_shader;
+		std::function <vec4f(Shader_Context& ,Shader_Context&, Shader_Context&) > m_vertex_shader;
 		std::function<vec4f(Shader_Context&)> m_fragment_shader;
+		Shader_Context m_vertex_uniform;
 		std::vector<Shader_Context> m_vertex_shader_in;
 		std::vector<Shader_Context> m_vertex_shader_out;
 		Shader_Context m_fragment_shader_in;
@@ -162,6 +164,9 @@ namespace soft_render
 		int m_width, m_height;
 		static constexpr int VAR_COLOR = 1;
 		static constexpr int VAR_POSITION = 0;
+		static constexpr int M = 2;
+		static constexpr int V = 3;
+		static constexpr int P = 4;
 
 	public: 
 		PipeLine_Renderer() 
@@ -183,12 +188,16 @@ namespace soft_render
 			memcpy(&m_indices[0][0], &indices[0], sizeof(int) * indices.size());
 
 			/////////////////////////////////////shader
-			m_vertex_shader = [&](Shader_Context& vs_in, Shader_Context& vs_out)
+			m_vertex_shader = [&](Shader_Context& vs_uniform, Shader_Context& vs_in, Shader_Context& vs_out)
 			{
 				auto pos = vs_in.vec3_vars[VAR_POSITION];
-				vs_out.vec3_vars[VAR_POSITION] = pos;
-				vs_out.vec3_vars[VAR_COLOR] = vs_in.vec3_vars[VAR_COLOR];
-				return vec4f{ pos[0],pos[1],pos[2],1.f };
+				vec4f pos_as4{ pos[0],pos[1],pos[2],1.f };
+				// MVP
+				pos_as4 = vs_uniform.mat4_vars[P] % vs_uniform.mat4_vars[V] % vs_uniform.mat4_vars[M] % pos_as4;
+
+				vs_out.vec4_vars[VAR_POSITION] = pos_as4;
+				vs_out.vec4_vars[VAR_COLOR] = vs_in.vec4_vars[VAR_COLOR];
+				return pos_as4;
 			};
 
 			m_fragment_shader = [&](Shader_Context& fs_in)
@@ -204,11 +213,19 @@ namespace soft_render
 			for (int i = 0; i < m_positions.size(); i++)
 			{
 				m_vertex_shader_in[i].vec3_vars[VAR_POSITION] = m_positions[i];
-				m_vertex_shader_in[i].vec3_vars[VAR_COLOR] = m_positions[i];
+				m_vertex_shader_in[i].vec4_vars[VAR_COLOR] = { m_positions[i][0],m_positions[i][1],m_positions[i][2],1.f };
 			}
+			//declare vetex uniform
+			m_vertex_uniform.mat4_vars[M] = get_identity<4,4,float>();
+			m_vertex_uniform.mat4_vars[V] = get_identity<4,4,float>();
+			m_vertex_uniform.mat4_vars[P] = get_identity<4,4,float>();
+
+			//m_vertex_uniform.mat4_vars[M] = get_identity<4,4,float>();
+			//m_vertex_uniform.mat4_vars[V] = lookat_matrix<float>({ 10.f,0,0.f }, { 0,0,0 }, { 0,0,1 });
+			//m_vertex_uniform.mat4_vars[P] = perspective_matrix<float>(3.14 * 0.5, m_width * 1.0f / m_height, 1.f, 500.f);
 
 			//declare fragment variable
-			m_fragment_shader_in.vec3_vars[VAR_COLOR] = vec3f();
+			m_fragment_shader_in.vec4_vars[VAR_COLOR] = vec4f();
 
 
 
@@ -256,11 +273,17 @@ namespace soft_render
 				for (int tvi = 0; tvi < 3; tvi++)
 				{
 					int vi = m_indices[ti][tvi];
-					vec4f pos = m_vertex_shader(m_vertex_shader_in[vi], m_vertex_shader_out[vi]);
+					vec4f pos = m_vertex_shader(m_vertex_uniform, m_vertex_shader_in[vi], m_vertex_shader_out[vi]);
 
-					vec2i fragment_normal = to_normal_fragment({ pos[0],pos[1] }, width_height);
+					//perspective division
+					pos[0] /= pos[3];
+					pos[1] /= pos[3];
+					pos[2] /= pos[3];
 
-					pos_udc[tvi] = fragment_normal;
+					// to fragment position
+					vec2i fragment_normal_position = to_normal_fragment({ pos[0],pos[1] }, width_height);
+
+					pos_udc[tvi] = fragment_normal_position;
 
 					vertex_shader_out[tvi] = m_vertex_shader_out[vi];
 				}
