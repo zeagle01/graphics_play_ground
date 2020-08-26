@@ -86,6 +86,8 @@ target_link_libraries(clumsy_engine PUBLIC glfw)
 target_link_libraries(clumsy_engine PRIVATE glad)
 
 
+include(${CMAKE_SOURCE_DIR}/cmake/glm.cmake)
+link_to_glm(clumsy_engine ${CMAKE_SOURCE_DIR}/external/glm)
 
 ##########imgui
 include(${CMAKE_SOURCE_DIR}/cmake/imgui.cmake)
