@@ -167,3 +167,36 @@ TEST(Matrix, solve_2112)
 
 	EXPECT_THAT(act, Eq(exp));
 }
+
+
+TEST(Matrix, look_at_point)
+{
+
+	vec4f p{ 0.0,0.0,0.0,1 };
+
+	mat4x4f m = lookat_matrix<float>({ 0,0,3 }, { 0,0,0 }, { 0,1,0 });
+
+
+	auto act = m % p;
+
+	vec4f exp{ 0,0,-3 };
+
+	EXPECT_THAT(act, Eq(exp));
+}
+
+TEST(Matrix, perspective_point)
+{
+
+	vec4f p{ 0.5,0.5,0.5,1 };
+
+	mat4x4f m = perspective_matrix<float>(1, 1, 1, 10);
+
+
+	auto act = m % p;
+
+	vec4f exp{};
+
+	EXPECT_THAT(act, Eq(exp));
+}
+
+

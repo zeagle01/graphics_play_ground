@@ -457,7 +457,7 @@ namespace soft_render
 
 		mat<N, N, T> adj = adjoint(a);
 
-		T det = dot(a.get_row(0), adj.get_col(0));
+		T det = dot(a.get_row(0), adj.get_row(0));
 
 		assert(det != 0.f);
 
@@ -534,10 +534,10 @@ namespace soft_render
 		const mat<3, 1, T> yaxis = cross(zaxis, xaxis);
 		mat4x4<T> ret
 		{
-			{xaxis.x, xaxis.y, xaxis.z, -dot(eye, xaxis)},
-			{yaxis.x, yaxis.y, yaxis.z, -dot(eye, yaxis)},
-			{zaxis.x, zaxis.y, zaxis.z, -dot(eye, zaxis)},
-			{0.0f, 0.0f, 0.0f, 1.0f}
+			{xaxis.x,			yaxis.x,			zaxis.x,			0},
+			{xaxis.y,			yaxis.y,			zaxis.y,			0},
+			{xaxis.z,			yaxis.z,			zaxis.z,			0},
+			{-dot(eye, xaxis), -dot(eye, yaxis),	-dot(eye, zaxis),	1.0f}
 		};
 		return ret;
 	}

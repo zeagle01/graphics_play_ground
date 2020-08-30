@@ -177,9 +177,9 @@ namespace soft_render
 			/////////////////////////////////////mesh
 			Mesh_Loader mesh_loader;
 			std::string mesh_dir = "../../../resources/meshes/";
-			//mesh_loader.load_from_obj(mesh_dir + "african_head.obj");
+			mesh_loader.load_from_obj(mesh_dir + "african_head.obj");
 			//mesh_loader.load_from_obj(mesh_dir+"flag.obj");
-			mesh_loader.load_from_obj(mesh_dir+"1_triangle.obj");
+			//mesh_loader.load_from_obj(mesh_dir+"1_triangle.obj");
 			auto positions = mesh_loader.get_positions();
 			auto indices = mesh_loader.get_indices();
 			m_positions.resize(positions.size() / 3);
@@ -196,13 +196,13 @@ namespace soft_render
 				pos_as4 = vs_uniform.mat4_vars[P] % vs_uniform.mat4_vars[V] % vs_uniform.mat4_vars[M] % pos_as4;
 
 				vs_out.vec4_vars[VAR_POSITION] = pos_as4;
-				vs_out.vec4_vars[VAR_COLOR] = vs_in.vec4_vars[VAR_COLOR];
+				vs_out.vec4_vars[VAR_COLOR] = pos_as4;
 				return pos_as4;
 			};
 
 			m_fragment_shader = [&](Shader_Context& fs_in)
 			{
-				auto color = fs_in.vec3_vars[VAR_COLOR];
+				auto color = fs_in.vec4_vars[VAR_COLOR];
 				return vec4f{ color[0],color[1],color[2],1.f };
 			};
 
@@ -216,13 +216,13 @@ namespace soft_render
 				m_vertex_shader_in[i].vec4_vars[VAR_COLOR] = { m_positions[i][0],m_positions[i][1],m_positions[i][2],1.f };
 			}
 			//declare vetex uniform
-			m_vertex_uniform.mat4_vars[M] = get_identity<4,4,float>();
-			m_vertex_uniform.mat4_vars[V] = get_identity<4,4,float>();
-			m_vertex_uniform.mat4_vars[P] = get_identity<4,4,float>();
+//			m_vertex_uniform.mat4_vars[M] = get_identity<4,4,float>();
+//			m_vertex_uniform.mat4_vars[V] = get_identity<4,4,float>();
+//			m_vertex_uniform.mat4_vars[P] = get_identity<4,4,float>();
 
-			//m_vertex_uniform.mat4_vars[M] = get_identity<4,4,float>();
-			//m_vertex_uniform.mat4_vars[V] = lookat_matrix<float>({ 10.f,0,0.f }, { 0,0,0 }, { 0,0,1 });
-			//m_vertex_uniform.mat4_vars[P] = perspective_matrix<float>(3.14 * 0.5, m_width * 1.0f / m_height, 1.f, 500.f);
+			m_vertex_uniform.mat4_vars[M] = get_identity<4,4,float>();
+			m_vertex_uniform.mat4_vars[V] = lookat_matrix<float>({ 0,0,3.f }, { 0,0,0 }, { 0,1,0 });
+			m_vertex_uniform.mat4_vars[P] = perspective_matrix<float>(3.14 * 0.5, m_width * 1.0f / m_height, 1.f, 500.f);
 
 			//declare fragment variable
 			m_fragment_shader_in.vec4_vars[VAR_COLOR] = vec4f();
@@ -261,6 +261,14 @@ namespace soft_render
 			return vec3f{ x[0],x[1],1 - x[0] - x[1] };
 		}
 
+		void homogeneous_divide(vec4f& v)
+		{
+			v[0] /= v[3];
+			v[1] /= v[3];
+			v[2] /= v[3];
+			v[3] = 1;
+		}
+
 		void draw_triangle() 
 		{
 			vec2i pos_udc[3];
@@ -276,9 +284,9 @@ namespace soft_render
 					vec4f pos = m_vertex_shader(m_vertex_uniform, m_vertex_shader_in[vi], m_vertex_shader_out[vi]);
 
 					//perspective division
-					pos[0] /= pos[3];
-					pos[1] /= pos[3];
-					pos[2] /= pos[3];
+					homogeneous_divide(pos);
+					homogeneous_divide(m_vertex_shader_out[vi].vec4_vars[VAR_POSITION]);
+					homogeneous_divide(m_vertex_shader_out[vi].vec4_vars[VAR_COLOR]);
 
 					// to fragment position
 					vec2i fragment_normal_position = to_normal_fragment({ pos[0],pos[1] }, width_height);
@@ -314,6 +322,12 @@ namespace soft_render
 						{
 							int key = it.first;
 							it.second = w[0] * vertex_shader_out[0].vec3_vars[key] + w[1] * vertex_shader_out[1].vec3_vars[key] + w[2] * vertex_shader_out[2].vec3_vars[key];
+						}
+
+						for (auto& it : m_fragment_shader_in.vec4_vars)
+						{
+							int key = it.first;
+							it.second = w[0] * vertex_shader_out[0].vec4_vars[key] + w[1] * vertex_shader_out[1].vec4_vars[key] + w[2] * vertex_shader_out[2].vec4_vars[key];
 						}
 
 
