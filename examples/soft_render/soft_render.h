@@ -221,7 +221,7 @@ namespace soft_render
 //			m_vertex_uniform.mat4_vars[P] = get_identity<4,4,float>();
 
 			m_vertex_uniform.mat4_vars[M] = get_identity<4,4,float>();
-			m_vertex_uniform.mat4_vars[V] = lookat_matrix<float>({ 0,0,3.f }, { 0,0,0 }, { 0,1,0 });
+			m_vertex_uniform.mat4_vars[V] = lookat_matrix<float>({ 1,1,3.f }, { 0,0,0 }, { 0,1,0 });
 			m_vertex_uniform.mat4_vars[P] = perspective_matrix<float>(3.14 * 0.5, m_width * 1.0f / m_height, 1.f, 500.f);
 
 			//declare fragment variable
