@@ -90,8 +90,9 @@ include(${CMAKE_SOURCE_DIR}/cmake/glm.cmake)
 link_to_glm(clumsy_engine ${CMAKE_SOURCE_DIR}/external/glm)
 
 ##########imgui
-include(${CMAKE_SOURCE_DIR}/cmake/imgui.cmake)
-link_to_imgui(clumsy_engine ${CMAKE_SOURCE_DIR}/external/imgui-master)
+#include(${CMAKE_SOURCE_DIR}/cmake/imgui.cmake)
+#link_to_imgui(clumsy_engine ${CMAKE_SOURCE_DIR}/external/imgui)
+target_link_libraries(clumsy_engine PRIVATE my_imgui)
 
 
 include(GNUInstallDirs)

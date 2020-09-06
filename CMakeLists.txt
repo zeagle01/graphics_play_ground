@@ -16,6 +16,8 @@ add_subdirectory(examples)
 add_subdirectory(glad)
 add_subdirectory(clumsy_engine)
 
+add_subdirectory(external_wrappers/imgui)
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #set(cmake_version "3.15")

@@ -62,8 +62,9 @@ target_link_libraries(gl_render PUBLIC gflags)
 include(FetchContent)
 
 ##########imgui
-include(${CMAKE_SOURCE_DIR}/cmake/imgui.cmake)
-link_to_imgui(gl_render ${CMAKE_SOURCE_DIR}/external/imgui-master)
+#include(${CMAKE_SOURCE_DIR}/cmake/imgui.cmake)
+#link_to_imgui(gl_render ${CMAKE_SOURCE_DIR}/external/imgui-master)
+target_link_libraries(gl_render PRIVATE my_imgui)
 
 #########glm
 FetchContent_Declare(
