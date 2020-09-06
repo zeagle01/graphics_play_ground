@@ -30,7 +30,7 @@ namespace clumsy_engine
 
 	private:
 		layer_vec m_layers;
-		layer_vec::iterator m_layer_insert;
+		int m_layer_insert_pos = 0;
 	};
 
 }

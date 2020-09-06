@@ -4,6 +4,7 @@
 #include "application.h"
 #include "log.h"
 #include "application_event.h"
+#include "glad/glad.h"
 #include "GLFW/glfw3.h" 
 #include "layer_stack.h"
 #include "layer.h"
@@ -43,6 +44,9 @@ namespace clumsy_engine
 			return On_Window_Close(wc_e);
 		};
 		s_singleton.reset(this);
+
+		m_imgui_layer = std::make_shared<Imgui_Layer>();
+		push_overlay(m_imgui_layer);
 	}
 
 	Application:: ~Application()
@@ -101,6 +105,19 @@ namespace clumsy_engine
 			{
 				layer->on_update();
 			}
+
+			m_imgui_layer->begin();
+
+			for (auto& layer : *m_layer_stack)
+			{
+				//m_imgui_layer->begin();
+				layer->on_imgui_render();
+				//m_imgui_layer->end();
+			}
+
+			//m_imgui_layer->on_imgui_render();
+
+			m_imgui_layer->end();
 
 //			auto [x, y] = Input::get_mouse_position();
 //

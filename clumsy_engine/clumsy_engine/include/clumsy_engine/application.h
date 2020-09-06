@@ -15,6 +15,7 @@ namespace clumsy_engine
 	class Layer_Stack;
 	class Layer;
 	class Window;
+	class Imgui_Layer;
 	enum class Event_Type;
 
 
@@ -41,6 +42,7 @@ namespace clumsy_engine
 		bool on_event(Event& e);
 
 		std::unique_ptr<Window> m_window;
+		std::shared_ptr<Imgui_Layer> m_imgui_layer;
 
 		std::map<Event_Type,std::function<bool (Event& e)>> m_event_fn;
 

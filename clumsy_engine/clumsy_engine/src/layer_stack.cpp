@@ -8,7 +8,6 @@ namespace clumsy_engine
 
 	Layer_Stack::Layer_Stack()
 	{
-		m_layer_insert = m_layers.begin();
 
 	}
 	Layer_Stack::~Layer_Stack()
@@ -18,7 +17,8 @@ namespace clumsy_engine
 
 	void Layer_Stack::push_layer(std::shared_ptr<Layer> layer)
 	{
-		m_layer_insert = m_layers.emplace(m_layer_insert,layer);
+		 m_layers.emplace(m_layers.begin() + m_layer_insert_pos, layer);
+		 m_layer_insert_pos++;
 	}
 	void Layer_Stack::push_overlay(std::shared_ptr<Layer> overlay)
 	{
@@ -32,7 +32,7 @@ namespace clumsy_engine
 		if (it != m_layers.end())
 		{
 			m_layers.erase(it);
-			m_layer_insert--;
+			m_layer_insert_pos--;
 		}
 
 	}
