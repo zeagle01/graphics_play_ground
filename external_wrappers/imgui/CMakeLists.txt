@@ -35,9 +35,12 @@ target_include_directories(my_imgui PUBLIC ${imgui_dir}/examples)
 
 set_property(TARGET my_imgui PROPERTY FOLDER external_wrappers)
 
+target_compile_definitions(my_imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 
-find_package(glfw3 CONFIG REQUIRED)
+
+#find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(my_imgui PRIVATE glfw)
 
 target_link_libraries(my_imgui PRIVATE glad)
+

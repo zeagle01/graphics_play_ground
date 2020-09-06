@@ -80,7 +80,7 @@ src
 
 
 find_package(glfw3 CONFIG REQUIRED)
-target_link_libraries(clumsy_engine PUBLIC glfw)
+target_link_libraries(clumsy_engine PRIVATE glfw)
 
 
 target_link_libraries(clumsy_engine PRIVATE glad)
@@ -90,8 +90,6 @@ include(${CMAKE_SOURCE_DIR}/cmake/glm.cmake)
 link_to_glm(clumsy_engine ${CMAKE_SOURCE_DIR}/external/glm)
 
 ##########imgui
-#include(${CMAKE_SOURCE_DIR}/cmake/imgui.cmake)
-#link_to_imgui(clumsy_engine ${CMAKE_SOURCE_DIR}/external/imgui)
 target_link_libraries(clumsy_engine PRIVATE my_imgui)
 
 

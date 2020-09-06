@@ -18,10 +18,14 @@ add_subdirectory(clumsy_engine)
 
 add_subdirectory(external_wrappers/imgui)
 
+add_subdirectory(external/glfw)
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #set(cmake_version "3.15")
 #message("${cmake_version}")
+
+set_target_properties(glfw PROPERTIES FOLDER external)
 
 
 add_executable(install_resources

@@ -76,8 +76,8 @@ target_link_libraries(shellet PRIVATE jsoncpp_lib_static)
 #find_package(glad CONFIG REQUIRED)
 target_link_libraries(shellet PUBLIC  glad)
 
-hunter_add_package(GLFW)
-find_package(glfw3 CONFIG REQUIRED)
+#hunter_add_package(GLFW)
+#find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(shellet PUBLIC  glfw)
 
 

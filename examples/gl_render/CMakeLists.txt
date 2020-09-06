@@ -44,7 +44,6 @@ target_link_libraries(gl_render PRIVATE glad)
 
 
 
-find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(gl_render PUBLIC glfw)
 
 
@@ -62,8 +61,6 @@ target_link_libraries(gl_render PUBLIC gflags)
 include(FetchContent)
 
 ##########imgui
-#include(${CMAKE_SOURCE_DIR}/cmake/imgui.cmake)
-#link_to_imgui(gl_render ${CMAKE_SOURCE_DIR}/external/imgui-master)
 target_link_libraries(gl_render PRIVATE my_imgui)
 
 #########glm

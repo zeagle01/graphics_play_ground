@@ -5,6 +5,8 @@ file(GLOB glad_src
 add_library(glad ${glad_src})
 target_include_directories(glad PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+set_target_properties(glad PROPERTIES FOLDER external_wrappers)
+
 #target_include_directories(glad 
 #    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 #    PUBLIC $<INSTALL_INTERFACE:include>
