@@ -28,6 +28,8 @@ src/handy_helpers.h
 src/windows_input.h
 src/windows_input.cpp
 src/input.cpp
+src/dispatcher.h
+src/dispatcher.cpp
 )
 
 set(include_files

@@ -17,6 +17,8 @@ namespace clumsy_engine
 	class Window;
 	class Imgui_Layer;
 	enum class Event_Type;
+	template<typename  Base_T, typename Ret  >
+	class Dispatcher;
 
 
 	class Application
@@ -45,6 +47,10 @@ namespace clumsy_engine
 		std::shared_ptr<Imgui_Layer> m_imgui_layer;
 
 		std::map<Event_Type,std::function<bool (Event& e)>> m_event_fn;
+
+		std::shared_ptr<Dispatcher<Event,  bool>> m_dispatcher_imp;
+		Dispatcher<Event, bool>& m_dispatcher;
+
 
 		bool m_is_running;
 

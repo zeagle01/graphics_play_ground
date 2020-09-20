@@ -11,6 +11,7 @@
 #include "window.h"
 #include "imgui_layer.h"
 #include "input.h"
+#include "dispatcher.h"
 
 
 namespace clumsy_engine
@@ -33,16 +34,17 @@ namespace clumsy_engine
 
 	Application::Application()
 		:m_is_running(true)
-		,m_layer_stack(std::make_unique<Layer_Stack>())
+		, m_layer_stack(std::make_unique<Layer_Stack>())
+		,m_dispatcher_imp(std::make_shared<Dispatcher<Event, bool>>())
+		,m_dispatcher(*m_dispatcher_imp)
 	{
 		m_window = Window::create();
 		m_window->set_event_callback(BIND_MEMBER(on_event));
 
-		m_event_fn[Event_Type::Window_Close] = [&](Event& e)
-		{
-			Window_Close_Event& wc_e = (Window_Close_Event&)e;
-			return On_Window_Close(wc_e);
-		};
+
+		m_dispatcher_imp->add<Window_Close_Event>(BIND_MEMBER(On_Window_Close));
+
+
 		s_singleton.reset(this);
 
 		m_imgui_layer = std::make_shared<Imgui_Layer>();
@@ -57,20 +59,8 @@ namespace clumsy_engine
 	bool Application::on_event(Event& e)
 	{
 
-		bool use_dispatcher = true;
-		if (use_dispatcher)
-		{
-			Dispatcher dispatcher(e);
-			dispatcher.dispatch<Window_Close_Event>(BIND_MEMBER(On_Window_Close));
+		m_dispatcher(e);
 
-		}
-		else
-		{
-			if (m_event_fn.count(e.get_dynamic_type()))
-			{
-				m_event_fn[e.get_dynamic_type()](e);
-			}
-		}
 
 		for (auto it = m_layer_stack->end(); it != m_layer_stack->begin();)
 		{
