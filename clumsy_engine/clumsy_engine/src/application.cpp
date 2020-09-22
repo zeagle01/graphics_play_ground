@@ -13,6 +13,8 @@
 #include "input.h"
 #include "dispatcher.h"
 
+#include "gmock/gmock.h"
+
 
 namespace clumsy_engine
 {
@@ -142,5 +144,19 @@ namespace clumsy_engine
 		return *m_window;
 	}
 
+	bool run_test(int argc,char** argv)
+	{
+
+		::testing::InitGoogleMock(&argc, argv);
+
+
+		auto failed = RUN_ALL_TESTS();
+		if (failed)
+		{
+			std::getchar();
+		}
+
+		return true;
+	}
 
 }

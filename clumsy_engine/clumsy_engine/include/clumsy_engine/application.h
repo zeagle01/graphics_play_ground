@@ -61,4 +61,6 @@ namespace clumsy_engine
 	};
 
 	extern std::unique_ptr<clumsy_engine::Application> create_application();
+
+	bool run_test(int argc,char** argv);
 }

@@ -32,6 +32,10 @@ src/dispatcher.h
 src/dispatcher.cpp
 )
 
+set(test_files
+test/cloth_sim_test.cpp
+)
+
 set(include_files
 include/clumsy_engine/clumsy_engine.h
 include/clumsy_engine/application.h
@@ -50,6 +54,8 @@ include/clumsy_engine/input.h
 add_library(clumsy_engine SHARED
 ${include_files}
 ${source_files}
+${test_files}
+
 )
 
 
@@ -94,6 +100,10 @@ link_to_glm(clumsy_engine ${CMAKE_SOURCE_DIR}/external/glm)
 
 ##########imgui
 target_link_libraries(clumsy_engine PUBLIC my_imgui)
+
+##########gtest
+include(${CMAKE_SOURCE_DIR}/cmake/gtest.cmake)
+link_to_gtest(clumsy_engine ${CMAKE_SOURCE_DIR}/external/gtest)
 
 
 include(GNUInstallDirs)
