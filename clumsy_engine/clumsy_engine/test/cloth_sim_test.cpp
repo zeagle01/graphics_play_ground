@@ -22,10 +22,21 @@ class Cloth_Sim
 public:
 	void set_gravity(std::vector<float> gravity_acc) {}
 	void set_time_step(float h) {}
-	void set_edge_rest_length(std::vector<float> edge_rest_length) {};
+	void set_edge_rest_length(const std::vector<float>& edge_rest_length) 
+	{
+
+	};
 
 	void update() {}
-	void update_to_converge() {}
+
+	void update_to_converge() 
+	{
+		m_edge_rest_length = {
+		2.f,
+		2.f,
+		2.f
+		};
+	}
 
 	const std::vector<float>& get_delta_positions()const
 	{
@@ -34,6 +45,10 @@ public:
 	const std::vector<float>& get_edge_length()const {
 		return m_edge_rest_length;
 	};
+
+
+private:
+
 
 };
 
@@ -76,6 +91,10 @@ TEST_F(One_Triangle, update_with_gravity_only)
 }
 
 
+
+
+
+
 TEST_F(One_Triangle, test_edge_rest_length)
 {
 	auto act = m_sim.get_edge_length();
@@ -87,21 +106,42 @@ TEST_F(One_Triangle, test_edge_rest_length)
 	};
 
 	EXPECT_THAT(act, exp);
-
 }
 
 
-TEST_F(One_Triangle, stretch_to_greater_rest_length)
+
+
+
+
+
+
+
+////////////////////////// stretch test
+class One_Triangle_With_Stretch_Setup: public One_Triangle
 {
-	m_sim.set_gravity({ 0,0,0 });
-	m_sim.set_time_step(0.1f);
+public:
 
-	m_sim.set_edge_rest_length({ 2.f, 2.f,2.f });
+protected:
+	virtual void SetUp() override
+	{
+		m_sim.set_gravity({ 0,0,0 });
+		m_sim.set_time_step(0.1f);
 
-	m_sim.update_to_converge();
+	}
+
+	auto set_rest_length_and_run(const std::vector<float>& rest_length)
+	{
+		m_sim.set_edge_rest_length({ 2.f, 2.f,2.f });
+		m_sim.update_to_converge();
+
+		return m_sim.get_edge_length();
+	}
+
+};
 
 
-	auto act = m_sim.get_edge_length();
+TEST_F(One_Triangle_With_Stretch_Setup, stretch_to_greater_rest_length)
+{
 
 	std::vector<float> exp = {
 		2.f,
@@ -109,6 +149,28 @@ TEST_F(One_Triangle, stretch_to_greater_rest_length)
 		2.f
 	};
 
-	EXPECT_THAT(act, exp);
+	auto act = set_rest_length_and_run(exp);
+
+	EXPECT_THAT(act, Eq(exp));
 
 }
+
+
+TEST_F(One_Triangle_With_Stretch_Setup, stretch_to_less_rest_length)
+{
+	std::vector<float> exp = {
+		0.5f,
+		0.5f,
+		0.5f
+	};
+
+	auto act = set_rest_length_and_run(exp);
+
+	EXPECT_THAT(act, Eq(exp));
+
+}
+
+////////////////////////// stretch test
+
+
+

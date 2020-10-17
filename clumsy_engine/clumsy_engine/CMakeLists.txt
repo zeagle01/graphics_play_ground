@@ -34,6 +34,7 @@ src/dispatcher.cpp
 
 set(test_files
 test/cloth_sim_test.cpp
+test/stretch_constraint_test.cpp
 )
 
 set(include_files

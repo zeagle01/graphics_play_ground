@@ -17,8 +17,9 @@ add_subdirectory(glad)
 add_subdirectory(clumsy_engine)
 
 add_subdirectory(external_wrappers/imgui)
-
 add_subdirectory(external/glfw)
+
+add_subdirectory(common/matrix_math)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 

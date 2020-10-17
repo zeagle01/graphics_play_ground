@@ -151,10 +151,12 @@ namespace clumsy_engine
 
 
 		auto failed = RUN_ALL_TESTS();
-		if (failed)
-		{
-			std::getchar();
-		}
+		//if (failed)
+		//{
+		//	std::getchar();
+		//}
+
+		std::getchar();
 
 		return true;
 	}
