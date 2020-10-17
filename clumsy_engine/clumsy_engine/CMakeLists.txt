@@ -30,6 +30,11 @@ src/windows_input.cpp
 src/input.cpp
 src/dispatcher.h
 src/dispatcher.cpp
+src/simulator.h
+src/simulator.cpp
+src/interaction.h
+src/gravity.h
+src/gravity.cpp
 )
 
 set(test_files
