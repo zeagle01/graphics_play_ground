@@ -7,41 +7,43 @@
 #include <vector>
 #include <memory>
 
-//#include "interaction.h"
 
 namespace clumsy_engine
 {
 
 	class Interaction;
+	class System_Equations_Solver;
 
 	class Simulator
 	{
 
-		std::vector<float> m_delta_positions = {
-				0,-0.1,0,
-				0,-0.1,0,
-				0,-0.1,0
-		};
+		std::vector<float> m_positions0;
 
-		std::vector<float> m_edge_rest_length = {
-			1.f,
-			1.f,
-			1.f
-		};
+		std::vector<float> m_velocity;
+
+		std::vector<float> m_positions;
 
 	public:
+		void set_mesh(std::vector<float> positions, std::vector<int> triangles)
+		{
+			m_positions = positions;
+		}
 
 		void add_interaction(std::unique_ptr<Interaction> interaction);
 
-		void set_time_step(float h) {}
+		void set_time_step(float h) { m_time_step = h; }
 
-		void update() {}
+		void update();
 
-		const std::vector<float>& get_delta_positions()const;
+		std::vector<float> get_delta_positions() ;
 
 	private:
 
-		//std::vector<std::unique_ptr<Interation>> m_interations;
+		std::vector<std::unique_ptr<Interaction>> m_interations;
+
+		float m_time_step;
+
+		//std::unique_ptr<System_Equations_Solver> m_solver;
 
 	};
 

@@ -35,11 +35,16 @@ src/simulator.cpp
 src/interaction.h
 src/gravity.h
 src/gravity.cpp
+src/inertial.h
+src/inertial.cpp
+src/system_equations_solver.h
+src/system_equations_solver.cpp
 )
 
 set(test_files
-test/cloth_sim_test.cpp
+test/simulator_test.cpp
 test/stretch_constraint_test.cpp
+test/system_equations_solver_test.cpp
 )
 
 set(include_files

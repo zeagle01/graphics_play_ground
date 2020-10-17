@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "system_equations_solver.h" 
 
 namespace clumsy_engine
 {
@@ -9,6 +10,6 @@ namespace clumsy_engine
 	{
 	public:
 		virtual ~Interaction() {}
-
+		virtual std::vector<Element_Equation> compute_equations() { return std::vector<Element_Equation>(); }
 	};
 }
