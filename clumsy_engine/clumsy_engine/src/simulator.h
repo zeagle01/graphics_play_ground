@@ -90,9 +90,6 @@ namespace clumsy_engine
 		};
 		Type_Map<Interaction> m_interactions_map;
 
-		//std::unique_ptr<System_Equations_Solver> m_solver;
-
-
 	};
 
 }

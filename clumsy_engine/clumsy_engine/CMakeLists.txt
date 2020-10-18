@@ -41,11 +41,14 @@ src/system_equations_solver.h
 src/system_equations_solver.cpp
 src/simulation_data.h
 src/simulation_data.cpp
+src/spring_stretch.h
+src/spring_stretch.cpp
 )
 
 set(test_files
 test/simulator_test.cpp
 test/stretch_constraint_test.cpp
+test/spring_stretch_test.cpp
 test/system_equations_solver_test.cpp
 )
 
