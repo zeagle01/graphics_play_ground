@@ -7,9 +7,23 @@
 #include "system_equations_solver.h"
 #include "inertial.h"
 
+#include "gravity.h"
+#include "Simulation_Data.h"
+
 
 namespace clumsy_engine
 {
+
+	Simulator::Simulator()
+	{
+		m_sim_data = std::make_shared <Simulation_Data>();
+	}
+
+	void Simulator::set_mesh(std::vector<float> positions, std::vector<int> triangles)
+	{
+		m_sim_data->set_mesh(positions, triangles);
+	}
+
 	void Simulator::add_interaction(std::unique_ptr<Interaction> interaction)
 	{
 		m_interations.push_back(std::move(interaction));
@@ -17,16 +31,11 @@ namespace clumsy_engine
 
 	std::vector<float> Simulator::get_delta_positions()
 	{
-		if (m_positions0.empty())
-		{
-			m_positions0.resize(m_positions.size());
-			return m_positions0;
-		}
+		std::vector<float> ret(m_sim_data->m_positions.size());
 
-		std::vector<float> ret(m_positions.size());
-		for (int i = 0; i < m_positions.size(); i++)
+		for (int i = 0; i < m_sim_data->m_positions.size(); i++)
 		{
-			ret[i] = m_positions[i] - m_positions0[i];
+			ret[i] = m_sim_data->m_positions[i] - m_sim_data->m_last_frame_positions[i];
 		}
 		return ret;
 	}
@@ -39,43 +48,40 @@ namespace clumsy_engine
 		{
 			m_solver = std::make_unique<System_Equations_Solver>();
 		}
-		if (m_velocity.empty())
-		{
-			m_velocity.resize(m_positions.size());
-		}
-		if (m_positions0.empty())
-		{
-			m_positions0 = m_positions;
-		}
 
-		int vertex_num = m_positions.size() / 3;
 
-		std::vector<float> masses(vertex_num, 1.f);
-
-		add_interaction(std::make_unique<Inertial>(vertex_num, masses, m_positions0, m_velocity, m_time_step));
-
-		std::vector<Element_Equation> equations;
+		std::vector<Constraint> constraints;
 
 		for (auto& interation : m_interations)
 		{
-			auto ieraction_equations = interation->compute_equations();
+			auto ieraction_constraints = interation->comfigure_constraints(m_sim_data);
 
-			equations.insert(equations.end(), ieraction_equations.begin(), ieraction_equations.end());
+			constraints.insert(constraints.end(), ieraction_constraints.begin(), ieraction_constraints.end());
 		}
 
-
-
+		std::vector<Element_Equation> equations;
+		for (auto& con : constraints)
+		{
+			equations.push_back(con());
+		}
 
 
 
 		///////////// update////////////
-		m_positions0 = m_positions;
+		m_sim_data->m_last_frame_positions = m_sim_data->m_positions;
 
-		m_solver->solve(m_positions, equations);
+		m_solver->solve(m_sim_data->m_positions, equations);
 
-		for (int i = 0; i < m_positions.size(); i++)
+		auto inertial = m_interactions_map.get<Inertial>();
+
+		if (inertial)
 		{
-			m_velocity[i] = (m_positions[i] - m_positions0[i]) / m_time_step;
+			float time_step = inertial->get_time_step();
+
+			for (int i = 0; i < m_sim_data->m_positions.size(); i++)
+			{
+				m_sim_data->m_velocities[i] = (m_sim_data->m_positions[i] - m_sim_data->m_last_frame_positions[i]) / time_step;
+			}
 		}
 	}
 

@@ -8,27 +8,42 @@
 namespace clumsy_engine
 {
 
-	std::vector<Element_Equation> Gravity::compute_equations() 
+	std::vector<Constraint> Gravity::comfigure_constraints(std::shared_ptr<Simulation_Data> sim_data)
 	{
 
-		std::vector<Element_Equation> ret;
+		std::vector<Constraint> ret;
 
-		ret.resize(m_vertex_num);
+		int vertex_num = sim_data->get_vertex_num();
 
-		for (int i = 0; i < m_vertex_num; i++)
+		ret.resize(vertex_num);
+
+		for (int i = 0; i < vertex_num; i++)
 		{
-			ret[i].A = std::vector<float>{0.f};
-
-			ret[i].b = std::vector<float>
+			ret[i] = [&sim_data,i,this]()
 			{
-				 m_masses[i] * m_gx,
-				 m_masses[i] * m_gy,
-				 m_masses[i] * m_gz
-			};
 
-			ret[i].stencil = std::vector<int>{ i };
+				Element_Equation ret;
+
+				ret.A = std::vector<float>{ 0.f };
+
+				ret.b = std::vector<float>
+				{
+					 sim_data->m_masses[i] * m_gx,
+					 sim_data->m_masses[i] * m_gy,
+					 sim_data->m_masses[i] * m_gz
+				};
+
+				ret.stencil = std::vector<int>{ i };
+
+				return ret;
+			};
+				
 		}
 
 		return ret;
+
 	}
+
+
+
 }

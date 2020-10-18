@@ -3,6 +3,7 @@
 
 #include "interaction.h"
 #include "gravity.h"
+#include "inertial.h"
 #include "Simulator.h"
 
 #include <memory>
@@ -26,7 +27,8 @@ protected:
 
 	std::vector<float>  setup_and_update()
 	{
-		m_sim.set_time_step(0.1f);
+
+		m_sim.add_interaction<Inertial>(0.1f);
 
 		m_sim.update();
 
@@ -48,22 +50,6 @@ protected:
 
 
 
-TEST_F(One_Vertex, update_with_gravity_only)
-{
-
-	float time_stpe = 0.1f;
-	std::vector<float> masses(m_vertex_num, 1.f);
-
-	m_sim.add_interaction(std::make_unique<Gravity>(m_vertex_num, 0, -10.f, 0, time_stpe, masses));
-
-	auto act = setup_and_update();
-
-	std::vector<float> exp = {
-		0,-0.1,0
-	};
-
-	EXPECT_THAT(act, exp);
-}
 
 TEST_F(One_Vertex, without_any_interaction_just_floating_there)
 {
@@ -79,6 +65,18 @@ TEST_F(One_Vertex, without_any_interaction_just_floating_there)
 
 
 
+TEST_F(One_Vertex, update_with_gravity_only)
+{
+	m_sim.add_interaction<Gravity>(0, -10.f, 0);
+
+	auto act = setup_and_update();
+
+	std::vector<float> exp = {
+		0,-0.1,0
+	};
+
+	EXPECT_THAT(act, exp);
+}
 
 
 
