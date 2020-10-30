@@ -19,7 +19,11 @@ namespace clumsy_engine
 			m_time_step(time_step)
 		{}
 
-		virtual std::vector<Constraint> comfigure_constraints(std::shared_ptr<Simulation_Data> sim_data) override;
+		//virtual std::vector<Constraint> comfigure_constraints(std::shared_ptr<Simulation_Data> sim_data) override;
+
+		std::vector<stencil> compute_stencils(std::vector<float> positions, std::vector<int> triangles) override;
+
+		Element_Equation compute_element_equation(stencil st) override;
 
 
 		float get_time_step() {

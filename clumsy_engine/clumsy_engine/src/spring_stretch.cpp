@@ -5,14 +5,17 @@
 namespace clumsy_engine
 {
 
-	std::vector<Constraint> Spring_Stretch::comfigure_constraints(std::shared_ptr<Simulation_Data> sim_data)
+	std::vector<stencil> Spring_Stretch::compute_stencils(std::vector<float> positions, std::vector<int> triangles)
 	{
-		std::vector<Constraint> ret;
-		//auto& edges = sim_data->m_edges;
-//		for (int i = 0; i < edges.size(); i++)
-//		{
-//
-//		}
+		//TODO: return edge indices of mesh
+		std::vector<stencil>ret;
+
+		return { {0,1} };
+	}
+
+	Element_Equation Spring_Stretch::compute_element_equation(stencil st)
+	{
+		Element_Equation ret;
 
 		return ret;
 	}

@@ -3,47 +3,41 @@
 
 #include "gravity.h" 
 
+#include "one_point_stencils.h"
 
 
 namespace clumsy_engine
 {
 
-	std::vector<Constraint> Gravity::comfigure_constraints(std::shared_ptr<Simulation_Data> sim_data)
+	std::vector<stencil> Gravity::compute_stencils(std::vector<float> positions, std::vector<int> triangles) 
+	{
+		One_Point_Stencils st;
+
+		return st(positions.size() / 3);
+
+	}
+
+	Element_Equation Gravity::compute_element_equation(stencil st) 
 	{
 
-		std::vector<Constraint> ret;
+		Element_Equation ret;
 
-		int vertex_num = sim_data->get_vertex_num();
+		ret.A = std::vector<float>{ 0.f };
 
-		ret.resize(vertex_num);
+		float mass = 1.f;//TODO
 
-		for (int i = 0; i < vertex_num; i++)
+		ret.b = std::vector<float>
 		{
-			ret[i] = [&sim_data,i,this]()
-			{
+			mass * m_gx,
+			mass * m_gy,
+			mass * m_gz
+		};
 
-				Element_Equation ret;
-
-				ret.A = std::vector<float>{ 0.f };
-
-				ret.b = std::vector<float>
-				{
-					 sim_data->m_masses[i] * m_gx,
-					 sim_data->m_masses[i] * m_gy,
-					 sim_data->m_masses[i] * m_gz
-				};
-
-				ret.stencil = std::vector<int>{ i };
-
-				return ret;
-			};
-				
-		}
+		ret.stencil = std::vector<int>{ st[0] };
 
 		return ret;
 
 	}
-
 
 
 }

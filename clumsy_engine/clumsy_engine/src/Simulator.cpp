@@ -50,21 +50,14 @@ namespace clumsy_engine
 		}
 
 
-		std::vector<Constraint> constraints;
-
-		for (auto& interation : m_interations)
-		{
-			auto ieraction_constraints = interation->comfigure_constraints(m_sim_data);
-
-			constraints.insert(constraints.end(), ieraction_constraints.begin(), ieraction_constraints.end());
-		}
+		//std::vector<Constraint> constraints;
 
 		std::vector<Element_Equation> equations;
-		for (auto& con : constraints)
+		for (auto& interation : m_interations)
 		{
-			equations.push_back(con());
+			auto ieraction_equations = interation->compute_element_equations(m_sim_data);
+			equations.insert(equations.end(), ieraction_equations.begin(), ieraction_equations.end());
 		}
-
 
 
 		///////////// update////////////

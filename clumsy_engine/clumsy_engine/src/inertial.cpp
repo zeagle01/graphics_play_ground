@@ -3,42 +3,43 @@
 
 #include "inertial.h"
 #include "Simulation_Data.h"
+#include "one_point_stencils.h"
 
 
 namespace clumsy_engine
 {
 
-	std::vector<Constraint> Inertial::comfigure_constraints(std::shared_ptr<Simulation_Data> sim_data)
+	std::vector<stencil> Inertial::compute_stencils(std::vector<float> positions, std::vector<int> triangles)
 	{
-		std::vector<Constraint> ret;
+		One_Point_Stencils st;
 
-		int vertex_num = sim_data->get_vertex_num();
-		ret.resize(vertex_num);
-
-		for (int i = 0; i < vertex_num; i++)
-		{
-
-			ret[i] = [&sim_data, this, i]()
-			{
-				Element_Equation eq;
-				eq.A = std::vector<float>{ sim_data->m_masses[i] / m_time_step / m_time_step };
-
-				eq.b = std::vector<float>
-				{
-					sim_data->m_last_frame_positions[i * 3 + 0] + m_time_step * sim_data->m_velocities[i * 3 + 0],
-					sim_data->m_last_frame_positions[i * 3 + 1] + m_time_step * sim_data->m_velocities[i * 3 + 1],
-					sim_data->m_last_frame_positions[i * 3 + 2] + m_time_step * sim_data->m_velocities[i * 3 + 2],
-				};
-
-				eq.stencil = std::vector<int>{ i };
-
-				return eq;
-			};
-
-		}
-
-		return ret;
+		return st(positions.size() / 3);
 	}
+
+	Element_Equation Inertial::compute_element_equation(stencil st)
+	{
+
+		Element_Equation eq;
+
+		float mass = 1.f;//TODO
+
+		std::vector<float> lastPos{ 0,0,0 };//TODO
+		std::vector<float> velocity{ 0,0,0 };//TODO
+
+		eq.A = std::vector<float>{ mass / m_time_step / m_time_step };
+
+		eq.b = std::vector<float>
+		{
+			lastPos[0] + m_time_step * velocity[0],
+			lastPos[1] + m_time_step * velocity[1],
+			lastPos[2] + m_time_step * velocity[2],
+		};
+
+		eq.stencil = { st[0] };
+
+		return eq;
+	}
+
 
 
 }

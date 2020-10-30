@@ -43,6 +43,8 @@ src/simulation_data.h
 src/simulation_data.cpp
 src/spring_stretch.h
 src/spring_stretch.cpp
+src/one_point_stencils.h
+src/one_point_stencils.cpp
 )
 
 set(test_files

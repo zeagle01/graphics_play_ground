@@ -6,11 +6,14 @@
 
 namespace clumsy_engine
 {
-	class Spring_Stretch:public Interaction
+	class Spring_Stretch :public Interaction
 	{
 	public:
 
-		std::vector<Constraint> comfigure_constraints(std::shared_ptr<Simulation_Data> sim_data) override;
+		std::vector<stencil> compute_stencils(std::vector<float> positions, std::vector<int> triangles) override;
+
+		Element_Equation compute_element_equation(stencil st) override;
+
 
 	};
 }
