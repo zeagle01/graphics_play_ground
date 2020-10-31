@@ -10,7 +10,8 @@
 namespace clumsy_engine
 {
 
-//	using Constraint = std::function<Element_Equation()>;
+	class Simulator;
+
 	using stencil = std::vector<int>;
 
 	class Interaction
@@ -22,16 +23,7 @@ namespace clumsy_engine
 
 		virtual Element_Equation compute_element_equation(stencil st) { return Element_Equation(); }
 
-		std::vector<Element_Equation> compute_element_equations(std::shared_ptr<Simulation_Data> sim_data) 
-		{ 
-			auto& stencils = compute_stencils(sim_data->m_positions, sim_data->m_triangles);
-			std::vector<Element_Equation> ret;
-			for (auto& st : stencils)
-			{
-				ret.push_back(compute_element_equation(st));
-			}
-			return ret; 
-		};
+		std::vector<Element_Equation> compute_element_equations(Simulator* sim);
 	};
 
 }

@@ -8,6 +8,10 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <typeinfo>
+
+#include "data_connections.h"
+//#include "simulation_data.h"
 
 
 namespace clumsy_engine
@@ -16,20 +20,18 @@ namespace clumsy_engine
 	class Interaction;
 	class System_Equations_Solver;
 	class Simulation_Data;
+	class Data_Wrapper;
+
 
 	class Simulator
 	{
-
-
+		friend Data_Connections;
 	public:
+
 		Simulator();
-		void set_mesh(std::vector<float> positions, std::vector<int> triangles);
-
-
 
 		void update();
 
-		std::vector<float> get_delta_positions() ;
 
 		template<typename Inter,typename ...P>
 		void add_interaction(P&& ... p)
@@ -38,22 +40,49 @@ namespace clumsy_engine
 
 			m_interactions_map.add(inter.get());
 
+			Data_Connections::setup_data_connections(this, inter.get());
+
 			m_interations.push_back(std::move(inter));
 		}
 
+	public:
+
+		template<typename T>
+		void add_data()
+		{
+			auto data = std::make_unique<T>();
+
+			m_data_map.add(data.get());
+
+			m_datas.push_back(std::move(data));
+		}
+
+		void set_mesh(std::vector<float> positions, std::vector<int> triangles);
+
+		std::vector<float> get_edge_lengths();
+		std::vector<float> get_delta_positions() ;
 
 
+		template<typename T, typename dataT = T::data_type>
+		void set(const dataT& d)
+		{
+			static_assert(std::is_same_v<dataT, T::data_type>);
+			auto data = m_data_map.get<T>();
+			data->set(d);
+		}
+
+		template<typename T>
+		const auto& get()
+		{
+			auto data = m_data_map.get<T>();
+			using ret_type = decltype(data->get());
+			//			std::string  n1 = typeid(ret_type).name();
+			//			std::string n2 = typeid(T::data_type).name();
+			static_assert(std::is_same_v<ret_type, const T::data_type&>);
+			return data->get();
+		}
 
 	private:
-		void add_interaction(std::unique_ptr<Interaction> interaction);
-
-
-
-	private:
-
-		std::vector<std::unique_ptr<Interaction>> m_interations;
-
-		std::shared_ptr<Simulation_Data> m_sim_data;
 
 
 		template<typename Base_T>
@@ -88,8 +117,14 @@ namespace clumsy_engine
 			std::map<std::string, Base_T*> type_map;
 
 		};
-		Type_Map<Interaction> m_interactions_map;
 
+		Type_Map<Interaction> m_interactions_map;
+		Type_Map<Data_Wrapper> m_data_map;
+
+		std::vector<std::unique_ptr<Data_Wrapper>> m_datas;
+		std::vector<std::unique_ptr<Interaction>> m_interations;
+
+		std::shared_ptr<Simulation_Data> m_sim_data;
 	};
 
 }

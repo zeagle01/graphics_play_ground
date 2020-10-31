@@ -33,6 +33,7 @@ src/dispatcher.cpp
 src/simulator.h
 src/simulator.cpp
 src/interaction.h
+src/interaction.cpp
 src/gravity.h
 src/gravity.cpp
 src/inertial.h
@@ -45,6 +46,9 @@ src/spring_stretch.h
 src/spring_stretch.cpp
 src/one_point_stencils.h
 src/one_point_stencils.cpp
+src/signal.h
+src/data_connections.h
+src/data_connections.cpp
 )
 
 set(test_files
@@ -52,6 +56,7 @@ test/simulator_test.cpp
 test/stretch_constraint_test.cpp
 test/spring_stretch_test.cpp
 test/system_equations_solver_test.cpp
+test/signal_test.cpp
 )
 
 set(include_files

@@ -6,6 +6,7 @@
 #include "interaction.h"
 #include "system_equations_solver.h"
 #include "inertial.h"
+#include "spring_stretch.h"
 
 #include "gravity.h"
 #include "Simulation_Data.h"
@@ -17,25 +18,32 @@ namespace clumsy_engine
 	Simulator::Simulator()
 	{
 		m_sim_data = std::make_shared <Simulation_Data>();
+
+		add_data<Position>();
+		add_data<Last_Frame_Position>();
+		add_data<Triangle_Indices>();
 	}
+
 
 	void Simulator::set_mesh(std::vector<float> positions, std::vector<int> triangles)
 	{
+		set<Position>(positions);
+		set<Triangle_Indices>(triangles);
+
 		m_sim_data->set_mesh(positions, triangles);
 	}
 
-	void Simulator::add_interaction(std::unique_ptr<Interaction> interaction)
-	{
-		m_interations.push_back(std::move(interaction));
-	}
+
 
 	std::vector<float> Simulator::get_delta_positions()
 	{
-		std::vector<float> ret(m_sim_data->m_positions.size());
+		const auto& positions = m_data_map.get<Position>()->get();
 
-		for (int i = 0; i < m_sim_data->m_positions.size(); i++)
+		std::vector<float> ret(positions.size());
+
+		for (int i = 0; i < positions.size(); i++)
 		{
-			ret[i] = m_sim_data->m_positions[i] - m_sim_data->m_last_frame_positions[i];
+			ret[i] = positions[i] - get<Last_Frame_Position>()[i];
 		}
 		return ret;
 	}
@@ -49,21 +57,19 @@ namespace clumsy_engine
 			m_solver = std::make_unique<System_Equations_Solver>();
 		}
 
-
-		//std::vector<Constraint> constraints;
-
 		std::vector<Element_Equation> equations;
 		for (auto& interation : m_interations)
 		{
-			auto ieraction_equations = interation->compute_element_equations(m_sim_data);
+			auto ieraction_equations = interation->compute_element_equations(this);
 			equations.insert(equations.end(), ieraction_equations.begin(), ieraction_equations.end());
 		}
 
 
 		///////////// update////////////
-		m_sim_data->m_last_frame_positions = m_sim_data->m_positions;
+		auto& positions = m_data_map.get<Position>()->data;
+		set<Last_Frame_Position>(positions);
 
-		m_solver->solve(m_sim_data->m_positions, equations);
+		m_solver->solve(positions, equations);
 
 		auto inertial = m_interactions_map.get<Inertial>();
 
@@ -71,11 +77,16 @@ namespace clumsy_engine
 		{
 			float time_step = inertial->get_time_step();
 
-			for (int i = 0; i < m_sim_data->m_positions.size(); i++)
+			for (int i = 0; i < positions.size(); i++)
 			{
-				m_sim_data->m_velocities[i] = (m_sim_data->m_positions[i] - m_sim_data->m_last_frame_positions[i]) / time_step;
+				m_sim_data->m_velocities[i] = (positions[i] - get<Last_Frame_Position>()[i]) / time_step;
 			}
 		}
+	}
+
+	std::vector<float> Simulator::get_edge_lengths()
+	{
+		return { 1. };
 	}
 
 }
