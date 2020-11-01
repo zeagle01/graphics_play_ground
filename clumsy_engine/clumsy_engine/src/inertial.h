@@ -6,6 +6,7 @@
 #include "Interaction.h"
 #include "Simulation_Data.h"
 #include <vector> 
+#include "type_list.h"
 
 namespace clumsy_engine
 {
@@ -15,23 +16,14 @@ namespace clumsy_engine
 	{
 	public:
 
-		Inertial(float time_step) :
-			m_time_step(time_step)
-		{}
+		using dependent_variables = type_list<data::Position, data::Time_Step>; 
 
-		//virtual std::vector<Constraint> comfigure_constraints(std::shared_ptr<Simulation_Data> sim_data) override;
 
-		std::vector<stencil> compute_stencils(std::vector<float> positions, std::vector<int> triangles) override;
+		std::vector<stencil> compute_stencils() override;
 
 		Element_Equation compute_element_equation(stencil st) override;
 
 
-		float get_time_step() {
-			return m_time_step;
-		}
-
-	private:
-		float m_time_step;
 	};
 
 }

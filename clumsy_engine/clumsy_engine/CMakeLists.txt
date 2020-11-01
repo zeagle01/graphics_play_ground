@@ -49,6 +49,10 @@ src/one_point_stencils.cpp
 src/signal.h
 src/data_connections.h
 src/data_connections.cpp
+src/type_map.h
+src/type_map.cpp
+src/type_list.h
+src/type_list.cpp
 )
 
 set(test_files
@@ -57,6 +61,7 @@ test/stretch_constraint_test.cpp
 test/spring_stretch_test.cpp
 test/system_equations_solver_test.cpp
 test/signal_test.cpp
+test/simulation_data_test.cpp
 )
 
 set(include_files

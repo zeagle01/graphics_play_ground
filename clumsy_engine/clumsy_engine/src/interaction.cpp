@@ -5,13 +5,14 @@
 #include "interaction.h"
 #include "simulator.h"
 #include "simulation_data.h"
+#include "type_map.h"
 
 namespace clumsy_engine
 {
 
-	std::vector<Element_Equation> Interaction::compute_element_equations(Simulator* sim)
+	std::vector<Element_Equation> Interaction::compute_element_equations()
 	{
-		auto& stencils = compute_stencils(sim->get<Position>(), sim->get<Triangle_Indices>());
+		auto& stencils = compute_stencils();
 		std::vector<Element_Equation> ret;
 		for (auto& st : stencils)
 		{

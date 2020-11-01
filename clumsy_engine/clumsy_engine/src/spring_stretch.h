@@ -3,24 +3,21 @@
 #pragma  once
 
 #include "interaction.h"
+#include "type_list.h"
 
 namespace clumsy_engine
 {
 	class Spring_Stretch :public Interaction
 	{
 	public:
+		using dependent_variables = type_list<data::Position>; 
 
-		std::vector<stencil> compute_stencils(std::vector<float> positions, std::vector<int> triangles) override;
+		std::vector<stencil> compute_stencils() override;
 
 		Element_Equation compute_element_equation(stencil st) override;
 
 
 	public:
-
-		void set_positions(const std::vector<float>& positions)
-		{
-			m_positions = positions;
-		}
 
 		void set_stiff(float stiff)
 		{

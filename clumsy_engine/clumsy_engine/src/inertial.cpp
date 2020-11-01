@@ -9,9 +9,11 @@
 namespace clumsy_engine
 {
 
-	std::vector<stencil> Inertial::compute_stencils(std::vector<float> positions, std::vector<int> triangles)
+	std::vector<stencil> Inertial::compute_stencils()
 	{
 		One_Point_Stencils st;
+
+		const auto& positions = get<data::Position>();
 
 		return st(positions.size() / 3);
 	}
@@ -26,13 +28,15 @@ namespace clumsy_engine
 		std::vector<float> lastPos{ 0,0,0 };//TODO
 		std::vector<float> velocity{ 0,0,0 };//TODO
 
-		eq.A = std::vector<float>{ mass / m_time_step / m_time_step };
+		float time_step = get<data::Time_Step>();
+
+		eq.A = std::vector<float>{ mass / time_step / time_step };
 
 		eq.b = std::vector<float>
 		{
-			lastPos[0] + m_time_step * velocity[0],
-			lastPos[1] + m_time_step * velocity[1],
-			lastPos[2] + m_time_step * velocity[2],
+			lastPos[0] + time_step * velocity[0],
+			lastPos[1] + time_step * velocity[1],
+			lastPos[2] + time_step * velocity[2],
 		};
 
 		eq.stencil = { st[0] };

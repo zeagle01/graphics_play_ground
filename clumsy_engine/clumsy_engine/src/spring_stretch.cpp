@@ -1,11 +1,12 @@
 
 
 #include "spring_stretch.h"
+#include "simulation_data.h"
 
 namespace clumsy_engine
 {
 
-	std::vector<stencil> Spring_Stretch::compute_stencils(std::vector<float> positions, std::vector<int> triangles)
+	std::vector<stencil> Spring_Stretch::compute_stencils()
 	{
 		//TODO: return edge indices of mesh
 		std::vector<stencil>ret;
@@ -18,14 +19,16 @@ namespace clumsy_engine
 		Element_Equation ret = Element_Equation::with_size(st.size());
 		ret.stencil = st;
 
+		const auto& positions = get_data<data::Position>();
+
 		float w[] = { -1,1 };
 		float x[] = {
-			m_positions[st[0] * 3 + 0],
-			m_positions[st[0] * 3 + 1],
-			m_positions[st[0] * 3 + 2],
-			m_positions[st[1] * 3 + 0],
-			m_positions[st[1] * 3 + 1],
-			m_positions[st[1] * 3 + 2]
+			positions[st[0] * 3 + 0],
+			positions[st[0] * 3 + 1],
+			positions[st[0] * 3 + 2],
+			positions[st[1] * 3 + 0],
+			positions[st[1] * 3 + 1],
+			positions[st[1] * 3 + 2]
 		};
 
 		float d[3];

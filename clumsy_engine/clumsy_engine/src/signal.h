@@ -27,25 +27,25 @@ namespace clumsy_engine
 	};
 
 //	template<typename T>
-//	struct Broad_Cast_Data
+//	using sennder = std::function<const T & ()>;
+//
+//	template<typename T>
+//	struct receiver
 //	{
-//		using cr_signal = signal<const T&>;
-//		using cr_slot = slot<const T&>;
-//
-//		T data;
-//		cr_signal sig;
-//
-//		void send_to(cr_slot s)
+//		void connect(sender<T> s)
 //		{
-//			sig.connect(s);
+//			slots.push_back(s);
 //		}
 //
-//		void set_and_broad_cast(const T& data)
+//		void operator()(P&&... p)
 //		{
-//			this->data = data;
-//
-//			sig(data);
+//			for (auto& s : slots)
+//			{
+//				s(std::forward<P>(p)...);
+//			}
 //		}
+//
+//		std::vector<sender<T>> senders;
 //	};
 
 }

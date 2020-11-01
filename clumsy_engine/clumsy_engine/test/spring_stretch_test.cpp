@@ -18,7 +18,7 @@ public:
 		{ 0,0,0,
 			1,0,0 };
 
-		m_spring_stretch.set_positions(m_positions);
+		m_spring_stretch.set<data::Position>(m_positions);
 	}
 
 protected:
@@ -36,7 +36,7 @@ protected:
 
 TEST_F(Spring_Stretch_Test, one_spring_stencil)
 {
-	auto stencils = m_spring_stretch.compute_stencils(m_positions, m_triangles);
+	auto stencils = m_spring_stretch.compute_stencils();
 
 	std::vector<stencil> exp{ {0,1} };
 

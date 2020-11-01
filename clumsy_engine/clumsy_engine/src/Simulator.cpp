@@ -14,30 +14,24 @@
 
 namespace clumsy_engine
 {
+	using namespace data;
 
 	Simulator::Simulator()
 	{
-		m_sim_data = std::make_shared <Simulation_Data>();
 
-		add_data<Position>();
-		add_data<Last_Frame_Position>();
-		add_data<Triangle_Indices>();
+		for_each_type<data::all_variables, build_sim_data>(m_data_map);
+		for_each_type1<data::all_variables, build_dependent>(m_data_map);
+
+		//double_for_each_type<data::all_variables, build_sim_data>(m_data_map);
+			
 	}
 
-
-	void Simulator::set_mesh(std::vector<float> positions, std::vector<int> triangles)
-	{
-		set<Position>(positions);
-		set<Triangle_Indices>(triangles);
-
-		m_sim_data->set_mesh(positions, triangles);
-	}
 
 
 
 	std::vector<float> Simulator::get_delta_positions()
 	{
-		const auto& positions = m_data_map.get<Position>()->get();
+		const auto& positions = m_data_map.get_data<Position>();
 
 		std::vector<float> ret(positions.size());
 
@@ -58,15 +52,17 @@ namespace clumsy_engine
 		}
 
 		std::vector<Element_Equation> equations;
-		for (auto& interation : m_interations)
+		for (auto& it : m_interactions_map)
 		{
-			auto ieraction_equations = interation->compute_element_equations(this);
+			auto& interation = it.second;
+			auto ieraction_equations = interation->compute_element_equations();
 			equations.insert(equations.end(), ieraction_equations.begin(), ieraction_equations.end());
 		}
 
 
 		///////////// update////////////
-		auto& positions = m_data_map.get<Position>()->data;
+		const auto& m_positions = get<Position>();
+		auto positions = m_positions;
 		set<Last_Frame_Position>(positions);
 
 		m_solver->solve(positions, equations);
@@ -75,12 +71,16 @@ namespace clumsy_engine
 
 		if (inertial)
 		{
-			float time_step = inertial->get_time_step();
+			float time_step = get<data::Time_Step>();
+
+			std::vector<float> velocity(positions.size());
 
 			for (int i = 0; i < positions.size(); i++)
 			{
-				m_sim_data->m_velocities[i] = (positions[i] - get<Last_Frame_Position>()[i]) / time_step;
+				velocity[i] = (positions[i] - get<Last_Frame_Position>()[i]) / time_step;
 			}
+
+			set<data::Velocity>(velocity);//maybe optimization?
 		}
 	}
 

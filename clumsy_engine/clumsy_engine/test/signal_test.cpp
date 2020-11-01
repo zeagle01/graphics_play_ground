@@ -22,18 +22,20 @@ struct observer
 	int data;
 };
 
-TEST(Signal_Test, set_broad_cast_data)
+TEST(Signal_Test, set_Source_Datadata)
 {
-	Broad_Cast_Data<int> d;
+	signal<const int&> d;
+
 	observer ob;
 
 	auto s = std::bind(&observer::process, &ob, std::placeholders::_1);
 
-	d.send_to(s);
+	d.connect(s);
 
 	int exp = 10;
 
-	d.set(exp);
+	d(exp);
+
 
 	EXPECT_THAT(ob.data, Eq(exp));
 

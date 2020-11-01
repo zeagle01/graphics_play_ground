@@ -17,17 +17,22 @@ using namespace clumsy_engine;
 class Simulator_Test :public Test
 {
 public:
+	Simulator_Test()
+	{
+		m_sim.add_interaction<Inertial>();
+
+		m_sim.set<data::Time_Step>(0.1);
+
+	}
 
 protected:
 
 	std::vector<float>  setup_and_update()
 	{
 
-		m_sim.add_interaction<Inertial>(0.1f);
-
 		m_sim.update();
 
-		return m_sim.get_delta_positions();
+		return m_sim.get<data::Delta_Position>();
 
 	}
 
@@ -42,6 +47,11 @@ protected:
 
 };
 
+
+
+
+
+/////////////////////////////////////
 class One_Vertex :public Simulator_Test
 {
 public:
@@ -51,26 +61,11 @@ public:
 
 		m_vertex_num = m_positions.size() / 3;
 
-		m_sim.set_mesh(m_positions, m_triangles);
+		m_sim.set<data::Position>(m_positions);
+
 	}
 
 };
-
-
-////////////////////////////////////////////////////////////
-TEST_F(Simulator_Test, set_then_get_data)
-{
-
-	std::vector<float> exp{ 2.f };
-
-	m_sim.set<Position>(exp);
-
-	auto act = m_sim.get<Position>();
-
-	EXPECT_THAT(act, Eq(exp));
-}
-
-
 
 
 TEST_F(One_Vertex, without_any_interaction_just_floating_there)
@@ -89,7 +84,9 @@ TEST_F(One_Vertex, without_any_interaction_just_floating_there)
 
 TEST_F(One_Vertex, update_with_gravity_only)
 {
-	m_sim.add_interaction<Gravity>(0, -10.f, 0);
+	m_sim.add_interaction<Gravity>();
+
+	m_sim.set<data::Gravity>({ 0,-10,0 });
 
 	auto act = setup_and_update();
 
@@ -113,7 +110,11 @@ public:
 
 		m_vertex_num = m_positions.size() / 3;
 
-		m_sim.set_mesh(m_positions, m_triangles);
+		m_sim.add_interaction<Spring_Stretch>();
+
+		m_sim.set<data::Position>(m_positions);
+
+		m_sim.set<data::Triangle_Indices>(m_triangles);
 	}
 
 };
@@ -121,9 +122,6 @@ public:
 
 TEST_F(One_Edge, update_with_one_edge)
 {
-	m_sim.add_interaction<Spring_Stretch>();
-
-	m_sim.set_mesh(m_positions, m_triangles);
 
 	setup_and_update();
 
