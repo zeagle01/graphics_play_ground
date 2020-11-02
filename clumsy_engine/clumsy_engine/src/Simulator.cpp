@@ -67,6 +67,8 @@ namespace clumsy_engine
 
 		m_solver->solve(positions, equations);
 
+		set<Position>(positions);
+
 		auto inertial = m_interactions_map.get<Inertial>();
 
 		if (inertial)

@@ -119,9 +119,38 @@ namespace data
 
 	class Velocity :public Dependent_Data<std::vector<float>> {};
 
-	class Last_Frame_Position :public Dependent_Data<std::vector<float>> {};
+	class Last_Frame_Position :public Dependent_Data<std::vector<float>, type_list<Position>> 
+	{
+	public:
+		void compute(data_type& last_frame_positions) override
+		{
+			const auto& positions = m_senders.get_data<Position>();
+			if (last_frame_positions.size() != positions.size())
+			{
+				last_frame_positions = positions;
+			}
+		}
+	};
 
-	class Delta_Position :public Dependent_Data<std::vector<float>, type_list<Position, Last_Frame_Position>> {};
+	class Delta_Position :public Dependent_Data<std::vector<float>, type_list<Position, Last_Frame_Position>> 
+	{
+	public:
+		void compute(data_type& delta_pos) override
+		{
+			const auto& positions = m_senders.get_data<Position>();
+			const auto& last_postions = m_senders.get_data<Last_Frame_Position>();
+
+			int size = positions.size();
+			if (delta_pos.size() != size)
+			{
+				delta_pos.resize(size);
+			}
+			for (int i = 0; i < size; i++)
+			{
+				delta_pos[i] = positions[i] - last_postions[i];
+			}
+		}
+	};
 
 	class Mass :public Dependent_Data<std::vector<float>> {};
 
@@ -161,7 +190,7 @@ namespace data
 	};
 
 
-	using all_variables = type_list<Gravity, Time_Step, Position, Delta_Position, Velocity, Last_Frame_Position, Mass, Triangle_Indices, Edge_Indice>;
+	using all_variables = type_list<Gravity, Time_Step, Position, Delta_Position, Velocity, Last_Frame_Position, Mass, Triangle_Indices, Edge_Indice, Edge_Length>;
 }
 
 	///
@@ -186,15 +215,6 @@ namespace data
 	};
 
 
-
-//	template<typename tl0,typename tl1, typename F, typename ...P>
-//	struct double_for_each_type
-//	{
-//		static void apply(P&&... p)
-//		{
-//
-//		}
-//	};
 
 	template<typename tl,  template<typename U> typename F, typename ...P>
 	static void for_each_type1(P&&... p)
