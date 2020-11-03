@@ -6,6 +6,7 @@
 #include "signal.h" 
 #include "type_map.h"
 #include "type_list.h"
+#include "class_reflect.h"
 
 namespace clumsy_engine
 {
@@ -106,92 +107,139 @@ namespace clumsy_engine
 
 
 	///
-namespace data
-{
-
-
-	//////
-	class Gravity :public Dependent_Data<std::vector<float>> {};
-
-	class Time_Step :public Dependent_Data<float> {};
-
-	class Position :public Dependent_Data<std::vector<float>> {};
-
-	class Velocity :public Dependent_Data<std::vector<float>> {};
-
-	class Last_Frame_Position :public Dependent_Data<std::vector<float>, type_list<Position>> 
+	namespace data
 	{
-	public:
-		void compute(data_type& last_frame_positions) override
+
+
+		//////
+		class Gravity :public Dependent_Data<std::vector<float>> {};
+
+		class Time_Step :public Dependent_Data<float> {};
+
+		class Position :public Dependent_Data<std::vector<float>> {};
+
+		class Velocity :public Dependent_Data<std::vector<float>> {};
+
+		class Last_Frame_Position :public Dependent_Data<std::vector<float>, type_list<Position>>
 		{
-			const auto& positions = m_senders.get_data<Position>();
-			if (last_frame_positions.size() != positions.size())
+		public:
+			void compute(data_type& last_frame_positions) override
 			{
-				last_frame_positions = positions;
-			}
-		}
-	};
-
-	class Delta_Position :public Dependent_Data<std::vector<float>, type_list<Position, Last_Frame_Position>> 
-	{
-	public:
-		void compute(data_type& delta_pos) override
-		{
-			const auto& positions = m_senders.get_data<Position>();
-			const auto& last_postions = m_senders.get_data<Last_Frame_Position>();
-
-			int size = positions.size();
-			if (delta_pos.size() != size)
-			{
-				delta_pos.resize(size);
-			}
-			for (int i = 0; i < size; i++)
-			{
-				delta_pos[i] = positions[i] - last_postions[i];
-			}
-		}
-	};
-
-	class Mass :public Dependent_Data<std::vector<float>> {};
-
-	class Triangle_Indices :public Dependent_Data<std::vector<int>> {};
-
-	class Edge_Indice :public Dependent_Data<std::vector<int>>
-	{
-	public:
-		void compute(data_type& edge_indice) override
-		{
-
-		}
-	};
-
-	class Edge_Length :public Dependent_Data<std::vector<float>>
-	{
-	public:
-		void compute(data_type& edge_length) override
-		{
-			const auto& positions = m_senders.get_data<Position>();
-			const auto& edge_indices = m_senders.get_data<Edge_Indice>();
-			int eNum = edge_indices.size() / 2;
-			edge_length.resize(eNum);
-			for (int i = 0; i < eNum; i++)
-			{
-				int v0 = edge_indices[i * 2 + 0];
-				int v1 = edge_indices[i * 2 + 1];
-				float l = 0;
-				for (int i = 0; i < 3; i++)
+				const auto& positions = m_senders.get_data<Position>();
+				if (last_frame_positions.size() != positions.size())
 				{
-					float d = positions[v0 * 3 + i] - positions[v1 * 3 + i];
-					l += d * d;
+					last_frame_positions = positions;
 				}
-				edge_length[i] = std::sqrt(l);
 			}
-		}
+		};
+
+		class Delta_Position :public Dependent_Data<std::vector<float>, type_list<Position, Last_Frame_Position>>
+		{
+		public:
+			void compute(data_type& delta_pos) override
+			{
+				const auto& positions = m_senders.get_data<Position>();
+				const auto& last_postions = m_senders.get_data<Last_Frame_Position>();
+
+				int size = positions.size();
+				if (delta_pos.size() != size)
+				{
+					delta_pos.resize(size);
+				}
+				for (int i = 0; i < size; i++)
+				{
+					delta_pos[i] = positions[i] - last_postions[i];
+				}
+			}
+		};
+
+		class Mass :public Dependent_Data<std::vector<float>> {};
+
+		class Triangle_Indices :public Dependent_Data<std::vector<int>> {};
+
+		class Edge_Indice :public Dependent_Data<std::vector<int>>
+		{
+		public:
+			void compute(data_type& edge_indice) override
+			{
+
+			}
+		};
+
+		class Edge_Length :public Dependent_Data<std::vector<float>>
+		{
+		public:
+			void compute(data_type& edge_length) override
+			{
+				const auto& positions = m_senders.get_data<Position>();
+				const auto& edge_indices = m_senders.get_data<Edge_Indice>();
+				int eNum = edge_indices.size() / 2;
+				edge_length.resize(eNum);
+				for (int i = 0; i < eNum; i++)
+				{
+					int v0 = edge_indices[i * 2 + 0];
+					int v1 = edge_indices[i * 2 + 1];
+					float l = 0;
+					for (int i = 0; i < 3; i++)
+					{
+						float d = positions[v0 * 3 + i] - positions[v1 * 3 + i];
+						l += d * d;
+					}
+					edge_length[i] = std::sqrt(l);
+				}
+			}
+		};
+
+
+		using all_variables = type_list<Gravity, Time_Step, Position, Delta_Position, Velocity, Last_Frame_Position, Mass, Triangle_Indices, Edge_Indice, Edge_Length>;
+	}
+
+#define DEF_MEM(x,t,deps) \
+		class x :public Dependent_Data<t,deps> {};\
+		x* x##_var;\
+
+	struct data_
+	{
+		using empty_deps = type_list<>;
+		using vf = std::vector<float>;
+		DEF_MEM(Gravity, vf, empty_deps);
+
+	} ;
+
+	template<typename ...P>
+	struct typesss
+	{
+		typesss(std::tuple<P...> t) {};
+		using types = type_list<P...>;
 	};
 
 
-	using all_variables = type_list<Gravity, Time_Step, Position, Delta_Position, Velocity, Last_Frame_Position, Mass, Triangle_Indices, Edge_Indice, Edge_Length>;
-}
+	template<typename tup>
+	struct extract_tuple_pointer;
+
+	template<typename ...P>
+	struct extract_tuple_pointer<std::tuple<P*...>>
+	{
+		using types = type_list<P...>;
+	};
+
+	using tuple_t = decltype(as_tuple(std::declval<data_>()));
+	using all_types = extract_tuple_pointer<tuple_t>::types;
+
+//	static void test_use()
+//	{
+//		static data_ ddd;
+//
+//		using tuple_t = decltype(as_tuple(std::declval<data_>()));
+//		using all_types = extract_tuple_pointer<tuple_t>::types;
+//		//all_types a;
+//
+//		auto n1 = typeid(tuple_t).name();
+//		//using n2 = typeid(all_types).name();
+//
+//
+//	}
+
 
 	///
 	template<typename tl, typename F, typename ...P>

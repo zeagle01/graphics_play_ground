@@ -19,8 +19,8 @@ namespace clumsy_engine
 	Simulator::Simulator()
 	{
 
-		for_each_type<data::all_variables, build_sim_data>(m_data_map);
-		for_each_type1<data::all_variables, build_dependent>(m_data_map);
+		for_each_type<all_types, build_sim_data>(m_data_map);
+		for_each_type1<all_types ,build_dependent>(m_data_map);
 
 		//double_for_each_type<data::all_variables, build_sim_data>(m_data_map);
 			

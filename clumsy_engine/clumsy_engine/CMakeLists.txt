@@ -53,6 +53,7 @@ src/type_map.h
 src/type_map.cpp
 src/type_list.h
 src/type_list.cpp
+src/class_reflect.h
 )
 
 set(test_files
