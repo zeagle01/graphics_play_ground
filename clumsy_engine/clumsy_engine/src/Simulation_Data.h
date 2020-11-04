@@ -7,6 +7,7 @@
 #include "type_map.h"
 #include "type_list.h"
 #include "class_reflect.h"
+#include "data_computes.h"
 
 namespace clumsy_engine
 {
@@ -29,7 +30,7 @@ namespace clumsy_engine
 		{
 			for (auto c : m_children)
 			{
-				c->set_me_and_children_dirty(dirty);
+				c->set_me_and_children_dirty(value);
 			}
 		}
 
@@ -39,19 +40,19 @@ namespace clumsy_engine
 
 			for (auto c : m_children)
 			{
-				c->set_me_and_children_dirty(dirty);
+				c->set_me_and_children_dirty(value);
 			}
 
 		}
 
 		void set_dirty(bool value)
 		{
-			this->dirty = dirty;
+			m_dirty = value;
 		}
 
 		bool is_dirty()
 		{
-			return dirty;
+			return m_dirty;
 		}
 
 		void add_child(Node* n)
@@ -61,10 +62,10 @@ namespace clumsy_engine
 
 	private:
 		std::vector<Node*> m_children;
-		bool dirty;
+		bool m_dirty;
 	};
 
-	template<typename T, typename dependent_types = type_list<>>
+	template<typename T, typename Computer=Plain_Computer ,typename dependent_types = type_list<>>
 	class Dependent_Data :public Node, public Data_Base
 	{
 
@@ -83,7 +84,7 @@ namespace clumsy_engine
 		{
 			if (is_dirty())
 			{
-				compute(data);
+				Computer::apply(m_senders, data);
 				set_dirty(false);
 			}
 			return data;
@@ -99,111 +100,42 @@ namespace clumsy_engine
 		}
 
 	protected:
-		virtual void compute(T& d) {}
 		Simulation_Datas m_senders;
+	};
+
+
+	struct Plain_Computer
+	{
+		template<typename T>
+		static void apply(Simulation_Datas& datas, T& d) {}
 	};
 
 
 
 
-	///
-	namespace data
-	{
+#define EVAL(...) __VA_ARGS__
 
-
-		//////
-		class Gravity :public Dependent_Data<std::vector<float>> {};
-
-		class Time_Step :public Dependent_Data<float> {};
-
-		class Position :public Dependent_Data<std::vector<float>> {};
-
-		class Velocity :public Dependent_Data<std::vector<float>> {};
-
-		class Last_Frame_Position :public Dependent_Data<std::vector<float>, type_list<Position>>
-		{
-		public:
-			void compute(data_type& last_frame_positions) override
-			{
-				const auto& positions = m_senders.get_data<Position>();
-				if (last_frame_positions.size() != positions.size())
-				{
-					last_frame_positions = positions;
-				}
-			}
-		};
-
-		class Delta_Position :public Dependent_Data<std::vector<float>, type_list<Position, Last_Frame_Position>>
-		{
-		public:
-			void compute(data_type& delta_pos) override
-			{
-				const auto& positions = m_senders.get_data<Position>();
-				const auto& last_postions = m_senders.get_data<Last_Frame_Position>();
-
-				int size = positions.size();
-				if (delta_pos.size() != size)
-				{
-					delta_pos.resize(size);
-				}
-				for (int i = 0; i < size; i++)
-				{
-					delta_pos[i] = positions[i] - last_postions[i];
-				}
-			}
-		};
-
-		class Mass :public Dependent_Data<std::vector<float>> {};
-
-		class Triangle_Indices :public Dependent_Data<std::vector<int>> {};
-
-		class Edge_Indice :public Dependent_Data<std::vector<int>>
-		{
-		public:
-			void compute(data_type& edge_indice) override
-			{
-
-			}
-		};
-
-		class Edge_Length :public Dependent_Data<std::vector<float>>
-		{
-		public:
-			void compute(data_type& edge_length) override
-			{
-				const auto& positions = m_senders.get_data<Position>();
-				const auto& edge_indices = m_senders.get_data<Edge_Indice>();
-				int eNum = edge_indices.size() / 2;
-				edge_length.resize(eNum);
-				for (int i = 0; i < eNum; i++)
-				{
-					int v0 = edge_indices[i * 2 + 0];
-					int v1 = edge_indices[i * 2 + 1];
-					float l = 0;
-					for (int i = 0; i < 3; i++)
-					{
-						float d = positions[v0 * 3 + i] - positions[v1 * 3 + i];
-						l += d * d;
-					}
-					edge_length[i] = std::sqrt(l);
-				}
-			}
-		};
-
-
-		using all_variables = type_list<Gravity, Time_Step, Position, Delta_Position, Velocity, Last_Frame_Position, Mass, Triangle_Indices, Edge_Indice, Edge_Length>;
-	}
-
-#define DEF_MEM(x,t,deps) \
-		class x :public Dependent_Data<t,deps> {};\
+#define DEF_MEM(x,t,c,deps) \
+		class x :public Dependent_Data<t,c,EVAL(deps)> {};\
 		x* x##_var;\
 
-	struct data_
+
+	struct data
 	{
 		using empty_deps = type_list<>;
 		using vf = std::vector<float>;
-		DEF_MEM(Gravity, vf, empty_deps);
-
+		using vi = std::vector<int>;
+		DEF_MEM(Gravity,					vf,		Plain_Computer,					empty_deps);
+		DEF_MEM(Time_Step,					float,	Plain_Computer,					empty_deps);
+		DEF_MEM(Position,					vf,		Plain_Computer,					empty_deps);
+		DEF_MEM(Velocity,					vf,		Plain_Computer,					empty_deps);
+		DEF_MEM(Last_Frame_Position,		vf,		Compute_Last_Frame_Position,	type_list< Position>);
+		DEF_MEM(Mass,						vf,		Plain_Computer,					empty_deps);
+		DEF_MEM(Triangle_Indice,			vi,		Plain_Computer,					empty_deps);
+		DEF_MEM(Edge_Indice,				vi,		Plain_Computer,					empty_deps);
+		DEF_MEM(Edge_Length,				vf,		Compute_Edge_Length,			empty_deps);
+		using dp_deps = type_list< Position,Last_Frame_Position>;
+		DEF_MEM(Delta_Position,				vf,		Delta,							dp_deps );
 	} ;
 
 	template<typename ...P>
@@ -223,49 +155,15 @@ namespace clumsy_engine
 		using types = type_list<P...>;
 	};
 
-	using tuple_t = decltype(as_tuple(std::declval<data_>()));
+	using tuple_t = decltype(as_tuple(std::declval<data>()));
 	using all_types = extract_tuple_pointer<tuple_t>::types;
 
-//	static void test_use()
-//	{
-//		static data_ ddd;
-//
-//		using tuple_t = decltype(as_tuple(std::declval<data_>()));
-//		using all_types = extract_tuple_pointer<tuple_t>::types;
-//		//all_types a;
-//
-//		auto n1 = typeid(tuple_t).name();
-//		//using n2 = typeid(all_types).name();
-//
-//
-//	}
 
-
-	///
-	template<typename tl, typename F, typename ...P>
-	static void for_each_type(P&&... p)
-	{
-		if constexpr (!is_empty<tl>)
-		{
-			using current_t = front<tl>;
-
-			F::apply<current_t>(std::forward<P>(p)...);
-
-			using poped_list = pop_front<tl>;
-
-			for_each_type<poped_list, F>(std::forward<P>(p)...);
-		}
-		else
-		{
-			return;
-		}
-
-	};
 
 
 
 	template<typename tl,  template<typename U> typename F, typename ...P>
-	static void for_each_type1(P&&... p)
+	static void for_each_depend_type(P&&... p)
 	{
 		if constexpr (!is_empty<tl>)
 		{
@@ -276,46 +174,11 @@ namespace clumsy_engine
 			for_each_type<current_tl, F<current_t>>(std::forward<P>(p)...);
 
 			using poped_list = pop_front<tl>;
-			for_each_type1<poped_list, F>(std::forward<P>(p)...);
+			for_each_depend_type<poped_list, F>(std::forward<P>(p)...);
 		}
 
 	};
 
-	template<typename tl0, typename tl1, typename F, typename ctl0 = tl0, typename ctl1 = tl1, typename ...P>
-	static void double_for_each_type(P&&... p)
-	{
-		if constexpr (!is_empty<ctl0>&&!is_empty<ctl1>)
-		{
-			using current_t0 = front<ctl0>;
-
-			using current_t1 = front<ctl1>;
-
-			F::apply<current_t0, current_t1>(std::forward<P>(p)...);
-
-			using poped_list0 = pop_front<ctl0>;
-			using poped_list1 = pop_front<ctl1>;
-
-			double_for_each_type<tl0, tl1, F, poped_list0, poped_list1 >(std::forward<P>(p)...);
-		}
-		else if constexpr (is_empty<tl0> && !is_empty<tl1>)
-		{
-			using current_t0 = front<tl0>;
-
-			using current_t1 = front<ctl1>;
-
-			F::apply<current_t0, current_t1>(std::forward<P>(p)...);
-
-			using poped_list0 = pop_front<tl0>;
-			using poped_list1 = pop_front<ctl1>;
-
-			double_for_each_type<tl0, tl1, F, poped_list0, poped_list1>(std::forward<P>(p)...);
-		}
-		else 
-		{
-			return;
-		}
-
-	};
 
 	struct extract_sim_data
 	{

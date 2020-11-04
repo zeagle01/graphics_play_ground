@@ -83,4 +83,63 @@ namespace clumsy_engine
 
 
 
+
+	///
+	template<typename tl, typename F, typename ...P>
+	static void for_each_type(P&&... p)
+	{
+		if constexpr (!is_empty<tl>)
+		{
+			using current_t = front<tl>;
+
+			F::apply<current_t>(std::forward<P>(p)...);
+
+			using poped_list = pop_front<tl>;
+
+			for_each_type<poped_list, F>(std::forward<P>(p)...);
+		}
+		else
+		{
+			return;
+		}
+
+	};
+
+
+	template<typename tl0, typename tl1, typename F, typename ctl0 = tl0, typename ctl1 = tl1, typename ...P>
+	static void double_for_each_type(P&&... p)
+	{
+		if constexpr (!is_empty<ctl0>&&!is_empty<ctl1>)
+		{
+			using current_t0 = front<ctl0>;
+
+			using current_t1 = front<ctl1>;
+
+			F::apply<current_t0, current_t1>(std::forward<P>(p)...);
+
+			using poped_list0 = pop_front<ctl0>;
+			using poped_list1 = pop_front<ctl1>;
+
+			double_for_each_type<tl0, tl1, F, poped_list0, poped_list1 >(std::forward<P>(p)...);
+		}
+		else if constexpr (is_empty<tl0> && !is_empty<tl1>)
+		{
+			using current_t0 = front<tl0>;
+
+			using current_t1 = front<ctl1>;
+
+			F::apply<current_t0, current_t1>(std::forward<P>(p)...);
+
+			using poped_list0 = pop_front<tl0>;
+			using poped_list1 = pop_front<ctl1>;
+
+			double_for_each_type<tl0, tl1, F, poped_list0, poped_list1>(std::forward<P>(p)...);
+		}
+		else 
+		{
+			return;
+		}
+
+	};
+
 }

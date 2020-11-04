@@ -36,40 +36,81 @@ namespace clumsy_engine
 		if constexpr (count == 1)
 		{
 
-			auto& [a] = std::forward<T>(val);
+			auto& [v0] = std::forward<T>(val);
 
-			return std::make_tuple(a);
+			return std::make_tuple(v0);
 		}
 		else if constexpr (count == 2)
 		{
-			auto& [a, b] = std::forward<T>(val);
-			return std::make_tuple(a, b);
+			auto& [v0, v1] = std::forward<T>(val);
+			return std::make_tuple(v0, v1);
 		}
 		else if constexpr (count == 3)
 		{
-			auto& [a, b, c] = std::forward<T>(val);
-			return std::make_tuple(a, b, c);
-		}
-		else if constexpr (count == 3)
-		{
-			auto& [a, b, c] = std::forward<T>(val);
-			return std::make_tuple(a, b, c);
+			auto& [v0, v1, v2] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2);
 		}
 		else if constexpr (count == 4)
 		{
-			auto& [a, b, c, d] = std::forward<T>(val);
-			return std::make_tuple(a, b, c, d);
+			auto& [v0, v1, v2,v3] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3);
 		}
 		else if constexpr (count == 5)
 		{
-			auto& [a, b, c, d, e] = std::forward<T>(val);
-			return std::make_tuple(a, b, c, d, e);
+			auto& [v0, v1, v2, v3,v4] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3, v4);
 		}
 		else if constexpr (count == 6)
 		{
-			auto& [a, b, c, d, e, f] = std::forward<T>(val);
-			return std::make_tuple(a, b, c, d, e, f);
+			auto& [v0, v1, v2, v3, v4,v5] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3, v4, v5);
 		}
+		else if constexpr (count == 7)
+		{
+			auto& [v0, v1, v2, v3, v4,v5,v6] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3, v4, v5,v6);
+		}
+		else if constexpr (count == 8)
+		{
+			auto& [v0, v1, v2, v3, v4,v5,v6,v7] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3, v4, v5,v6,v7);
+		}
+		else if constexpr (count == 9)
+		{
+			auto& [v0, v1, v2, v3, v4,v5,v6,v7,v8] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3, v4, v5,v6,v7,v8);
+		}
+		else if constexpr (count == 10)
+		{
+			auto& [v0, v1, v2, v3, v4,v5,v6,v7,v8,v9] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3, v4, v5,v6,v7,v8,v9);
+		}
+		else if constexpr (count == 11)
+		{
+			auto& [v0, v1, v2, v3, v4,v5,v6,v7,v8,v9,v10] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3, v4, v5,v6,v7,v8,v9,v10);
+		}
+		else if constexpr (count == 12)
+		{
+			auto& [v0, v1, v2, v3, v4,v5,v6,v7,v8,v9,v10,v11] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3, v4, v5,v6,v7,v8,v9,v10,v11);
+		}
+		else if constexpr (count == 13)
+		{
+			auto& [v0, v1, v2, v3, v4,v5,v6,v7,v8,v9,v10,v11,v12] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3, v4, v5,v6,v7,v8,v9,v10,v11,v12);
+		}
+		else if constexpr (count == 14)
+		{
+			auto& [v0, v1, v2, v3, v4,v5,v6,v7,v8,v9,v10,v11,v12,v13] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3, v4, v5,v6,v7,v8,v9,v10,v11,v12,v13);
+		}
+		else if constexpr (count == 15)
+		{
+			auto& [v0, v1, v2, v3, v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14] = std::forward<T>(val);
+			return std::make_tuple(v0, v1, v2, v3, v4, v5,v6,v7,v8,v9,v10,v11,v12,v13,v14);
+		}
+
 	}
 
 

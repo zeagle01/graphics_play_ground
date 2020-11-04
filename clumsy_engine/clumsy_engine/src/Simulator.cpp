@@ -14,16 +14,14 @@
 
 namespace clumsy_engine
 {
-	using namespace data;
+	//using namespace data;
 
 	Simulator::Simulator()
 	{
 
 		for_each_type<all_types, build_sim_data>(m_data_map);
-		for_each_type1<all_types ,build_dependent>(m_data_map);
+		for_each_depend_type<all_types ,build_dependent>(m_data_map);
 
-		//double_for_each_type<data::all_variables, build_sim_data>(m_data_map);
-			
 	}
 
 
@@ -31,13 +29,13 @@ namespace clumsy_engine
 
 	std::vector<float> Simulator::get_delta_positions()
 	{
-		const auto& positions = m_data_map.get_data<Position>();
+		const auto& positions = m_data_map.get_data<data::Position>();
 
 		std::vector<float> ret(positions.size());
 
 		for (int i = 0; i < positions.size(); i++)
 		{
-			ret[i] = positions[i] - get<Last_Frame_Position>()[i];
+			ret[i] = positions[i] - get<data::Last_Frame_Position>()[i];
 		}
 		return ret;
 	}
@@ -61,13 +59,13 @@ namespace clumsy_engine
 
 
 		///////////// update////////////
-		const auto& m_positions = get<Position>();
+		const auto& m_positions = get<data::Position>();
 		auto positions = m_positions;
-		set<Last_Frame_Position>(positions);
+		set<data::Last_Frame_Position>(positions);
 
 		m_solver->solve(positions, equations);
 
-		set<Position>(positions);
+		set<data::Position>(positions);
 
 		auto inertial = m_interactions_map.get<Inertial>();
 
@@ -79,7 +77,7 @@ namespace clumsy_engine
 
 			for (int i = 0; i < positions.size(); i++)
 			{
-				velocity[i] = (positions[i] - get<Last_Frame_Position>()[i]) / time_step;
+				velocity[i] = (positions[i] - get<data::Last_Frame_Position>()[i]) / time_step;
 			}
 
 			set<data::Velocity>(velocity);//maybe optimization?

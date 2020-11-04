@@ -114,7 +114,7 @@ public:
 
 		m_sim.set<data::Position>(m_positions);
 
-		m_sim.set<data::Triangle_Indices>(m_triangles);
+		m_sim.set<data::Triangle_Indice>(m_triangles);
 	}
 
 };

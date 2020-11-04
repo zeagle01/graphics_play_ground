@@ -38,11 +38,11 @@ namespace clumsy_engine
 			}
 			else
 			{
-				auto ret = std::make_shared<Sub_T>();
+				//auto ret = std::make_shared<Sub_T>();
 
-				add(ret);
+				//add(ret);
 
-				return ret;
+				return nullptr;
 			}
 
 		}
