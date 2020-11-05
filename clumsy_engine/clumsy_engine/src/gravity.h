@@ -14,11 +14,11 @@
 namespace clumsy_engine
 {
 
-	class Gravity :public Interaction
+	class Gravity :public Interaction, public Simulation_Data_Acc<type_list<data::Gravity, data::Position>>
 	{
 	public:
 
-		using dependent_variables = type_list<data::Gravity,data::Position>; //TODO
+		//using dependent_variables = type_list<data::Gravity,data::Position>; //TODO
 
 		std::vector<stencil> compute_stencils() override;
 

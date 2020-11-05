@@ -18,6 +18,7 @@ public:
 		{ 0,0,0,
 			1,0,0 };
 
+
 		m_spring_stretch.set<data::Position>(m_positions);
 	}
 

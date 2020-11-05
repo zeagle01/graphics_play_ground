@@ -4,6 +4,7 @@
 
 #include <map>
 #include <memory>
+#include "type_list.h"
 
 
 namespace clumsy_engine
@@ -90,6 +91,11 @@ namespace clumsy_engine
 		{
 			static_assert(std::is_convertible_v<dataT, T::data_type>);
 			auto sim_data = m_sim_datas.get<T>();
+			if (!sim_data)
+			{
+				sim_data = std::make_shared<T>();
+				m_sim_datas.add(std::make_shared<T>());
+			}
 			sim_data->set(d);
 		}
 
@@ -112,4 +118,48 @@ namespace clumsy_engine
 
 	};
 
+
+	template<typename tl>
+	class Simulation_Data_Acc
+	{
+	public:
+		using types = tl;
+
+
+		void set_(std::shared_ptr<Simulation_Datas> sim_datas)
+		{
+			m_data_map = sim_datas;
+		}
+
+		template<typename T, typename dataT = T::data_type>
+		void set(const dataT& d)
+		{
+
+			static_assert(is_in<T, tl>);
+			
+			static_assert(std::is_convertible_v<dataT, T::data_type>);
+
+			auto n0 = typeid(dataT).name();
+			auto n1 = typeid(T::data_type).name();
+
+			if (!m_data_map)
+			{
+				m_data_map = std::make_shared<Simulation_Datas>();
+			}
+
+			m_data_map->set_data<T, dataT>(d);
+		}
+
+		template<typename T>
+		const auto& get()
+		{
+			static_assert(is_in<T, tl>);
+			return m_data_map->get_data<T>();
+		}
+
+
+	private:
+		std::shared_ptr<Simulation_Datas >m_data_map;
+
+	};
 }

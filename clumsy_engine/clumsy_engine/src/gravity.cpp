@@ -28,7 +28,7 @@ namespace clumsy_engine
 
 		float mass = 1.f;//TODO
 
-		const auto& gravity = get_data<data::Gravity>();
+		const auto& gravity = get<data::Gravity>();
 
 		ret.b = std::vector<float>
 		{

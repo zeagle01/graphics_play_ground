@@ -7,10 +7,10 @@
 
 namespace clumsy_engine
 {
-	class Spring_Stretch :public Interaction
+	class Spring_Stretch :public Interaction, public Simulation_Data_Acc<type_list<data::Position>>
 	{
 	public:
-		using dependent_variables = type_list<data::Position>; 
+		//using dependent_variables = type_list<data::Position>; 
 
 		std::vector<stencil> compute_stencils() override;
 

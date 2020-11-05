@@ -19,7 +19,7 @@ namespace clumsy_engine
 		Element_Equation ret = Element_Equation::with_size(st.size());
 		ret.stencil = st;
 
-		const auto& positions = get_data<data::Position>();
+		const auto& positions = get<data::Position>();
 
 		float w[] = { -1,1 };
 		float x[] = {

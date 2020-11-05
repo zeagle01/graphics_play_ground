@@ -12,12 +12,11 @@ namespace clumsy_engine
 {
 
 
-	class Inertial :public Interaction
+	class Inertial :public Interaction,public Simulation_Data_Acc<type_list<data::Position, data::Time_Step>>
 	{
 	public:
 
-		using dependent_variables = type_list<data::Position, data::Time_Step>; 
-
+		//using dependent_variables = type_list<data::Position, data::Time_Step>; 
 
 		std::vector<stencil> compute_stencils() override;
 

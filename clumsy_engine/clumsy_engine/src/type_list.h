@@ -82,6 +82,33 @@ namespace clumsy_engine
 	inline constexpr bool is_empty = is_empty_imp<L>::value;
 
 
+	//is_in
+	template<typename T,typename L>
+	struct is_in_imp
+	{
+		static inline constexpr bool value = false;
+	};
+
+	template<typename T>
+	struct is_in_imp<T,type_list<>>
+	{
+		static inline constexpr bool value = false;
+	};
+
+	template<typename T, typename H, typename ...P>
+	struct is_in_imp<T, type_list<H, P...>>
+	{
+		static inline constexpr bool value = std::conditional_t<
+			std::is_same_v<T, H>,
+			std::true_type,
+			is_in_imp<T, type_list<P...>>
+			>::value;
+	};
+
+	template<typename T,typename L>
+	inline constexpr bool is_in= is_in_imp<T, L>::value;
+
+
 
 
 	///

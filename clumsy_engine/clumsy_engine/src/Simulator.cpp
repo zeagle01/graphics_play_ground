@@ -19,8 +19,13 @@ namespace clumsy_engine
 	Simulator::Simulator()
 	{
 
-		for_each_type<all_types, build_sim_data>(m_data_map);
-		for_each_depend_type<all_types ,build_dependent>(m_data_map);
+		m_data_map = std::make_shared<Simulation_Datas>();
+
+		set_(m_data_map);
+
+		for_each_type<all_types, build_sim_data>(*m_data_map);
+
+		for_each_depend_type<all_types ,build_dependent>(*m_data_map);
 
 	}
 
@@ -29,7 +34,7 @@ namespace clumsy_engine
 
 	std::vector<float> Simulator::get_delta_positions()
 	{
-		const auto& positions = m_data_map.get_data<data::Position>();
+		const auto& positions = get<data::Position>();
 
 		std::vector<float> ret(positions.size());
 
