@@ -13,9 +13,8 @@ namespace clumsy_engine
 	{
 		One_Point_Stencils st;
 
-		const auto& positions = get<data::Position>();
 
-		return st(positions.size() / 3);
+		return st(get<data::Vertex_Num>());
 
 	}
 

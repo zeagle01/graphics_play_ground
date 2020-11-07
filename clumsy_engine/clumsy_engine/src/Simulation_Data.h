@@ -202,15 +202,6 @@ namespace clumsy_engine
 	};
 
 
-	struct extract_sim_data
-	{
-		template<typename T>
-		static void apply(Simulation_Datas& subset_sim_datas, Simulation_Datas& all_sim_datas)
-		{
-			auto sim_data = all_sim_datas.get_sim_data<T>();
-			subset_sim_datas.add_sim_data(sim_data);
-		}
-	};
 
 	struct build_sim_data 
 	{

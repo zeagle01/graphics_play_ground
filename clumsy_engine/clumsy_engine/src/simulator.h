@@ -20,8 +20,6 @@ namespace clumsy_engine
 {
 
 	class Interaction;
-	class System_Equations_Solver;
-	class Data_Base;
 
 
 	class Simulator:public Simulation_Data_Acc<all_types>

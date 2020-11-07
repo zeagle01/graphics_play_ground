@@ -35,13 +35,9 @@ namespace clumsy_engine
 			if (type_map.count(key))
 			{
 				return std::dynamic_pointer_cast<Sub_T>(type_map[key]);
-				//return dynamic_cast<Sub_T*>(type_map[key]);
 			}
 			else
 			{
-				//auto ret = std::make_shared<Sub_T>();
-
-				//add(ret);
 
 				return nullptr;
 			}
