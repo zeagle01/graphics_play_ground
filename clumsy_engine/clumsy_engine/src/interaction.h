@@ -28,18 +28,6 @@ namespace clumsy_engine
 
 
 
-//		template<typename T, typename dataT = T::data_type>
-//		void set(const dataT& d)
-//		{
-//			static_assert(std::is_same_v<dataT, T::data_type>);
-//			m_sim_datas.set_data<T, dataT>(d);
-//		}
-//
-//		template<typename T>
-//		const auto& get()
-//		{
-//			return m_sim_datas.get_data<T>();
-//		}
 //
 //
 //		template<typename tl>

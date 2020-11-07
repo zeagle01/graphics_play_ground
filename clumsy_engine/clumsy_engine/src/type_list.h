@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <concepts>
+
 
 
 namespace clumsy_engine
@@ -109,6 +111,8 @@ namespace clumsy_engine
 	inline constexpr bool is_in= is_in_imp<T, L>::value;
 
 
+	template<typename T,typename tl>
+	concept Type_In_List = is_in<T, tl>;
 
 
 	///

@@ -65,7 +65,7 @@ namespace clumsy_engine
 		bool m_dirty = false;
 	};
 
-	template<typename T, typename Computer=Plain_Computer ,typename dependent_types = type_list<>>
+	template<typename T, typename Computer = Plain_Computer, typename dependent_types = type_list<>>
 	class Dependent_Data :public Node, public Data_Base
 	{
 
@@ -73,6 +73,12 @@ namespace clumsy_engine
 		using data_type = T;
 		using dependent_variables = dependent_types;
 		T data;
+		Dependent_Data() 
+		{
+			m_senders = std::make_shared<Simulation_Datas>();
+			m_sender_acc.set_(m_senders);
+		}
+
 		void set(const T& d)
 		{
 			data = d;
@@ -86,7 +92,8 @@ namespace clumsy_engine
 		{
 			if (is_dirty())
 			{
-				Computer::apply(m_senders, data);
+
+				Computer::apply(m_sender_acc, data);
 				set_dirty(false);
 			}
 			return data;
@@ -98,18 +105,22 @@ namespace clumsy_engine
 		{
 			sender->add_child(this);
 
-			m_senders.add_sim_data(sender);
+			m_senders->add_sim_data(sender);
 		}
 
 	protected:
-		Simulation_Datas m_senders;
+
+		Simulation_Data_Acc<dependent_variables> m_sender_acc;
+		std::shared_ptr<Simulation_Datas> m_senders;
 	};
 
 
+	using empty_deps = type_list<>;
+
 	struct Plain_Computer
 	{
-		template<typename T>
-		static void apply(Simulation_Datas& datas, T& d) {}
+		template<typename tl,typename T>
+		static void apply(Simulation_Data_Acc<tl>& datas, T& d) {}
 	};
 
 
@@ -125,7 +136,6 @@ namespace clumsy_engine
 
 	struct data
 	{
-		using empty_deps = type_list<>;
 		using vf = std::vector<float>;
 		using vi = std::vector<int>;
 

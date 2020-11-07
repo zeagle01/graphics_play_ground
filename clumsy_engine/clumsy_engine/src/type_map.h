@@ -5,7 +5,6 @@
 #include <map>
 #include <memory>
 #include "type_list.h"
-#include <concepts>
 
 
 namespace clumsy_engine
@@ -61,6 +60,8 @@ namespace clumsy_engine
 
 		std::map<std::string, std::shared_ptr<Base_T>> type_map;
 	};
+
+	//using Sim_Data_Ptr = std::shared_ptr<Type_Map<Data_Base>>;
 
 	class Simulation_Datas
 	{
@@ -120,6 +121,7 @@ namespace clumsy_engine
 	};
 
 
+
 	template<typename tl>
 	class Simulation_Data_Acc
 	{
@@ -133,11 +135,10 @@ namespace clumsy_engine
 		}
 
 		template<typename T, typename dataT = T::data_type>
+		requires Type_In_List<T,tl>
 		void set(const dataT& d)
 		{
 
-			static_assert(is_in<T, tl>);
-			
 			static_assert(std::is_convertible_v<dataT, T::data_type>);
 
 			auto n0 = typeid(dataT).name();
@@ -152,9 +153,9 @@ namespace clumsy_engine
 		}
 
 		template<typename T>
+		requires Type_In_List<T,tl>
 		const auto& get()
 		{
-			static_assert(is_in<T, tl>);
 			return m_data_map->get_data<T>();
 		}
 
@@ -163,4 +164,6 @@ namespace clumsy_engine
 		std::shared_ptr<Simulation_Datas >m_data_map;
 
 	};
+
+
 }
