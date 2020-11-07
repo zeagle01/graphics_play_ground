@@ -27,21 +27,7 @@ public:
 
 protected:
 
-	std::vector<float>  setup_and_update()
-	{
-
-		m_sim.update();
-
-		return m_sim.get<data::Delta_Position>();
-
-	}
-
-
 	std::vector<float> m_positions;
-
-	std::vector<int> m_triangles;
-
-	int m_vertex_num;
 
 	Simulator m_sim;
 
@@ -59,8 +45,6 @@ public:
 	{
 		m_positions = std::vector<float>(3, 0.f);
 
-		m_vertex_num = m_positions.size() / 3;
-
 		m_sim.set<data::Position>(m_positions);
 
 	}
@@ -71,7 +55,9 @@ public:
 TEST_F(One_Vertex, without_any_interaction_just_floating_there)
 {
 
-	auto act = setup_and_update();
+	 m_sim.update();
+
+	 auto act = m_sim.get<data::Delta_Position>();
 
 	std::vector<float> exp = {
 		0,0.0,0
@@ -88,7 +74,9 @@ TEST_F(One_Vertex, update_with_gravity_only)
 
 	m_sim.set<data::Gravity>({ 0,-10,0 });
 
-	auto act = setup_and_update();
+	m_sim.update();
+	
+	auto act = m_sim.get<data::Delta_Position>();
 
 	std::vector<float> exp = {
 		0,-0.1,0
@@ -108,13 +96,11 @@ public:
 			1, 0,0
 			};
 
-		m_vertex_num = m_positions.size() / 3;
-
 		m_sim.add_interaction<Spring_Stretch>();
 
 		m_sim.set<data::Position>(m_positions);
 
-		m_sim.set<data::Triangle_Indice>(m_triangles);
+		m_sim.set<data::Edge_Indice>({ 0,1 });
 	}
 
 };
@@ -123,9 +109,12 @@ public:
 TEST_F(One_Edge, update_with_one_edge)
 {
 
-	setup_and_update();
+	m_sim.update();
+//	m_sim.update();
+//	m_sim.update();
+//	m_sim.update();
 
-	auto act = m_sim.get_edge_lengths();
+	auto act = m_sim.get<data::Edge_Length>();
 
 	std::vector<float> exp = { 1 };
 

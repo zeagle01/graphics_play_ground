@@ -35,15 +35,15 @@ protected:
 };
 
 
-TEST_F(Spring_Stretch_Test, one_spring_stencil)
-{
-	auto stencils = m_spring_stretch.compute_stencils();
-
-	std::vector<stencil> exp{ {0,1} };
-
-	EXPECT_THAT(stencils, Eq(exp));
-
-}
+//TEST_F(Spring_Stretch_Test, one_spring_stencil)
+//{
+//	auto stencils = m_spring_stretch.compute_stencils();
+//
+//	std::vector<stencil> exp{ {0,1} };
+//
+//	EXPECT_THAT(stencils, Eq(exp));
+//
+//}
 
 TEST_F(Spring_Stretch_Test, one_spring_equation)
 {

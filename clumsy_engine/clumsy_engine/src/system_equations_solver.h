@@ -14,14 +14,6 @@ namespace clumsy_engine
 
 	struct Element_Equation
 	{
-//		Element_Equation() = default;
-//		Element_Equation(int vNum)
-//		{
-//			A.resize(vNum * vNum);
-//			b.resize(vNum * 3);
-//			stencil.resize(vNum);
-//		}
-
 
 		std::vector<float> A;
 		std::vector<float> b;

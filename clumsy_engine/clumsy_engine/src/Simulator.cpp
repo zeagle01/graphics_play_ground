@@ -30,21 +30,6 @@ namespace clumsy_engine
 	}
 
 
-
-
-	std::vector<float> Simulator::get_delta_positions()
-	{
-		const auto& positions = get<data::Position>();
-
-		std::vector<float> ret(positions.size());
-
-		for (int i = 0; i < positions.size(); i++)
-		{
-			ret[i] = positions[i] - get<data::Last_Frame_Position>()[i];
-		}
-		return ret;
-	}
-
 	void Simulator::update()
 	{
 
@@ -53,6 +38,10 @@ namespace clumsy_engine
 		{
 			m_solver = std::make_unique<System_Equations_Solver>();
 		}
+
+		//back up last
+		auto positions = get<data::Position>();
+		set<data::Last_Frame_Position>(positions);
 
 		std::vector<Element_Equation> equations;
 		for (auto& it : m_interactions_map)
@@ -64,10 +53,6 @@ namespace clumsy_engine
 
 
 		///////////// update////////////
-		const auto& m_positions = get<data::Position>();
-		auto positions = m_positions;
-		set<data::Last_Frame_Position>(positions);
-
 		m_solver->solve(positions, equations);
 
 		set<data::Position>(positions);
@@ -87,11 +72,6 @@ namespace clumsy_engine
 
 			set<data::Velocity>(velocity);//maybe optimization?
 		}
-	}
-
-	std::vector<float> Simulator::get_edge_lengths()
-	{
-		return { 1. };
 	}
 
 }

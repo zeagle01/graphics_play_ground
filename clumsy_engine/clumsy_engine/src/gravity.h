@@ -18,8 +18,6 @@ namespace clumsy_engine
 	{
 	public:
 
-		//using dependent_variables = type_list<data::Gravity,data::Position>; //TODO
-
 		std::vector<stencil> compute_stencils() override;
 
 		Element_Equation compute_element_equation(stencil st) override;

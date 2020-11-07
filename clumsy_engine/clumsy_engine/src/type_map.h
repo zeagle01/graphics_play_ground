@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include "type_list.h"
+#include <concepts>
 
 
 namespace clumsy_engine
@@ -94,7 +95,7 @@ namespace clumsy_engine
 			if (!sim_data)
 			{
 				sim_data = std::make_shared<T>();
-				m_sim_datas.add(std::make_shared<T>());
+				m_sim_datas.add(sim_data);
 			}
 			sim_data->set(d);
 		}

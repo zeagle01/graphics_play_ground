@@ -8,20 +8,32 @@ namespace clumsy_engine
 
 	class Simulation_Datas;
 
-	struct Copy_If_Empty {
-		template<typename T>
-		static void apply(const T& datas, T& d)
+	template<typename L, typename V, int N = 1>
+	struct Allocate_With_Size {
+		static void apply(Simulation_Datas& datas, L& d)
 		{
-			if (d.size() != datas.size())
+			auto size = datas.get_data<V>();
+			if (d.empty())
 			{
-				d = datas;
+				d.resize(size * N);
 			}
 		}
 	};
 
-	struct Compute_Last_Frame_Position { static void apply(Simulation_Datas& datas, std::vector<float>& d); };
+	template<typename L,int Dim>
+	struct Get_List_Size {
+		static void apply(Simulation_Datas& datas, int& d)
+		{
+			d = datas.get_data<L>().size()/Dim;
+		}
+	};
+
+
 	struct Delta { static void apply(Simulation_Datas& datas, std::vector<float>& d); };
+
 	struct Compute_Edge_Length { static void apply(Simulation_Datas& datas, std::vector<float>& d); };
+
+	struct Compute_Edge_Indices { static void apply(Simulation_Datas& datas, std::vector<int>& d); };
 
 
 }

@@ -75,3 +75,48 @@ TEST_F(With_Only_Diagnal_Term, equation_with_only_inertial_term)
 }
 
 
+
+TEST_F(System_Equations_Solver_Test, equation_with_one_spring)
+{
+
+	int v_num = 2;
+
+	Element_Equation d0
+	{
+		{1000},
+		{0,0,0},
+		{0}
+	};
+
+	Element_Equation d1
+	{
+		{1000},
+		{1000,0,0},
+		{1}
+	};
+
+	Element_Equation s0
+	{
+		{1,-1,-1,1},
+		{ -1,0,0,
+		1,0,0 },
+		{0,1}
+	};
+
+	std::vector<Element_Equation> eqs{ d0,d1,s0 };
+
+
+	std::vector<float> act{ 0,0,0,2,0,0 };
+	m_solver.solve(act, eqs);
+	m_solver.solve(act, eqs);
+	m_solver.solve(act, eqs);
+	m_solver.solve(act, eqs);
+	m_solver.solve(act, eqs);
+	m_solver.solve(act, eqs);
+	m_solver.solve(act, eqs);
+	m_solver.solve(act, eqs);
+	m_solver.solve(act, eqs);
+	std::vector<float> exp{ 0,0,0,1,0,0 };
+
+	EXPECT_THAT(act, Eq(exp));
+}

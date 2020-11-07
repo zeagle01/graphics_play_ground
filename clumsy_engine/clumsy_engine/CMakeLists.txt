@@ -65,6 +65,7 @@ test/spring_stretch_test.cpp
 test/system_equations_solver_test.cpp
 test/signal_test.cpp
 test/simulation_data_test.cpp
+test/data_computes_test.cpp
 )
 
 set(include_files

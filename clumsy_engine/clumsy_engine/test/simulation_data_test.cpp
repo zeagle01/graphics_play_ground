@@ -9,6 +9,17 @@ using namespace clumsy_engine;
 
 
 //////////////////////////////////////////////////////////
+template<typename sender_T>
+struct Foward
+{
+	template<typename T>
+	static void apply(Simulation_Datas& datas, T& d)
+	{
+		auto input = datas.get_data<sender_T>();
+		d = input;
+	}
+};
+
 class Dependent_Data_Test:public Test
 {
 protected:
@@ -22,15 +33,9 @@ protected:
 	}
 
 	class Node0 :public Dependent_Data<int> { };
-	class Node1 :public Dependent_Data<float> 
-	{ 
-	public:
-		void compute(float& d)
-		{
-			auto input=m_senders.get_data<Node0>();
-			d = input;
-		}
-	};
+
+
+	class Node1 :public Dependent_Data<float,Foward<Node0>> {};
 
 
 	std::shared_ptr<Node0 >m_data0;
@@ -68,15 +73,7 @@ protected:
 		m_data2->add_sender(m_data1);
 	}
 
-	class Node2 :public Dependent_Data<double> 
-	{ 
-	public:
-		void compute(data_type& d)
-		{
-			auto input = m_senders.get_data<Node1>();
-			d = input;
-		}
-	};
+	class Node2 :public Dependent_Data<double, Foward<Node1>> {};
 
 
 	std::shared_ptr<Node0> m_data0;

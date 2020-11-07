@@ -45,15 +45,6 @@ namespace clumsy_engine
 
 		}
 
-	public:
-
-
-
-		std::vector<float> get_edge_lengths();
-		std::vector<float> get_delta_positions() ;
-
-
-
 
 	private:
 
