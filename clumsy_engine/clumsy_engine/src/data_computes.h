@@ -6,7 +6,16 @@
 namespace clumsy_engine
 {
 
-	class Simulation_Datas;
+
+
+	template<typename T,typename U>
+	void Resize_If_Empty(T& dst,const U& src )
+	{
+		if (dst.empty())
+		{
+			dst.resize(src.size());
+		}
+	}
 
 	template<typename L, typename V, int N = 1>
 	struct Allocate_With_Size {
@@ -112,6 +121,97 @@ namespace clumsy_engine
 		}
 	};
 
+	struct Compute_Triangle_Area
+	{
+		template<typename sim_acc_T>
+		static void apply(sim_acc_T& datas, std::vector<float>& triangle_area)
+		{
+			const auto& triangle_indice = datas.get<data::Triangle_Indice>();
+			const auto& position = datas.get<data::Position>();
+
+			int t_num = triangle_indice.size() / 3;
+			if (triangle_area.size() != t_num)
+			{
+				triangle_area.resize(t_num);
+			}
+			for (int i = 0; i < t_num; i++)
+			{
+				int v[]{ triangle_indice[i * 3 + 0],triangle_indice[i * 3 + 1],triangle_indice[i * 3 + 2] };
+				float x[]{
+					position[v[0]*3+0], position[v[0]*3+1], position[v[0]*3+2],
+					position[v[1]*3+0], position[v[1]*3+1], position[v[2]*3+2],
+					position[v[2]*3+0], position[v[2]*3+1], position[v[2]*3+2]
+				};
+
+				float d[2 * 3];
+				for (int j = 0; j < 2; j++)
+				{
+					for (int k = 0; k < 3; k++)
+					{
+						d[j * 3 + k] = x[j * 3 + k] - x[2 * 3 + k];
+					}
+				}
+
+				float cross[3];
+				cross[0] = d[0 * 3 + 1] * d[1 * 3 + 2] - d[0 * 3 + 2] * d[1 * 3 + 1];
+				cross[1] = -d[0 * 3 + 0] * d[1 * 3 + 2] + d[0 * 3 + 2] * d[1 * 3 + 0];
+				cross[2] = d[0 * 3 + 0] * d[1 * 3 + 1] - d[0 * 3 + 1] * d[1 * 3 + 0];
+
+				float l = 0;
+				for (int i = 0; i < 3; i++)
+				{
+					l += cross[i] * cross[i];
+				}
+				l = std::sqrt(l);
+				l = 0.5f * l;
+				triangle_area[i] = l;
+			}
+
+		}
+	};
+
+	struct Compute_Vertex_Area
+	{
+		template<typename sim_acc_T>
+		static void apply(sim_acc_T& datas, std::vector<float>& vertex_area)
+		{
+			auto triangle_area = datas.get<data::Triangle_Area>();
+			auto triangle_indice = datas.get<data::Triangle_Indice>();
+			auto v_num = datas.get<data::Vertex_Num>();
+			if (vertex_area.size() != v_num)
+			{
+				vertex_area.resize(v_num);
+			}
+
+			for (int i = 0; i < triangle_area.size(); i++)
+			{
+				for (int vi = 0; vi < 3; vi++)
+				{
+					int v = triangle_indice[i * 3 + vi];
+					vertex_area[v] += triangle_area[i] / 3;
+				}
+			}
+
+		}
+	};
+
+	struct Compute_Mass { 
+
+		template<typename sim_acc_T>
+		static void apply(sim_acc_T& datas, std::vector<float>& mass)
+		{
+			auto vertex_areas = datas.get<data::Vertex_Area>();
+			auto density = datas.get<data::Mass_Density>();
+
+			Resize_If_Empty(mass, vertex_areas);
+
+			for (int i = 0; i < vertex_areas.size(); i++)
+			{
+				mass[i] = density * vertex_areas[i];
+			}
+
+		}
+	};
 
 }
 

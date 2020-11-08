@@ -23,6 +23,9 @@ public:
 
 		m_sim.set<data::Time_Step>(0.1);
 
+		//m_sim.set<data::Mass_Density>(1.);
+
+
 	}
 
 protected:
@@ -46,6 +49,8 @@ public:
 		m_positions = std::vector<float>(3, 0.f);
 
 		m_sim.set<data::Position>(m_positions);
+
+		m_sim.set<data::Mass>({ 1.f });
 
 	}
 
@@ -100,6 +105,8 @@ public:
 
 		m_sim.set<data::Position>(m_positions);
 
+		m_sim.set<data::Mass>({ 1.f,1.f });
+
 		m_sim.set<data::Edge_Indice>({ 0,1 });
 	}
 
@@ -118,7 +125,7 @@ TEST_F(One_Edge, update_with_one_edge)
 
 	std::vector<float> exp = { 1 };
 
-	EXPECT_THAT(act, Eq(exp));
+	EXPECT_THAT(act[0], FloatNear(exp[0],1e-2f));
 
 }
 

@@ -21,16 +21,19 @@ namespace clumsy_engine
 
 		Element_Equation eq;
 
-		float mass = 1.f;//TODO
 
 		const auto& lastPos = get<data::Last_Frame_Position>();
 		const auto& velocity = get<data::Velocity>();
+		const auto& mass = get<data::Mass>();
 
 		float time_step = get<data::Time_Step>();
 
 		int v = st[0];
 
-		float k = mass / time_step / time_step;
+		float mass_v = mass[v];//TODO
+
+		float k = mass_v / time_step / time_step;
+
 		eq.A = std::vector<float>{k};
 
 		eq.b = std::vector<float>

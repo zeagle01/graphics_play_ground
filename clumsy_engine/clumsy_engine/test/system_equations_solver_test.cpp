@@ -118,5 +118,8 @@ TEST_F(System_Equations_Solver_Test, equation_with_one_spring)
 	m_solver.solve(act, eqs);
 	std::vector<float> exp{ 0,0,0,1,0,0 };
 
-	EXPECT_THAT(act, Eq(exp));
+	for (int i = 0; i < exp.size(); i++)
+	{
+		EXPECT_THAT(act[i], FloatNear(exp[i], 1e-2f));
+	}
 }

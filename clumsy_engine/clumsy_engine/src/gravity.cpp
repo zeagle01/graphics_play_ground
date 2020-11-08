@@ -25,18 +25,21 @@ namespace clumsy_engine
 
 		ret.A = std::vector<float>{ 0.f };
 
-		float mass = 1.f;//TODO
+		int v = st[0];
 
 		const auto& gravity = get<data::Gravity>();
+		const auto& mass = get<data::Mass>();
+
+		float mass_v = mass[v];//TODO
 
 		ret.b = std::vector<float>
 		{
-			mass * gravity[0],
-			mass * gravity[1],
-			mass * gravity[2]
+			mass_v * gravity[0],
+			mass_v * gravity[1],
+			mass_v * gravity[2]
 		};
 
-		ret.stencil = std::vector<int>{ st[0] };
+		ret.stencil = std::vector<int>{v};
 
 		return ret;
 

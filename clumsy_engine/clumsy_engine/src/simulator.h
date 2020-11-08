@@ -10,7 +10,6 @@
 #include <string>
 #include <typeinfo>
 
-#include "data_connections.h"
 #include "type_map.h"
 #include "Simulation_Data.h"
 
@@ -24,7 +23,6 @@ namespace clumsy_engine
 
 	class Simulator:public Simulation_Data_Acc<all_types>
 	{
-		friend Data_Connections;
 	public:
 
 		Simulator();

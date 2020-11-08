@@ -47,8 +47,6 @@ src/spring_stretch.cpp
 src/one_point_stencils.h
 src/one_point_stencils.cpp
 src/signal.h
-src/data_connections.h
-src/data_connections.cpp
 src/type_map.h
 src/type_map.cpp
 src/type_list.h

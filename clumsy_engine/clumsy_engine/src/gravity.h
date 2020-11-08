@@ -14,7 +14,7 @@
 namespace clumsy_engine
 {
 
-	class Gravity :public Interaction, public Simulation_Data_Acc<type_list<data::Gravity, data::Vertex_Num>>
+	class Gravity :public Interaction, public Simulation_Data_Acc<type_list<data::Gravity,data::Mass, data::Vertex_Num>>
 	{
 	public:
 
