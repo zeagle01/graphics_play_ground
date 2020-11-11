@@ -30,6 +30,12 @@ src/windows_input.cpp
 src/input.cpp
 src/dispatcher.h
 src/dispatcher.cpp
+
+src/graphic_context.h
+src/opengl_context.h
+src/opengl_context.cpp
+
+
 src/simulator.h
 src/simulator.cpp
 src/interaction.h

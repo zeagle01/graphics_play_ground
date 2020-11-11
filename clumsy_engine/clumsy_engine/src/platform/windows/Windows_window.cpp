@@ -8,8 +8,10 @@
 #include "mouse_event.h"
 #include "key_event.h"
 #include "application_event.h"
+#include "graphic_context.h"
+#include "opengl_context.h"
 
-#include "glad/glad.h" //put glad first before other opengl include
+//#include "glad/glad.h" //put glad first before other opengl include
 #include "GLFW/glfw3.h"
 
 namespace clumsy_engine
@@ -31,7 +33,7 @@ namespace clumsy_engine
 	void Windows_Window::on_update()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_window);
+		m_context->swap_buffers();
 	}
 
 	void Windows_Window::init(const Window_Property& p)
@@ -41,6 +43,7 @@ namespace clumsy_engine
 		m_window_data.title = p.title;
 
 		CE_CORE_TRACE("creating window {0},({1},{2})", p.title, p.width, p.height);
+
 
 		if (!s_GLFW_initialized)
 		{
@@ -61,12 +64,11 @@ namespace clumsy_engine
 			CE_CORE_TRACE("windows {0} is created!", (void*)m_window);
 		}
 
+		m_context = std::make_shared<OpenGL_Context>(m_window);
 
-		glfwMakeContextCurrent(m_window);
+		m_context->init();
 
-		//right after make context current(need a context)
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		CE_CORE_ASSERT(status, "glad load failed");
+
 
 		glfwSetWindowUserPointer(m_window, &m_window_data);
 		set_vertical_sync(true);

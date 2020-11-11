@@ -12,6 +12,8 @@ struct GLFWwindow;
 namespace clumsy_engine
 {
 
+	class Graphic_Context;
+
 	class Windows_Window :public Window
 	{
 	public:
@@ -35,6 +37,9 @@ namespace clumsy_engine
 	private:
 
 		GLFWwindow* m_window;
+
+		std::shared_ptr<Graphic_Context> m_context;
+
 
 		struct Window_Data
 		{
