@@ -51,6 +51,34 @@ namespace clumsy_engine
 
 		m_imgui_layer = std::make_shared<Imgui_Layer>();
 		push_overlay(m_imgui_layer);
+
+
+		//gl data stuff
+		glGenVertexArrays(1,&m_vertex_array);
+		glBindVertexArray(m_vertex_array);
+
+		glGenBuffers(1, &m_vertex_buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
+
+		std::vector<float> positions{
+			0.,0,0,
+			1,0,0,
+			1,1,0
+		};
+
+		std::vector<int> triangles{
+			0,1,2
+		};
+
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * positions.size(), positions.data(), GL_DYNAMIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+
+		glGenBuffers(1, &m_index_buffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index_buffer);
+
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * triangles.size(), triangles.data(), GL_DYNAMIC_DRAW);
 	}
 
 	Application:: ~Application()
@@ -90,8 +118,20 @@ namespace clumsy_engine
 
 		while (m_is_running)
 		{
-			glClearColor(0.8, 0.1, 0.3, 0.2);
+			glClearColor(0.2, 0.1, 0.3, 0.2);
 			glClear(GL_COLOR_BUFFER_BIT);
+
+			std::vector<float> pp{
+			0.,0,0,
+			-1,0,0,
+			1,1,0
+			};
+
+			glBindVertexArray(m_vertex_array);
+
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * pp.size(), pp.data(), GL_DYNAMIC_DRAW);
+
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 
 			for (auto& layer : *m_layer_stack)
 			{

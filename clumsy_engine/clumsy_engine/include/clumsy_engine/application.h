@@ -57,7 +57,11 @@ namespace clumsy_engine
 		std::unique_ptr<Layer_Stack> m_layer_stack;
 
 	private:
+		unsigned int m_vertex_array, m_vertex_buffer, m_index_buffer;
+
+	private:
 		bool On_Window_Close(Window_Close_Event& e);
+
 	};
 
 	extern std::unique_ptr<clumsy_engine::Application> create_application();

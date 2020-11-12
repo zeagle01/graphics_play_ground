@@ -29,6 +29,9 @@ namespace clumsy_engine
 		//right after make context current(need a context)
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		CE_CORE_ASSERT(status, "glad load failed");
+		CE_CORE_INFO("gl rednerer: {0}", glGetString(GL_RENDERER));
+		CE_CORE_INFO("gl verdor: {0}", glGetString(GL_VENDOR));
+		CE_CORE_INFO("gl version: {0}", glGetString(GL_VERSION));
 	}
 
 
