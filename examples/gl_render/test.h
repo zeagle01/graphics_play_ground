@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include "glog/logging.h"
 
 
 namespace test

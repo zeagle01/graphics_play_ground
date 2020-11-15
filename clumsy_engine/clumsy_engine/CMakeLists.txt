@@ -34,6 +34,8 @@ src/dispatcher.cpp
 src/graphic_context.h
 src/opengl_context.h
 src/opengl_context.cpp
+src/shader.h
+src/shader.cpp
 
 
 src/simulator.h

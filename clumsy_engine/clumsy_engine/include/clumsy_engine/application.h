@@ -16,6 +16,7 @@ namespace clumsy_engine
 	class Layer;
 	class Window;
 	class Imgui_Layer;
+	class Shader;
 	enum class Event_Type;
 	template<typename  Base_T, typename Ret  >
 	class Dispatcher;
@@ -55,6 +56,8 @@ namespace clumsy_engine
 		bool m_is_running;
 
 		std::unique_ptr<Layer_Stack> m_layer_stack;
+
+		std::unique_ptr<Shader> m_shader;
 
 	private:
 		unsigned int m_vertex_array, m_vertex_buffer, m_index_buffer;

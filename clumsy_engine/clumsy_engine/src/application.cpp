@@ -12,6 +12,7 @@
 #include "imgui_layer.h"
 #include "input.h"
 #include "dispatcher.h"
+#include "shader.h"
 
 #include "gmock/gmock.h"
 
@@ -79,6 +80,32 @@ namespace clumsy_engine
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index_buffer);
 
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * triangles.size(), triangles.data(), GL_DYNAMIC_DRAW);
+
+		std::string vertex_src = R"(
+			#version 330 core
+			layout(location=0 ) in vec3 position;
+
+			void main()
+			{
+				gl_Position=vec4(position,1.0);
+			}
+
+		)";
+
+		std::string fragment_src = R"(
+
+			#version 330 core
+			layout(location=0 ) out vec4 color;
+
+			void main()
+			{
+				color=vec4(0.8.0.2,0.3,1.0);
+			}
+
+		)";
+
+		//shader
+		m_shader = std::make_unique<Shader>(vertex_src, fragment_src);
 	}
 
 	Application:: ~Application()
@@ -126,6 +153,8 @@ namespace clumsy_engine
 			-1,0,0,
 			1,1,0
 			};
+
+			m_shader->bind();
 
 			glBindVertexArray(m_vertex_array);
 
