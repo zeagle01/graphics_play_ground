@@ -123,7 +123,7 @@ namespace clumsy_engine
 		{
 			using current_t = front<tl>;
 
-			F::apply<current_t>(std::forward<P>(p)...);
+			F::template apply<current_t>(std::forward<P>(p)...);
 
 			using poped_list = pop_front<tl>;
 
@@ -146,7 +146,7 @@ namespace clumsy_engine
 
 			using current_t1 = front<ctl1>;
 
-			F::apply<current_t0, current_t1>(std::forward<P>(p)...);
+			F::template apply<current_t0, current_t1>(std::forward<P>(p)...);
 
 			using poped_list0 = pop_front<ctl0>;
 			using poped_list1 = pop_front<ctl1>;
@@ -159,7 +159,7 @@ namespace clumsy_engine
 
 			using current_t1 = front<ctl1>;
 
-			F::apply<current_t0, current_t1>(std::forward<P>(p)...);
+			F::template apply<current_t0, current_t1>(std::forward<P>(p)...);
 
 			using poped_list0 = pop_front<tl0>;
 			using poped_list1 = pop_front<ctl1>;

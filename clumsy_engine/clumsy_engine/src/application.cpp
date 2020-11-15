@@ -84,9 +84,11 @@ namespace clumsy_engine
 		std::string vertex_src = R"(
 			#version 330 core
 			layout(location=0 ) in vec3 position;
+			out vec3 v_position;
 
 			void main()
 			{
+				v_position=position;
 				gl_Position=vec4(position,1.0);
 			}
 
@@ -95,11 +97,12 @@ namespace clumsy_engine
 		std::string fragment_src = R"(
 
 			#version 330 core
-			layout(location=0 ) out vec4 color;
+			in vec3 v_position;
+			out vec4 color;
 
 			void main()
 			{
-				color=vec4(0.8.0.2,0.3,1.0);
+				color=vec4(v_position,1.0);
 			}
 
 		)";

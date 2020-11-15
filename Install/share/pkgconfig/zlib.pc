@@ -1,0 +1,12 @@
+
+prefix=E:/hunter_root/_Base/e14bc15/08e6c06/3113548/Install
+exec_prefix=E:/hunter_root/_Base/e14bc15/08e6c06/3113548/Install
+libdir=E:/hunter_root/_Base/e14bc15/08e6c06/3113548/Install/lib
+sharedlibdir=E:/hunter_root/_Base/e14bc15/08e6c06/3113548/Install/lib
+includedir=E:/hunter_root/_Base/e14bc15/08e6c06/3113548/Install/include
+Name: zlib
+Description: zlib compression library
+Version: 1.2.11
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}

@@ -1,13 +1,15 @@
 
 
 #pragma once
+#include <cmath>
 
-#include "simulation_data.h"
+//#include "simulation_data.h"
 
 namespace clumsy_engine
 {
 
 
+	struct data;
 
 	template<typename T,typename U>
 	void Resize_If_Empty(T& dst,const U& src )

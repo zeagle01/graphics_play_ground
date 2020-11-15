@@ -119,8 +119,8 @@ namespace clumsy_engine
 
 	struct Plain_Computer
 	{
-		template<typename tl,typename T>
-		static void apply(Simulation_Data_Acc<tl>& datas, T& d) {}
+		template<typename data_acc,typename T>
+		static void apply(data_acc& datas, T& d) {}
 	};
 
 

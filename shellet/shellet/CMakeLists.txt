@@ -68,37 +68,26 @@ target_link_libraries(shellet_test PRIVATE shellet)
 
 
 
-hunter_add_package(jsoncpp)
-find_package(jsoncpp CONFIG REQUIRED)
+find_package(jsoncpp CONFIG REQUIRED PATHS ${CMAKE_SOURCE_DIR}/Install/lib/cmake/jsoncpp)
 target_link_libraries(shellet PRIVATE jsoncpp_lib_static)
 
 
-#find_package(glad CONFIG REQUIRED)
 target_link_libraries(shellet PUBLIC  glad)
 
-#hunter_add_package(GLFW)
-#find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(shellet PUBLIC  glfw)
 
 
-hunter_add_package(Glog)
-find_package(glog CONFIG REQUIRED)
+find_package(glog CONFIG REQUIRED PATHS ${CMAKE_SOURCE_DIR}/Install/lib/cmake/glog)
 target_link_libraries(shellet PUBLIC glog::glog)
 
-hunter_add_package(gflags)
-find_package(gflags CONFIG REQUIRED)
+find_package(gflags CONFIG REQUIRED PATHS ${CMAKE_SOURCE_DIR}/Install/lib/cmake/gflags)
 target_link_libraries(shellet PUBLIC gflags)
 
 
 
-hunter_add_package(GTest)
-find_package(GMock CONFIG REQUIRED)
+find_package(GMock CONFIG REQUIRED PATHS ${CMAKE_SOURCE_DIR}/Install/lib/cmake/GMock)
 target_link_libraries(shellet_test PRIVATE GMock::gmock)
 
-#include(${CMAKE_SOURCE_DIR}/cmake/gtest.cmake)
-#link_to_gtest(shellet_test ${CMAKE_SOURCE_DIR}/external/gtest)
 
-
-hunter_add_package(Eigen)
 find_package(Eigen3 CONFIG REQUIRED)
 target_link_libraries(shellet PUBLIC Eigen3::Eigen)

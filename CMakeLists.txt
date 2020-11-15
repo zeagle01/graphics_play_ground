@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
-include(cmake/HunterGate.cmake)
-HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.23.214.tar.gz"
-    SHA1 "e14bc153a7f16d6a5eeec845fb0283c8fad8c358"
-)
+#include(cmake/HunterGate.cmake)
+#HunterGate(
+#    URL "https://github.com/ruslo/hunter/archive/v0.23.214.tar.gz"
+#    SHA1 "e14bc153a7f16d6a5eeec845fb0283c8fad8c358"
+#)
 
 project(graphics_play_ground)
 
@@ -22,6 +22,7 @@ add_subdirectory(external/glfw)
 add_subdirectory(common/matrix_math)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 
 #set(cmake_version "3.15")
 #message("${cmake_version}")
