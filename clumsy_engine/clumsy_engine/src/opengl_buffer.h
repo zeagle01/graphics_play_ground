@@ -1,0 +1,47 @@
+
+
+
+
+#pragma once
+#include "buffer.h"
+
+
+namespace clumsy_engine
+{
+
+
+    class OpenGL_Vertex_Buffer:public  Vertex_Buffer
+    {
+        public:
+            OpenGL_Vertex_Buffer(float *vertices, int size);
+            ~OpenGL_Vertex_Buffer();
+
+            void bind() const override;
+            void unbind() const override;
+
+        private:
+            unsigned int m_renderer_id;
+
+
+    };
+
+    class OpenGL_Index_Buffer:public  Index_Buffer
+    {
+        public:
+            OpenGL_Index_Buffer(int *vertices, int size);
+
+            ~OpenGL_Index_Buffer();
+
+            void bind() const override;
+            void unbind() const override;
+
+            int get_count() const override;
+
+        private:
+            unsigned int m_renderer_id;
+            unsigned int m_count;
+
+
+    };
+
+}

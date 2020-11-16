@@ -13,6 +13,7 @@
 #include "input.h"
 #include "dispatcher.h"
 #include "shader.h"
+#include "buffer.h"
 
 #include "gmock/gmock.h"
 
@@ -53,14 +54,7 @@ namespace clumsy_engine
 		m_imgui_layer = std::make_shared<Imgui_Layer>();
 		push_overlay(m_imgui_layer);
 
-
-		//gl data stuff
-		glGenVertexArrays(1,&m_vertex_array);
-		glBindVertexArray(m_vertex_array);
-
-		glGenBuffers(1, &m_vertex_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
-
+		/// data
 		std::vector<float> positions{
 			0.,0,0,
 			1,0,0,
@@ -71,15 +65,16 @@ namespace clumsy_engine
 			0,1,2
 		};
 
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * positions.size(), positions.data(), GL_DYNAMIC_DRAW);
+		//gl data stuff
+		m_vertex_buffer = Vertex_Buffer::create(positions.data(), positions.size());
+		m_vertex_buffer->bind();
+
+		m_index_buffer = Index_Buffer::create(triangles.data(), triangles.size());
+		m_index_buffer->bind();
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
-		glGenBuffers(1, &m_index_buffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index_buffer);
-
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * triangles.size(), triangles.data(), GL_DYNAMIC_DRAW);
 
 		std::string vertex_src = R"(
 			#version 330 core
@@ -159,11 +154,11 @@ namespace clumsy_engine
 
 			m_shader->bind();
 
-			glBindVertexArray(m_vertex_array);
+			m_vertex_buffer->bind();
 
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * pp.size(), pp.data(), GL_DYNAMIC_DRAW);
 
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, m_index_buffer->get_count(), GL_UNSIGNED_INT, nullptr);
 
 			for (auto& layer : *m_layer_stack)
 			{
