@@ -105,10 +105,13 @@ namespace clumsy_engine
 
         inline const std::vector<Buffer_Element>& get_elements() const { return m_elements; }
 
-        int get_stride() { return m_stride; }
+		int get_stride()const { return m_stride; }
 
         auto begin() { return m_elements.begin(); }
         auto end() { return m_elements.end(); }
+
+		auto begin()const { return m_elements.cbegin(); }
+		auto end() const { return m_elements.cend(); }
     private:
         void calculate_offset_and_stride()
         {

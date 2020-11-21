@@ -19,6 +19,7 @@ namespace clumsy_engine
 	class Shader;
 	class Vertex_Buffer;
 	class Index_Buffer;
+	class Vertex_Array;
 	enum class Event_Type;
 	template<typename  Base_T, typename Ret  >
 	class Dispatcher;
@@ -60,8 +61,7 @@ namespace clumsy_engine
 		std::unique_ptr<Layer_Stack> m_layer_stack;
 
 		std::unique_ptr<Shader> m_shader;
-		std::unique_ptr<Vertex_Buffer> m_vertex_buffer;
-		std::unique_ptr<Index_Buffer> m_index_buffer;
+		std::unique_ptr<Vertex_Array> m_vertex_array;
 
 	private:
 		bool On_Window_Close(Window_Close_Event& e);

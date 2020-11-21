@@ -43,6 +43,10 @@ src/opengl_buffer.cpp
 src/renderer.h
 src/renderer.cpp
 src/enum_loop.h
+src/vertex_array.h
+src/vertex_array.cpp
+src/openGL_vertex_array.h
+src/openGL_vertex_array.cpp
 
 
 src/simulator.h

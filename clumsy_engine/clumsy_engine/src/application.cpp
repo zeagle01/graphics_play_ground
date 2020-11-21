@@ -14,6 +14,7 @@
 #include "dispatcher.h"
 #include "shader.h"
 #include "buffer.h"
+#include "vertex_array.h"
 
 #include "gmock/gmock.h"
 
@@ -71,8 +72,8 @@ namespace clumsy_engine
 		};
 
 		//gl data stuff
-		m_vertex_buffer = Vertex_Buffer::create(positions.data(), positions.size());
-		m_vertex_buffer->bind();
+		m_vertex_array = Vertex_Array::create();
+		std::shared_ptr<Vertex_Buffer > vertex_buffer = Vertex_Buffer::create(positions.data(), positions.size());
 
 		Buffer_Layout layout =
 		{
@@ -80,17 +81,11 @@ namespace clumsy_engine
 			{Shader_Data_Type::Float3, "a_color"}
 
 		};
-		int index= 0;
-		for (const auto& e : layout)
-		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index, e.count, e.gl_type, e.normalized, layout.get_stride(), (void*)e.offset);
-			index++;
-		}
+		vertex_buffer->set_layout(layout);
+		m_vertex_array->add_vertex_buffer(vertex_buffer);
 
-
-		m_index_buffer = Index_Buffer::create(triangles.data(), triangles.size());
-		m_index_buffer->bind();
+		std::shared_ptr<Index_Buffer> index_buffer = Index_Buffer::create(triangles.data(), triangles.size());
+		m_vertex_array->set_index_buffer(index_buffer);
 
 
 
@@ -179,11 +174,12 @@ namespace clumsy_engine
 
 			m_shader->bind();
 
-			m_vertex_buffer->bind();
+			m_vertex_array->bind();
+			//m_vertex_buffer->bind();
 
 //			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * pp.size(), pp.data(), GL_DYNAMIC_DRAW);
 
-			glDrawElements(GL_TRIANGLES, m_index_buffer->get_count(), GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, m_vertex_array->get_index_buffer()->get_count(), GL_UNSIGNED_INT, nullptr);
 
 			for (auto& layer : *m_layer_stack)
 			{
