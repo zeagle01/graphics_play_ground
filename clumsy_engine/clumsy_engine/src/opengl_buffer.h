@@ -19,8 +19,19 @@ namespace clumsy_engine
             void bind() const override;
             void unbind() const override;
 
+            const Buffer_Layout& get_layout()const override
+            {
+                return m_layout;
+
+            }
+            void set_layout(const Buffer_Layout& layout) override
+            {
+                m_layout = layout;
+            }
+
         private:
             unsigned int m_renderer_id;
+            Buffer_Layout m_layout;
 
 
     };
@@ -35,11 +46,14 @@ namespace clumsy_engine
             void bind() const override;
             void unbind() const override;
 
+
+
             int get_count() const override;
 
         private:
             unsigned int m_renderer_id;
             unsigned int m_count;
+
 
 
     };

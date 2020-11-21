@@ -56,10 +56,15 @@ namespace clumsy_engine
 
 		/// data
 		std::vector<float> positions{
-			0.,0,0,
-			1,0,0,
-			1,1,0
+			0.,0,0,0,0,0.5,
+			1,0,0,0,0,0.2,
+			1,1,0,0,0,0.2
 		};
+//		std::vector<float> positions{
+//			0.,0,0,
+//			1,0,0,
+//			1,1,0,
+//		};
 
 		std::vector<int> triangles{
 			0,1,2
@@ -69,21 +74,39 @@ namespace clumsy_engine
 		m_vertex_buffer = Vertex_Buffer::create(positions.data(), positions.size());
 		m_vertex_buffer->bind();
 
+		Buffer_Layout layout =
+		{
+			{Shader_Data_Type::Float3, "a_position"},
+			{Shader_Data_Type::Float3, "a_color"}
+
+		};
+		int index= 0;
+		for (const auto& e : layout)
+		{
+			glEnableVertexAttribArray(index);
+			glVertexAttribPointer(index, e.count, e.gl_type, e.normalized, layout.get_stride(), (void*)e.offset);
+			index++;
+		}
+
+
 		m_index_buffer = Index_Buffer::create(triangles.data(), triangles.size());
 		m_index_buffer->bind();
 
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+
+
 
 
 		std::string vertex_src = R"(
 			#version 330 core
 			layout(location=0 ) in vec3 position;
+			layout(location=1 ) in vec3 a_color;
 			out vec3 v_position;
+			out vec3 v_color;
 
 			void main()
 			{
 				v_position=position;
+				v_color=a_color;
 				gl_Position=vec4(position,1.0);
 			}
 
@@ -93,11 +116,13 @@ namespace clumsy_engine
 
 			#version 330 core
 			in vec3 v_position;
+			in vec3 v_color;
 			out vec4 color;
 
 			void main()
 			{
-				color=vec4(v_position,1.0);
+				color=vec4(v_position+v_color,1.0);
+				//color=vec4(v_position,1.0);
 			}
 
 		)";
@@ -146,17 +171,17 @@ namespace clumsy_engine
 			glClearColor(0.2, 0.1, 0.3, 0.2);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			std::vector<float> pp{
-			0.,0,0,
-			-1,0,0,
-			1,1,0
-			};
+//			std::vector<float> pp{
+//			0.,0,0,
+//			-1,0,0,
+//			1,1,0
+//			};
 
 			m_shader->bind();
 
 			m_vertex_buffer->bind();
 
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * pp.size(), pp.data(), GL_DYNAMIC_DRAW);
+//			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * pp.size(), pp.data(), GL_DYNAMIC_DRAW);
 
 			glDrawElements(GL_TRIANGLES, m_index_buffer->get_count(), GL_UNSIGNED_INT, nullptr);
 

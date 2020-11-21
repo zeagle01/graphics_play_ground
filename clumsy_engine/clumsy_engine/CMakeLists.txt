@@ -42,6 +42,7 @@ src/opengl_buffer.h
 src/opengl_buffer.cpp
 src/renderer.h
 src/renderer.cpp
+src/enum_loop.h
 
 
 src/simulator.h
