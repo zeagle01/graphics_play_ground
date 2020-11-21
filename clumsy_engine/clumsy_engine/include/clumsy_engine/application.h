@@ -61,7 +61,7 @@ namespace clumsy_engine
 		std::unique_ptr<Layer_Stack> m_layer_stack;
 
 		std::unique_ptr<Shader> m_shader;
-		std::unique_ptr<Vertex_Array> m_vertex_array;
+		std::shared_ptr<Vertex_Array> m_vertex_array;
 
 	private:
 		bool On_Window_Close(Window_Close_Event& e);

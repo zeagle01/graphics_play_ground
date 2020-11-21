@@ -4,8 +4,6 @@
 #include "application.h"
 #include "log.h"
 #include "application_event.h"
-#include "glad/glad.h"
-#include "GLFW/glfw3.h" 
 #include "layer_stack.h"
 #include "layer.h"
 #include "window.h"
@@ -15,6 +13,8 @@
 #include "shader.h"
 #include "buffer.h"
 #include "vertex_array.h"
+#include "renderer.h"
+#include "render_command.h"
 
 #include "gmock/gmock.h"
 
@@ -163,23 +163,15 @@ namespace clumsy_engine
 
 		while (m_is_running)
 		{
-			glClearColor(0.2, 0.1, 0.3, 0.2);
-			glClear(GL_COLOR_BUFFER_BIT);
+			Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
+			Render_Command::clear();
 
-//			std::vector<float> pp{
-//			0.,0,0,
-//			-1,0,0,
-//			1,1,0
-//			};
+			Renderer::begin_scene();
 
 			m_shader->bind();
+			Renderer::submit(m_vertex_array);
+			Renderer::end_scene();
 
-			m_vertex_array->bind();
-			//m_vertex_buffer->bind();
-
-//			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * pp.size(), pp.data(), GL_DYNAMIC_DRAW);
-
-			glDrawElements(GL_TRIANGLES, m_vertex_array->get_index_buffer()->get_count(), GL_UNSIGNED_INT, nullptr);
 
 			for (auto& layer : *m_layer_stack)
 			{

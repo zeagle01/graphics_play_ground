@@ -16,8 +16,8 @@ namespace clumsy_engine
 	{
 		switch (Renderer::get_API())
 		{
-		case Renderer_API::None: CE_CORE_WARN("rederer api none!"); return nullptr;
-		case Renderer_API::OpenGL:  return std::make_unique<OpenGL_Vertex_Array>();
+		case Renderer_API::API::None: CE_CORE_WARN("rederer api none!"); return nullptr;
+		case Renderer_API::API::OpenGL:  return std::make_unique<OpenGL_Vertex_Array>();
 		}
 
 		CE_CORE_ERROR("rederer api error!");
