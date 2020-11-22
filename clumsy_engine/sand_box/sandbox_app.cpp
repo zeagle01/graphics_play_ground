@@ -12,6 +12,9 @@ public:
 	Layer_Demo() :
 		clumsy_engine::Layer("demo_layer")
 		, m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>(-1,1,-1,1))
+		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
+		, m_camara_position(0.f)
+		,m_camara_rotation(0.f)
 	{
 
 		/// data
@@ -87,6 +90,41 @@ public:
 
 		//shader
 		m_shader = std::make_shared<clumsy_engine::Shader>(vertex_src, fragment_src);
+
+
+		auto key_pressed_handler = [](auto& e)
+		{
+			return false;
+		};
+
+//		m_dispatcher->add<clumsy_engine::Key_Pressed_Event>(
+//			std::bind(&Layer_Demo::on_key_pressed, this, std::placeholders::_1)
+//			//key_pressed_handler
+//			);
+	}
+
+	bool on_key_pressed(clumsy_engine::Key_Pressed_Event& e)
+	{
+//		float speed=0.1f;
+//		if (e.get_key() == CE_KEY_LEFT)
+//		{
+//			m_camara_position.x -= speed;
+//		}
+//		if (e.get_key() == CE_KEY_RIGHT)
+//		{
+//			m_camara_position.x += speed;
+//		}
+//
+//		if (e.get_key() == CE_KEY_UP)
+//		{
+//			m_camara_position.y += speed;
+//		}
+//		if (e.get_key() == CE_KEY_DOWN)
+//		{
+//			m_camara_position.y -= speed;
+//		}
+		return false;
+
 	}
 
 	virtual void on_attach() 
@@ -95,11 +133,41 @@ public:
 	virtual void on_detach() {};
 	virtual void on_update()
 	{
+
+		//dealing move to update way (instead of event)
+		float position_speed = 0.1f;
+		if (clumsy_engine::Input::is_key_pressed(CE_KEY_LEFT))
+		{
+			m_camara_position.x -= position_speed;
+		}
+		if (clumsy_engine::Input::is_key_pressed(CE_KEY_RIGHT))
+		{
+			m_camara_position.x += position_speed;
+		}
+		if (clumsy_engine::Input::is_key_pressed(CE_KEY_UP))
+		{
+			m_camara_position.y += position_speed;
+		}
+		if (clumsy_engine::Input::is_key_pressed(CE_KEY_DOWN))
+		{
+			m_camara_position.y -= position_speed;
+		}
+
+		float roation_speed = 0.2;
+		if (clumsy_engine::Input::is_key_pressed(CE_KEY_A))
+		{
+			m_camara_rotation += roation_speed;
+		}
+		if (clumsy_engine::Input::is_key_pressed(CE_KEY_D))
+		{
+			m_camara_rotation -= roation_speed;
+		}
+
 		clumsy_engine::Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
 		clumsy_engine::Render_Command::clear();
 
-		m_camara->set_position({ 0.5, 0.5, 0 });
-		m_camara->set_rotation(45.f);
+		m_camara->set_position(m_camara_position);
+		m_camara->set_rotation(m_camara_rotation);
 
 		clumsy_engine::Renderer::begin_scene(m_camara);
 
@@ -110,7 +178,7 @@ public:
 	};
 	virtual void on_event(clumsy_engine::Event& e) 
 	{
-		//CE_TRACE("layer {0} handle {1} ", (void*)this, e.to_string());
+		(*m_dispatcher)(e);
 	}
 
 	virtual void on_imgui_render() 
@@ -129,6 +197,11 @@ private:
 
 	std::shared_ptr<clumsy_engine::Orthorgraphic_Camara> m_camara;
 
+	glm::vec3 m_camara_position;
+
+	float m_camara_rotation;
+
+	std::shared_ptr<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
 };
 
 

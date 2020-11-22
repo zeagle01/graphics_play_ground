@@ -10,7 +10,9 @@
 #include "clumsy_engine/event.h"
 #include "clumsy_engine/input.h"
 #include "clumsy_engine/key_codes.h"
+#include "clumsy_engine/key_event.h"
 #include "clumsy_engine/mouse_button_codes.h"
+#include "clumsy_engine/dispatcher.h"
 
 #include "clumsy_engine/renderer.h"
 #include "clumsy_engine/render_command.h"

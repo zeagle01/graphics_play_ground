@@ -9,7 +9,6 @@ set(source_files
 src/application.cpp
 src/event.cpp
 src/key_event.cpp
-src/key_event.h
 src/mouse_event.h
 src/mouse_event.cpp
 src/application_event.h
@@ -28,7 +27,6 @@ src/handy_helpers.h
 src/windows_input.h
 src/windows_input.cpp
 src/input.cpp
-src/dispatcher.h
 src/dispatcher.cpp
 
 src/graphic_context.h
@@ -106,6 +104,8 @@ include/clumsy_engine/buffer.h
 include/clumsy_engine/shader.h
 include/clumsy_engine/vertex_array.h
 include/clumsy_engine/orthographic_camara.h
+include/clumsy_engine/dispatcher.h
+include/clumsy_engine/key_event.h
 )
 
 add_library(clumsy_engine SHARED
