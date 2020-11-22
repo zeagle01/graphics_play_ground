@@ -11,3 +11,10 @@
 #include "clumsy_engine/input.h"
 #include "clumsy_engine/key_codes.h"
 #include "clumsy_engine/mouse_button_codes.h"
+
+#include "clumsy_engine/renderer.h"
+#include "clumsy_engine/render_command.h"
+#include "clumsy_engine/buffer.h"
+#include "clumsy_engine/shader.h"
+#include "clumsy_engine/vertex_array.h"
+#include "clumsy_engine/orthographic_camara.h"

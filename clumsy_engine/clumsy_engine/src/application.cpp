@@ -43,7 +43,6 @@ namespace clumsy_engine
 		, m_layer_stack(std::make_unique<Layer_Stack>())
 		, m_dispatcher_imp(std::make_shared<Dispatcher<Event, bool>>())
 		, m_dispatcher(*m_dispatcher_imp)
-		, m_camara(std::make_shared<Orthorgraphic_Camara>(-1,1,-1,1))
 	{
 		m_window = Window::create();
 		m_window->set_event_callback(BIND_MEMBER(on_event));
@@ -57,79 +56,6 @@ namespace clumsy_engine
 		m_imgui_layer = std::make_shared<Imgui_Layer>();
 		push_overlay(m_imgui_layer);
 
-		/// data
-		std::vector<float> positions{
-			0.,0,0,0,0,0.5,
-			1,0,0,0,0,0.2,
-			1,1,0,0,0,0.2
-		};
-//		std::vector<float> positions{
-//			0.,0,0,
-//			1,0,0,
-//			1,1,0,
-//		};
-
-		std::vector<int> triangles{
-			0,1,2
-		};
-
-		//gl data stuff
-		m_vertex_array = Vertex_Array::create();
-		std::shared_ptr<Vertex_Buffer > vertex_buffer = Vertex_Buffer::create(positions.data(), positions.size());
-
-		Buffer_Layout layout =
-		{
-			{Shader_Data_Type::Float3, "a_position"},
-			{Shader_Data_Type::Float3, "a_color"}
-
-		};
-		vertex_buffer->set_layout(layout);
-		m_vertex_array->add_vertex_buffer(vertex_buffer);
-
-		std::shared_ptr<Index_Buffer> index_buffer = Index_Buffer::create(triangles.data(), triangles.size());
-		m_vertex_array->set_index_buffer(index_buffer);
-
-
-
-
-
-		std::string vertex_src = R"(
-			#version 330 core
-			layout(location=0 ) in vec3 position;
-			layout(location=1 ) in vec3 a_color;
-			out vec3 v_position;
-			out vec3 v_color;
-
-			uniform mat4 u_view_projection;
-
-			void main()
-			{
-
-				//vec3 t_position=u_view_projection*position;
-				v_position=position;
-				v_color=a_color;
-				gl_Position=u_view_projection*vec4(position,1.0);
-			}
-
-		)";
-
-		std::string fragment_src = R"(
-
-			#version 330 core
-			in vec3 v_position;
-			in vec3 v_color;
-			out vec4 color;
-
-			void main()
-			{
-				color=vec4(v_position+v_color,1.0);
-				//color=vec4(v_position,1.0);
-			}
-
-		)";
-
-		//shader
-		m_shader = std::make_shared<Shader>(vertex_src, fragment_src);
 	}
 
 	Application:: ~Application()
@@ -169,17 +95,6 @@ namespace clumsy_engine
 
 		while (m_is_running)
 		{
-			Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
-			Render_Command::clear();
-
-			m_camara->set_position({ 0.5, 0.5, 0 });
-			m_camara->set_rotation(45.f);
-
-			Renderer::begin_scene(m_camara);
-
-			Renderer::submit(m_shader, m_vertex_array);
-
-			Renderer::end_scene();
 
 
 			for (auto& layer : *m_layer_stack)

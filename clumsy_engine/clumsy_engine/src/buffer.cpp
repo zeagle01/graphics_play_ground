@@ -7,6 +7,7 @@
 #include "renderer_API.h"
 #include "renderer.h"
 #include "log.h"
+#include "enum_loop.h"
 
 namespace clumsy_engine
 {
@@ -42,4 +43,14 @@ namespace clumsy_engine
         return nullptr;
 
     }
+
+	void Buffer_Layout::calculate_offset_and_stride()
+	{
+		int offset = 0;
+		m_stride = 0;
+		for (auto& e : m_elements)
+		{
+			loop_enum<Shader_Data_Type>::apply<collect_element_layout>(e, offset, m_stride);
+		}
+	}
 }

@@ -14,7 +14,7 @@ int main(int argc,char** argv)
 
 	BEGIN_PROFILING();
 
-	clumsy_engine::run_test(argc,argv);
+//	clumsy_engine::run_test(argc,argv);
 
 	clumsy_engine::Log::init();
 

@@ -2,6 +2,7 @@
 
 #include "glm/glm.hpp"
 #include <memory>
+#include "clumsy_engine_export.h"
 
 
 namespace clumsy_engine
@@ -10,7 +11,7 @@ namespace clumsy_engine
 	class Vertex_Array;
 
 
-	class Renderer_API
+	class CLUMSY_ENGINE_EXPORT Renderer_API
 	{
 	public:
 		enum class API

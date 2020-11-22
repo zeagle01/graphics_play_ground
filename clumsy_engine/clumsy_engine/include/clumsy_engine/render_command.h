@@ -2,11 +2,12 @@
 #pragma  once
 
 #include "renderer_API.h"
+#include "clumsy_engine_export.h"
 
 namespace clumsy_engine
 {
 
-	class Render_Command
+	class CLUMSY_ENGINE_EXPORT Render_Command
 	{
 	public:
 

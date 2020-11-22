@@ -56,15 +56,10 @@ namespace clumsy_engine
 		std::shared_ptr<Dispatcher<Event,  bool>> m_dispatcher_imp;
 		Dispatcher<Event, bool>& m_dispatcher;
 
+		std::unique_ptr<Layer_Stack> m_layer_stack;
 
 		bool m_is_running;
 
-		std::unique_ptr<Layer_Stack> m_layer_stack;
-
-		std::shared_ptr<Shader> m_shader;
-		std::shared_ptr<Vertex_Array> m_vertex_array;
-
-		std::shared_ptr<Orthorgraphic_Camara> m_camara;
 
 	private:
 		bool On_Window_Close(Window_Close_Event& e);

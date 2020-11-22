@@ -34,26 +34,18 @@ src/dispatcher.cpp
 src/graphic_context.h
 src/opengl_context.h
 src/opengl_context.cpp
-src/shader.h
 src/shader.cpp
-src/buffer.h
 src/buffer.cpp
-src/opengl_buffer.h
 src/opengl_buffer.cpp
-src/renderer.h
 src/renderer.cpp
 src/enum_loop.h
-src/vertex_array.h
 src/vertex_array.cpp
 src/openGL_vertex_array.h
 src/openGL_vertex_array.cpp
-src/renderer_API.h
 src/renderer_API.cpp
-src/render_command.h
 src/render_command.cpp
 src/openGL_Renderer_API.h
 src/openGL_Renderer_API.cpp
-src/orthographic_camara.h
 src/orthographic_camara.cpp
 
 
@@ -107,6 +99,13 @@ include/clumsy_engine/imgui_layer.h
 include/clumsy_engine/key_codes.h
 include/clumsy_engine/mouse_button_codes.h
 include/clumsy_engine/input.h
+include/clumsy_engine/renderer.h
+include/clumsy_engine/render_command.h
+include/clumsy_engine/renderer_API.h
+include/clumsy_engine/buffer.h
+include/clumsy_engine/shader.h
+include/clumsy_engine/vertex_array.h
+include/clumsy_engine/orthographic_camara.h
 )
 
 add_library(clumsy_engine SHARED
@@ -155,6 +154,7 @@ target_link_libraries(clumsy_engine PRIVATE glad)
 
 include(${CMAKE_SOURCE_DIR}/cmake/glm.cmake)
 link_to_glm(clumsy_engine ${CMAKE_SOURCE_DIR}/external/glm)
+target_link_libraries(clumsy_engine PUBLIC glm)
 
 ##########imgui
 target_link_libraries(clumsy_engine PUBLIC my_imgui)

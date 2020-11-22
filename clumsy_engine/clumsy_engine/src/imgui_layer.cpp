@@ -95,34 +95,12 @@ namespace clumsy_engine
 			ImGui::DestroyContext();
 		}
 
-//		void Imgui_Layer::on_update() 
-//		{
-//
-//
-//			auto& app = Application::get_singleton();
-//			auto& window = app.get_window();
-//
-//			ImGuiIO& io=ImGui::GetIO();
-//
-//			//CE_CORE_INFO("{0} {1}", app.get_window().get_width(), app.get_window().get_height());
-//
-//			//io.DisplaySize = ImVec2(app.get_window().get_width()/2, app.get_window().get_height()/2);
-//			io.DisplaySize = ImVec2(window.get_width(), window.get_height());
-//
-//			ImGui_ImplOpenGL3_NewFrame();
-//			ImGui::NewFrame();
-//
-//			static bool show = true;
-//			ImGui::ShowDemoWindow(&show);
-//
-//			ImGui::Render();
-//			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-//		}
 
 		void Imgui_Layer::on_imgui_render()
 		{
 			static bool show = true;
 			ImGui::ShowDemoWindow(&show);
+
 
 		}
 

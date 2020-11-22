@@ -5,7 +5,6 @@
 #include <memory>
 #include <vector> 
 #include <string>
-#include "enum_loop.h"
 #include "glad/glad.h"
 
 namespace clumsy_engine
@@ -113,15 +112,8 @@ namespace clumsy_engine
 		auto begin()const { return m_elements.cbegin(); }
 		auto end() const { return m_elements.cend(); }
     private:
-        void calculate_offset_and_stride()
-        {
-            int offset = 0;
-            m_stride = 0;
-            for (auto& e : m_elements)
-            {
-				loop_enum<Shader_Data_Type>::apply<collect_element_layout>(e, offset, m_stride);
-            }
-        }
+        void calculate_offset_and_stride();
+        
     private:
         std::vector<Buffer_Element> m_elements;
         int m_stride;
