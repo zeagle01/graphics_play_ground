@@ -23,6 +23,7 @@ namespace clumsy_engine
 	enum class Event_Type;
 	template<typename  Base_T, typename Ret  >
 	class Dispatcher;
+	class Orthorgraphic_Camara;
 
 
 	class Application
@@ -60,8 +61,10 @@ namespace clumsy_engine
 
 		std::unique_ptr<Layer_Stack> m_layer_stack;
 
-		std::unique_ptr<Shader> m_shader;
+		std::shared_ptr<Shader> m_shader;
 		std::shared_ptr<Vertex_Array> m_vertex_array;
+
+		std::shared_ptr<Orthorgraphic_Camara> m_camara;
 
 	private:
 		bool On_Window_Close(Window_Close_Event& e);

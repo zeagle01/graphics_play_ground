@@ -53,6 +53,8 @@ src/render_command.h
 src/render_command.cpp
 src/openGL_Renderer_API.h
 src/openGL_Renderer_API.cpp
+src/orthographic_camara.h
+src/orthographic_camara.cpp
 
 
 src/simulator.h

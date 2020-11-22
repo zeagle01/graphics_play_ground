@@ -15,6 +15,7 @@
 #include "vertex_array.h"
 #include "renderer.h"
 #include "render_command.h"
+#include "orthographic_camara.h"
 
 #include "gmock/gmock.h"
 
@@ -40,8 +41,9 @@ namespace clumsy_engine
 	Application::Application()
 		:m_is_running(true)
 		, m_layer_stack(std::make_unique<Layer_Stack>())
-		,m_dispatcher_imp(std::make_shared<Dispatcher<Event, bool>>())
-		,m_dispatcher(*m_dispatcher_imp)
+		, m_dispatcher_imp(std::make_shared<Dispatcher<Event, bool>>())
+		, m_dispatcher(*m_dispatcher_imp)
+		, m_camara(std::make_shared<Orthorgraphic_Camara>(-1,1,-1,1))
 	{
 		m_window = Window::create();
 		m_window->set_event_callback(BIND_MEMBER(on_event));
@@ -98,11 +100,15 @@ namespace clumsy_engine
 			out vec3 v_position;
 			out vec3 v_color;
 
+			uniform mat4 u_view_projection;
+
 			void main()
 			{
+
+				//vec3 t_position=u_view_projection*position;
 				v_position=position;
 				v_color=a_color;
-				gl_Position=vec4(position,1.0);
+				gl_Position=u_view_projection*vec4(position,1.0);
 			}
 
 		)";
@@ -123,7 +129,7 @@ namespace clumsy_engine
 		)";
 
 		//shader
-		m_shader = std::make_unique<Shader>(vertex_src, fragment_src);
+		m_shader = std::make_shared<Shader>(vertex_src, fragment_src);
 	}
 
 	Application:: ~Application()
@@ -166,10 +172,13 @@ namespace clumsy_engine
 			Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
 			Render_Command::clear();
 
-			Renderer::begin_scene();
+			m_camara->set_position({ 0.5, 0.5, 0 });
+			m_camara->set_rotation(45.f);
 
-			m_shader->bind();
-			Renderer::submit(m_vertex_array);
+			Renderer::begin_scene(m_camara);
+
+			Renderer::submit(m_shader, m_vertex_array);
+
 			Renderer::end_scene();
 
 

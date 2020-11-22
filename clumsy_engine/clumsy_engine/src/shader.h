@@ -3,6 +3,8 @@
 #pragma once
 
 #include <string>
+#include "glm/glm.hpp"
+
 
 namespace clumsy_engine
 {
@@ -15,6 +17,9 @@ namespace clumsy_engine
         void bind()const ;
 
         void unbind()const ;
+
+        void upload_uniform_mat4(const std::string& name,const glm::mat4& m);
+
         private:
         unsigned int m_renderer_id;
 
