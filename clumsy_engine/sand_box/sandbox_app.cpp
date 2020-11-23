@@ -127,40 +127,41 @@ public:
 
 	}
 
-	virtual void on_attach() 
+	void on_attach()  override
 	{
 	};
-	virtual void on_detach() {};
-	virtual void on_update()
+	void on_detach()override {};
+	void on_update(clumsy_engine::Time_Step dt) override
 	{
 
+		CE_INFO("{0} s", dt.get_seconds());
 		//dealing move to update way (instead of event)
 		float position_speed = 0.1f;
 		if (clumsy_engine::Input::is_key_pressed(CE_KEY_LEFT))
 		{
-			m_camara_position.x -= position_speed;
+			m_camara_position.x -= position_speed * dt;
 		}
 		if (clumsy_engine::Input::is_key_pressed(CE_KEY_RIGHT))
 		{
-			m_camara_position.x += position_speed;
+			m_camara_position.x += position_speed * dt;
 		}
 		if (clumsy_engine::Input::is_key_pressed(CE_KEY_UP))
 		{
-			m_camara_position.y += position_speed;
+			m_camara_position.y += position_speed * dt;
 		}
 		if (clumsy_engine::Input::is_key_pressed(CE_KEY_DOWN))
 		{
-			m_camara_position.y -= position_speed;
+			m_camara_position.y -= position_speed * dt;
 		}
 
 		float roation_speed = 0.2;
 		if (clumsy_engine::Input::is_key_pressed(CE_KEY_A))
 		{
-			m_camara_rotation += roation_speed;
+			m_camara_rotation += roation_speed * dt;
 		}
 		if (clumsy_engine::Input::is_key_pressed(CE_KEY_D))
 		{
-			m_camara_rotation -= roation_speed;
+			m_camara_rotation -= roation_speed * dt;
 		}
 
 		clumsy_engine::Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });

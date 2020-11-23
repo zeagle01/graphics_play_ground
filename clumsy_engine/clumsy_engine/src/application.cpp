@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <memory>
+#include <chrono>
 #include "application.h"
 #include "log.h"
 #include "application_event.h"
@@ -16,6 +17,7 @@
 #include "renderer.h"
 #include "render_command.h"
 #include "orthographic_camara.h"
+#include "time_step.h"
 
 #include "gmock/gmock.h"
 
@@ -46,6 +48,7 @@ namespace clumsy_engine
 	{
 		m_window = Window::create();
 		m_window->set_event_callback(BIND_MEMBER(on_event));
+		m_window->set_vertical_sync(false);
 
 
 		m_dispatcher_imp->add<Window_Close_Event>(BIND_MEMBER(On_Window_Close));
@@ -96,10 +99,15 @@ namespace clumsy_engine
 		while (m_is_running)
 		{
 
+			float time = std::chrono::high_resolution_clock::now().time_since_epoch().count()*1e-9;
+
+			Time_Step time_step = time - m_last_frame_time;
+
+			m_last_frame_time = time;
 
 			for (auto& layer : *m_layer_stack)
 			{
-				layer->on_update();
+				layer->on_update(time_step);
 			}
 
 			m_imgui_layer->begin();

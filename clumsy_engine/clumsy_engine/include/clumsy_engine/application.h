@@ -58,6 +58,8 @@ namespace clumsy_engine
 
 		std::unique_ptr<Layer_Stack> m_layer_stack;
 
+		float m_last_frame_time;
+
 		bool m_is_running;
 
 

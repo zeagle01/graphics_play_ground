@@ -28,6 +28,7 @@ src/windows_input.h
 src/windows_input.cpp
 src/input.cpp
 src/dispatcher.cpp
+src/time_step.cpp
 
 src/graphic_context.h
 src/opengl_context.h
@@ -106,6 +107,7 @@ include/clumsy_engine/vertex_array.h
 include/clumsy_engine/orthographic_camara.h
 include/clumsy_engine/dispatcher.h
 include/clumsy_engine/key_event.h
+include/clumsy_engine/time_step.h
 )
 
 add_library(clumsy_engine SHARED

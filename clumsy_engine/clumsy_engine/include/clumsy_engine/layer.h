@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include "time_step.h"
 
 namespace clumsy_engine
 {
@@ -16,7 +17,7 @@ namespace clumsy_engine
 
 		virtual void on_attach() {};
 		virtual void on_detach() {};
-		virtual void on_update() {};
+		virtual void on_update(Time_Step dt) {};
 		virtual void on_imgui_render() {};
 		virtual void on_event(Event& e) {}
 
