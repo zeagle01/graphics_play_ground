@@ -1,0 +1,8 @@
+[requires]
+eigen/3.3.8
+gtest/1.10.0
+glm/0.9.9.8
+
+
+[generators]
+cmake_find_package_multi

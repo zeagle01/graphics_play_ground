@@ -64,13 +64,8 @@ include(FetchContent)
 target_link_libraries(gl_render PRIVATE my_imgui)
 
 #########glm
-FetchContent_Declare(
-  glm_repo
-  GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/external/glm
-  GIT_TAG        master
-)
-FetchContent_MakeAvailable(glm_repo)
-target_link_libraries(gl_render PRIVATE glm)
+find_package(glm CONFIG REQUIRED PATHS ${CMAKE_BINARY_DIR}  )
+target_link_libraries(gl_render PRIVATE glm::glm)
 
 
 

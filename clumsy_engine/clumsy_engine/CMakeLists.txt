@@ -75,15 +75,6 @@ src/data_computes.cpp
 
 )
 
-set(test_files
-test/simulator_test.cpp
-test/stretch_constraint_test.cpp
-test/spring_stretch_test.cpp
-test/system_equations_solver_test.cpp
-test/signal_test.cpp
-test/simulation_data_test.cpp
-test/data_computes_test.cpp
-)
 
 set(include_files
 include/clumsy_engine/clumsy_engine.h
@@ -113,8 +104,6 @@ include/clumsy_engine/time_step.h
 add_library(clumsy_engine SHARED
 ${include_files}
 ${source_files}
-${test_files}
-
 )
 
 
@@ -134,6 +123,7 @@ target_include_directories(clumsy_engine
 PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/clumsy_engine>
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/spdlog/include>
 $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 $<INSTALL_INTERFACE:include>
@@ -154,16 +144,14 @@ target_link_libraries(clumsy_engine PRIVATE glfw)
 target_link_libraries(clumsy_engine PRIVATE glad)
 
 
-include(${CMAKE_SOURCE_DIR}/cmake/glm.cmake)
-link_to_glm(clumsy_engine ${CMAKE_SOURCE_DIR}/external/glm)
-target_link_libraries(clumsy_engine PUBLIC glm)
+##glm
+find_package(glm CONFIG REQUIRED PATHS ${CMAKE_BINARY_DIR})
+target_link_libraries(clumsy_engine PUBLIC glm::glm)
 
 ##########imgui
 target_link_libraries(clumsy_engine PUBLIC my_imgui)
 
-##########gtest
-include(${CMAKE_SOURCE_DIR}/cmake/gtest.cmake)
-link_to_gtest(clumsy_engine ${CMAKE_SOURCE_DIR}/external/gtest)
+
 
 
 include(GNUInstallDirs)

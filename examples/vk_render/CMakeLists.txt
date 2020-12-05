@@ -21,15 +21,8 @@ set_property(TARGET vk_render PROPERTY FOLDER examples)
 target_link_libraries(vk_render PUBLIC glfw)
 
 
-include(FetchContent)
-###########glm
-FetchContent_Declare(
-  glm_repo
-  GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/external/glm
-  GIT_TAG        master
-)
-FetchContent_MakeAvailable(glm_repo)
-target_link_libraries(vk_render PRIVATE glm)
+find_package(glm CONFIG REQUIRED PATHS ${CMAKE_BINARY_DIR})
+target_link_libraries(vk_render PRIVATE glm::glm)
 
 
 ###########vulkan

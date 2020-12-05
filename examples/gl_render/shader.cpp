@@ -57,7 +57,9 @@ unsigned int Shader::compile_shader(std::string& shader,unsigned int type)
 
 void Shader::create_shader_from_file(const std::string &vertex_shader,const  std::string &fragment_shader)
 {
-    create_shader(read_source_from_file(vertex_shader), read_source_from_file(fragment_shader));
+	auto v_source = read_source_from_file(vertex_shader);
+	auto f_source = read_source_from_file(fragment_shader);
+	create_shader(v_source, f_source);
 }
 
 void Shader::create_shader(std::string& vertex_shader, std::string& fragment_shader)

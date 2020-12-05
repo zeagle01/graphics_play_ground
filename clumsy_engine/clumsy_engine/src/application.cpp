@@ -19,7 +19,6 @@
 #include "orthographic_camara.h"
 #include "time_step.h"
 
-#include "gmock/gmock.h"
 
 
 namespace clumsy_engine
@@ -154,23 +153,6 @@ namespace clumsy_engine
 	Window& Application::get_window()const
 	{
 		return *m_window;
-	}
-
-	bool run_test(int argc,char** argv)
-	{
-
-		::testing::InitGoogleMock(&argc, argv);
-
-
-		auto failed = RUN_ALL_TESTS();
-		//if (failed)
-		//{
-		//	std::getchar();
-		//}
-
-		std::getchar();
-
-		return true;
 	}
 
 }

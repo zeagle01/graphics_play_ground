@@ -11,6 +11,6 @@ set_target_properties(sand_box PROPERTIES FOLDER clumsy_engine)
 
 target_link_libraries(sand_box PUBLIC clumsy_engine)
 
-target_compile_features(sand_box PRIVATE cxx_std_20)
+target_compile_features(sand_box PRIVATE cxx_std_17)
 
 set_target_properties(sand_box PROPERTIES FOLDER "clumsy_engine")

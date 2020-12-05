@@ -89,5 +89,5 @@ find_package(GMock CONFIG REQUIRED PATHS ${CMAKE_SOURCE_DIR}/Install/lib/cmake/G
 target_link_libraries(shellet_test PRIVATE GMock::gmock)
 
 
-find_package(Eigen3 CONFIG REQUIRED)
+find_package(Eigen3 CONFIG REQUIRED PATHS ${CMAKE_BINARY_DIR})
 target_link_libraries(shellet PUBLIC Eigen3::Eigen)
