@@ -27,5 +27,14 @@ set_property(TARGET soft_render PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_
 
 
 #hunter_add_package(GTest)
-find_package(GMock CONFIG REQUIRED ${CMAKE_SOURCE_DIR}/Install/lib/cmake/GMock)
+find_package(GMock CONFIG REQUIRED PATHS ${CMAKE_SOURCE_DIR}/Install/lib/cmake/GMock)
 target_link_libraries(soft_render PRIVATE GMock::gmock)
+
+
+#find_package(GTest CONFIG REQUIRED PATHS ${CMAKE_BINARY_DIR})
+#target_link_libraries(soft_render PRIVATE GTest::gmock)
+
+
+#include(${CMAKE_SOURCE_DIR}/cmake/gtest.cmake)
+#link_to_gtest(soft_render ${CMAKE_SOURCE_DIR}/external/gtest)
+
