@@ -1,35 +1,31 @@
 
-#include <iostream>
-#include <memory>
+#include "sim_app.h"
+#include "inertial.h"
+#include "gravity.h"
 
 #include "imgui.h"
-#include "clumsy_engine/clumsy_engine.h"
-#include "clumsy_engine/entry_point.h"//only included once
-#include "sim_app.h"
 
-
-class Layer_Demo :public clumsy_engine::Layer
-{
-public:
-	Layer_Demo() :
-		clumsy_engine::Layer("demo_layer")
+using namespace clumsy_engine;
+	Sim_Gui::Sim_Gui() :
+		clumsy_engine::Layer("sim_gui")
 		, m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>(-1,1,-1,1))
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 		, m_camara_position(0.f)
 		,m_camara_rotation(0.f)
 	{
 
+
 		/// data
-		std::vector<float> positions{
-			0.,0,0,0,0,0.5,
-			1,0,0,0,0,0.2,
-			1,1,0,0,0,0.2
-		};
-		//		std::vector<float> positions{
-		//			0.,0,0,
-		//			1,0,0,
-		//			1,1,0,
-		//		};
+		//std::vector<float> positions{
+		//	0.,0,0,0,0,0.5,
+		//	1,0,0,0,0,0.2,
+		//	1,1,0,0,0,0.2
+		//};
+				std::vector<float> positions{
+					0.,0,0,
+					1,0,0,
+					1,1,0,
+				};
 
 		std::vector<int> triangles{
 			0,1,2
@@ -41,8 +37,8 @@ public:
 
 		clumsy_engine::Buffer_Layout layout =
 		{
-			{clumsy_engine::Shader_Data_Type::Float3, "a_position"},
-			{clumsy_engine::Shader_Data_Type::Float3, "a_color"}
+			{clumsy_engine::Shader_Data_Type::Float3, "a_position"}
+			//, {clumsy_engine::Shader_Data_Type::Float3, "a_color"}
 
 		};
 		vertex_buffer->set_layout(layout);
@@ -103,9 +99,28 @@ public:
 //			std::bind(&Layer_Demo::on_key_pressed, this, std::placeholders::_1)
 //			//key_pressed_handler
 //			);
+
+
+
+
+
+
+		///////////////simulation init
+		m_sim.add_interaction<clumsy_engine::Inertial>();
+		m_sim.add_interaction<clumsy_engine::Gravity>();
+
+		m_sim.set<data::Time_Step>(0.01);
+		m_sim.set<data::Mass_Density>(1.);
+		m_sim.set<data::Gravity>({ 0,-10,0 });
+		
+		m_sim.set<clumsy_engine::data::Triangle_Indice>(triangles);
+		m_sim.set<clumsy_engine::data::Position>(positions);
+
+		//m_sim.set<clumsy_engine::data::Mass>({ 1.f,1.f,1.f });
+
 	}
 
-	bool on_key_pressed(clumsy_engine::Key_Pressed_Event& e)
+	bool Sim_Gui::on_key_pressed(clumsy_engine::Key_Pressed_Event& e)
 	{
 //		float speed=0.1f;
 //		if (e.get_key() == CE_KEY_LEFT)
@@ -129,11 +144,15 @@ public:
 
 	}
 
-	void on_attach()  override
+	void Sim_Gui::on_attach()  
 	{
 	};
-	void on_detach()override {};
-	void on_update(clumsy_engine::Time_Step dt) override
+
+	void Sim_Gui::on_detach() 
+	{
+	};
+
+	void Sim_Gui::on_update(clumsy_engine::Time_Step dt) 
 	{
 
 		CE_INFO("{0} s", dt.get_seconds());
@@ -178,63 +197,32 @@ public:
 
 		clumsy_engine::Renderer::end_scene();
 
+
+		//simulation update
+		m_sim.update();
+		auto new_pos = m_sim.get<data::Position>();
+		m_vertex_array->set_positions(new_pos.data(), new_pos.size() / 3);
+
+
 	};
-	virtual void on_event(clumsy_engine::Event& e) 
+
+	void Sim_Gui::on_event(clumsy_engine::Event& e) 
 	{
 		(*m_dispatcher)(e);
 	}
 
-	virtual void on_imgui_render(ImGuiContext* imgui_context) 
+	void Sim_Gui::on_imgui_render(ImGuiContext* imgui_context) 
 	{
 
 		ImGui::SetCurrentContext(imgui_context); //cross lib imgui context do not share ! so set it manully
 
-		ImGui::Begin("Test from demo layer");
-		ImGui::Text("hello world from demo layer");
+		ImGui::Begin("Test from sim app");
+		ImGui::Text("hello world from sim app");
 		ImGui::End();
+
+		m_sim.set<data::Gravity>({ 0,-10,0 });
+
 	}
 
-private:
-
-	std::shared_ptr<clumsy_engine::Shader> m_shader;
-	std::shared_ptr<clumsy_engine::Vertex_Array> m_vertex_array;
-
-	std::shared_ptr<clumsy_engine::Orthorgraphic_Camara> m_camara;
-
-	glm::vec3 m_camara_position;
-
-	float m_camara_rotation;
-
-	std::shared_ptr<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
-};
-
-
-class SanBox_App:public clumsy_engine::Application
-{
-	public:
-		SanBox_App() 
-		{
-
-			//std::shared_ptr<clumsy_engine::Layer> layer = std::make_shared<Layer_Demo>();
-			push_layer(std::make_shared<Layer_Demo>());
-		}
-
-};
-
-
-
-std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
-{
-	clumsy_engine::Log::get_core_logger()->trace("create app");
-
-	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
-	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
-
-
-//	layer = std::make_shared<clumsy_engine::Imgui_Layer>();
-//	app->push_overlay(layer);
-
-	return app;
-}
 
 

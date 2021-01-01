@@ -130,7 +130,7 @@ namespace clumsy_engine
             virtual const Buffer_Layout& get_layout()const = 0;
             virtual void set_layout(const Buffer_Layout& layout) = 0;
 
-            //virtual void set_data() = 0;
+            virtual void set_data(float * data,int num) = 0;
 
             static std::unique_ptr<Vertex_Buffer> create(float *vertices, int size);
     };

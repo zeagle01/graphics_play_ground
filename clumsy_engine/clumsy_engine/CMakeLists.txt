@@ -48,26 +48,19 @@ src/openGL_Renderer_API.cpp
 src/orthographic_camara.cpp
 
 
-src/simulator.h
 src/simulator.cpp
-src/interaction.h
 src/interaction.cpp
-src/gravity.h
 src/gravity.cpp
-src/inertial.h
 src/inertial.cpp
 src/system_equations_solver.h
 src/system_equations_solver.cpp
-src/simulation_data.h
 src/simulation_data.cpp
 src/spring_stretch.h
 src/spring_stretch.cpp
 src/one_point_stencils.h
 src/one_point_stencils.cpp
 src/signal.h
-src/type_map.h
 src/type_map.cpp
-src/type_list.h
 src/type_list.cpp
 src/class_reflect.h
 src/data_computes.h
@@ -99,6 +92,14 @@ include/clumsy_engine/orthographic_camara.h
 include/clumsy_engine/dispatcher.h
 include/clumsy_engine/key_event.h
 include/clumsy_engine/time_step.h
+
+include/simulator/simulator.h
+include/simulator/type_list.h
+include/simulator/type_map.h
+include/simulator/simulation_data.h
+include/simulator/inertial.h
+include/simulator/interaction.h
+include/simulator/gravity.h
 )
 
 add_library(clumsy_engine  SHARED
@@ -123,6 +124,7 @@ target_include_directories(clumsy_engine
 PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/clumsy_engine>
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/simulator>
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/spdlog/include>
 $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>

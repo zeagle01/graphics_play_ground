@@ -21,6 +21,8 @@ namespace clumsy_engine
 		virtual std::vector<std::shared_ptr<Vertex_Buffer>> get_vertex_buffer() const = 0;
 		virtual std::shared_ptr<Index_Buffer> get_index_buffer() const = 0;
 
+		void set_positions(float* data, int num);
+
 		static std::unique_ptr<Vertex_Array> create();
 	};
 

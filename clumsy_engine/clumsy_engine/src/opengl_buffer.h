@@ -28,6 +28,7 @@ namespace clumsy_engine
             {
                 m_layout = layout;
             }
+			void set_data(float* data, int num)override;
 
         private:
             unsigned int m_renderer_id;

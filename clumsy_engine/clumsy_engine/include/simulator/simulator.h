@@ -8,7 +8,6 @@
 #include <memory>
 #include <map>
 #include <string>
-#include <typeinfo>
 
 #include "type_map.h"
 #include "Simulation_Data.h"
