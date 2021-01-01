@@ -29,8 +29,8 @@ namespace clumsy_engine
 		layer_vec::iterator end() { return m_layers.end(); };
 
 	private:
-		layer_vec m_layers;
 		int m_layer_insert_pos = 0;
+		layer_vec m_layers;
 	};
 
 }

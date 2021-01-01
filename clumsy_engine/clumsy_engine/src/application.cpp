@@ -20,7 +20,6 @@
 #include "time_step.h"
 
 
-
 namespace clumsy_engine
 {
 
@@ -113,12 +112,10 @@ namespace clumsy_engine
 
 			for (auto& layer : *m_layer_stack)
 			{
-				//m_imgui_layer->begin();
-				layer->on_imgui_render();
-				//m_imgui_layer->end();
+				layer->on_imgui_render(m_imgui_layer->get_imgui_context());
 			}
 
-			//m_imgui_layer->on_imgui_render();
+
 
 			m_imgui_layer->end();
 

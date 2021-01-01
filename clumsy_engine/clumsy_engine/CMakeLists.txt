@@ -101,7 +101,7 @@ include/clumsy_engine/key_event.h
 include/clumsy_engine/time_step.h
 )
 
-add_library(clumsy_engine SHARED
+add_library(clumsy_engine  SHARED
 ${include_files}
 ${source_files}
 )

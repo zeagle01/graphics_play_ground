@@ -6,12 +6,12 @@
 #include "clumsy_engine/clumsy_engine.h"
 
 
-class Layer_Demo :public clumsy_engine::Layer
+class Layer_Demo :public clumsy_engine::Imgui_Layer
 {
 public:
 	Layer_Demo() :
-		clumsy_engine::Layer("demo_layer")
-		, m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>(-1,1,-1,1))
+		//clumsy_engine::Layer("demo_layer")
+		 m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>(-1,1,-1,1))
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 		, m_camara_position(0.f)
 		,m_camara_rotation(0.f)
@@ -182,13 +182,14 @@ public:
 		(*m_dispatcher)(e);
 	}
 
-	virtual void on_imgui_render() 
+	virtual void on_imgui_render(ImGuiContext* imgui_context) 
 	{
 
-		////do not work for imgui context reason
-//		ImGui::Begin("Test");
-//		ImGui::Text("hello world");
-//		ImGui::End();
+		ImGui::SetCurrentContext(imgui_context); //cross lib imgui context do not share ! so set it manully
+
+		ImGui::Begin("Test from demo layer");
+		ImGui::Text("hello world from demo layer");
+		ImGui::End();
 	}
 
 private:

@@ -17,21 +17,22 @@ add_library(my_imgui
     ${imgui_dir}/imgui_demo.cpp
     ${imgui_dir}/imgui_draw.cpp
     ${imgui_dir}/imgui_internal.h
+    ${imgui_dir}/imgui_tables.cpp
     ${imgui_dir}/imgui_widgets.cpp
     ${imgui_dir}/imstb_rectpack.h
     ${imgui_dir}/imstb_textedit.h
     ${imgui_dir}/imstb_truetype.h
 
-    ${imgui_dir}/examples/imgui_impl_glfw.h
-    ${imgui_dir}/examples/imgui_impl_glfw.cpp
+    ${imgui_dir}/backends/imgui_impl_glfw.h
+    ${imgui_dir}/backends/imgui_impl_glfw.cpp
 
-    ${imgui_dir}/examples/imgui_impl_opengl3.h
-    ${imgui_dir}/examples/imgui_impl_opengl3.cpp
+    ${imgui_dir}/backends/imgui_impl_opengl3.h
+    ${imgui_dir}/backends/imgui_impl_opengl3.cpp
     )
 
 
 target_include_directories(my_imgui PUBLIC ${imgui_dir})
-target_include_directories(my_imgui PUBLIC ${imgui_dir}/examples)
+target_include_directories(my_imgui PUBLIC ${imgui_dir}/backends)
 
 set_property(TARGET my_imgui PROPERTY FOLDER external_wrappers)
 

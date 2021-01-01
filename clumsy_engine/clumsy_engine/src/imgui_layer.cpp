@@ -59,7 +59,7 @@ namespace clumsy_engine
 
 			// Setup Dear ImGui context
 			IMGUI_CHECKVERSION();
-			ImGui::CreateContext();
+			m_imgui_context = ImGui::CreateContext();
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 			//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -96,10 +96,14 @@ namespace clumsy_engine
 		}
 
 
-		void Imgui_Layer::on_imgui_render()
+		void Imgui_Layer::on_imgui_render(ImGuiContext* imgui_context)
 		{
 			static bool show = true;
 			ImGui::ShowDemoWindow(&show);
+
+			ImGui::Begin("Test from imgui layer");
+			ImGui::Text("hello world from imgui layer");
+			ImGui::End();
 
 
 		}

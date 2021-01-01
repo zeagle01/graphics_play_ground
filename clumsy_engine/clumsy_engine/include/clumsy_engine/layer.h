@@ -5,6 +5,8 @@
 #include <string>
 #include "time_step.h"
 
+struct  ImGuiContext;
+
 namespace clumsy_engine
 {
 	class Event;
@@ -18,7 +20,7 @@ namespace clumsy_engine
 		virtual void on_attach() {};
 		virtual void on_detach() {};
 		virtual void on_update(Time_Step dt) {};
-		virtual void on_imgui_render() {};
+		virtual void on_imgui_render(ImGuiContext* imgui_context) {};
 		virtual void on_event(Event& e) {}
 
 
