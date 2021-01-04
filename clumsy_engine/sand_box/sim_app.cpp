@@ -116,7 +116,6 @@ using namespace clumsy_engine;
 		m_sim.set<clumsy_engine::data::Triangle_Indice>(triangles);
 		m_sim.set<clumsy_engine::data::Position>(positions);
 
-		//m_sim.set<clumsy_engine::data::Mass>({ 1.f,1.f,1.f });
 
 	}
 
@@ -217,10 +216,22 @@ using namespace clumsy_engine;
 		ImGui::SetCurrentContext(imgui_context); //cross lib imgui context do not share ! so set it manully
 
 		ImGui::Begin("Test from sim app");
+
 		ImGui::Text("hello world from sim app");
+
+		static float gravity[] = { 0.f,0.f,0.f };
+		static float time_step = 0.1f;
+		static float rho = 1.f;
+
+		ImGui::SliderFloat3("gravity", gravity, -10.f, 10.f);            
+		ImGui::SliderFloat("time step", &time_step, 0.001, 10.f);           
+		ImGui::SliderFloat("mass density", &rho, 0.001, 10.f);           
+
 		ImGui::End();
 
-		m_sim.set<data::Gravity>({ 0,-10,0 });
+		m_sim.set<data::Time_Step>(time_step);
+		m_sim.set<data::Mass_Density>(rho);
+		m_sim.set<data::Gravity>({ gravity[0],gravity[1],gravity[2] });
 
 	}
 
