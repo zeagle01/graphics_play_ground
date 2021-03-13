@@ -1,12 +1,21 @@
 
 
+cmake_minimum_required(VERSION 3.15)
 
-project(matrix_math CXX)
+project(matrix_math  )
 
 
-add_executable(matrix_math  
-main.cpp
-matrix_math.h
+add_library(matrix_math STATIC 
+include/matrix_math/matrix_math.h
+matrix_math.cpp
+)
+
+target_include_directories(matrix_math
+PUBLIC
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+PUBLIC
+$<INSTALL_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 set_target_properties(matrix_math PROPERTIES FOLDER common)
+

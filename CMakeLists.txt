@@ -20,6 +20,7 @@ add_subdirectory(external_wrappers/imgui)
 add_subdirectory(external/glfw)
 
 add_subdirectory(common/matrix_math)
+add_subdirectory(unit_test/common/matrix_math_test)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
