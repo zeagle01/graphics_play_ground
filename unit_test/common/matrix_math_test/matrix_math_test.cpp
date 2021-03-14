@@ -228,7 +228,7 @@ TEST(Matrix_Test, determinant_2by2)
 
 TEST(Matrix_Test, solve)
 {
-	mat3x3f A = get_identity<3, 3, float>();
+	mat3x3f A = get_identity<3, float>();
 
 	vec3f b{ 0,1,0 };
 	vec3f exp{ 0,1,0 };

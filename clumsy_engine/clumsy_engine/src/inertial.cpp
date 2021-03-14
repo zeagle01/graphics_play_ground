@@ -34,13 +34,11 @@ namespace clumsy_engine
 
 		float k = mass_v / time_step / time_step;
 
-		eq.A = std::vector<float>{k};
+		eq.A = std::vector<mat3x3f>{ get_identity<3,float>() * k };
 
-		eq.b = std::vector<float>
+		eq.b = std::vector<vec3f>
 		{
-			k* lastPos[v * 3 + 0] + time_step * velocity[v * 3 + 0],
-			k* lastPos[v * 3 + 1] + time_step * velocity[v * 3 + 1],
-			k* lastPos[v * 3 + 2] + time_step * velocity[v * 3 + 2],
+			k* lastPos[v] + time_step * velocity[v],
 		};
 
 		eq.stencil = { v };

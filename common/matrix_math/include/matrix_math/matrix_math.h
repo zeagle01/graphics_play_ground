@@ -1,4 +1,5 @@
 
+#pragma once
 
 #include <initializer_list>
 #include <numeric>
@@ -24,6 +25,19 @@ public:
 			for ( auto it_row = it_col->begin(); it_row != it_col->end(); it_row++,ri++)
 			{
 				data[ci][ri]=*it_row;
+			}
+		}
+
+	}
+
+	mat(const std::initializer_list<vec<Row, T>> data_list)//col major
+	{
+		int ci = 0;
+		for ( auto it_col = data_list.begin(); it_col != data_list.end(); it_col++,ci++)
+		{
+			for (int ri = 0; ri < Row;  ri++)
+			{
+				data[ci][ri] = (*it_col)(ri);
 			}
 		}
 
@@ -103,13 +117,13 @@ static mat<Row, Col, T> get_uniform(T value)
 	return ret;
 }
 
-template<size_t row, size_t col, typename T>
-static inline mat<row, col, T> get_identity()
+template<size_t N, typename T>
+static inline mat<N, N, T> get_identity()
 {
-	mat<row, col, T> ret;
-	for (int ri = 0; ri < row; ri++)
+	mat<N, N, T> ret;
+	for (int ri = 0; ri < N; ri++)
 	{
-		for (int ci = 0; ci < col; ci++)
+		for (int ci = 0; ci < N; ci++)
 		{
 			if (ri == ci)
 			{
@@ -261,6 +275,17 @@ MATRIX_SCALAR_OP(+)
 MATRIX_SCALAR_OP(-)
 MATRIX_SCALAR_OP(*)
 MATRIX_SCALAR_OP(/)
+
+// -a
+template<size_t Row,size_t Col,typename T>  
+static mat<Row, Col, T> operator-(const mat<Row, Col, T>& m) 
+{ 
+	auto fn=[](T v) 
+	{
+		return -v ;
+	};
+	return matrix_elementwise_unary_op<Row, Col, T>(m, fn);
+}
 
 ///////////////////////
 // a0.a1 (matrix multiply matrix)
@@ -425,6 +450,7 @@ using mat4x4 = mat<4, 4, T>;
 
 using mat4x4f = mat<4, 4, float>;
 using mat3x3f = mat<3, 3, float>;
+using mat3x2f = mat<3, 2, float>;
 using mat2x2f = mat<2, 2, float>;
 
 

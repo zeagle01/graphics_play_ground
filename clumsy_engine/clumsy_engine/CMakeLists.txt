@@ -154,6 +154,9 @@ target_link_libraries(clumsy_engine PUBLIC glm::glm)
 target_link_libraries(clumsy_engine PUBLIC my_imgui)
 
 
+target_link_libraries(clumsy_engine PUBLIC matrix_math)
+
+
 
 
 include(GNUInstallDirs)

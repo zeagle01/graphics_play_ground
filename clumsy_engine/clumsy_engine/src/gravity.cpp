@@ -23,7 +23,7 @@ namespace clumsy_engine
 
 		Element_Equation ret;
 
-		ret.A = std::vector<float>{ 0.f };
+		ret.A = std::vector<mat3x3f>{ get_uniform < 3,3,float>(0) };
 
 		int v = st[0];
 
@@ -32,11 +32,9 @@ namespace clumsy_engine
 
 		float mass_v = mass[v];//TODO
 
-		ret.b = std::vector<float>
+		ret.b = std::vector<vec3f>
 		{
-			mass_v * gravity[0],
-			mass_v * gravity[1],
-			mass_v * gravity[2]
+			mass_v * gravity,
 		};
 
 		ret.stencil = std::vector<int>{v};

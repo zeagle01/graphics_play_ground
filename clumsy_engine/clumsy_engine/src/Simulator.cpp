@@ -63,7 +63,7 @@ namespace clumsy_engine
 		{
 			float time_step = get<data::Time_Step>();
 
-			std::vector<float> velocity(positions.size());
+			std::vector<vec3f> velocity(positions.size());
 
 			for (int i = 0; i < positions.size(); i++)
 			{

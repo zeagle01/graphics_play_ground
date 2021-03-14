@@ -30,7 +30,7 @@ public:
 
 protected:
 
-	std::vector<float> m_positions;
+	std::vector<vec3f> m_positions;
 
 	Simulator m_sim;
 
@@ -46,7 +46,7 @@ class One_Vertex :public Simulator_Test
 public:
 	One_Vertex()
 	{
-		m_positions = std::vector<float>(3, 0.f);
+		m_positions = std::vector<vec3f>{ get_uniform<3,1,float>(0) };
 
 		m_sim.set<data::Position>(m_positions);
 
@@ -97,8 +97,8 @@ public:
 	One_Edge()
 	{
 		m_positions = {
-			0, 0,0,
-			1, 0,0
+			{0, 0,0},
+			{1, 0,0}
 			};
 
 		m_sim.add_interaction<Spring_Stretch>();

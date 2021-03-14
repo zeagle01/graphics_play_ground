@@ -15,8 +15,10 @@ public:
 	Spring_Stretch_Test()
 	{
 		m_positions=
-		{ 0,0,0,
-			1,0,0 };
+		{ 
+			{0,0,0},
+			{1,0,0 } 
+		};
 
 
 		m_spring_stretch.set<data::Position>(m_positions);
@@ -30,7 +32,7 @@ protected:
 		1,0,0 
 	} ;
 	Spring_Stretch m_spring_stretch;
-	std::vector<float > m_positions;
+	std::vector<vec3f > m_positions;
 	std::vector<int> m_triangles;
 };
 
@@ -49,14 +51,16 @@ TEST_F(Spring_Stretch_Test, one_spring_equation)
 {
 	auto equation = m_spring_stretch.compute_element_equation({ 0,1 });
 
+	auto id = get_identity<3, float>();
+
 	Element_Equation exp{
 		{
-			1,-1,
-			-1,1
+			id,-id,
+			-id,id
 		},
 		{
-			-1,0,0,
-			1,0,0
+			{-1,0,0},
+			{1,0,0}
 		},
 		{0,1}
 	};

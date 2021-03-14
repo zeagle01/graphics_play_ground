@@ -8,6 +8,7 @@
 #include "type_list.h"
 #include "class_reflect.h"
 #include "data_computes.h"
+#include "matrix_math/matrix_math.h"
 
 namespace clumsy_engine
 {
@@ -139,22 +140,25 @@ namespace clumsy_engine
 		using vf = std::vector<float>;
 		using vi = std::vector<int>;
 
-		DEF_MEM(Gravity,					vf,		Plain_Computer,										empty_deps);
-		DEF_MEM(Time_Step,					float,	Plain_Computer,										empty_deps);
-		DEF_MEM(Mass_Density,				float,	Plain_Computer,										empty_deps);
-		DEF_MEM(Position,					vf,		Plain_Computer,										empty_deps);
-		DEF_MEM(Triangle_Indice,			vi,		Plain_Computer,										empty_deps);
+		using v_v3f = std::vector<vec3f>;
+		using v_v3i = std::vector<vec3i>;
 
-		DEF_MEM(Vertex_Num,					int,	TMP(Get_List_Size<Position, 3>),					type_list<Position>);
-		DEF_MEM(Velocity,					vf,		TMP(Allocate_With_Size<vf, Vertex_Num, 3>),			type_list<Vertex_Num>);
-		DEF_MEM(Last_Frame_Position,		vf,		TMP(Allocate_With_Size<vf, Vertex_Num, 3>),			type_list<Vertex_Num>);
-		DEF_MEM(Triangle_Area,				vf,		Compute_Triangle_Area,								TMP(type_list<Position,Triangle_Indice>));
-		DEF_MEM(Vertex_Area,				vf,		Compute_Vertex_Area,								TMP(type_list<Vertex_Num,Triangle_Area,Triangle_Indice>));
-		DEF_MEM(Mass,						vf,		Compute_Mass,										TMP(type_list<Mass_Density,Vertex_Area>));
+		DEF_MEM(Gravity,					vec3f,		Plain_Computer,										empty_deps);
+		DEF_MEM(Time_Step,					float,		Plain_Computer,										empty_deps);
+		DEF_MEM(Mass_Density,				float,		Plain_Computer,										empty_deps);
+		DEF_MEM(Position,					v_v3f,		Plain_Computer,										empty_deps);
+		DEF_MEM(Triangle_Indice,			vi,			Plain_Computer,										empty_deps);
 
-		DEF_MEM(Edge_Indice,				vi,		Compute_Edge_Indices,								TMP(type_list<Triangle_Indice, Vertex_Num>));
-		DEF_MEM(Edge_Length,				vf,		Compute_Edge_Length,								TMP(type_list<Position, Edge_Indice>));
-		DEF_MEM(Delta_Position,				vf,		Delta,												TMP(type_list< Position,Last_Frame_Position> ));
+		DEF_MEM(Vertex_Num,					int,		TMP(Get_List_Size<Position, 1>),					type_list<Position>);
+		DEF_MEM(Velocity,					v_v3f,		TMP(Allocate_With_Size<v_v3f, Vertex_Num, 1>),		type_list<Vertex_Num>);
+		DEF_MEM(Last_Frame_Position,		v_v3f,		TMP(Allocate_With_Size<v_v3f, Vertex_Num, 1>),		type_list<Vertex_Num>);
+		DEF_MEM(Triangle_Area,				vf,			Compute_Triangle_Area,								TMP(type_list<Position,Triangle_Indice>));
+		DEF_MEM(Vertex_Area,				vf,			Compute_Vertex_Area,								TMP(type_list<Vertex_Num,Triangle_Area,Triangle_Indice>));
+		DEF_MEM(Mass,						vf,			Compute_Mass,										TMP(type_list<Mass_Density,Vertex_Area>));
+
+		DEF_MEM(Edge_Indice,				vi,			Compute_Edge_Indices,								TMP(type_list<Triangle_Indice, Vertex_Num>));
+		DEF_MEM(Edge_Length,				vf,			Compute_Edge_Length,								TMP(type_list<Position, Edge_Indice>));
+		DEF_MEM(Delta_Position,				vf,			Delta,												TMP(type_list< Position,Last_Frame_Position> ));
 	} ;
 
 	template<typename ...P>

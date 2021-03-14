@@ -3,7 +3,7 @@
 #pragma once
 #include <cmath>
 
-//#include "simulation_data.h"
+#include "matrix_math/matrix_math.h"
 
 namespace clumsy_engine
 {
@@ -140,33 +140,18 @@ namespace clumsy_engine
 			for (int i = 0; i < t_num; i++)
 			{
 				int v[]{ triangle_indice[i * 3 + 0],triangle_indice[i * 3 + 1],triangle_indice[i * 3 + 2] };
-				float x[]{
-					position[v[0]*3+0], position[v[0]*3+1], position[v[0]*3+2],
-					position[v[1]*3+0], position[v[1]*3+1], position[v[2]*3+2],
-					position[v[2]*3+0], position[v[2]*3+1], position[v[2]*3+2]
+				vec3f x[]{
+					position[v[0]],
+					position[v[1]],
+					position[v[2]]
 				};
 
-				float d[2 * 3];
-				for (int j = 0; j < 2; j++)
-				{
-					for (int k = 0; k < 3; k++)
-					{
-						d[j * 3 + k] = x[j * 3 + k] - x[2 * 3 + k];
-					}
-				}
+				auto n = (x[0] - x[2]) ^ (x[1] - x[2]);
 
-				float cross[3];
-				cross[0] = d[0 * 3 + 1] * d[1 * 3 + 2] - d[0 * 3 + 2] * d[1 * 3 + 1];
-				cross[1] = -d[0 * 3 + 0] * d[1 * 3 + 2] + d[0 * 3 + 2] * d[1 * 3 + 0];
-				cross[2] = d[0 * 3 + 0] * d[1 * 3 + 1] - d[0 * 3 + 1] * d[1 * 3 + 0];
+				float l = Vectorized_Norm<2>()(n);
 
-				float l = 0;
-				for (int i = 0; i < 3; i++)
-				{
-					l += cross[i] * cross[i];
-				}
-				l = std::sqrt(l);
 				l = 0.5f * l;
+
 				triangle_area[i] = l;
 			}
 
