@@ -111,7 +111,7 @@ using namespace clumsy_engine;
 
 		m_sim.set<data::Time_Step>(0.01);
 		m_sim.set<data::Mass_Density>(1.);
-		m_sim.set<data::Gravity>({ 0,-10,0 });
+		m_sim.set<data::Gravity>({ 0,0,0 });
 		
 		m_sim.set<clumsy_engine::data::Triangle_Indice>(triangles);
 		m_sim.set<clumsy_engine::data::Position>(positions);
@@ -202,7 +202,7 @@ using namespace clumsy_engine;
 		//simulation update
 		m_sim.update();
 		auto new_pos = m_sim.get<data::Position>();
-		m_vertex_array->set_positions(new_pos[0].get_flat(), new_pos.size() / 3);
+		m_vertex_array->set_positions(new_pos[0].get_flat(), new_pos.size() );
 
 
 	};

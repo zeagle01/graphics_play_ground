@@ -13,9 +13,9 @@ namespace clumsy_engine
 		auto& x0 = ret;
 		int vertexNum = ret.size() ;
 
-		std::vector<mat3x3f> lhs(vertexNum);
+		std::vector<mat3x3f> lhs(vertexNum,get_uniform<3,3,float>(0));
 
-		std::vector<vec3f> rhs(vertexNum);
+		std::vector<vec3f> rhs(vertexNum,get_uniform<3,1,float>(0));
 
 
 		for (int i = 0; i < equations.size(); i++)
