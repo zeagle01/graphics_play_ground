@@ -49,7 +49,7 @@ protected:
 
 TEST_F(Spring_Stretch_Test, one_spring_equation)
 {
-	auto equation = m_spring_stretch.compute_element_equation({ 0,1 });
+	auto equation = m_spring_stretch.compute_element_equation({ 0,1 }, 0);
 
 	auto id = get_identity<3, float>();
 

@@ -77,13 +77,7 @@ namespace clumsy_engine
 			{
 				int v0 = edge_indices[i * 2 + 0];
 				int v1 = edge_indices[i * 2 + 1];
-				float l = 0;
-				for (int i = 0; i < 3; i++)
-				{
-					float d = positions[v0 * 3 + i] - positions[v1 * 3 + i];
-					l += d * d;
-				}
-				edge_length[i] = std::sqrt(l);
+				edge_length[i] = Vectorized_Norm<2>()(positions[v0] - positions[v1]);
 			}
 
 		}

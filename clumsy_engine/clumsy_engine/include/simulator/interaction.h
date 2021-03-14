@@ -21,7 +21,7 @@ namespace clumsy_engine
 
 		virtual std::vector<stencil> compute_stencils() { return std::vector<stencil>(); }
 
-		virtual Element_Equation compute_element_equation(stencil st) { return Element_Equation(); }
+		virtual Element_Equation compute_element_equation(stencil st,int i) { return Element_Equation(); }
 
 		std::vector<Element_Equation> compute_element_equations();
 

@@ -146,6 +146,7 @@ namespace clumsy_engine
 		DEF_MEM(Gravity,					vec3f,		Plain_Computer,										empty_deps);
 		DEF_MEM(Time_Step,					float,		Plain_Computer,										empty_deps);
 		DEF_MEM(Mass_Density,				float,		Plain_Computer,										empty_deps);
+		DEF_MEM(Stretch_Stiff,				float,		Plain_Computer,										empty_deps);
 		DEF_MEM(Position,					v_v3f,		Plain_Computer,										empty_deps);
 		DEF_MEM(Triangle_Indice,			vi,			Plain_Computer,										empty_deps);
 

@@ -7,32 +7,15 @@
 
 namespace clumsy_engine
 {
-	class Spring_Stretch :public Interaction, public Simulation_Data_Acc<type_list<data::Position>>
+	class Spring_Stretch :public Interaction, public Simulation_Data_Acc<type_list<data::Position,data::Edge_Length,data::Stretch_Stiff>>
 	{
 	public:
-		//using dependent_variables = type_list<data::Position>; 
 
 		std::vector<stencil> compute_stencils() override;
 
-		Element_Equation compute_element_equation(stencil st) override;
+		Element_Equation compute_element_equation(stencil st,int ei) override;
 
 
-	public:
-
-		void set_stiff(float stiff)
-		{
-			m_stiff = stiff;
-		}
-
-		void set_rest_length(const std::vector<float>& rest_length)
-		{
-			m_rest_length = rest_length;
-		}
-
-	private:
-		std::vector<float> m_positions;
-		std::vector<float> m_rest_length;
-		float m_stiff = 1.f;
 
 	};
 }

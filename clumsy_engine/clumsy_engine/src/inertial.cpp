@@ -16,7 +16,7 @@ namespace clumsy_engine
 		return st(get<data::Vertex_Num>());
 	}
 
-	Element_Equation Inertial::compute_element_equation(stencil st)
+	Element_Equation Inertial::compute_element_equation(stencil st,int ei)
 	{
 
 		Element_Equation eq;

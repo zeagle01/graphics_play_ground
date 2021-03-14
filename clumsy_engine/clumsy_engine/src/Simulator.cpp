@@ -53,9 +53,12 @@ namespace clumsy_engine
 
 
 		///////////// update////////////
-		m_solver->solve(positions, equations);
+		for (int i = 0; i < 50; i++)
+		{
+			m_solver->solve(positions, equations);
+			set<data::Position>(positions);
+		}
 
-		set<data::Position>(positions);
 
 		auto inertial = m_interactions_map.get<Inertial>();
 

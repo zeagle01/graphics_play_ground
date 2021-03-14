@@ -14,12 +14,14 @@ namespace clumsy_engine
 		return { {0,1} };
 	}
 
-	Element_Equation Spring_Stretch::compute_element_equation(stencil st)
+	Element_Equation Spring_Stretch::compute_element_equation(stencil st,int ei)
 	{
 		Element_Equation ret = Element_Equation::with_size(st.size());
 		ret.stencil = st;
 
 		const auto& positions = get<data::Position>();
+		const auto& edge_lengths = get<data::Edge_Length>();
+		auto stiff = get<data::Stretch_Stiff>();
 
 		vec2f w = { -1,1 };
 		mat3x2f x{
@@ -31,17 +33,16 @@ namespace clumsy_engine
 
 		float l = Vectorized_Norm<2>()(d);
 
-		float l0 = 1.f;//TODO
-		d = d * l0 / l;
+		d = d * edge_lengths[ei] / l;
 
 		for (int i = 0; i < 2; i++)
 		{
 			for (int j = 0; j < 2; j++)
 			{
-				ret.A[i * 2 + j] = w(i) * w(j) * m_stiff * get_identity<3, float>();
+				ret.A[i * 2 + j] = w(i) * w(j) * stiff * get_identity<3, float>();
 			}
 
-			ret.b[i] = w(i) * d * m_stiff;
+			ret.b[i] = w(i) * d * stiff;
 		}
 
 		return ret;

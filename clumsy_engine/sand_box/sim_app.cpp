@@ -2,6 +2,7 @@
 #include "sim_app.h"
 #include "inertial.h"
 #include "gravity.h"
+#include "spring_stretch.h"
 
 #include "imgui.h"
 
@@ -21,11 +22,11 @@ using namespace clumsy_engine;
 		//	1,0,0,0,0,0.2,
 		//	1,1,0,0,0,0.2
 		//};
-				std::vector<vec3f> positions{
-					{0.,0,0},
-					{1,0,0},
-					{1,1,0},
-				};
+		std::vector<vec3f> positions{
+			{0.,0,0},
+			{0.5,0,0},
+			{0.5,0.5,0},
+		};
 
 		std::vector<int> triangles{
 			0,1,2
@@ -108,10 +109,12 @@ using namespace clumsy_engine;
 		///////////////simulation init
 		m_sim.add_interaction<clumsy_engine::Inertial>();
 		m_sim.add_interaction<clumsy_engine::Gravity>();
+		m_sim.add_interaction<clumsy_engine::Spring_Stretch>();
 
 		m_sim.set<data::Time_Step>(0.01);
 		m_sim.set<data::Mass_Density>(1.);
 		m_sim.set<data::Gravity>({ 0,0,0 });
+		m_sim.set<data::Stretch_Stiff>(1e3f);
 		
 		m_sim.set<clumsy_engine::data::Triangle_Indice>(triangles);
 		m_sim.set<clumsy_engine::data::Position>(positions);
@@ -224,16 +227,19 @@ using namespace clumsy_engine;
 		static float gravity[] = { 0.f,0.f,0.f };
 		static float time_step = 0.1f;
 		static float rho = 1.f;
+		static float stretch_stiff = 1e3f;
 
 		ImGui::SliderFloat3("gravity", gravity, -10.f, 10.f);            
 		ImGui::SliderFloat("time step", &time_step, 0.001, 10.f);           
 		ImGui::SliderFloat("mass density", &rho, 0.001, 10.f);           
+		ImGui::SliderFloat("stretch stiff", &stretch_stiff, 0.001, 1e7f);           
 
 		ImGui::End();
 
 		m_sim.set<data::Time_Step>(time_step);
 		m_sim.set<data::Mass_Density>(rho);
 		m_sim.set<data::Gravity>({ gravity[0],gravity[1],gravity[2] });
+		m_sim.set<data::Stretch_Stiff>(stretch_stiff);
 
 	}
 

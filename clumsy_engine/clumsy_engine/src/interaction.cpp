@@ -14,9 +14,11 @@ namespace clumsy_engine
 	{
 		const auto& stencils = compute_stencils();
 		std::vector<Element_Equation> ret;
+		int i = 0;
 		for (auto& st : stencils)
 		{
-			ret.push_back(compute_element_equation(st));
+			ret.push_back(compute_element_equation(st, i));
+			i++;
 		}
 		return ret;
 	};

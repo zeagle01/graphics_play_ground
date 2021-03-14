@@ -18,7 +18,7 @@ namespace clumsy_engine
 
 		std::vector<stencil> compute_stencils() override;
 
-		Element_Equation compute_element_equation(stencil st) override;
+		Element_Equation compute_element_equation(stencil st,int ei) override;
 
 
 	};

@@ -18,7 +18,7 @@ namespace clumsy_engine
 
 	}
 
-	Element_Equation Gravity::compute_element_equation(stencil st) 
+	Element_Equation Gravity::compute_element_equation(stencil st, int i)
 	{
 
 		Element_Equation ret;
