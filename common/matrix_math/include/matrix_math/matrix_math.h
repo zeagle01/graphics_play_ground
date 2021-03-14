@@ -29,8 +29,13 @@ public:
 
 	}
 
-	vec<Row, T>& operator[](int c) { return col_vecs[c]; }
-	const vec<Row, T>& operator[](int c) const { return col_vecs[c]; }
+	vec<Row, T>& column(int c) { return col_vecs[c]; }
+	const vec<Row, T>& column(int c) const { return col_vecs[c]; }
+
+	T& operator()(int ri,int ci) { 
+		return data[ci][ri]; 
+	}
+	const T& operator()(int ri,int ci) const { return data[ci][ri]; }
 
 	T * get_flat(){ return flat; }
 	T const* get_flat()const { return flat; }
@@ -42,7 +47,7 @@ public:
 	static constexpr size_t col = Col;
 private:
 	union {
-		T data[row][col];
+		T data[col][row];
 		T flat[row * col];
 		vec<Row, T> col_vecs[col];
 	};
@@ -62,14 +67,29 @@ public:
 		}
 
 	}
-	T& operator[](int i) { return data[i]; }
-	const T& operator[](int i) const { return data[i]; }
+
+	operator T()
+	{
+		return data[0];
+	}
+
+	vec<Row, T>& column(int c) { return *this; }
+	const vec<Row, T>& column(int c) const { return *this; }
+
+	T& operator()(int ri) { return data[ri]; }
+	const T& operator()(int ri) const { return data[ri]; }
+
+	T& operator()(int ri, int ci) { return data[ri]; }
+	const T& operator()(int ri, int ci) const { return data[ri]; }
 
 	T * get_flat(){ return data; }
 	T const* get_flat()const { return data; }
 private:
 	T data[Row];
 };
+
+
+
 
 ////////////////////////////
 template<size_t Row,size_t Col,typename T>
@@ -93,13 +113,43 @@ static inline mat<row, col, T> get_identity()
 		{
 			if (ri == ci)
 			{
-				ret[ci][ri] = 1.f;
+				ret(ri,ci) = 1.f;
 			}
 			else
 			{
-				ret[ci][ri] = 0.f;
+				ret(ri,ci) = 0.f;
 			}
 
+		}
+	}
+	return ret;
+}
+
+template<size_t N, typename T>
+static inline mat<N - 1, N - 1, T> get_minor(const mat<N, N, T>& a, const int r, const int c)
+{
+	mat<N - 1, N - 1, T> ret;
+	for (int ri = 0; ri < N - 1; ri++)
+	{
+		for (int ci = 0; ci < N - 1; ci++)
+		{
+			int rr = ri < r ? ri : ri + 1;
+			int cc = ci < c ? ci : ci + 1;
+			ret(ci,ri) = a(cc,rr);
+		}
+	}
+	return ret;
+}
+
+template<size_t Row,size_t Col, typename T>
+static inline mat<Col, Row, T> transpose(const mat<Row, Col, T>& m)
+{
+	mat<Col, Row, T> ret;
+	for (int ri = 0; ri < Row; ri++)
+	{
+		for (int ci = 0; ci < Col; ci++)
+		{
+			ret(ci,ri) = m(ri,ci);
 		}
 	}
 	return ret;
@@ -183,7 +233,74 @@ MATRIX_ELEMENTWISE_BINARY_OP(*,Multiply)
 
 //a0/a1
 MATRIX_ELEMENTWISE_BINARY_OP(/,Divide)
+
+
+#define MATRIX_SCALAR_OP(x) \
+template<size_t Row,size_t Col,typename T>  \
+static mat<Row, Col, T> operator##x(const mat<Row, Col, T>& m,T s) \
+{ \
+	auto fn=[s](T v) \
+	{\
+		return v x s;\
+	};\
+	return matrix_elementwise_unary_op<Row, Col, T>(m, fn);\
+}\
+\
+template<size_t Row,size_t Col,typename T>  \
+static mat<Row, Col, T> operator##x(T s,const mat<Row, Col, T>& m) \
+{ \
+	auto fn=[s](T v) \
+	{\
+		return s x v;\
+	};\
+	return matrix_elementwise_unary_op<Row, Col, T>(m, fn);\
+}\
+
+//// a*s
+MATRIX_SCALAR_OP(+)
+MATRIX_SCALAR_OP(-)
+MATRIX_SCALAR_OP(*)
+MATRIX_SCALAR_OP(/)
+
 ///////////////////////
+// a0.a1 (matrix multiply matrix)
+template<size_t Row, size_t Col, size_t N,typename T>
+static inline mat<Row, Col, T> operator&(const mat<Row, N, T>& m0, const mat<N, Col, T>& m1)
+{
+	mat<Row, Col, T> ret = get_uniform<Row, Col, T>(T(0));
+	for (int ci = 0; ci < Col; ci++)
+	{
+		for (int ni = 0; ni < N; ni++)
+		{
+			ret.column(ci) = ret.column(ci) + m0.column(ni) * m1(ni, ci);
+		}
+	}
+	return ret;
+}
+
+//// v0.v1 (dot)
+//template<size_t N, typename T>
+//static inline T operator&(const vec< N, T>& v0, const vec<N, T>& v1)
+//{
+//	auto m = matrix_elementwise_binary_op(v0, v1, Multiply<T>());
+//	return std::accumulate(m.get_flat(), m.get_flat() + N, T(0));
+//}
+
+
+template<size_t Row, size_t Col, typename T>
+static inline vec<Row, T> operator&( const vec<Row, T>& v,const mat<Row, Col, T>& m)
+{
+	return operator&(m, v);
+}
+
+
+//cross product
+template< typename T>
+static inline vec<3, T> operator^(const vec<3, T>& a, const vec<3, T>& b)
+{
+	return { a(1) * b(2) - a(2) * b(1), a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0) };
+}
+
 
 
 
@@ -234,6 +351,61 @@ static bool is_near(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1, T th
 	T norm = Vectorized_Norm<P>()(m0 - m1);
 	return norm <= threshold;
 }
+
+
+
+
+/////////////////////
+template<size_t N, typename T>
+struct determinant {
+
+	static	T get(const mat<N, N, T>& a) {
+		T sum = 0;
+		for (size_t i = 0; i < N; i++)
+		{
+			sum += a(0,i) * cofactor(a, i, 0);
+		}
+		return sum;
+	}
+};
+
+template<typename T>
+struct determinant<1, T>
+{
+	static T get(const mat<1, 1, T>& a)
+	{
+		return a(0,0);
+	}
+};
+
+template<size_t N, typename T>
+constexpr inline T cofactor(const mat<N, N, T>& a, const int row, const int col)
+{
+	T sign = (row + col) % 2 ? -1 : 1;
+	return  determinant<N - 1, T>::get(get_minor(a, row, col)) * sign;
+}
+
+template<size_t N, typename T>
+inline mat<N, N, T> adjoint(const mat<N, N, T>& a) {
+	mat<N, N, T> ret;
+	for (size_t ri = 0; ri < N; ri++) {
+		for (size_t ci = 0; ci < N; ci++)
+		{
+			ret(ri,ci) = cofactor(a, ri, ci);
+		}
+	}
+	return ret;
+}
+
+template<size_t Row, size_t Col, typename T>
+static inline mat<Row, Col, T> operator|(const mat<Row, Col, T>& m0, const mat<Row, Row, T>& m1) {
+
+	mat<Row, Row, T> adj = adjoint(m1);
+	T det = determinant<Row, T>::get(m1);
+	auto inv = adj / det;
+	return inv & m0;
+}
+
 /////////////////////
 
 
@@ -254,3 +426,9 @@ using mat4x4 = mat<4, 4, T>;
 using mat4x4f = mat<4, 4, float>;
 using mat3x3f = mat<3, 3, float>;
 using mat2x2f = mat<2, 2, float>;
+
+
+
+
+
+
