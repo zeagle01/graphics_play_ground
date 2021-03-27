@@ -377,6 +377,12 @@ static bool is_near(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1, T th
 	return norm <= threshold;
 }
 
+template< size_t Row, size_t Col, typename T  >
+static bool operator==(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1)
+{
+	return is_near<0>(m0, m1);
+}
+
 
 
 

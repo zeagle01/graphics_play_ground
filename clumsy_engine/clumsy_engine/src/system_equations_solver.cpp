@@ -13,9 +13,14 @@ namespace clumsy_engine
 		auto& x0 = ret;
 		int vertexNum = ret.size() ;
 
-		std::vector<mat3x3f> lhs(vertexNum,get_uniform<3,3,float>(0));
+		if (lhs.size() != vertexNum)
+		{
+			lhs.resize(vertexNum, get_uniform<3, 3, float>(0));
+			rhs.resize(vertexNum, get_uniform<3, 1, float>(0));
+		}
 
-		std::vector<vec3f> rhs(vertexNum,get_uniform<3,1,float>(0));
+		lhs.assign(vertexNum, get_uniform<3, 3, float>(0));
+		rhs.assign(vertexNum, get_uniform<3, 1, float>(0));
 
 
 		for (int i = 0; i < equations.size(); i++)
@@ -32,8 +37,11 @@ namespace clumsy_engine
 
 				rhs[ev_r] = rhs[ev_r] + equation.b[evi];
 
-				for (int evj = 0; evj < element_vertex_num && evj != evi; evj++)
+				for (int evj = 0; evj < element_vertex_num; evj++)
 				{
+					if (evj == evi) {
+						continue;
+					}
 
 					int ev_c = equation.stencil[evj];
 

@@ -159,7 +159,7 @@ namespace clumsy_engine
 
 		DEF_MEM(Edge_Indice,				vi,			Compute_Edge_Indices,								TMP(type_list<Triangle_Indice, Vertex_Num>));
 		DEF_MEM(Edge_Length,				vf,			Compute_Edge_Length,								TMP(type_list<Position, Edge_Indice>));
-		DEF_MEM(Delta_Position,				vf,			Delta,												TMP(type_list< Position,Last_Frame_Position> ));
+		DEF_MEM(Delta_Position,				v_v3f,		Delta,												TMP(type_list< Position,Last_Frame_Position> ));
 	} ;
 
 	template<typename ...P>

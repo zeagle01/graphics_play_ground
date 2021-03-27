@@ -14,8 +14,17 @@ using namespace clumsy_engine;
 
 class System_Equations_Solver_Test :public Test
 {
+public:
+	System_Equations_Solver_Test()
+	{
+		m_solver = std::make_shared<System_Equations_Solver>();
+	}
+
 protected:
-	System_Equations_Solver m_solver;
+
+	std::shared_ptr<System_Equations_Solver> m_solver;
+	std::vector<Element_Equation> m_equations;
+	std::vector<vec3f> m_x;
 };
 
 
@@ -24,102 +33,65 @@ class With_Only_Diagnal_Term :public System_Equations_Solver_Test
 {
 
 public:
-
-	std::vector<float> test_diagonal_equations(std::vector<mat3x3f> A, std::vector<vec3f> b)
+	With_Only_Diagnal_Term()
 	{
-//		std::vector<float> ret(b.size());
-//		m_equations.resize(A.size());
-//		for (int i = 0; i < A.size(); i++)
-//		{
-//			m_equations[i].A = std::vector<float>{ A[i] };
-//
-//			m_equations[i].b = std::vector<float>{ b[i * 3 + 0],b[i * 3 + 1],b[i * 3 + 2] };
-//
-//			m_equations[i].stencil = std::vector<int>{ i };
-//		}
-//
-//		m_solver.solve(ret, m_equations);
-//		return  ret;
+		Element_Equation eq;
+		eq.stencil = std::vector<int>{ 0 };
+		eq.A = std::vector<mat3x3f>{ get_identity<3,float>() };
+		eq.b = std::vector<vec3f>{ vec3f{ 0,1,0 } };
+
+		auto eq1 = eq;
+		eq1.stencil = { 1 };
+
+		m_equations.push_back(eq);
+		m_equations.push_back(eq1);
+		int vNum = 2;
+		m_x.resize(vNum);
 	}
 
-
-protected:
-	std::vector<Element_Equation> m_equations;
 
 };
 
 
 TEST_F(With_Only_Diagnal_Term, equation_with_only_inertial_term)
 {
-//	std::vector<float> A
-//	{
-//		1,2,1
-//	};
-//	std::vector<float> b
-//	{
-//		1,0,0,
-//		2,0,0,
-//		3,0,0
-//	};
-//
-//	std::vector<float> exp =
-//	{
-//		1,0,0,
-//		1,0,0,
-//		3,0,0
-//	};
-//
-//	auto act = test_diagonal_equations(A, b);
-//
-//	EXPECT_THAT(act, Eq(exp));
+	m_solver->solve(m_x, m_equations);
+
+	std::vector<vec3f> exp{ {0,1,0} ,{0,1,0} };
+	
+	EXPECT_THAT(m_x, Eq(exp));
 }
 
-
-
-TEST_F(System_Equations_Solver_Test, equation_with_one_spring)
+class With_One_Spring :public System_Equations_Solver_Test
 {
 
-	//int v_num = 2;
+public:
+	With_One_Spring()
+	{
+		Element_Equation eq;
+		float stiff = 1e1;
+		eq.stencil = std::vector<int>{ 0 ,1 };
+		eq.A = std::vector<mat3x3f>{ stiff * get_identity<3,float>(),-stiff * get_identity<3,float>(),-stiff * get_identity<3,float>(),stiff * get_identity<3,float>() };
+		//eq.b = std::vector<vec3f>{ vec3f{ 0,1,0 } };
+		eq.b = { {-stiff,0,0} ,{stiff,0,0} };
+		m_equations.push_back(eq);
 
-	//Element_Equation d0
-	//{
-	//	{1000},
-	//	{0,0,0},
-	//	{0}
-	//};
-
-	//Element_Equation d1
-	//{
-	//	{1000},
-	//	{1000,0,0},
-	//	{1}
-	//};
-
-	//Element_Equation s0
-	//{
-	//	{1,-1,-1,1},
-	//	{ -1,0,0,
-	//	1,0,0 },
-	//	{0,1}
-	//};
-
-	//std::vector<Element_Equation> eqs{ d0,d1,s0 };
+		int vNum = 2;
+		m_x = { {0,0,0},{1,0,0} };
+	}
 
 
-	//std::vector<float> act{ 0,0,0,2,0,0 };
-	//m_solver.solve(act, eqs);
-	//m_solver.solve(act, eqs);
-	//m_solver.solve(act, eqs);
-	//m_solver.solve(act, eqs);
-	//m_solver.solve(act, eqs);
-	//m_solver.solve(act, eqs);
-	//m_solver.solve(act, eqs);
-	//m_solver.solve(act, eqs);
-	//m_solver.solve(act, eqs);
-	//std::vector<float> exp{ 0,0,0,1,0,0 };
+};
 
-	//for (int i = 0; i < exp.size(); i++)
-	//{
-	//	EXPECT_THAT(act[i], FloatNear(exp[i], 1e-2f));
-	//}
+
+
+TEST_F(With_One_Spring, equation_with_one_spring)
+{
+	m_solver->solve(m_x, m_equations);
+
+	std::vector<vec3f> exp{ {0,0,0} ,{1,0,0} };
+	
+	EXPECT_THAT(m_x, Eq(exp));
 }
+
+

@@ -224,10 +224,10 @@ using namespace clumsy_engine;
 
 		ImGui::Text("hello world from sim app");
 
-		static float gravity[] = { 0.f,0.f,0.f };
-		static float time_step = 0.1f;
+		static float gravity[] = { 0.f,-10.f,0.f };
+		static float time_step = 0.01f;
 		static float rho = 1.f;
-		static float stretch_stiff = 1e3f;
+		static float stretch_stiff = 1e2f;
 
 		ImGui::SliderFloat3("gravity", gravity, -10.f, 10.f);            
 		ImGui::SliderFloat("time step", &time_step, 0.001, 10.f);           

@@ -8,10 +8,15 @@ namespace clumsy_engine
 
 	std::vector<stencil> Spring_Stretch::compute_stencils()
 	{
-		//TODO: return edge indices of mesh
-		std::vector<stencil>ret;
 
-		return { {0,1} };
+		const auto&edge_indice  = get<data::Edge_Indice>();
+		std::vector<stencil>ret;
+		for (int i = 0; i < edge_indice.size() / 2; i++)
+		{
+			ret.push_back({ edge_indice[i * 2 + 0],edge_indice[i * 2 + 1] });
+		}
+
+		return ret;
 	}
 
 	Element_Equation Spring_Stretch::compute_element_equation(stencil st,int ei)

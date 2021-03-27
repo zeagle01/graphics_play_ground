@@ -24,6 +24,13 @@ target_compile_features(clumsy_engine_test PRIVATE cxx_std_20)
 
 set_target_properties(clumsy_engine_test PROPERTIES FOLDER clumsy_engine)
 
+set_target_properties(clumsy_engine_test 
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/lib
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/lib
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin
+)
+
 
 
 

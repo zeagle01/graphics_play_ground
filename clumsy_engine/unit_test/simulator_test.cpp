@@ -60,12 +60,14 @@ public:
 TEST_F(One_Vertex, without_any_interaction_just_floating_there)
 {
 
+	m_sim.set<data::Velocity>({ { 0,0,0 } });
+
 	 m_sim.update();
 
 	 auto act = m_sim.get<data::Delta_Position>();
 
-	std::vector<float> exp = {
-		0,0.0,0
+	std::vector<vec3f> exp = {
+		{0,0.0,0}
 	};
 
 	EXPECT_THAT(act, exp);
@@ -78,16 +80,17 @@ TEST_F(One_Vertex, update_with_gravity_only)
 	m_sim.add_interaction<Gravity>();
 
 	m_sim.set<data::Gravity>({ 0,-10,0 });
+	m_sim.set<data::Velocity>({ { 0,0,0 } });
 
 	m_sim.update();
 	
 	auto act = m_sim.get<data::Delta_Position>();
 
-	std::vector<float> exp = {
-		0,-0.1,0
+	std::vector<vec3f> exp = {
+		{0,-0.1,0}
 	};
 
-	EXPECT_THAT(act, exp);
+	EXPECT_TRUE(is_near<0>(act[0], exp[0], 1e-4f));
 }
 
 //////////////////////////////////////////

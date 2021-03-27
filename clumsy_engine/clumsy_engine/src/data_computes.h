@@ -46,7 +46,7 @@ namespace clumsy_engine
 
 	struct Delta {
 		template<typename sim_acc_T>
-		static void apply(sim_acc_T& datas, std::vector<float>& d)
+		static void apply(sim_acc_T& datas, std::vector<vec3f>& d)
 		{
 			const auto& positions = datas.get<data::Position>();
 			const auto& last_positions = datas.get<data::Last_Frame_Position>();
