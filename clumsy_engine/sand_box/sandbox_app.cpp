@@ -195,13 +195,25 @@ public:
 			m_mouse_pos_x = newMousePos.x;
 			m_mouse_pos_y = newMousePos.y;
 
-			glm::vec3 y_axis = glm::normalize(m_camara_up);
-			glm::vec3 z_axis = glm::normalize(m_camara_position - m_camara_target_position);
-			glm::vec3 x_axis = glm::cross(y_axis, z_axis);
+			m_theta += delta_y * 1e-3f;
+			m_phi += delta_x * 1e-3f;
 
-			m_camara_position += 1e-2f * delta_x * x_axis;
-			m_camara_position += 1e-2f * delta_y * y_axis;
-			m_camara_up = glm::cross(z_axis, x_axis);
+			float r = glm::length(m_camara_position - m_camara_target_position);
+			m_camara_position.y = m_camara_target_position.y + r * std::sin(m_theta);
+			m_camara_position.z = m_camara_target_position.z + r * std::cos(m_theta) * std::cos(m_phi);
+			m_camara_position.x = m_camara_target_position.x + r * std::cos(m_theta) * std::sin(m_phi);
+			m_camara_up.y = std::cos(m_theta);
+			m_camara_up.z = std::sin(m_theta) * std::cos(m_phi);
+			m_camara_up.x = std::sin(m_theta) * std::sin(m_phi);
+
+
+//			glm::vec3 y_axis = glm::normalize(m_camara_up);
+//			glm::vec3 z_axis = glm::normalize(m_camara_position - m_camara_target_position);
+//			glm::vec3 x_axis = glm::cross(y_axis, z_axis);
+//
+//			m_camara_position += 1e-2f * delta_x * x_axis;
+//			m_camara_position += 1e-2f * delta_y * y_axis;
+//			m_camara_up = glm::cross(z_axis, x_axis);
 
 		}
 		else//release
@@ -330,6 +342,8 @@ private:
 	float m_camara_rotation;
 	float m_mouse_pos_x = 0.f;
 	float m_mouse_pos_y = 0.f;
+	float m_theta = 0.f;
+	float m_phi = 0.f;
 	bool m_release = false;
 	std::vector<float> m_positions;
 
