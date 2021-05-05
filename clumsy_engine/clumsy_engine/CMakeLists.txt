@@ -146,15 +146,19 @@ target_link_libraries(clumsy_engine PRIVATE glfw)
 target_link_libraries(clumsy_engine PRIVATE glad)
 
 
-##glm
+## glm
 find_package(glm CONFIG REQUIRED PATHS ${CMAKE_BINARY_DIR})
 target_link_libraries(clumsy_engine PUBLIC glm::glm)
 
-##########imgui
+########## imgui
 target_link_libraries(clumsy_engine PUBLIC my_imgui)
 
 
+## matrix_math
 target_link_libraries(clumsy_engine PUBLIC matrix_math)
+
+## clumsy_lib
+target_link_libraries(clumsy_engine PUBLIC clumsy_lib)
 
 
 

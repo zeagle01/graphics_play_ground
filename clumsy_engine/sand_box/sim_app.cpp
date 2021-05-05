@@ -159,7 +159,8 @@ using namespace clumsy_engine;
 	void Sim_Gui::on_update(clumsy_engine::Time_Step dt) 
 	{
 
-		CE_INFO("{0} s", dt.get_seconds());
+		//CE_INFO("{0} s", dt.get_seconds());
+
 		//dealing move to update way (instead of event)
 		float position_speed = 0.1f;
 		if (clumsy_engine::Input::is_key_pressed(CE_KEY_LEFT))
@@ -197,7 +198,7 @@ using namespace clumsy_engine;
 
 		clumsy_engine::Renderer::begin_scene(m_camara);
 
-		clumsy_engine::Renderer::submit(m_shader, m_vertex_array);
+		clumsy_engine::Renderer::submit(m_shader, m_vertex_array,glm::mat4(1.f));
 
 		clumsy_engine::Renderer::end_scene();
 

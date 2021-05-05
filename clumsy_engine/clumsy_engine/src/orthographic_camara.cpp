@@ -23,4 +23,20 @@ namespace clumsy_engine
 		m_view_projection_matrix = m_projection_matrix * m_view_matrix;
 	}
 
+	void Orthorgraphic_Camara::set_view_matrix(const glm::mat4& view_matrix)
+	{
+		m_view_matrix = view_matrix;
+		m_view_projection_matrix = m_projection_matrix * m_view_matrix;
+
+	}
+
+
+	void Orthorgraphic_Camara::set_projection_matrix(const glm::mat4& projection_matrix)
+	{
+		m_projection_matrix = projection_matrix;
+		m_view_projection_matrix = m_projection_matrix * m_view_matrix;
+
+	}
+
+
 }

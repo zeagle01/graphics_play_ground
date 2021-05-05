@@ -15,6 +15,10 @@ namespace clumsy_engine
 		void set_position(const glm::vec3& position) { m_position = position; recalculate_view_matrix();}
 		void set_rotation(float rotation) { m_rotation = rotation; recalculate_view_matrix();}
 
+		void set_view_matrix(const glm::mat4& view_matrix);
+		void set_projection_matrix(const glm::mat4& projection_matrix);
+
+
 		const glm::vec3& get_position()const { return m_position;  }
 		float get_rotation()const { return m_rotation;  }
 

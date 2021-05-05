@@ -18,10 +18,11 @@ namespace clumsy_engine
 	{
 
 	}
-	void Renderer::submit(std::shared_ptr<Shader> shader,std::shared_ptr<Vertex_Array> vertex_array )
+	void Renderer::submit(std::shared_ptr<Shader> shader, std::shared_ptr<Vertex_Array> vertex_array, const glm::mat4& transform)
 	{
 		shader->bind();
 		shader->upload_uniform_mat4("u_view_projection", s_scene_data->view_projection_matrix);
+		shader->upload_uniform_mat4("u_model_matrix", transform);
 		vertex_array->bind();
 		Render_Command::draw_indexed(vertex_array);
 	}

@@ -18,7 +18,7 @@ namespace clumsy_engine
 
             static void begin_scene(std::shared_ptr<Orthorgraphic_Camara> camara);
             static void end_scene();
-			static void submit(std::shared_ptr<Shader> shader, std::shared_ptr<Vertex_Array> vertex_array);
+			static void submit(std::shared_ptr<Shader> shader, std::shared_ptr<Vertex_Array> vertex_array, const glm::mat4& transform);
     private:
         struct SceneData
         {
