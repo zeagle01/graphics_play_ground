@@ -1,7 +1,4 @@
 
-#include <iostream>
-#include <memory>
-#include <chrono>
 #include "application.h"
 #include "log.h"
 #include "application_event.h"
@@ -19,6 +16,11 @@
 #include "camara.h"
 #include "time_step.h"
 
+#include <memory>
+#include <iostream>
+#include <memory>
+#include <chrono>
+
 
 namespace clumsy_engine
 {
@@ -27,13 +29,9 @@ namespace clumsy_engine
 
 
 
-	static std::unique_ptr<Application> s_singleton;
+	static Application* s_singleton; //life time controled by user
 	Application& Application::get_singleton()
 	{
-		if (!s_singleton)
-		{
-			s_singleton = std::make_unique<Application>();
-		}
 		return *s_singleton;
 	}
 
@@ -44,18 +42,18 @@ namespace clumsy_engine
 		, m_dispatcher_imp(std::make_shared<Dispatcher<Event, bool>>())
 		, m_dispatcher(*m_dispatcher_imp)
 	{
+
+		s_singleton = this;
+
 		m_window = Window::create();
 		m_window->set_event_callback(BIND_MEMBER(on_event));
 		m_window->set_vertical_sync(false);
 
-
 		m_dispatcher_imp->add<Window_Close_Event>(BIND_MEMBER(On_Window_Close));
-
-
-		s_singleton.reset(this);
 
 		m_imgui_layer = std::make_shared<Imgui_Layer>();
 		push_overlay(m_imgui_layer);
+
 
 	}
 
@@ -86,6 +84,7 @@ namespace clumsy_engine
 		return true;
 	}
 
+
 	void Application::run()
 	{
 
@@ -108,20 +107,16 @@ namespace clumsy_engine
 				layer->on_update(time_step);
 			}
 
-			m_imgui_layer->begin();
-
-			for (auto& layer : *m_layer_stack)
+			if (m_imgui_layer)
 			{
-				layer->on_imgui_render(m_imgui_layer->get_imgui_context());
+				m_imgui_layer->begin();
+
+				for (auto& layer : *m_layer_stack)
+				{
+					layer->on_imgui_render(m_imgui_layer->get_imgui_context());
+				}
+				m_imgui_layer->end();
 			}
-
-
-
-			m_imgui_layer->end();
-
-//			auto [x, y] = Input::get_mouse_position();
-//
-//			CE_CORE_TRACE("{0},{1}", x, y);
 
 			m_window->on_update();
 		}

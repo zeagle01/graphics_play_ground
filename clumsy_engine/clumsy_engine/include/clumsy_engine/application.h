@@ -62,7 +62,6 @@ namespace clumsy_engine
 
 		bool m_is_running;
 
-
 	private:
 		bool On_Window_Close(Window_Close_Event& e);
 

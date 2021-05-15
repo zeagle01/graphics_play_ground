@@ -26,7 +26,7 @@ namespace clumsy_engine
 
 		//for debug only,never use in real logic
 		inline const std::string& get_name() const { return m_name; }
-	private:
+	protected:
 		std::string m_name;
 
 	};

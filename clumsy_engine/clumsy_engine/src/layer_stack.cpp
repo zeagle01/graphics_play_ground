@@ -1,6 +1,7 @@
 
 
 #include "layer_stack.h"
+#include "log.h"
 
 
 namespace clumsy_engine
@@ -8,11 +9,13 @@ namespace clumsy_engine
 
 	Layer_Stack::Layer_Stack()
 	{
-
+		CE_CORE_INFO("create layer_stack {0}", (void*)this);
 	}
 	Layer_Stack::~Layer_Stack()
 	{
 		m_layers.clear();
+
+		CE_CORE_INFO("destroy layer_stack {0}", (void*)this);
 	}
 
 	void Layer_Stack::push_layer(std::shared_ptr<Layer> layer)

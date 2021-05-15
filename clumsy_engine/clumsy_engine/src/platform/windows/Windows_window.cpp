@@ -27,6 +27,7 @@ namespace clumsy_engine
 
 	Windows_Window::~Windows_Window()
 	{
+		shut_down();
 		CE_CORE_TRACE("delete Windows_Window {0}", (void*)this);
 	}
 

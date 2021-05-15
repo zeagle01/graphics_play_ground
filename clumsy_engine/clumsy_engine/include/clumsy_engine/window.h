@@ -5,6 +5,7 @@
 #include <functional>
 #include "event.h"
 #include <string>
+#include "log.h"
 #include <memory>
 
 
@@ -25,7 +26,10 @@ namespace clumsy_engine
 	public:
 		using  Event_Callback = std::function<bool(Event&)>;
 
-		virtual ~Window() {};
+		virtual ~Window() 
+		{
+			CE_CORE_INFO("destroy window {0}", (void*)this);
+		};
 
 		virtual void on_update() = 0;
 		virtual unsigned int get_width() const = 0;
