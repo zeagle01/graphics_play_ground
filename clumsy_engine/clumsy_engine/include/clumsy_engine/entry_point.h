@@ -28,8 +28,8 @@ int main(int argc,char** argv)
 
 	std::unique_ptr<clumsy_engine::Application> app = clumsy_engine::create_application();
 
-	END_PROFILING();
-
 	app->run();
+
+	END_PROFILING();
 
 }

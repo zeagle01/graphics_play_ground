@@ -13,7 +13,7 @@
 #define PROFILING
 
 #ifdef PROFILING
-#define FUNCTION_SCOPE_TIMER(function_name) Scope_Timer time##__LINE__(function_name)
+#define FUNCTION_SCOPE_TIMER(function_name) clumsy_engine::Scope_Timer time##__LINE__(function_name)
 
 #define RECORD_FUNCTION_DURATION() FUNCTION_SCOPE_TIMER(__FUNCSIG__)
 #define BEGIN_PROFILING() clumsy_engine::Profiler::get_singleton().begin_session(__FUNCSIG__)
@@ -70,7 +70,7 @@ namespace clumsy_engine
 
 	private:
 		std::ofstream m_os;
-		int m_record_count;
+		int m_record_count = 0;
 	};
 
 

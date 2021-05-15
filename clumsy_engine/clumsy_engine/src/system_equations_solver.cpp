@@ -2,6 +2,7 @@
 
 
 #include "system_equations_solver.h"
+#include "profiler.h"
 
 
 
@@ -10,6 +11,8 @@ namespace clumsy_engine
 
 	void System_Equations_Solver::solve(std::vector<vec3f>& ret, std::vector<Element_Equation> const equations)
 	{
+		RECORD_FUNCTION_DURATION();
+
 		auto& x0 = ret;
 		int vertexNum = ret.size() ;
 

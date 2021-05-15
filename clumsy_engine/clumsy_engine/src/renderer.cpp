@@ -4,6 +4,7 @@
 #include "vertex_array.h"
 #include "shader.h"
 #include "camara.h"
+#include "profiler.h"
 
 namespace clumsy_engine
 {
@@ -20,6 +21,8 @@ namespace clumsy_engine
 	}
 	void Renderer::submit(std::shared_ptr<Shader> shader, std::shared_ptr<Vertex_Array> vertex_array, const glm::mat4& transform)
 	{
+		RECORD_FUNCTION_DURATION();
+
 		shader->bind();
 		shader->upload_uniform_mat4("u_view_projection", s_scene_data->view_projection_matrix);
 		shader->upload_uniform_mat4("u_model_matrix", transform);

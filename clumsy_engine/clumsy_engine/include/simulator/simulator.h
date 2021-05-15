@@ -11,6 +11,7 @@
 
 #include "type_map.h"
 #include "Simulation_Data.h"
+#include "system_equations_solver.h"
 
 
 
@@ -43,10 +44,13 @@ namespace clumsy_engine
 
 	private:
 
+		void assemble_equations();
 
 
 		Type_Map<Interaction> m_interactions_map;
 		std::shared_ptr< Simulation_Datas> m_data_map;
+
+		std::vector<Element_Equation> m_equations;
 
 
 	};

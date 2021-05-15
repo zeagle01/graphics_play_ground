@@ -4,9 +4,9 @@
 
 #include "simulator.h"
 #include "interaction.h"
-#include "system_equations_solver.h"
 #include "inertial.h"
 #include "spring_stretch.h"
+#include "profiler.h"
 
 #include "gravity.h"
 #include "Simulation_Data.h"
@@ -29,9 +29,24 @@ namespace clumsy_engine
 
 	}
 
+	void Simulator::assemble_equations()
+	{
+		RECORD_FUNCTION_DURATION();
+
+		m_equations.resize(0);
+
+		for (auto& it : m_interactions_map)
+		{
+			auto& interation = it.second;
+			auto ieraction_equations = interation->compute_element_equations();
+			m_equations.insert(m_equations.end(), ieraction_equations.begin(), ieraction_equations.end());
+		}
+
+	}
 
 	void Simulator::update()
 	{
+		RECORD_FUNCTION_DURATION();
 
 		std::unique_ptr<System_Equations_Solver> m_solver;
 		if (!m_solver)
@@ -43,19 +58,12 @@ namespace clumsy_engine
 		auto positions = get<data::Position>();
 		set<data::Last_Frame_Position>(positions);
 
-		std::vector<Element_Equation> equations;
-		for (auto& it : m_interactions_map)
-		{
-			auto& interation = it.second;
-			auto ieraction_equations = interation->compute_element_equations();
-			equations.insert(equations.end(), ieraction_equations.begin(), ieraction_equations.end());
-		}
-
+		assemble_equations();
 
 		///////////// update////////////
 		for (int i = 0; i < 1; i++)
 		{
-			m_solver->solve(positions, equations);
+			m_solver->solve(positions, m_equations);
 		}
 		set<data::Position>(positions);
 

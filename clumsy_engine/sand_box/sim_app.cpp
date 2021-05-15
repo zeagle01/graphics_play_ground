@@ -3,6 +3,7 @@
 #include "inertial.h"
 #include "gravity.h"
 #include "spring_stretch.h"
+#include "profiler.h"
 
 #include "imgui.h"
 
@@ -162,6 +163,7 @@ using namespace clumsy_engine;
 	void Sim_Gui::on_update(clumsy_engine::Time_Step dt) 
 	{
 
+		RECORD_FUNCTION_DURATION();
 
 		clumsy_engine::Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
 		clumsy_engine::Render_Command::clear();

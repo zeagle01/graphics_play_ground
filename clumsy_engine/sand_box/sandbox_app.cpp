@@ -6,6 +6,7 @@
 #include "clumsy_engine/clumsy_engine.h"
 #include "clumsy_engine/entry_point.h"//only included once
 #include "sim_app.h"
+#include "profiler.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -210,6 +211,9 @@ class SanBox_App:public clumsy_engine::Application
 
 std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
 {
+
+	RECORD_FUNCTION_DURATION();
+
 	clumsy_engine::Log::get_core_logger()->trace("create app");
 
 	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 

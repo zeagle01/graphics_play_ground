@@ -5,6 +5,7 @@
 #include "renderer.h"
 #include "log.h"
 #include "openGL_vertex_array.h"
+#include "profiler.h"
 
 
 
@@ -26,6 +27,8 @@ namespace clumsy_engine
 
 	void Vertex_Array::set_positions(float* data, int num)
 	{
+		RECORD_FUNCTION_DURATION();
+
 		bind();
 		get_vertex_buffer()[0]->set_data(data, num);
 	}
