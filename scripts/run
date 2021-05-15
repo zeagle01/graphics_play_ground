@@ -6,12 +6,12 @@ cd $buildDir
 echo "change dir to  `pwd`"
 #cmake ..
 cmake --build $buildDir
-targetDir=$buildDir/examples/vk_render/Debug
+targetDir=$buildDir/out/bin/Debug
 
 cd $targetDir
 echo "change dir to  `pwd`"
 
-./vk_render.exe 
+./sand_box.exe 
 
 
 
