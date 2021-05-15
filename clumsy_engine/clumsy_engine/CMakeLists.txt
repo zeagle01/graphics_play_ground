@@ -45,7 +45,6 @@ src/renderer_API.cpp
 src/render_command.cpp
 src/openGL_Renderer_API.h
 src/openGL_Renderer_API.cpp
-src/orthographic_camara.cpp
 
 
 src/simulator.cpp
@@ -88,7 +87,7 @@ include/clumsy_engine/renderer_API.h
 include/clumsy_engine/buffer.h
 include/clumsy_engine/shader.h
 include/clumsy_engine/vertex_array.h
-include/clumsy_engine/orthographic_camara.h
+include/clumsy_engine/camara.h
 include/clumsy_engine/dispatcher.h
 include/clumsy_engine/key_event.h
 include/clumsy_engine/time_step.h

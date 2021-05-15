@@ -21,16 +21,15 @@ public:
 	Layer_Demo() :
 		clumsy_engine::Layer("demo_layer")
 		, m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>())
-		, m_camara_NEW(std::make_shared<clumsy_engine::Orthorgraphic_Camara_NEW>())
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
-		, m_camara_position{ 0, 0, 1.0f }
-		, m_camara_up{ 0,1,0 }
-		, m_camara_target_position{ 0, 0, 0 }
 	{
 
-		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f);
-		m_camara_NEW->set_view_field(-1.f, 1.f, -1.f, 1.f, -0.1f, -100.f);
-		m_camara_NEW->set_position(glm::vec3(0.f, 0.f, 3.f));
+		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f, -0.1f, -100.f);
+		m_camara->look_at(
+			glm::vec3(0.f,0.f,3.f),
+			glm::vec3(0.f,0.f,0.f),
+			glm::vec3(0.f,1.f,0.f)
+		);
 
 		/// data
 		m_positions = {
@@ -150,73 +149,16 @@ public:
 	void on_update(clumsy_engine::Time_Step dt) override
 	{
 
-		//CE_INFO("{0} s", dt.get_seconds());
-
-		//dealing move to update way (instead of event)
-		float position_speed = 0.1f;
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_LEFT))
-		{
-			m_camara_position.x -= position_speed * dt;
-		}
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_RIGHT))
-		{
-			m_camara_position.x += position_speed * dt;
-		}
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_UP))
-		{
-			m_camara_position.y += position_speed * dt;
-		}
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_DOWN))
-		{
-			m_camara_position.y -= position_speed * dt;
-		}
-
-		float roation_speed = 0.2;
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_A))
-		{
-			m_camara_rotation += roation_speed * dt;
-		}
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_D))
-		{
-			m_camara_rotation -= roation_speed * dt;
-		}
-
 		//mouse handle
-		if (m_release) //click
-		{
-			m_release = false;
-
-			auto newMousePos = clumsy_engine::Input::get_mouse_position();
-			m_mouse_pos_x = newMousePos.x;
-			m_mouse_pos_y = newMousePos.y;
-			CE_CORE_INFO("click");
-		}
-		else if (!m_release && clumsy_engine::Input::is_mouse_button_pressed(CE_MOUSE_BUTTON_LEFT)) //press
-		{
-			auto newMousePos = clumsy_engine::Input::get_mouse_position();
-			float delta_x = newMousePos.x - m_mouse_pos_x;
-			float delta_y = newMousePos.y - m_mouse_pos_y;
-			CE_CORE_INFO("mouse x y {0} {1}", delta_x, delta_y);
-			m_mouse_pos_x = newMousePos.x;
-			m_mouse_pos_y = newMousePos.y;
-
-			m_camara_NEW->dragging_handle(glm::vec2(delta_x, delta_y));
-		}
-		else//release
-		{
-			m_release = true;
-		}
-
+		auto newMousePos = clumsy_engine::Input::get_mouse_position();
+		auto mouse_delta = m_drag_delta_computer(newMousePos.x, newMousePos.y, clumsy_engine::Input::is_mouse_button_pressed(CE_MOUSE_BUTTON_LEFT));
+		m_camara->dragging_handle(glm::vec2(mouse_delta[0], mouse_delta[1]));
 
 		clumsy_engine::Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
 		clumsy_engine::Render_Command::clear();
 
-
-
-		clumsy_engine::Renderer::begin_scene(m_camara_NEW);
-
+		clumsy_engine::Renderer::begin_scene(m_camara);
 		clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::mat4(1.f));
-
 		clumsy_engine::Renderer::end_scene();
 
 	};
@@ -243,19 +185,9 @@ private:
 	std::shared_ptr<clumsy_engine::Vertex_Array> m_vertex_array;
 
 	std::shared_ptr<clumsy_engine::Orthorgraphic_Camara> m_camara;
-	std::shared_ptr<clumsy_engine::Orthorgraphic_Camara_NEW> m_camara_NEW;
 
+	clumsy_engine::Drag_Delta_Computer m_drag_delta_computer;
 
-	glm::vec3 m_camara_position ;
-	glm::vec3 m_camara_up  ;
-	glm::vec3 m_camara_target_position;
-
-	float m_camara_rotation;
-	float m_mouse_pos_x = 0.f;
-	float m_mouse_pos_y = 0.f;
-	float m_theta = 0.f;
-	float m_phi = 0.f;
-	bool m_release = false;
 	std::vector<float> m_positions;
 
 	std::shared_ptr<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
@@ -280,8 +212,8 @@ std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
 {
 	clumsy_engine::Log::get_core_logger()->trace("create app");
 
-	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
-	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
+	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
+	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
 
 
 //	layer = std::make_shared<clumsy_engine::Imgui_Layer>();

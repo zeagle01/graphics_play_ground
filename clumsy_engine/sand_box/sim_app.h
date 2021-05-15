@@ -32,9 +32,7 @@ private:
 
 	std::shared_ptr<clumsy_engine::Orthorgraphic_Camara> m_camara;
 
-	glm::vec3 m_camara_position;
-
-	float m_camara_rotation;
+	clumsy_engine::Drag_Delta_Computer m_drag_delta_computer;
 
 	std::shared_ptr<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
 

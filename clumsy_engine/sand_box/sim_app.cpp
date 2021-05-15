@@ -11,11 +11,13 @@ using namespace clumsy_engine;
 		clumsy_engine::Layer("sim_gui")
 		, m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>())
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
-		, m_camara_position(0.f)
-		,m_camara_rotation(0.f)
 	{
-
-		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f);
+		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f, -0.1f, -100.f);
+		m_camara->look_at(
+			glm::vec3(0.f,0.f,3.f),
+			glm::vec3(0.f,0.f,0.f),
+			glm::vec3(0.f,1.f,0.f)
+		);
 
 		/// data
 		//std::vector<float> positions{
@@ -160,42 +162,14 @@ using namespace clumsy_engine;
 	void Sim_Gui::on_update(clumsy_engine::Time_Step dt) 
 	{
 
-		//CE_INFO("{0} s", dt.get_seconds());
-
-		//dealing move to update way (instead of event)
-		float position_speed = 0.1f;
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_LEFT))
-		{
-			m_camara_position.x -= position_speed * dt;
-		}
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_RIGHT))
-		{
-			m_camara_position.x += position_speed * dt;
-		}
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_UP))
-		{
-			m_camara_position.y += position_speed * dt;
-		}
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_DOWN))
-		{
-			m_camara_position.y -= position_speed * dt;
-		}
-
-		float roation_speed = 0.2;
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_A))
-		{
-			m_camara_rotation += roation_speed * dt;
-		}
-		if (clumsy_engine::Input::is_key_pressed(CE_KEY_D))
-		{
-			m_camara_rotation -= roation_speed * dt;
-		}
 
 		clumsy_engine::Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
 		clumsy_engine::Render_Command::clear();
 
-		m_camara->set_position(m_camara_position);
-		m_camara->set_rotation(m_camara_rotation);
+		//mouse handle
+		auto newMousePos = clumsy_engine::Input::get_mouse_position();
+		auto mouse_delta = m_drag_delta_computer(newMousePos.x, newMousePos.y, clumsy_engine::Input::is_mouse_button_pressed(CE_MOUSE_BUTTON_LEFT));
+		m_camara->dragging_handle(glm::vec2(mouse_delta[0], mouse_delta[1]));
 
 		clumsy_engine::Renderer::begin_scene(m_camara);
 
