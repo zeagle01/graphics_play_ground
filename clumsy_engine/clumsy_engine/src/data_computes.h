@@ -92,6 +92,9 @@ namespace clumsy_engine
 			int t_num = triangle_indices.size() / 3;
 			int v_num = datas.get<data::Vertex_Num>();
 
+			d.clear();
+			d.reserve(v_num * 3);
+
 			std::vector<std::vector<int>> vv(v_num);
 
 			for (int ti = 0; ti < t_num; ti++)
@@ -114,6 +117,7 @@ namespace clumsy_engine
 				}
 
 			}
+			d.shrink_to_fit();
 
 		}
 	};

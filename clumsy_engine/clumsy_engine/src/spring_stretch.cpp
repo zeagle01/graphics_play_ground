@@ -9,7 +9,8 @@ namespace clumsy_engine
 	std::vector<stencil> Spring_Stretch::compute_stencils()
 	{
 
-		const auto&edge_indice  = get<data::Edge_Indice>();
+		const auto& edge_indice = get<data::Edge_Indice>();
+
 		std::vector<stencil>ret;
 		for (int i = 0; i < edge_indice.size() / 2; i++)
 		{
