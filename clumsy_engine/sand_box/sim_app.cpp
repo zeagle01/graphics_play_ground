@@ -9,12 +9,13 @@
 using namespace clumsy_engine;
 	Sim_Gui::Sim_Gui() :
 		clumsy_engine::Layer("sim_gui")
-		, m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>(-1,1,-1,1))
+		, m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>())
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 		, m_camara_position(0.f)
 		,m_camara_rotation(0.f)
 	{
 
+		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f);
 
 		/// data
 		//std::vector<float> positions{

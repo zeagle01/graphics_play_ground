@@ -14,6 +14,11 @@ namespace clumsy_engine
 	{
 		s_scene_data->view_projection_matrix = camara->get_view_projection_matrix();
 	}
+
+	void Renderer::begin_scene(std::shared_ptr<Orthorgraphic_Camara_NEW> camara)
+	{
+		s_scene_data->view_projection_matrix = camara->get_view_projection_matrix();
+	}
 	void Renderer::end_scene()
 	{
 

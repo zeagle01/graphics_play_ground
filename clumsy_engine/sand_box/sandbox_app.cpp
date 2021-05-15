@@ -20,12 +20,17 @@ class Layer_Demo :public clumsy_engine::Layer
 public:
 	Layer_Demo() :
 		clumsy_engine::Layer("demo_layer")
-		, m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>(-1,1,-1,1))
+		, m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>())
+		, m_camara_NEW(std::make_shared<clumsy_engine::Orthorgraphic_Camara_NEW>())
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 		, m_camara_position{ 0, 0, 1.0f }
 		, m_camara_up{ 0,1,0 }
 		, m_camara_target_position{ 0, 0, 0 }
 	{
+
+		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f);
+		m_camara_NEW->set_view_field(-1.f, 1.f, -1.f, 1.f, -0.1f, -100.f);
+		m_camara_NEW->set_position(glm::vec3(0.f, 0.f, 3.f));
 
 		/// data
 		m_positions = {
@@ -195,43 +200,20 @@ public:
 			m_mouse_pos_x = newMousePos.x;
 			m_mouse_pos_y = newMousePos.y;
 
-			m_theta += delta_y * 1e-3f;
-			m_phi += delta_x * 1e-3f;
-
-			float r = glm::length(m_camara_position - m_camara_target_position);
-			m_camara_position.y = m_camara_target_position.y + r * std::sin(m_theta);
-			m_camara_position.z = m_camara_target_position.z + r * std::cos(m_theta) * std::cos(m_phi);
-			m_camara_position.x = m_camara_target_position.x + r * std::cos(m_theta) * std::sin(m_phi);
-			m_camara_up.y = std::cos(m_theta);
-			m_camara_up.z = std::sin(m_theta) * std::cos(m_phi);
-			m_camara_up.x = std::sin(m_theta) * std::sin(m_phi);
-
-
-//			glm::vec3 y_axis = glm::normalize(m_camara_up);
-//			glm::vec3 z_axis = glm::normalize(m_camara_position - m_camara_target_position);
-//			glm::vec3 x_axis = glm::cross(y_axis, z_axis);
-//
-//			m_camara_position += 1e-2f * delta_x * x_axis;
-//			m_camara_position += 1e-2f * delta_y * y_axis;
-//			m_camara_up = glm::cross(z_axis, x_axis);
-
+			m_camara_NEW->dragging_handle(glm::vec2(delta_x, delta_y));
 		}
 		else//release
 		{
 			m_release = true;
 		}
 
-//		m_camara->set_position(m_camara_position);
-//		m_camara->set_rotation(m_camara_rotation);
-
-		set_camara();
 
 		clumsy_engine::Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
 		clumsy_engine::Render_Command::clear();
 
 
 
-		clumsy_engine::Renderer::begin_scene(m_camara);
+		clumsy_engine::Renderer::begin_scene(m_camara_NEW);
 
 		clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::mat4(1.f));
 
@@ -253,79 +235,6 @@ public:
 		ImGui::End();
 	}
 
-	private:
-		void set_camara()
-		{
-			//glm::vec3 y_axis = glm::normalize(m_camara_up);
-			//glm::vec3 z_axis = glm::normalize(m_camara_position - m_camara_target_position);
-			//glm::vec3 x_axis = glm::cross(y_axis, z_axis);
-
-			//glm::mat4 view_matrix
-			//{
-			//	1, 0, 0, 0.f,
-			//	0, 1, 0, 0.f,
-			//	0, 0, 1, 0.f,
-			//	m_camara_target_position[0] - m_camara_position[0], m_camara_target_position[1] - m_camara_position[1], m_camara_target_position[2] - m_camara_position[2], 1.f,
-			//};
-			//glm::mat4 view_matrix1{
-			//	x_axis[0], x_axis[1], x_axis[2], 0.f,
-			//	y_axis[0], y_axis[1], y_axis[2], 0.f,
-			//	z_axis[0], z_axis[1], z_axis[2], 0.f,
-			//	0.f,0.f,0.f,					1.f
-			//};
-			//view_matrix = view_matrix1 * view_matrix;
-
-			glm::mat4 view_matrix = glm::lookAt(m_camara_position, m_camara_target_position, m_camara_up);
-
-
-			//		mat4x4<T> ret = uniform_fill<4,4,T>(0);
-			//		T fax = 1.0 / tan(fovy * 0.5);
-			//		ret[0][0] = fax / aspect;
-			//		ret[1][1] = fax ;
-			//		ret[2][2] = zfar / (zfar - znear);
-			//		ret[3][2] = -znear * zfar / (zfar - znear);
-			//		ret[2][3] = 1;
-
-//			glm::mat4 mirror_reflection{
-//				1.f,0.f,0.f,0.f,
-//				0.f,1.f,0.f,0.f,
-//				0.f,0.f,-1.f,0.f,
-//				0.f,0.f,0.f,1.f
-//			};
-//
-////			float r = 0.5, l = -0.5;
-////			float t = 0.5, b = -0.5;
-////			float n = -0.5, f = -100;
-////			glm::mat4 projection_matrix{
-////				2 * n / (r - l),		0.f,					0.f,					0.f,
-////				0,						2 * n / (t - b),		0.f,					0.f,
-////				-(r + l) / (r - l),		-(t + b) / (t - b),		-(n + f) / (n - f),		1.f,
-////				0.f,					0.f,					2 * f * n / (n - f),	0.f
-////			};
-//
-//			float n = 0.01, f = 100;
-//			float aspect_ratio = 1.f;
-//			float fov = 3.14 * 0.25;
-//
-//			float c = 1.f / std::tan(fov);
-//			glm::mat4 projection_matrix{
-//				c / aspect_ratio,		0,					0.f,					0.f,
-//				0,						c,					0.f,					0.f,
-//				0,						0,					f / (f - n),			1.f,
-//				0.f,					0.f,				-f * n / (f - n),		0.f
-//			};
-
-			glm::mat4 projection_matrix = glm::perspective(45.0f, 1.f, 0.1f, 100.0f);
-
-			m_camara->set_view_matrix(view_matrix);
-			//m_camara->set_projection_matrix(mirror_reflection * projection_matrix);
-			m_camara->set_projection_matrix(projection_matrix);
-
-			auto vp = m_camara->get_view_projection_matrix();
-			glm::vec4 x(m_positions[0], m_positions[1], m_positions[2], 1.f);
-			auto aa = vp * x;
-
-		}
 
 private:
 
@@ -334,6 +243,8 @@ private:
 	std::shared_ptr<clumsy_engine::Vertex_Array> m_vertex_array;
 
 	std::shared_ptr<clumsy_engine::Orthorgraphic_Camara> m_camara;
+	std::shared_ptr<clumsy_engine::Orthorgraphic_Camara_NEW> m_camara_NEW;
+
 
 	glm::vec3 m_camara_position ;
 	glm::vec3 m_camara_up  ;
