@@ -16,7 +16,7 @@
 #include "vertex_array.h"
 #include "renderer.h"
 #include "render_command.h"
-#include "orthographic_camara.h"
+#include "camara.h"
 #include "time_step.h"
 
 

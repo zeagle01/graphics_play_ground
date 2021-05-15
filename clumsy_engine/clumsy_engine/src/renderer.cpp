@@ -3,7 +3,7 @@
 #include "render_command.h"
 #include "vertex_array.h"
 #include "shader.h"
-#include "orthographic_camara.h"
+#include "camara.h"
 
 namespace clumsy_engine
 {

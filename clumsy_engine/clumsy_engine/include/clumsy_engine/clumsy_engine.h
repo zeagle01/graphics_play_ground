@@ -20,4 +20,4 @@
 #include "clumsy_engine/buffer.h"
 #include "clumsy_engine/shader.h"
 #include "clumsy_engine/vertex_array.h"
-#include "clumsy_engine/orthographic_camara.h"
+#include "clumsy_engine/camara.h"
