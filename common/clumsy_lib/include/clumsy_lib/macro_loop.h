@@ -54,8 +54,6 @@
 #define _LOOP() LOOP
 #define INSIDE_LOOP(LOOP_COUNT,PRE_MACRO,MACRO,...) DEFF(_LOOP)()(LOOP_COUNT,PRE_MACRO,MACRO,__VA_ARGS__)
 
-#define PUSH_BACK_LIST(i,v) v.push_back(i);
-
 
 
 

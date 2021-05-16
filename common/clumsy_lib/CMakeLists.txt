@@ -7,6 +7,7 @@ project(clumsy_lib  )
 add_library(clumsy_lib STATIC 
 include/clumsy_lib/type_list.h
 include/clumsy_lib/macro_loop.h
+include/clumsy_lib/class_reflection.h
 clumsy_lib.cpp
 )
 

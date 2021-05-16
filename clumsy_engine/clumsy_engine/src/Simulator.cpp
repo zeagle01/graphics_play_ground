@@ -58,11 +58,11 @@ namespace clumsy_engine
 		auto positions = get<data::Position>();
 		set<data::Last_Frame_Position>(positions);
 
-		assemble_equations();
 
 		///////////// update////////////
 		for (int i = 0; i < 1; i++)
 		{
+			assemble_equations();
 			m_solver->solve(positions, m_equations);
 		}
 		set<data::Position>(positions);

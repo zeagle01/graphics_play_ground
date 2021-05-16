@@ -6,7 +6,7 @@
 #include "signal.h" 
 #include "type_map.h"
 #include "type_list.h"
-#include "class_reflect.h"
+#include "clumsy_lib/class_reflection.h"
 #include "data_computes.h"
 #include "matrix_math/matrix_math.h"
 
@@ -147,6 +147,7 @@ namespace clumsy_engine
 		DEF_MEM(Time_Step,					float,		Plain_Computer,										empty_deps);
 		DEF_MEM(Mass_Density,				float,		Plain_Computer,										empty_deps);
 		DEF_MEM(Stretch_Stiff,				float,		Plain_Computer,										empty_deps);
+		DEF_MEM(Ref_Position,				v_v3f,		Plain_Computer,										empty_deps);
 		DEF_MEM(Position,					v_v3f,		Plain_Computer,										empty_deps);
 		DEF_MEM(Triangle_Indice,			vi,			Plain_Computer,										empty_deps);
 
@@ -158,16 +159,9 @@ namespace clumsy_engine
 		DEF_MEM(Mass,						vf,			Compute_Mass,										TMP(type_list<Mass_Density,Vertex_Area>));
 
 		DEF_MEM(Edge_Indice,				vi,			Compute_Edge_Indices,								TMP(type_list<Triangle_Indice, Vertex_Num>));
-		DEF_MEM(Edge_Length,				vf,			Compute_Edge_Length,								TMP(type_list<Position, Edge_Indice>));
+		DEF_MEM(Edge_Length,				vf,			Compute_Edge_Length,								TMP(type_list<Ref_Position, Edge_Indice>));
 		DEF_MEM(Delta_Position,				v_v3f,		Delta,												TMP(type_list< Position,Last_Frame_Position> ));
 	} ;
-
-	template<typename ...P>
-	struct typesss
-	{
-		typesss(std::tuple<P...> t) {};
-		using types = type_list<P...>;
-	};
 
 
 	template<typename tup>
@@ -179,7 +173,7 @@ namespace clumsy_engine
 		using types = type_list<P...>;
 	};
 
-	using tuple_t = decltype(as_tuple(std::declval<data>()));
+	using tuple_t = decltype(clumsy_lib::as_tuple<data>());
 	using all_types = extract_tuple_pointer<tuple_t>::types;
 
 

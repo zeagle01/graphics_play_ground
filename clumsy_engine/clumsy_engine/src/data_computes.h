@@ -69,7 +69,7 @@ namespace clumsy_engine
 		static void apply(sim_acc_T& datas, std::vector<float>& edge_length)
 		{
 
-			const auto& positions = datas.get<data::Position>();
+			const auto& positions = datas.get<data::Ref_Position>();
 			const auto& edge_indices = datas.get<data::Edge_Indice>();
 			int eNum = edge_indices.size() / 2;
 			edge_length.resize(eNum);
