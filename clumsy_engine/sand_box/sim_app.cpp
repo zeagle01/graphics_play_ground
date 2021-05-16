@@ -191,11 +191,13 @@ using namespace clumsy_engine;
 
 	void Sim_Gui::on_event(clumsy_engine::Event& e) 
 	{
+		RECORD_FUNCTION_DURATION();
 		(*m_dispatcher)(e);
 	}
 
 	void Sim_Gui::on_imgui_render(ImGuiContext* imgui_context) 
 	{
+		RECORD_FUNCTION_DURATION();
 
 		ImGui::SetCurrentContext(imgui_context); //cross lib imgui context do not share ! so set it manully
 

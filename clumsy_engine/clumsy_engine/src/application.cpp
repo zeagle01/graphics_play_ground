@@ -15,6 +15,7 @@
 #include "render_command.h"
 #include "camara.h"
 #include "time_step.h"
+#include "profiler.h"
 
 #include <memory>
 #include <iostream>
@@ -85,40 +86,41 @@ namespace clumsy_engine
 	}
 
 
-	void Application::run()
+	void Application::application_update()
 	{
+		RECORD_FUNCTION_DURATION();
 
-//		Window_Resize_Event e(100, 200);
-//		CE_TRACE(e.to_string());
-		
+		float time = std::chrono::high_resolution_clock::now().time_since_epoch().count() * 1e-9;
 
+		Time_Step time_step = time - m_last_frame_time;
 
-		while (m_is_running)
+		m_last_frame_time = time;
+
+		for (auto& layer : *m_layer_stack)
 		{
+			layer->on_update(time_step);
+		}
 
-			float time = std::chrono::high_resolution_clock::now().time_since_epoch().count()*1e-9;
-
-			Time_Step time_step = time - m_last_frame_time;
-
-			m_last_frame_time = time;
+		if (m_imgui_layer)
+		{
+			m_imgui_layer->begin();
 
 			for (auto& layer : *m_layer_stack)
 			{
-				layer->on_update(time_step);
+				layer->on_imgui_render(m_imgui_layer->get_imgui_context());
 			}
+			m_imgui_layer->end();
+		}
 
-			if (m_imgui_layer)
-			{
-				m_imgui_layer->begin();
+		m_window->on_update();
+	}
 
-				for (auto& layer : *m_layer_stack)
-				{
-					layer->on_imgui_render(m_imgui_layer->get_imgui_context());
-				}
-				m_imgui_layer->end();
-			}
+	void Application::run()
+	{
 
-			m_window->on_update();
+		while (m_is_running)
+		{
+			application_update();
 		}
 
 	}

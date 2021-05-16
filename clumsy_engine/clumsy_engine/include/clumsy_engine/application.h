@@ -45,6 +45,7 @@ namespace clumsy_engine
 
 
 	private:
+		void application_update();
 
 		bool on_event(Event& e);
 

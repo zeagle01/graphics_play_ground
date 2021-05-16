@@ -10,6 +10,7 @@
 #include "application_event.h"
 #include "graphic_context.h"
 #include "opengl_context.h"
+#include "profiler.h"
 
 //#include "glad/glad.h" //put glad first before other opengl include
 #include "GLFW/glfw3.h"
@@ -33,6 +34,8 @@ namespace clumsy_engine
 
 	void Windows_Window::on_update()
 	{
+		RECORD_FUNCTION_DURATION();
+
 		glfwPollEvents();
 		m_context->swap_buffers();
 	}

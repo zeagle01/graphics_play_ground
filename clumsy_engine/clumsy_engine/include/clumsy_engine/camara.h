@@ -95,7 +95,7 @@ namespace clumsy_engine
 	};
 
 
-	class Orthorgraphic_Camara :public Camara_Model<Focus_On_Target_Drag, Orthorgraphic_Projection> { };
+	class Orthorgraphic_Camara :public Camara_Model<Focus_On_Target_Drag, Perspective_Projection> { };
 
 
 }

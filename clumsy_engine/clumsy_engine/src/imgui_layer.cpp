@@ -14,6 +14,7 @@
 #include "application_event.h"
 #include "key_event.h"
 #include "handy_helpers.h"
+#include "profiler.h"
 
 namespace clumsy_engine
 {
@@ -28,6 +29,8 @@ namespace clumsy_engine
 
 		void Imgui_Layer::begin()
 		{
+			RECORD_FUNCTION_DURATION();
+
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
@@ -35,6 +38,8 @@ namespace clumsy_engine
 		
 		void Imgui_Layer::end()
 		{
+			RECORD_FUNCTION_DURATION();
+
 			auto& app = Application::get_singleton();
 			auto& window = app.get_window();
 
@@ -98,6 +103,8 @@ namespace clumsy_engine
 
 		void Imgui_Layer::on_imgui_render(ImGuiContext* imgui_context)
 		{
+			RECORD_FUNCTION_DURATION();
+
 			static bool show = true;
 			ImGui::ShowDemoWindow(&show);
 
