@@ -91,6 +91,7 @@ include/clumsy_engine/camara.h
 include/clumsy_engine/dispatcher.h
 include/clumsy_engine/key_event.h
 include/clumsy_engine/time_step.h
+include/clumsy_engine/ref.h
 
 include/simulator/simulator.h
 include/simulator/type_map.h

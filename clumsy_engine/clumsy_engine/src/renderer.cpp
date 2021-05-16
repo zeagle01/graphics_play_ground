@@ -10,9 +10,9 @@
 namespace clumsy_engine
 {
 
-	std::shared_ptr<Renderer::SceneData> Renderer::s_scene_data = std::make_shared<Renderer::SceneData>();
+	Ref<Renderer::SceneData> Renderer::s_scene_data = std::make_shared<Renderer::SceneData>();
 
-	void Renderer::begin_scene(std::shared_ptr<Orthorgraphic_Camara> camara)
+	void Renderer::begin_scene(Ref<Orthorgraphic_Camara> camara)
 	{
 		s_scene_data->view_projection_matrix = camara->get_view_projection_matrix();
 	}
@@ -20,7 +20,7 @@ namespace clumsy_engine
 	{
 
 	}
-	void Renderer::submit(std::shared_ptr<Shader> shader, std::shared_ptr<Vertex_Array> vertex_array, const glm::mat4& transform)
+	void Renderer::submit(Ref<Shader> shader, Ref<Vertex_Array> vertex_array, const glm::mat4& transform)
 	{
 		RECORD_FUNCTION_DURATION();
 

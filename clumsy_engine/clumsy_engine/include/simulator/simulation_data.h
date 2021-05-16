@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include <vector>
 #include "signal.h" 
 #include "type_map.h"
 #include "clumsy_lib/type_list.h"
 #include "clumsy_lib/class_reflection.h"
 #include "data_computes.h"
 #include "matrix_math/matrix_math.h"
+
+#include <vector>
 
 namespace clumsy_engine
 {

@@ -4,6 +4,8 @@
 #pragma once
 
 #include "window.h"
+#include "ref.h"
+
 #include <any>
 
 
@@ -38,7 +40,7 @@ namespace clumsy_engine
 
 		GLFWwindow* m_window;
 
-		std::shared_ptr<Graphic_Context> m_context;
+		Ref<Graphic_Context> m_context;
 
 
 		struct Window_Data

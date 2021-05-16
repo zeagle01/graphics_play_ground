@@ -7,6 +7,6 @@
 namespace clumsy_engine
 {
 
-	std::shared_ptr<Renderer_API> Render_Command::s_renderer_API = std::make_shared<OpenGL_Renderer_API>();
+	Ref<Renderer_API> Render_Command::s_renderer_API = std::make_shared<OpenGL_Renderer_API>();
 
 }

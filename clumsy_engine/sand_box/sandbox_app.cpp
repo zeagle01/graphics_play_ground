@@ -9,6 +9,7 @@
 #include "profiler.h"
 #include "clumsy_engine/openGL_shader.h"
 #include "profiler.h"
+#include "clumsy_engine/ref.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -87,9 +88,10 @@ public:
 
 		clumsy_engine::Renderer::begin_scene(m_camara);
 
+		plane_update();
+
 		clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::mat4(1.f));
 
-		plane_update();
 
 		clumsy_engine::Renderer::end_scene();
 
@@ -128,7 +130,7 @@ private:
 
 		//gl data stuff
 		m_vertex_array = clumsy_engine::Vertex_Array::create();
-		std::shared_ptr<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(m_positions.data(), m_positions.size());
+		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(m_positions.data(), m_positions.size());
 
 		clumsy_engine::Buffer_Layout layout =
 		{
@@ -139,7 +141,7 @@ private:
 		vertex_buffer->set_layout(layout);
 		m_vertex_array->add_vertex_buffer(vertex_buffer);
 
-		std::shared_ptr<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
+		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
 		m_vertex_array->set_index_buffer(index_buffer);
 
 
@@ -203,7 +205,7 @@ private:
 
 		//gl data stuff
 		m_vertex_array_plane = clumsy_engine::Vertex_Array::create();
-		std::shared_ptr<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(m_positions_plane.data(), m_positions_plane.size());
+		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(m_positions_plane.data(), m_positions_plane.size());
 
 		clumsy_engine::Buffer_Layout layout =
 		{
@@ -212,7 +214,7 @@ private:
 		vertex_buffer->set_layout(layout);
 		m_vertex_array_plane->add_vertex_buffer(vertex_buffer);
 
-		std::shared_ptr<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
+		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
 		m_vertex_array_plane->set_index_buffer(index_buffer);
 
 
@@ -272,19 +274,19 @@ private:
 
 
 
-	std::shared_ptr<clumsy_engine::Shader> m_shader;
-	std::shared_ptr<clumsy_engine::Vertex_Array> m_vertex_array;
+	clumsy_engine::Ref<clumsy_engine::Shader> m_shader;
+	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array;
 	std::vector<float> m_positions;
 
-	std::shared_ptr<clumsy_engine::Shader> m_shader_plane;
-	std::shared_ptr<clumsy_engine::Vertex_Array> m_vertex_array_plane;
+	clumsy_engine::Ref<clumsy_engine::Shader> m_shader_plane;
+	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array_plane;
 	std::vector<float> m_positions_plane;
 	glm::vec3 m_plane_color = glm::vec3(1.f, 0.f, 0.f);
 
-	std::shared_ptr<clumsy_engine::Orthorgraphic_Camara> m_camara;
+	clumsy_engine::Ref<clumsy_engine::Orthorgraphic_Camara> m_camara;
 	clumsy_engine::Drag_Delta_Computer m_drag_delta_computer;
 
-	std::shared_ptr<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
+	clumsy_engine::Ref<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
 };
 
 

@@ -38,7 +38,7 @@ using namespace clumsy_engine;
 
 		//gl data stuff
 		m_vertex_array = clumsy_engine::Vertex_Array::create();
-		std::shared_ptr<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(positions[0].get_flat(), positions.size() * 3);
+		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(positions[0].get_flat(), positions.size() * 3);
 
 		clumsy_engine::Buffer_Layout layout =
 		{
@@ -49,7 +49,7 @@ using namespace clumsy_engine;
 		vertex_buffer->set_layout(layout);
 		m_vertex_array->add_vertex_buffer(vertex_buffer);
 
-		std::shared_ptr<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
+		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
 		m_vertex_array->set_index_buffer(index_buffer);
 
 

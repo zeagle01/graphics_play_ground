@@ -3,6 +3,8 @@
 #pragma  once
 
 #include "buffer.h"
+#include "ref.h"
+
 #include <memory>
 
 namespace clumsy_engine
@@ -15,11 +17,11 @@ namespace clumsy_engine
 		virtual void bind() const = 0;
 		virtual void unbind() const = 0;
 
-		virtual void add_vertex_buffer(std::shared_ptr<Vertex_Buffer> vb)  = 0;
-		virtual void set_index_buffer( std::shared_ptr<Index_Buffer> ib)  = 0;
+		virtual void add_vertex_buffer(Ref<Vertex_Buffer> vb)  = 0;
+		virtual void set_index_buffer( Ref<Index_Buffer> ib)  = 0;
 
-		virtual std::vector<std::shared_ptr<Vertex_Buffer>> get_vertex_buffer() const = 0;
-		virtual std::shared_ptr<Index_Buffer> get_index_buffer() const = 0;
+		virtual std::vector<Ref<Vertex_Buffer>> get_vertex_buffer() const = 0;
+		virtual Ref<Index_Buffer> get_index_buffer() const = 0;
 
 		void set_positions(float* data, int num);
 

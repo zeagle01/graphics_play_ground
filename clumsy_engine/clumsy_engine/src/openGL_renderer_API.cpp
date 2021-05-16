@@ -15,7 +15,7 @@ namespace clumsy_engine
 
 		 }
 
-	void OpenGL_Renderer_API::draw_indexed(std::shared_ptr<Vertex_Array> vertex_array)
+	void OpenGL_Renderer_API::draw_indexed(Ref<Vertex_Array> vertex_array)
 	{
 		glDrawElements(GL_TRIANGLES, vertex_array->get_index_buffer()->get_count(), GL_UNSIGNED_INT, nullptr);
 

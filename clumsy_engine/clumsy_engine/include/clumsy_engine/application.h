@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "ref.h"
+
 #include <memory>
 #include <map>
 #include <functional>
@@ -37,8 +39,8 @@ namespace clumsy_engine
 
 		void run();
 
-		void push_layer(std::shared_ptr<Layer> layer);
-		void push_overlay(std::shared_ptr<Layer> overlay);
+		void push_layer(Ref<Layer> layer);
+		void push_overlay(Ref<Layer> overlay);
 
 		Window& get_window() const;
 
@@ -50,11 +52,11 @@ namespace clumsy_engine
 		bool on_event(Event& e);
 
 		std::unique_ptr<Window> m_window;
-		std::shared_ptr<Imgui_Layer> m_imgui_layer;
+		Ref<Imgui_Layer> m_imgui_layer;
 
 		std::map<Event_Type,std::function<bool (Event& e)>> m_event_fn;
 
-		std::shared_ptr<Dispatcher<Event,  bool>> m_dispatcher_imp;
+		Ref<Dispatcher<Event,  bool>> m_dispatcher_imp;
 		Dispatcher<Event, bool>& m_dispatcher;
 
 		std::unique_ptr<Layer_Stack> m_layer_stack;

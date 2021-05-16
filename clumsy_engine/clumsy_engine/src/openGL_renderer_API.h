@@ -14,7 +14,7 @@ namespace clumsy_engine
 		void clear() override;
 		void set_clear_color(const glm::vec4& color) override;
 
-		void draw_indexed(std::shared_ptr<Vertex_Array> vertex_array) override;
+		void draw_indexed(Ref<Vertex_Array> vertex_array) override;
 
 	};
 

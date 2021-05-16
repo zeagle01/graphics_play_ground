@@ -132,13 +132,13 @@ namespace clumsy_engine
 		return true;
 	}
 
-	void Application::push_layer(std::shared_ptr<Layer> layer)
+	void Application::push_layer(Ref<Layer> layer)
 	{
 		m_layer_stack->push_layer(layer);
 		layer->on_attach();
 	}
 
-	void Application::push_overlay(std::shared_ptr<Layer> overlay)
+	void Application::push_overlay(Ref<Layer> overlay)
 	{
 		m_layer_stack->push_overlay(overlay);
 		overlay->on_attach();

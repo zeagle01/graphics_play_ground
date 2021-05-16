@@ -18,15 +18,15 @@ namespace clumsy_engine
 		 void bind() const override;
 		 void unbind() const  override;
 
-		 void add_vertex_buffer(std::shared_ptr<Vertex_Buffer> vb) override;
-		 void set_index_buffer(std::shared_ptr<Index_Buffer> ib) override;
+		 void add_vertex_buffer(Ref<Vertex_Buffer> vb) override;
+		 void set_index_buffer(Ref<Index_Buffer> ib) override;
 
-		 std::vector<std::shared_ptr<Vertex_Buffer>> get_vertex_buffer() const override { return m_vertex_buffers; }
-		 std::shared_ptr<Index_Buffer> get_index_buffer() const override{ return m_index_buffer; };
+		 std::vector<Ref<Vertex_Buffer>> get_vertex_buffer() const override { return m_vertex_buffers; }
+		 Ref<Index_Buffer> get_index_buffer() const override{ return m_index_buffer; };
 
 	private:
-		std::vector<std::shared_ptr<Vertex_Buffer>> m_vertex_buffers;
-		std::shared_ptr<Index_Buffer> m_index_buffer;
+		std::vector<Ref<Vertex_Buffer>> m_vertex_buffers;
+		Ref<Index_Buffer> m_index_buffer;
 		unsigned int m_renderer_id;
 	};
 

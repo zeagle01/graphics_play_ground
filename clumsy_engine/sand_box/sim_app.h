@@ -2,8 +2,10 @@
 #pragma once
 
 #include "clumsy_engine/clumsy_engine.h"
-#include <memory>
 #include "simulator/Simulator.h"
+#include "clumsy_engine/ref.h"
+
+#include <memory>
 
 
 class Sim_Gui :public clumsy_engine::Layer
@@ -27,14 +29,14 @@ public:
 
 private:
 
-	std::shared_ptr<clumsy_engine::Shader> m_shader;
-	std::shared_ptr<clumsy_engine::Vertex_Array> m_vertex_array;
+	clumsy_engine::Ref<clumsy_engine::Shader> m_shader;
+	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array;
 
-	std::shared_ptr<clumsy_engine::Orthorgraphic_Camara> m_camara;
+	clumsy_engine::Ref<clumsy_engine::Orthorgraphic_Camara> m_camara;
 
 	clumsy_engine::Drag_Delta_Computer m_drag_delta_computer;
 
-	std::shared_ptr<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
+	clumsy_engine::Ref<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
 
 	clumsy_engine::Simulator m_sim;
 };
@@ -46,7 +48,6 @@ class Sim_App:public clumsy_engine::Application
 		Sim_App() 
 		{
 
-			//std::shared_ptr<clumsy_engine::Layer> layer = std::make_shared<Layer_Demo>();
 			push_layer(std::make_shared<Sim_Gui>());
 		}
 

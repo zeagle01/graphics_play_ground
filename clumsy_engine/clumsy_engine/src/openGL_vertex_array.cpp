@@ -30,7 +30,7 @@ namespace clumsy_engine
 		glBindVertexArray(0);
 	}
 
-	void OpenGL_Vertex_Array::add_vertex_buffer(std::shared_ptr<Vertex_Buffer> vb) 
+	void OpenGL_Vertex_Array::add_vertex_buffer(Ref<Vertex_Buffer> vb) 
 	{
 
 		if (vb->get_layout().get_elements().empty())
@@ -54,7 +54,7 @@ namespace clumsy_engine
 		m_vertex_buffers.push_back(vb);
 
 	}
-	void OpenGL_Vertex_Array::set_index_buffer(std::shared_ptr<Index_Buffer> ib) 
+	void OpenGL_Vertex_Array::set_index_buffer(Ref<Index_Buffer> ib) 
 	{
 		glBindVertexArray(m_renderer_id);
 		ib->bind();
