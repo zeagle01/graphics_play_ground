@@ -3,6 +3,7 @@
 #include "render_command.h"
 #include "vertex_array.h"
 #include "shader.h"
+#include "openGL_shader.h"
 #include "camara.h"
 #include "profiler.h"
 
@@ -23,10 +24,14 @@ namespace clumsy_engine
 	{
 		RECORD_FUNCTION_DURATION();
 
-		shader->bind();
-		shader->upload_uniform_mat4("u_view_projection", s_scene_data->view_projection_matrix);
-		shader->upload_uniform_mat4("u_model_matrix", transform);
-		vertex_array->bind();
-		Render_Command::draw_indexed(vertex_array);
+		auto ogl_shader = std::dynamic_pointer_cast<OpenGL_Shader>(shader);
+		if (ogl_shader)
+		{
+			ogl_shader->bind();
+			ogl_shader->upload_uniform_mat4("u_view_projection", s_scene_data->view_projection_matrix);
+			ogl_shader->upload_uniform_mat4("u_model_matrix", transform);
+			vertex_array->bind();
+			Render_Command::draw_indexed(vertex_array);
+		}
 	}
 }

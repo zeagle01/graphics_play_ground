@@ -92,23 +92,13 @@ using namespace clumsy_engine;
 		)";
 
 		//shader
-		m_shader = std::make_shared<clumsy_engine::Shader>(vertex_src, fragment_src);
+		m_shader = clumsy_engine::Shader::create(vertex_src, fragment_src);
 
 
 		auto key_pressed_handler = [](auto& e)
 		{
 			return false;
 		};
-
-//		m_dispatcher->add<clumsy_engine::Key_Pressed_Event>(
-//			std::bind(&Layer_Demo::on_key_pressed, this, std::placeholders::_1)
-//			//key_pressed_handler
-//			);
-
-
-
-
-
 
 		///////////////simulation init
 		m_sim.add_interaction<clumsy_engine::Inertial>();
