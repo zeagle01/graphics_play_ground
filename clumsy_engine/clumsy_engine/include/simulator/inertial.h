@@ -6,13 +6,13 @@
 #include "Interaction.h"
 #include "Simulation_Data.h"
 #include <vector> 
-#include "type_list.h"
+#include "clumsy_lib/type_list.h"
 
 namespace clumsy_engine
 {
 
 
-	class Inertial :public Interaction, public Simulation_Data_Acc<type_list< data::Vertex_Num, data::Mass, data::Last_Frame_Position, data::Velocity, data::Time_Step>>
+	class Inertial :public Interaction, public Simulation_Data_Acc<clumsy_lib::type_list< data::Vertex_Num, data::Mass, data::Last_Frame_Position, data::Velocity, data::Time_Step>>
 	{
 	public:
 

@@ -6,6 +6,7 @@
 
 using namespace testing;
 using namespace clumsy_engine;
+using namespace clumsy_lib;
 
 
 //////////////////////////////////////////////////////////

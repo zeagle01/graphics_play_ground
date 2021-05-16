@@ -11,7 +11,7 @@ include/clumsy_lib/class_reflection.h
 clumsy_lib.cpp
 )
 
-target_compile_features(clumsy_lib PRIVATE cxx_std_17)
+target_compile_features(clumsy_lib PRIVATE cxx_std_20)
 
 
 

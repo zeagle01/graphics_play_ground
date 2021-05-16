@@ -60,7 +60,6 @@ src/one_point_stencils.h
 src/one_point_stencils.cpp
 src/signal.h
 src/type_map.cpp
-src/type_list.cpp
 src/data_computes.h
 src/data_computes.cpp
 
@@ -92,7 +91,6 @@ include/clumsy_engine/key_event.h
 include/clumsy_engine/time_step.h
 
 include/simulator/simulator.h
-include/simulator/type_list.h
 include/simulator/type_map.h
 include/simulator/simulation_data.h
 include/simulator/inertial.h

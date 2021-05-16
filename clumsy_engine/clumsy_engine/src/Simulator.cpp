@@ -10,6 +10,7 @@
 
 #include "gravity.h"
 #include "Simulation_Data.h"
+#include "clumsy_lib/type_list.h"
 
 
 namespace clumsy_engine
@@ -23,7 +24,7 @@ namespace clumsy_engine
 
 		set_(m_data_map);
 
-		for_each_type<all_types, build_sim_data>(*m_data_map);
+		clumsy_lib::for_each_type<all_types, build_sim_data>(*m_data_map);
 
 		for_each_depend_type<all_types ,build_dependent>(*m_data_map);
 

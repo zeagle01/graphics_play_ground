@@ -17,7 +17,7 @@ using namespace clumsy_engine;
 TEST(Data_Computes_Test, compute_edge_indices)
 {
 
-	Simulation_Data_Acc<type_list<data::Triangle_Indice, data::Vertex_Num>> sim_data;
+	Simulation_Data_Acc<clumsy_lib::type_list<data::Triangle_Indice, data::Vertex_Num>> sim_data;
 	sim_data.set<data::Triangle_Indice>({ 0,1,2 });
 	sim_data.set<data::Vertex_Num>(3);
 
@@ -34,7 +34,7 @@ TEST(Data_Computes_Test, compute_edge_indices)
 TEST(Data_Computes_Test, compute_triangle_area)
 {
 
-	Simulation_Data_Acc<type_list<data::Triangle_Indice, data::Ref_Position>> sim_data;
+	Simulation_Data_Acc<clumsy_lib::type_list<data::Triangle_Indice, data::Ref_Position>> sim_data;
 	sim_data.set<data::Triangle_Indice>({ 0,1,2 });
 	sim_data.set<data::Ref_Position>(
 		{
@@ -55,7 +55,7 @@ TEST(Data_Computes_Test, compute_triangle_area)
 TEST(Data_Computes_Test, compute_vertex_area)
 {
 
-	Simulation_Data_Acc<type_list<data::Vertex_Num, data::Triangle_Indice, data::Triangle_Area >> sim_data;
+	Simulation_Data_Acc<clumsy_lib::type_list<data::Vertex_Num, data::Triangle_Indice, data::Triangle_Area >> sim_data;
 
 	sim_data.set<data::Triangle_Indice>({ 0,1,2 });
 	sim_data.set<data::Triangle_Area>({3.f});

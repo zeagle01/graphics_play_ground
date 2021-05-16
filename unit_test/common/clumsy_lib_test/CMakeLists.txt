@@ -12,6 +12,8 @@ macro_loop_test.cpp
 )
 
 
+target_compile_features(clumsy_lib_test PRIVATE cxx_std_20)
+
 target_link_libraries(clumsy_lib_test PRIVATE clumsy_lib)
 
 set_target_properties(clumsy_lib_test PROPERTIES FOLDER unit_test/common)

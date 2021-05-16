@@ -4,7 +4,7 @@
 
 #include <map>
 #include <memory>
-#include "type_list.h"
+#include "clumsy_lib/type_list.h"
 
 
 namespace clumsy_engine
@@ -131,7 +131,7 @@ namespace clumsy_engine
 		}
 
 		template<typename T, typename dataT = T::data_type>
-		requires Type_In_List<T,tl>
+		requires clumsy_lib::Type_In_List<T,tl>
 		void set(const dataT& d)
 		{
 
@@ -149,7 +149,7 @@ namespace clumsy_engine
 		}
 
 		template<typename T>
-		requires Type_In_List<T,tl>
+		requires clumsy_lib::Type_In_List<T,tl>
 		const auto& get()
 		{
 			return m_data_map->get_data<T>();
