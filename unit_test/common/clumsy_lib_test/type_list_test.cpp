@@ -4,6 +4,7 @@
 
 
 using namespace testing;
+using namespace clumsy_lib;
 
 TEST(Type_List_Test, get_front_test)
 {

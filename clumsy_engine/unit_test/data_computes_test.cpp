@@ -34,9 +34,9 @@ TEST(Data_Computes_Test, compute_edge_indices)
 TEST(Data_Computes_Test, compute_triangle_area)
 {
 
-	Simulation_Data_Acc<type_list<data::Triangle_Indice, data::Position>> sim_data;
+	Simulation_Data_Acc<type_list<data::Triangle_Indice, data::Ref_Position>> sim_data;
 	sim_data.set<data::Triangle_Indice>({ 0,1,2 });
-	sim_data.set<data::Position>(
+	sim_data.set<data::Ref_Position>(
 		{
 			{0,0,0},
 			{1,0,0},

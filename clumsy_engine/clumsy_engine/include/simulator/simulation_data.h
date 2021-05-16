@@ -127,11 +127,8 @@ namespace clumsy_engine
 
 
 
-#define TMP(...) __VA_ARGS__ 
 
-#define DEF_MEM(x,t,c,tl) \
-		class x :public Dependent_Data<t,c, tl > {};\
-		x* x##_var;\
+#define DEF_MEM(x,t,c,tl) DEF_DATA_CLASS_MEM(x,Dependent_Data,t,c,tl)
 
 
 
@@ -154,7 +151,7 @@ namespace clumsy_engine
 		DEF_MEM(Vertex_Num,					int,		TMP(Get_List_Size<Position, 1>),					type_list<Position>);
 		DEF_MEM(Velocity,					v_v3f,		TMP(Allocate_With_Size<v_v3f, Vertex_Num, 1>),		type_list<Vertex_Num>);
 		DEF_MEM(Last_Frame_Position,		v_v3f,		TMP(Allocate_With_Size<v_v3f, Vertex_Num, 1>),		type_list<Vertex_Num>);
-		DEF_MEM(Triangle_Area,				vf,			Compute_Triangle_Area,								TMP(type_list<Position,Triangle_Indice>));
+		DEF_MEM(Triangle_Area,				vf,			Compute_Triangle_Area,								TMP(type_list<Ref_Position,Triangle_Indice>));
 		DEF_MEM(Vertex_Area,				vf,			Compute_Vertex_Area,								TMP(type_list<Vertex_Num,Triangle_Area,Triangle_Indice>));
 		DEF_MEM(Mass,						vf,			Compute_Mass,										TMP(type_list<Mass_Density,Vertex_Area>));
 
@@ -175,6 +172,7 @@ namespace clumsy_engine
 
 	using tuple_t = decltype(clumsy_lib::as_tuple<data>());
 	using all_types = extract_tuple_pointer<tuple_t>::types;
+//	using all_types = clumsy_lib::extract_member_type_list_t<data>;
 
 
 

@@ -128,7 +128,7 @@ namespace clumsy_engine
 		static void apply(sim_acc_T& datas, std::vector<float>& triangle_area)
 		{
 			const auto& triangle_indice = datas.get<data::Triangle_Indice>();
-			const auto& position = datas.get<data::Position>();
+			const auto& position = datas.get<data::Ref_Position>();
 
 			int t_num = triangle_indice.size() / 3;
 			if (triangle_area.size() != t_num)
