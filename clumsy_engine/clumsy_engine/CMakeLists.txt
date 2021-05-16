@@ -29,6 +29,7 @@ src/windows_input.cpp
 src/input.cpp
 src/dispatcher.cpp
 src/time_step.cpp
+src/file_dialogs.cpp
 
 src/graphic_context.h
 src/opengl_context.h
@@ -63,6 +64,7 @@ src/signal.h
 src/type_map.cpp
 src/data_computes.h
 src/data_computes.cpp
+src/mesh_loader.cpp
 
 )
 
@@ -92,6 +94,7 @@ include/clumsy_engine/dispatcher.h
 include/clumsy_engine/key_event.h
 include/clumsy_engine/time_step.h
 include/clumsy_engine/ref.h
+include/clumsy_engine/file_dialogs.h
 
 include/simulator/simulator.h
 include/simulator/type_map.h
@@ -99,6 +102,7 @@ include/simulator/simulation_data.h
 include/simulator/inertial.h
 include/simulator/interaction.h
 include/simulator/gravity.h
+include/simulator/mesh_loader.h
 )
 
 add_library(clumsy_engine  SHARED

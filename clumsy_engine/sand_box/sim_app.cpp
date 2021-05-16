@@ -4,6 +4,8 @@
 #include "gravity.h"
 #include "spring_stretch.h"
 #include "profiler.h"
+#include "file_dialogs.h"
+#include "simulator/mesh_loader.h"
 
 #include "imgui.h"
 
@@ -26,19 +28,18 @@ using namespace clumsy_engine;
 		//	1,0,0,0,0,0.2,
 		//	1,1,0,0,0,0.2
 		//};
-		std::vector<vec3f> positions{
+		m_positions = {
 			{0.,0,0},
 			{0.5,0,0},
 			{0.5,0.5,0},
 		};
-
-		std::vector<int> triangles{
-			0,1,2
+		m_indices = {
+					0,1,2
 		};
 
 		//gl data stuff
 		m_vertex_array = clumsy_engine::Vertex_Array::create();
-		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(positions[0].get_flat(), positions.size() * 3);
+		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(m_positions[0].get_flat(), m_positions.size() * 3);
 
 		clumsy_engine::Buffer_Layout layout =
 		{
@@ -49,7 +50,7 @@ using namespace clumsy_engine;
 		vertex_buffer->set_layout(layout);
 		m_vertex_array->add_vertex_buffer(vertex_buffer);
 
-		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
+		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(m_indices.data(), m_indices.size());
 		m_vertex_array->set_index_buffer(index_buffer);
 
 
@@ -100,7 +101,12 @@ using namespace clumsy_engine;
 			return false;
 		};
 
-		///////////////simulation init
+
+		simulation_init();
+	}
+
+	void Sim_Gui::simulation_init()
+	{
 		m_sim.add_interaction<clumsy_engine::Inertial>();
 		m_sim.add_interaction<clumsy_engine::Gravity>();
 		m_sim.add_interaction<clumsy_engine::Spring_Stretch>();
@@ -110,12 +116,11 @@ using namespace clumsy_engine;
 		m_sim.set<data::Gravity>({ 0,0,0 });
 		m_sim.set<data::Stretch_Stiff>(1e3f);
 		
-		m_sim.set<clumsy_engine::data::Triangle_Indice>(triangles);
-		m_sim.set<clumsy_engine::data::Position>(positions);
-		m_sim.set<clumsy_engine::data::Ref_Position>(positions);
-		std::vector<vec3f> zero(positions.size(), get_uniform<3, 1, float>(0));
+		m_sim.set<clumsy_engine::data::Triangle_Indice>(m_indices);
+		m_sim.set<clumsy_engine::data::Position>(m_positions);
+		m_sim.set<clumsy_engine::data::Ref_Position>(m_positions);
+		std::vector<vec3f> zero(m_positions.size(), get_uniform<3, 1, float>(0));
 		m_sim.set<clumsy_engine::data::Velocity>(zero);
-
 
 	}
 
@@ -193,6 +198,33 @@ using namespace clumsy_engine;
 
 		ImGui::Begin("Test from sim app");
 
+		if (ImGui::Button("open.."))
+		{
+			Mesh_Loader loader;
+			auto opend_file = clumsy_engine::File_Dialogs::open_file("mesh file (*.obj)\0*.obj\0 project (*.pro)\0*.pro\0");
+			if (!opend_file.empty())
+			{
+				loader.load_from_obj(opend_file);
+				const auto& new_pos = loader.get_positions();
+				int v_num = new_pos.size() / 3;
+				m_positions.resize(v_num);
+				for (int i = 0; i < v_num; i++)
+				{
+					m_positions[i](0) = new_pos[i * 3 + 0];
+					m_positions[i](1) = new_pos[i * 3 + 1];
+					m_positions[i](2) = new_pos[i * 3 + 2];
+				}
+				m_indices = loader.get_indices();
+				simulation_init();
+				CE_INFO("opened {0}", opend_file);
+			}
+		}
+		if (ImGui::Button("save.."))
+		{
+			auto saved_file = clumsy_engine::File_Dialogs::save_file("project (*.pro)\0*.pro\0");
+			CE_INFO("save {0}", saved_file);
+		}
+
 		ImGui::Text("hello world from sim app");
 
 		static float gravity[] = { 0.f,-10.f,0.f };
@@ -205,7 +237,9 @@ using namespace clumsy_engine;
 		ImGui::SliderFloat("mass density", &rho, 0.001, 10.f);           
 		ImGui::SliderFloat("stretch stiff", &stretch_stiff, 0.001, 1e7f);           
 
+
 		ImGui::End();
+
 
 		m_sim.set<data::Time_Step>(time_step);
 		m_sim.set<data::Mass_Density>(rho);

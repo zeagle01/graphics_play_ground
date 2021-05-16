@@ -10,6 +10,7 @@
 #include "clumsy_engine/openGL_shader.h"
 #include "profiler.h"
 #include "clumsy_engine/ref.h"
+#include "clumsy_engine/file_dialogs.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -109,6 +110,18 @@ public:
 		ImGui::Begin("Test from demo layer");
 		ImGui::Text("hello world from demo layer");
 		ImGui::ColorEdit3("plane color", glm::value_ptr(m_plane_color));
+
+		if (ImGui::Button("open.."))
+		{
+			auto opend_file = clumsy_engine::File_Dialogs::open_file("mesh file (*.obj)\0*.obj\0 project (*.pro)\0*.pro\0");
+			CE_INFO("opened {0}", opend_file);
+		}
+		if (ImGui::Button("save.."))
+		{
+			auto saved_file = clumsy_engine::File_Dialogs::save_file("project (*.pro)\0*.pro\0");
+			CE_INFO("save {0}", saved_file);
+		}
+
 		ImGui::End();
 	}
 
@@ -309,8 +322,8 @@ std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
 
 	clumsy_engine::Log::get_core_logger()->trace("create app");
 
-	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
-	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
+	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
+	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
 
 	return app;
 }

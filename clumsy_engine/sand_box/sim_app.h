@@ -28,9 +28,12 @@ public:
 	
 
 private:
+	void simulation_init();
 
 	clumsy_engine::Ref<clumsy_engine::Shader> m_shader;
 	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array;
+	std::vector<vec3f> m_positions;
+	std::vector<int> m_indices;
 
 	clumsy_engine::Ref<clumsy_engine::Orthorgraphic_Camara> m_camara;
 
