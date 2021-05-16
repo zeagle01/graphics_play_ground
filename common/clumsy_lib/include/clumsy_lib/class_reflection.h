@@ -4,6 +4,7 @@
 #pragma once
 
 #include <type_traits>
+#include <tuple>
 #include "macro_loop.h"
 #include "type_list.h"
 
