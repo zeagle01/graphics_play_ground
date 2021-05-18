@@ -237,19 +237,27 @@ using namespace clumsy_engine;
 		static float rho = 1.f;
 		static float stretch_stiff = 1e2f;
 
-		ImGui::SliderFloat3("gravity", gravity, -10.f, 10.f);            
-		ImGui::SliderFloat("time step", &time_step, 0.001, 10.f);           
-		ImGui::SliderFloat("mass density", &rho, 0.001, 10.f);           
-		ImGui::SliderFloat("stretch stiff", &stretch_stiff, 0.001, 1e7f);           
+		if (ImGui::SliderFloat3("gravity", gravity, -10.f, 10.f))
+		{
+			m_sim.set<data::Gravity>({ gravity[0],gravity[1],gravity[2] });
+		}
+		if (ImGui::SliderFloat("time step", &time_step, 0.001, 10.f))
+		{
+			m_sim.set<data::Time_Step>(time_step);
+		}
+		if (ImGui::SliderFloat("mass density", &rho, 0.001, 10.f))
+		{
+			m_sim.set<data::Mass_Density>(rho);
+		}
 
+		if (ImGui::SliderFloat("stretch stiff", &stretch_stiff, 0.001, 1e7f))
+		{
+			m_sim.set<data::Stretch_Stiff>(stretch_stiff);
+		}
 
 		ImGui::End();
 
 
-		m_sim.set<data::Time_Step>(time_step);
-		m_sim.set<data::Mass_Density>(rho);
-		m_sim.set<data::Gravity>({ gravity[0],gravity[1],gravity[2] });
-		m_sim.set<data::Stretch_Stiff>(stretch_stiff);
 
 	}
 
