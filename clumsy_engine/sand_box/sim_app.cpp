@@ -102,14 +102,14 @@ using namespace clumsy_engine;
 		};
 
 
+		m_sim.add_interaction<clumsy_engine::Inertial>();
+		m_sim.add_interaction<clumsy_engine::Gravity>();
+		m_sim.add_interaction<clumsy_engine::Spring_Stretch>();
 		simulation_init();
 	}
 
 	void Sim_Gui::simulation_init()
 	{
-		m_sim.add_interaction<clumsy_engine::Inertial>();
-		m_sim.add_interaction<clumsy_engine::Gravity>();
-		m_sim.add_interaction<clumsy_engine::Spring_Stretch>();
 
 		m_sim.set<data::Time_Step>(0.01);
 		m_sim.set<data::Mass_Density>(1.);
@@ -169,6 +169,7 @@ using namespace clumsy_engine;
 		auto mouse_delta = m_drag_delta_computer(newMousePos.x, newMousePos.y, clumsy_engine::Input::is_mouse_button_pressed(CE_MOUSE_BUTTON_LEFT));
 		m_camara->dragging_handle(glm::vec2(mouse_delta[0], mouse_delta[1]));
 
+		//render
 		clumsy_engine::Renderer::begin_scene(m_camara);
 
 		clumsy_engine::Renderer::submit(m_shader, m_vertex_array,glm::mat4(1.f));
@@ -179,7 +180,11 @@ using namespace clumsy_engine;
 		//simulation update
 		m_sim.update();
 		auto new_pos = m_sim.get<data::Position>();
+
+		//update render data
 		m_vertex_array->set_positions(new_pos[0].get_flat(), new_pos.size() );
+		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(m_indices.data(), m_indices.size());
+		m_vertex_array->set_index_buffer(index_buffer);
 
 
 	};

@@ -14,7 +14,7 @@ namespace clumsy_engine
 	template<typename T,typename U>
 	void Resize_If_Empty(T& dst,const U& src )
 	{
-		if (dst.empty())
+		if (dst.size() != src.size())
 		{
 			dst.resize(src.size());
 		}
