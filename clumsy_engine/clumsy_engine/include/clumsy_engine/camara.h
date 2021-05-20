@@ -4,6 +4,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "log.h"
 
 
 namespace clumsy_engine
@@ -38,7 +39,10 @@ namespace clumsy_engine
 			recompute_view_projection_matrix();
 		}
 
-		const glm::mat4& get_view_projection_matrix() const { return m_view_projection_matrix; }
+		const glm::mat4& get_view_projection_matrix() const 
+		{ 
+			return m_view_projection_matrix; 
+		}
 
 	private:
 		void recompute_view_projection_matrix() { m_view_projection_matrix = m_projection_matrix * m_view_matrix; }
@@ -86,7 +90,7 @@ namespace clumsy_engine
 			camara_position.z = target_position.z + r * std::cos(m_theta) * std::cos(m_phi);
 			camara_position.x = target_position.x + r * std::cos(m_theta) * std::sin(m_phi);
 			camara_up.y = std::cos(m_theta);
-			camara_up.z = std::sin(m_theta) * std::cos(m_phi);
+			camara_up.z = -std::sin(m_theta) * std::cos(m_phi);
 			camara_up.x = std::sin(m_theta) * std::sin(m_phi);
 		}
 		float m_theta = 0.f;
