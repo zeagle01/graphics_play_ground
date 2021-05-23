@@ -7,6 +7,7 @@
 #include "file_dialogs.h"
 #include "simulator/mesh_loader.h"
 #include "openGL_shader.h"
+#include "glm/gtc/type_ptr.hpp"
 
 #include "imgui.h"
 
@@ -136,6 +137,15 @@ using namespace clumsy_engine;
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(m_indices.data(), m_indices.size());
 		m_vertex_array->set_index_buffer(index_buffer);
 
+		ogl_shader->bind();
+		ogl_shader->upload_uniform_vec3("u_light_pos", glm::vec3(10.f, 10.f, 10.f));
+		ogl_shader->upload_uniform_vec3("u_obj_color", glm::vec3(1.f, 0.f, 0.f));
+		ogl_shader->upload_uniform_vec3("u_eye_pos", m_camara->get_position());
+		ogl_shader->upload_uniform_vec3("u_light_color", glm::vec3(1.f, 1.f, 1.f));
+		ogl_shader->upload_uniform_float("u_ka", 0.3f);
+		ogl_shader->upload_uniform_float("u_ks", 0.5f);
+		ogl_shader->upload_uniform_float("u_kd", 0.5f);
+		ogl_shader->upload_uniform_float("u_specular_steep", 40.f);
 
 
 
@@ -215,16 +225,6 @@ using namespace clumsy_engine;
 		//render
 		clumsy_engine::Renderer::begin_scene(m_camara);
 
-		//set uniform
-		auto ogl_shader = std::dynamic_pointer_cast<OpenGL_Shader>(m_shader);
-		ogl_shader->upload_uniform_vec3("u_eye_pos", m_camara->get_position());
-		ogl_shader->upload_uniform_vec3("u_light_pos", glm::vec3(10.f, 10.f, 10.f));
-		ogl_shader->upload_uniform_vec3("u_obj_color", glm::vec3(1.f, 0.f, 0.f));
-		ogl_shader->upload_uniform_vec3("u_light_color", glm::vec3(1.f, 1.f, 1.f));
-		ogl_shader->upload_uniform_float("u_ka", 0.3f);
-		ogl_shader->upload_uniform_float("u_ks", 0.5f);
-		ogl_shader->upload_uniform_float("u_kd", 0.5f);
-		ogl_shader->upload_uniform_float("u_specular_steep", 40.f);
 
 		clumsy_engine::Renderer::submit(m_shader, m_vertex_array,glm::mat4(1.f));
 
@@ -259,6 +259,7 @@ using namespace clumsy_engine;
 		ImGui::SetCurrentContext(imgui_context); //cross lib imgui context do not share ! so set it manully
 
 		ImGui::Begin("Test from sim app");
+
 
 		if (ImGui::Button("open.."))
 		{
@@ -311,6 +312,51 @@ using namespace clumsy_engine;
 		if (ImGui::SliderFloat("stretch stiff", &stretch_stiff, 0.001f, 1e7f))
 		{
 			m_sim.set<data::Stretch_Stiff>(stretch_stiff);
+		}
+
+
+
+
+		//set render uniform
+		auto ogl_shader = std::dynamic_pointer_cast<OpenGL_Shader>(m_shader);
+		ogl_shader->bind();
+		static glm::vec3 light_pos = glm::vec3(10.f, 10.f, 10.f);
+		static glm::vec3 obj_color = glm::vec3(1.f, 0.f, 0.f);
+		static glm::vec3 light_color = glm::vec3(1.f, 1.f, 1.f);
+		static float ka = 0.3f;
+		static float ks = 0.5f;
+		static float kd = 0.5f;
+		static float specular_steep = 0.5f;
+
+		ogl_shader->upload_uniform_vec3("u_eye_pos", m_camara->get_position());
+
+		if (ImGui::SliderFloat3("light pos", glm::value_ptr(light_pos), -1e2f, 1e2f))
+		{
+			ogl_shader->upload_uniform_vec3("u_light_pos", light_pos);
+		}
+		if (ImGui::SliderFloat3("obj_color", glm::value_ptr(obj_color), 0.f, 1.f))
+		{
+			ogl_shader->upload_uniform_vec3("u_obj_color", obj_color);
+		}
+		if (ImGui::SliderFloat3("light_color", glm::value_ptr(light_color), 0.f, 1.f))
+		{
+			ogl_shader->upload_uniform_vec3("u_light_color", light_color);
+		}
+		if (ImGui::SliderFloat("ambient_coefficient", &ka, 0.f, 1.f))
+		{
+			ogl_shader->upload_uniform_float("u_ka", ka);
+		}
+		if (ImGui::SliderFloat("diffusion_coefficient", &kd, 0.f, 1.f))
+		{
+			ogl_shader->upload_uniform_float("u_kd", kd);
+		}
+		if (ImGui::SliderFloat("specular_coefficient", &ks, 0.f, 1.f))
+		{
+			ogl_shader->upload_uniform_float("u_ks", ks);
+		}
+		if (ImGui::SliderFloat("specular_steep", &specular_steep, 1e-2f, 1e2f))
+		{
+			ogl_shader->upload_uniform_float("u_specular_steep", specular_steep);
 		}
 
 		ImGui::End();
