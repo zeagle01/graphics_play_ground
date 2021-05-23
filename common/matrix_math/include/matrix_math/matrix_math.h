@@ -490,6 +490,23 @@ static inline mat<Row, Col, T> operator|(const mat<Row, Col, T>& m0, const mat<R
 
 
 
+/////////////list of matrix////////////
+
+template<int P, size_t Row, size_t Col, typename T  >
+static bool is_near_list(const mat<Row, Col, T>* m0, const mat<Row, Col, T>* m1, int list_size, T threshold = 0)
+{
+	return std::inner_product(m0, m0 + list_size, m1, true, std::logical_and<>(), is_near1<P, Row, Col, T>(threshold));
+}
+
+//template< size_t Row, size_t Col, typename T  >
+//static bool operator==(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1)
+//{
+//	return is_near<0>(m0, m1);
+//}
+
+
+
+
 //////////////////////type alias///////////////////////
 using vec2f = vec<2, float>;
 using vec3f = vec<3, float>;
