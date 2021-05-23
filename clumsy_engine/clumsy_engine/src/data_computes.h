@@ -156,6 +156,88 @@ namespace clumsy_engine
 		}
 	};
 
+	struct Compute_Triangle_Normal
+	{
+		template<typename sim_acc_T>
+		static void apply(sim_acc_T& datas, std::vector<vec3f>& triangle_normal)
+		{
+			const auto& triangle_indice = datas.get<data::Triangle_Indice>();
+			const auto& position = datas.get<data::Position>();
+
+			int t_num = triangle_indice.size() / 3;
+			if (triangle_normal.size() != t_num)
+			{
+				triangle_normal.resize(t_num);
+			}
+
+			for (int i = 0; i < t_num; i++)
+			{
+				int tv[]{ triangle_indice[i * 3 + 0],triangle_indice[i * 3 + 1],triangle_indice[i * 3 + 2] };
+				vec3f x[]{
+					position[tv[0]],
+					position[tv[1]],
+					position[tv[2]]
+				};
+
+				auto n = (x[0] - x[2]) ^ (x[1] - x[2]);
+				triangle_normal[i] = normalize(n);
+			}
+		}
+	};
+
+	struct Compute_Vertex_Adjacent_Triangle
+	{
+		template<typename sim_acc_T>
+		static void apply(sim_acc_T& datas, std::vector<std::vector<int>>& vertex_ajd_triangle)
+		{
+
+			auto triangle_indices = datas.get<data::Triangle_Indice>();
+			int t_num = triangle_indices.size() / 3;
+			int v_num = datas.get<data::Vertex_Num>();
+
+			vertex_ajd_triangle.assign(v_num, std::vector<int>());
+
+			std::vector<std::vector<int>> vv(v_num);
+
+			for (int ti = 0; ti < t_num; ti++)
+			{
+				for (int tvi = 0; tvi < 3; tvi++)
+				{
+					int vi = tvi;
+					int tv = triangle_indices[ti * 3 + vi];
+
+					vertex_ajd_triangle[tv].push_back(ti);
+				}
+			}
+		}
+	};
+
+	struct Compute_Vertex_Normal
+	{
+		template<typename sim_acc_T>
+		static void apply(sim_acc_T& datas, std::vector<vec3f>& vertex_normal)
+		{
+			auto const& triangle_normal = datas.get<data::Triangle_Normal>();
+			auto const& vertext_adj_triangle = datas.get<data::Vertex_Adjacent_Triangle>();
+			auto const& v_num = datas.get<data::Vertex_Num>();
+
+			vertex_normal.assign(v_num, vec3f{ 0, 0, 0 });
+
+			for (int vi = 0; vi < v_num; vi++)
+			{
+				int adj_triangle_num = vertext_adj_triangle[vi].size();
+				for (int ti = 0; ti < adj_triangle_num; ti++)
+				{
+					const auto& t = vertext_adj_triangle[vi][ti];
+					vertex_normal[vi] += triangle_normal[t];
+				}
+				vertex_normal[vi] = normalize(vertex_normal[vi]);
+			}
+
+		}
+	};
+
+
 	struct Compute_Vertex_Area
 	{
 		template<typename sim_acc_T>
