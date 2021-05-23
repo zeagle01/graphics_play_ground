@@ -6,6 +6,7 @@
 #include "profiler.h"
 #include "file_dialogs.h"
 #include "simulator/mesh_loader.h"
+#include "openGL_shader.h"
 
 #include "imgui.h"
 
@@ -15,43 +16,30 @@ using namespace clumsy_engine;
 		, m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>())
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 	{
-		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f, -0.1f, -100.f);
+		float ss = 0.50f;
+		m_camara->set_view_field(-ss, ss, -ss, ss, -0.01f, -100.f);
 		m_camara->look_at(
 			glm::vec3(0.f,0.f,3.f),
 			glm::vec3(0.f,0.f,0.f),
 			glm::vec3(0.f,1.f,0.f)
 		);
 
-		/// data
-		//std::vector<float> positions{
-		//	0.,0,0,0,0,0.5,
-		//	1,0,0,0,0,0.2,
-		//	1,1,0,0,0,0.2
-		//};
 		m_positions = {
 			{0.,0,0},
 			{0.5,0,0},
 			{0.5,0.5,0},
 		};
+
+		m_normals = {
+			{0.f,0.f,1.f},
+			{0.f,0.f,1.f},
+			{0.f,0.f,1.f}
+		};
+
 		m_indices = {
 					0,1,2
 		};
 
-		//gl data stuff
-		m_vertex_array = clumsy_engine::Vertex_Array::create();
-		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(m_positions[0].get_flat(), m_positions.size() * 3);
-
-		clumsy_engine::Buffer_Layout layout =
-		{
-			{clumsy_engine::Shader_Data_Type::Float3, "a_position"}
-			//, {clumsy_engine::Shader_Data_Type::Float3, "a_color"}
-
-		};
-		vertex_buffer->set_layout(layout);
-		m_vertex_array->add_vertex_buffer(vertex_buffer);
-
-		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(m_indices.data(), m_indices.size());
-		m_vertex_array->set_index_buffer(index_buffer);
 
 
 
@@ -59,41 +47,96 @@ using namespace clumsy_engine;
 
 		std::string vertex_src = R"(
 			#version 330 core
-			layout(location=0 ) in vec3 position;
-			layout(location=1 ) in vec3 a_color;
-			out vec3 v_position;
-			out vec3 v_color;
+
+			layout(location=0 ) in vec3 v_position;
+			layout(location=1 ) in vec3 v_normal;
 
 			uniform mat4 u_view_projection;
 
+			out vec3 frag_normal;
+			out vec3 frag_position;
+
 			void main()
 			{
-
-				//vec3 t_position=u_view_projection*position;
-				v_position=position;
-				v_color=a_color;
-				gl_Position=u_view_projection*vec4(position,1.0);
+				gl_Position=u_view_projection*vec4(v_position,1.0);
+				frag_normal=v_normal;
+				//frag_position=v_position;
 			}
 
 		)";
 
 		std::string fragment_src = R"(
-
 			#version 330 core
-			in vec3 v_position;
-			in vec3 v_color;
+
+			in vec3 frag_normal;
+			in vec3 frag_position;
+
+			uniform vec3 u_eye_pos;
+			uniform vec3 u_light_pos;
+			uniform vec3 u_obj_color;
+			uniform vec3 u_light_color;
+			uniform float u_ka;
+			uniform float u_ks;
+			uniform float u_kd;
+			uniform float u_specular_steep;
+
 			out vec4 color;
 
 			void main()
 			{
-				color=vec4(v_position+v_color,1.0);
-				//color=vec4(v_position,1.0);
+				//ambient
+				vec3 ambient_color=u_ka*u_light_color*u_obj_color;
+
+				//diffuse
+				vec3 light_dir=normalize(u_light_color-frag_position);
+				float diffuse=max(dot(frag_normal,light_dir),0.);
+				vec3 diffuse_color=u_kd*diffuse*u_light_color*u_obj_color;
+
+				//specular
+				vec3 eye_dir=normalize(u_eye_pos-frag_position);
+				vec3 specular_dir=normalize(light_dir+eye_dir);
+				float specular=pow(max(dot(specular_dir,frag_normal),0),u_specular_steep);
+				vec3 specular_color=u_ks*specular*u_light_color*u_obj_color;
+
+				color=vec4(ambient_color+diffuse_color+specular_color,1.0);
+				//color=vec4(frag_normal,1.0);
+				//color=vec4(1.0,0.,0.,1.0);
 			}
 
 		)";
 
 		//shader
 		m_shader = clumsy_engine::Shader::create(vertex_src, fragment_src);
+
+
+		auto ogl_shader = std::dynamic_pointer_cast<OpenGL_Shader>(m_shader);
+
+		//gl data stuff
+		m_vertex_array = clumsy_engine::Vertex_Array::create();
+
+		//vbo position
+		m_vbo_position = clumsy_engine::Vertex_Buffer::create(m_positions[0].get_flat(), m_positions.size() * 3);
+		clumsy_engine::Buffer_Layout vbo_position_layout =
+		{
+			{clumsy_engine::Shader_Data_Type::Float3, "v_position"}
+		};
+		m_vbo_position->set_layout(vbo_position_layout);
+		m_vertex_array->add_vertex_buffer(m_vbo_position,ogl_shader->get_id());
+
+		//vbo normal
+		m_vbo_normal = clumsy_engine::Vertex_Buffer::create(m_normals[0].get_flat(), m_normals.size() * 3);
+		clumsy_engine::Buffer_Layout vbo_normal_layout =
+		{
+			{clumsy_engine::Shader_Data_Type::Float3, "v_normal"}
+		};
+		m_vbo_normal->set_layout(vbo_normal_layout);
+		m_vertex_array->add_vertex_buffer(m_vbo_normal, ogl_shader->get_id());
+
+		//ibo 
+		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(m_indices.data(), m_indices.size());
+		m_vertex_array->set_index_buffer(index_buffer);
+
+
 
 
 		auto key_pressed_handler = [](auto& e)
@@ -172,6 +215,17 @@ using namespace clumsy_engine;
 		//render
 		clumsy_engine::Renderer::begin_scene(m_camara);
 
+		//set uniform
+		auto ogl_shader = std::dynamic_pointer_cast<OpenGL_Shader>(m_shader);
+		ogl_shader->upload_uniform_vec3("u_eye_pos", m_camara->get_position());
+		ogl_shader->upload_uniform_vec3("u_light_pos", glm::vec3(10.f, 10.f, 10.f));
+		ogl_shader->upload_uniform_vec3("u_obj_color", glm::vec3(1.f, 0.f, 0.f));
+		ogl_shader->upload_uniform_vec3("u_light_color", glm::vec3(1.f, 1.f, 1.f));
+		ogl_shader->upload_uniform_float("u_ka", 0.3f);
+		ogl_shader->upload_uniform_float("u_ks", 0.5f);
+		ogl_shader->upload_uniform_float("u_kd", 0.5f);
+		ogl_shader->upload_uniform_float("u_specular_steep", 40.f);
+
 		clumsy_engine::Renderer::submit(m_shader, m_vertex_array,glm::mat4(1.f));
 
 		clumsy_engine::Renderer::end_scene();
@@ -179,10 +233,13 @@ using namespace clumsy_engine;
 
 		//simulation update
 		m_sim.update();
-		auto new_pos = m_sim.get<data::Position>();
+		const auto& new_pos = m_sim.get<data::Position>();
+		const auto& new_normal = m_sim.get<data::Vertex_Normal>();
 
 		//update render data
-		m_vertex_array->set_positions(new_pos[0].get_flat(), new_pos.size() );
+		m_vbo_position->set_data(new_pos[0].get_flat(), new_pos.size());
+		m_vbo_normal->set_data(new_normal[0].get_flat(), new_normal.size());
+
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(m_indices.data(), m_indices.size());
 		m_vertex_array->set_index_buffer(index_buffer);
 
@@ -219,6 +276,7 @@ using namespace clumsy_engine;
 					m_positions[i](1) = new_pos[i * 3 + 1];
 					m_positions[i](2) = new_pos[i * 3 + 2];
 				}
+
 				m_indices = loader.get_indices();
 				simulation_init();
 				CE_INFO("opened {0}", opend_file);
@@ -241,16 +299,16 @@ using namespace clumsy_engine;
 		{
 			m_sim.set<data::Gravity>({ gravity[0],gravity[1],gravity[2] });
 		}
-		if (ImGui::SliderFloat("time step", &time_step, 0.001, 10.f))
+		if (ImGui::SliderFloat("time step", &time_step, 0.001f, 10.f))
 		{
 			m_sim.set<data::Time_Step>(time_step);
 		}
-		if (ImGui::SliderFloat("mass density", &rho, 0.001, 10.f))
+		if (ImGui::SliderFloat("mass density", &rho, 0.001f, 10.f))
 		{
 			m_sim.set<data::Mass_Density>(rho);
 		}
 
-		if (ImGui::SliderFloat("stretch stiff", &stretch_stiff, 0.001, 1e7f))
+		if (ImGui::SliderFloat("stretch stiff", &stretch_stiff, 0.001f, 1e7f))
 		{
 			m_sim.set<data::Stretch_Stiff>(stretch_stiff);
 		}
