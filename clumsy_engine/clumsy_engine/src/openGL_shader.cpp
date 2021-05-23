@@ -150,4 +150,10 @@ namespace clumsy_engine
 		glUniform3fv(location, 1, glm::value_ptr(m));
 	}
 
+    void OpenGL_Shader::upload_uniform_float(const std::string& name, const float& v)
+	{
+		auto location = glGetUniformLocation(m_renderer_id, name.c_str());
+		glUniform1fv(location, 1, &v);
+	}
+
 }  

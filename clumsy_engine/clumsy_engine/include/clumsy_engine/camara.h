@@ -39,9 +39,21 @@ namespace clumsy_engine
 			recompute_view_projection_matrix();
 		}
 
+		////////////getter
+
 		const glm::mat4& get_view_projection_matrix() const 
 		{ 
 			return m_view_projection_matrix; 
+		}
+
+		const glm::vec3& get_position() const 
+		{ 
+			return m_position; 
+		}
+
+		const glm::vec3& get_up_direction() const 
+		{ 
+			return m_up; 
 		}
 
 	private:
@@ -99,7 +111,7 @@ namespace clumsy_engine
 	};
 
 
-	class Orthorgraphic_Camara :public Camara_Model<Focus_On_Target_Drag, Perspective_Projection> { };
+	class Orthorgraphic_Camara :public Camara_Model<Focus_On_Target_Drag, Orthorgraphic_Projection> { };
 
 
 }
