@@ -4,6 +4,8 @@
 #include <initializer_list>
 #include <numeric>
 #include <algorithm>
+#include <limits>
+#include <functional>
 
 template<size_t Row,size_t Col,typename T>
 class mat;
@@ -175,40 +177,24 @@ static inline mat<Col, Row, T> transpose(const mat<Row, Col, T>& m)
 ///////////////////////
 
 template<typename T>
-struct Add
-{
-	T operator()(T v0, T v1)
-	{
-		return v0 + v1;
-	}
-};
+struct Add { T operator()(T v0, T v1) { return v0 + v1; } };
+template<typename T>
+struct Self_Add { T operator()(T v0, T v1) { return v0 += v1; } };
 
 template<typename T>
-struct Substract
-{
-	T operator()(T v0, T v1)
-	{
-		return v0 - v1;
-	}
-};
+struct Substract { T operator()(T v0, T v1) { return v0 - v1; } };
+template<typename T>
+struct Self_Substract { T operator()(T v0, T v1) { return v0 -= v1; } };
 
 template<typename T>
-struct Multiply
-{
-	T operator()(T v0, T v1)
-	{
-		return v0 * v1;
-	}
-};
+struct Multiply { T operator()(T v0, T v1) { return v0 * v1; } };
+template<typename T>
+struct Self_Multiply { T operator()(T v0, T v1) { return v0 *= v1; } };
 
 template<typename T>
-struct Divide
-{
-	T operator()(T v0, T v1)
-	{
-		return v0 / v1;
-	}
-};
+struct Divide { T operator()(T v0, T v1) { return v0 / v1; } };
+template<typename T>
+struct Self_Divide { T operator()(T v0, T v1) { return v0 /= v1; } };
 
 
 template<size_t Row, size_t Col, typename T, typename F>
@@ -220,11 +206,23 @@ static mat<Row, Col, T> matrix_elementwise_binary_op(const mat<Row, Col, T>& m0,
 }
 
 template<size_t Row, size_t Col, typename T, typename F>
+static void matrix_elementwise_self_binary_op(mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1, F fn)
+{
+	std::transform(m0.get_flat(), m0.get_flat() + Row * Col, m1.get_flat(), m0.get_flat(), fn);
+}
+
+template<size_t Row, size_t Col, typename T, typename F>
 static mat<Row, Col, T> matrix_elementwise_unary_op(const mat<Row, Col, T>& m0, F fn)
 {
 	mat<Row, Col, T> ret;
 	std::transform(m0.get_flat(), m0.get_flat() + Row * Col, ret.get_flat(), fn);
 	return ret;
+}
+
+template<size_t Row, size_t Col, typename T, typename F>
+static void matrix_elementwise_self_unary_op(mat<Row, Col, T>& m0, F fn)
+{
+	std::transform(m0.get_flat(), m0.get_flat() + Row * Col, m0.get_flat(), fn);
 }
 
 
@@ -236,8 +234,17 @@ static mat<Row, Col, T> operator##x(const mat<Row, Col, T>& m0,const mat<Row, Co
 	return matrix_elementwise_binary_op<Row,Col,T>(m0, m1,op<T>()); \
 } \
 
+#define MATRIX_ELEMENTWISE_SELF_BINARY_OP(x,op) \
+template<size_t Row,size_t Col,typename T> \
+static void operator##x(mat<Row, Col, T>& m0,const mat<Row, Col, T>& m1) \
+{ \
+	matrix_elementwise_self_binary_op<Row,Col,T>(m0, m1,op<T>()); \
+} \
+
 //a0+a1
 MATRIX_ELEMENTWISE_BINARY_OP(+,Add)
+
+MATRIX_ELEMENTWISE_SELF_BINARY_OP(+=,Self_Add)
 
 //a0-a1
 MATRIX_ELEMENTWISE_BINARY_OP(-,Substract)
@@ -270,11 +277,27 @@ static mat<Row, Col, T> operator##x(T s,const mat<Row, Col, T>& m) \
 	return matrix_elementwise_unary_op<Row, Col, T>(m, fn);\
 }\
 
-//// a*s
+#define MATRIX_SELF_SCALAR_OP(x) \
+template<size_t Row,size_t Col,typename T>  \
+static  void operator##x(mat<Row, Col, T>& m,T s) \
+{ \
+	auto fn=[s](T v) \
+	{\
+		return v x s;\
+	};\
+	return matrix_elementwise_self_unary_op<Row, Col, T>(m, fn);\
+}\
+
+
+//// a op s  and s op a
 MATRIX_SCALAR_OP(+)
 MATRIX_SCALAR_OP(-)
 MATRIX_SCALAR_OP(*)
 MATRIX_SCALAR_OP(/)
+MATRIX_SELF_SCALAR_OP(+=)
+MATRIX_SELF_SCALAR_OP(-=)
+MATRIX_SELF_SCALAR_OP(*=)
+MATRIX_SELF_SCALAR_OP(/=)
 
 // -a
 template<size_t Row,size_t Col,typename T>  
@@ -369,6 +392,20 @@ struct Vectorized_Norm<0>
 	}
 };
 
+//normalized vector
+template< size_t Row, typename T  >
+static vec<Row, T> normalize(const vec<Row, T>& v)
+{
+	vec<Row, T> ret = v;
+	T l = Vectorized_Norm<2>()(v);
+	if (l >= std::numeric_limits<T>::min())
+	{
+		ret = v / Vectorized_Norm<2>()(v);
+	}
+	return ret;
+}
+
+
 
 template<int P, size_t Row, size_t Col, typename T  >
 static bool is_near(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1, T threshold = 0)
@@ -376,6 +413,17 @@ static bool is_near(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1, T th
 	T norm = Vectorized_Norm<P>()(m0 - m1);
 	return norm <= threshold;
 }
+
+template<int P, size_t Row, size_t Col, typename T  >
+struct is_near1
+{
+	T threshold = T(0);
+	bool operator()(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1)
+	{
+		T norm = Vectorized_Norm<P>()(m0 - m1);
+		return norm <= threshold;
+	}
+};
 
 template< size_t Row, size_t Col, typename T  >
 static bool operator==(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1)

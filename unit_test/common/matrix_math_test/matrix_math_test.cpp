@@ -252,3 +252,24 @@ TEST(Matrix_Test, solve_2112)
 	EXPECT_THAT(act(0), Eq(exp(0)));
 	EXPECT_THAT(act(1), Eq(exp(1)));
 }
+
+
+TEST(Matrix_Test, normalized_vec)
+{
+
+	vec2f v{ 3,0 };
+
+	vec2f act = normalize(v);
+	vec2f exp = { 1,0 };
+
+
+	EXPECT_THAT(act(0), Eq(exp(0)));
+	EXPECT_THAT(act(1), Eq(exp(1)));
+
+	v={ 0,0 };
+	act = normalize(v);
+	exp = { 0,0 };
+
+	EXPECT_THAT(act(0), Eq(exp(0)));
+	EXPECT_THAT(act(1), Eq(exp(1)));
+}
