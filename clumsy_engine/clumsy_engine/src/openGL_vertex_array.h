@@ -18,8 +18,10 @@ namespace clumsy_engine
 		 void bind() const override;
 		 void unbind() const  override;
 
+		 void add_vertex_buffer(Ref<Vertex_Buffer> vb, int shader_program) override;
 		 void add_vertex_buffer(Ref<Vertex_Buffer> vb) override;
 		 void set_index_buffer(Ref<Index_Buffer> ib) override;
+
 
 		 std::vector<Ref<Vertex_Buffer>> get_vertex_buffer() const override { return m_vertex_buffers; }
 		 Ref<Index_Buffer> get_index_buffer() const override{ return m_index_buffer; };
