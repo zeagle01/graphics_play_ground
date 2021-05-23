@@ -17,7 +17,6 @@ namespace clumsy_engine
 		virtual void bind() const = 0;
 		virtual void unbind() const = 0;
 
-		virtual void add_vertex_buffer(Ref<Vertex_Buffer> vb)  = 0;
 		virtual void set_index_buffer( Ref<Index_Buffer> ib)  = 0;
 		virtual void add_vertex_buffer(Ref<Vertex_Buffer> vb, int shader_program) = 0;
 

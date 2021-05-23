@@ -19,7 +19,6 @@ namespace clumsy_engine
 		 void unbind() const  override;
 
 		 void add_vertex_buffer(Ref<Vertex_Buffer> vb, int shader_program) override;
-		 void add_vertex_buffer(Ref<Vertex_Buffer> vb) override;
 		 void set_index_buffer(Ref<Index_Buffer> ib) override;
 
 

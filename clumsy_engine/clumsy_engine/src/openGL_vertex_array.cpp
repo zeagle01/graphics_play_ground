@@ -56,30 +56,7 @@ namespace clumsy_engine
 
 
 	}
-	void OpenGL_Vertex_Array::add_vertex_buffer(Ref<Vertex_Buffer> vb) 
-	{
 
-		if (vb->get_layout().get_elements().empty())
-		{
-			CE_CORE_ERROR("vertex buffer got no layout yet");
-		}
-
-
-		glBindVertexArray(m_renderer_id);
-
-		vb->bind();
-		const auto& layout = vb->get_layout();
-		int index= 0;
-		for (const auto& e : layout)
-		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index, e.count, e.gl_type, e.normalized, layout.get_stride(), (void*)e.offset);
-			index++;
-		}
-
-		m_vertex_buffers.push_back(vb);
-
-	}
 	void OpenGL_Vertex_Array::set_index_buffer(Ref<Index_Buffer> ib) 
 	{
 		glBindVertexArray(m_renderer_id);

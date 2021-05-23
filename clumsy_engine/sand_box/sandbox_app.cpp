@@ -141,29 +141,10 @@ private:
 			0,1,2
 		};
 
-		//gl data stuff
-		m_vertex_array = clumsy_engine::Vertex_Array::create();
-		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(m_positions.data(), m_positions.size());
-
-		clumsy_engine::Buffer_Layout layout =
-		{
-			{clumsy_engine::Shader_Data_Type::Float3, "a_position"},
-			{clumsy_engine::Shader_Data_Type::Float3, "a_color"}
-
-		};
-		vertex_buffer->set_layout(layout);
-		m_vertex_array->add_vertex_buffer(vertex_buffer);
-
-		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
-		m_vertex_array->set_index_buffer(index_buffer);
-
-
-
-
-
+		//shader
 		std::string vertex_src = R"(
 			#version 330 core
-			layout(location=0 ) in vec3 position;
+			layout(location=0 ) in vec3 a_position;
 			layout(location=1 ) in vec3 a_color;
 			out vec3 v_position;
 			out vec3 v_color;
@@ -174,10 +155,9 @@ private:
 			void main()
 			{
 
-				//vec3 t_position=u_view_projection*position;
-				v_position=position;
+				v_position=a_position;
 				v_color=a_color;
-				gl_Position=u_view_projection*u_model_matrix*vec4(position,1.0);
+				gl_Position=u_view_projection*u_model_matrix*vec4(a_position,1.0);
 			}
 
 		)";
@@ -196,9 +176,29 @@ private:
 			}
 
 		)";
-
-		//shader
 		m_shader = clumsy_engine::Shader::create(vertex_src, fragment_src);
+		auto ogl_shader = std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader > (m_shader);
+
+		//gl data stuff
+		m_vertex_array = clumsy_engine::Vertex_Array::create();
+		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(m_positions.data(), m_positions.size());
+
+		clumsy_engine::Buffer_Layout layout =
+		{
+			{clumsy_engine::Shader_Data_Type::Float3, "a_position"},
+			{clumsy_engine::Shader_Data_Type::Float3, "a_color"}
+
+		};
+		vertex_buffer->set_layout(layout);
+		m_vertex_array->add_vertex_buffer(vertex_buffer, ogl_shader->get_id());
+
+		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
+		m_vertex_array->set_index_buffer(index_buffer);
+
+
+
+
+
 	}
 
 	void config_shader_plane()
@@ -216,19 +216,6 @@ private:
 			0,2,3
 		};
 
-		//gl data stuff
-		m_vertex_array_plane = clumsy_engine::Vertex_Array::create();
-		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(m_positions_plane.data(), m_positions_plane.size());
-
-		clumsy_engine::Buffer_Layout layout =
-		{
-			{clumsy_engine::Shader_Data_Type::Float3, "a_position"},
-		};
-		vertex_buffer->set_layout(layout);
-		m_vertex_array_plane->add_vertex_buffer(vertex_buffer);
-
-		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
-		m_vertex_array_plane->set_index_buffer(index_buffer);
 
 
 		std::string vertex_src = R"(
@@ -265,6 +252,22 @@ private:
 
 		//shader
 		m_shader_plane = clumsy_engine::Shader::create(vertex_src, fragment_src);
+		auto ogl_shader = std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader > (m_shader_plane);
+
+
+		//gl data stuff
+		m_vertex_array_plane = clumsy_engine::Vertex_Array::create();
+		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(m_positions_plane.data(), m_positions_plane.size());
+
+		clumsy_engine::Buffer_Layout layout =
+		{
+			{clumsy_engine::Shader_Data_Type::Float3, "position"},
+		};
+		vertex_buffer->set_layout(layout);
+		m_vertex_array_plane->add_vertex_buffer(vertex_buffer, ogl_shader->get_id());
+
+		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
+		m_vertex_array_plane->set_index_buffer(index_buffer);
 
 	}
 
@@ -322,8 +325,8 @@ std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
 
 	clumsy_engine::Log::get_core_logger()->trace("create app");
 
-	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
-	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
+	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
+	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
 
 	return app;
 }
