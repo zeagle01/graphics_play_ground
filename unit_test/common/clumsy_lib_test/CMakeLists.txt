@@ -9,6 +9,7 @@ add_executable(clumsy_lib_test
 main.cpp
 type_list_test.cpp
 macro_loop_test.cpp
+type_map_test.cpp
 )
 
 

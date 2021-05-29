@@ -3,6 +3,7 @@
 
 #include <concepts>
 
+
 namespace clumsy_lib 
 {
 
@@ -118,25 +119,31 @@ namespace clumsy_lib
 
 
 	///
-	template<typename tl, typename F, typename ...P>
-	static void for_each_type(P&&... p)
+	template<  typename F, typename tl >
+	struct for_each_type_inner;
+
+	template<  typename F, typename ...T>
+	struct for_each_type_inner< F, type_list<T...>>
 	{
-		if constexpr (!is_empty_v<tl>)
+		static void apply(F&& f)
 		{
-			using current_t = front_t<tl>;
-
-			F::template apply<current_t>(std::forward<P>(p)...);
-
-			using poped_list = pop_front_t<tl>;
-
-			for_each_type<poped_list, F>(std::forward<P>(p)...);
-		}
-		else
-		{
-			return;
+			(f.operator() < T > (), ...);
 		}
 
 	};
+
+	template<typename tl, typename F, typename ...P>
+	static void for_each_type(P&&... p)
+	{
+		auto parameterized_func = [&]<typename T>()
+		{
+			F::template apply<T>(std::forward<P>(p)...);
+		};
+		using func_t = decltype(parameterized_func);
+
+		for_each_type_inner<func_t, tl >::apply(std::forward<func_t>(parameterized_func));
+	}
+
 
 
 	template<typename tl0, typename tl1, typename F, typename ctl0 = tl0, typename ctl1 = tl1, typename ...P>
