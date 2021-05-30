@@ -1,6 +1,7 @@
 
 #include "gmock/gmock.h"
 #include "clumsy_lib/type_map.h"
+#include "clumsy_lib/variable_set.h"
 #include "clumsy_lib/class_reflection.h"
 #include <memory>
 #include <string>
@@ -139,13 +140,9 @@ struct dependent_variables_struct
 
 TEST(Type_Map_Test, dependent_data_accecor_test)
 {
-	using v_s_t = Variable_Set;
-	auto varialbe_set = Variable_Set::build_variable_set< dependent_variables_struct >();
+	auto varialbe_set = build_dependent_variable_set<Variable_Set, dependent_variables_struct >();
 
-	using variables = clumsy_lib::extract_member_type_list_t<dependent_variables_struct>;
-	for_each_depend_type<variables, build_dependent>(*varialbe_set);
-
-	varialbe_set->set_value<dependent_variables_struct::Force>(4.f);//will be ignore
+	///////force will be computed automaticly
 	varialbe_set->set_value<dependent_variables_struct::Position>(1.f);
 	varialbe_set->set_value<dependent_variables_struct::Velocity>(2.f);
 
@@ -153,6 +150,29 @@ TEST(Type_Map_Test, dependent_data_accecor_test)
 	auto v = varialbe_set->get_value<dependent_variables_struct::Velocity>();
 	auto f = varialbe_set->get_value<dependent_variables_struct::Force>();
 
-
 	EXPECT_THAT(f, Eq(3.f));
+
+
+	///////force set last
+	varialbe_set->set_value<dependent_variables_struct::Position>(1.f);
+	varialbe_set->set_value<dependent_variables_struct::Velocity>(2.f);
+	varialbe_set->set_value<dependent_variables_struct::Force>(4.f);//will be ignore
+
+	p = varialbe_set->get_value<dependent_variables_struct::Position>();
+	v = varialbe_set->get_value<dependent_variables_struct::Velocity>();
+	f = varialbe_set->get_value<dependent_variables_struct::Force>();
+
+	EXPECT_THAT(f, Eq(4.f));
+
+	///////force set first
+	varialbe_set->set_value<dependent_variables_struct::Force>(4.f);//will be ignore
+	varialbe_set->set_value<dependent_variables_struct::Position>(1.f);
+	varialbe_set->set_value<dependent_variables_struct::Velocity>(2.f);
+
+	p = varialbe_set->get_value<dependent_variables_struct::Position>();
+	v = varialbe_set->get_value<dependent_variables_struct::Velocity>();
+	f = varialbe_set->get_value<dependent_variables_struct::Force>();
+
+	EXPECT_THAT(f, Eq(4.f));
+
 }
