@@ -24,7 +24,7 @@ struct Var_C :Base {};
 
 TEST(Type_Map_Test,type_map_add_with_object)
 {
-	Type_Map<Base> map;
+	Type_Map map;
 
 	std::shared_ptr<Var_A> va = std::make_shared<Var_A>();
 
@@ -37,7 +37,7 @@ TEST(Type_Map_Test,type_map_add_with_object)
 
 TEST(Type_Map_Test,type_map_add_with_type)
 {
-	Type_Map<Base> map;
+	Type_Map map;
 
 	map.add_type<Var_A>();
 	auto act_type = map.get_type<Var_A>();
@@ -51,7 +51,7 @@ TEST(Type_Map_Test,type_map_add_with_type)
 
 TEST(Type_Map_Test,type_map_set_value)
 {
-	Variable_Set<Base> variable_set;
+	Variable_Set variable_set;
 
 	variable_set.add_type<Var_A>();
 
@@ -80,7 +80,7 @@ struct variables_struct
 
 TEST(Type_Map_Test,build_variable_set)
 {
-	auto variable_set = build_variable_set<variables_struct, Base>();
+	auto variable_set = Variable_Set::build_variable_set<variables_struct >();
 
 	variable_set->set_value < variables_struct::Position>(1.f);
 	auto act = variable_set->get_value<variables_struct::Position>();
@@ -92,10 +92,11 @@ TEST(Type_Map_Test,build_variable_set)
 
 TEST(Type_Map_Test, data_accecor_test)
 {
-	using v_s_t = Variable_Set<Base>;
-	using v_a_t = Variable_Accecor_With_Constriant<v_s_t, type_list<variables_struct::Velocity>>;
-	auto varialbe_set = build_variable_set<variables_struct, Base>();
-	auto data_accecor = std::make_shared<v_a_t>(*varialbe_set);
+	//using v_s_t = Variable_Set;
+	auto varialbe_set = Variable_Set::build_variable_set< variables_struct >();
+
+	using v_a_t = Variable_Accecor_With_Constriant<Variable_Set, type_list<variables_struct::Velocity>>;
+	auto data_accecor = std::make_shared<v_a_t>(varialbe_set.get());
 
 	//data_accecor->set_value<variables_struct::Position>(1.f);//constranit violation, compile error
 
@@ -125,7 +126,7 @@ struct Compute_Force
 };
 
 
-#define DEF_DEPENDENT_MEM(x,value_t,computer,dependent_list) DEF_DATA_CLASS_MEM(x,Dependent_Variable,value_t,Base,computer,dependent_list)
+#define DEF_DEPENDENT_MEM(x,value_t,computer,dependent_list) DEF_DATA_CLASS_MEM(x,Dependent_Variable,value_t,computer,dependent_list)
 
 struct dependent_variables_struct
 {
@@ -138,9 +139,8 @@ struct dependent_variables_struct
 
 TEST(Type_Map_Test, dependent_data_accecor_test)
 {
-	using v_s_t = Variable_Set<Base>;
-	using v_a_t = Variable_Accecor_With_Constriant<v_s_t, type_list<dependent_variables_struct::Velocity>>;
-	auto varialbe_set = build_variable_set<dependent_variables_struct, Base>();
+	using v_s_t = Variable_Set;
+	auto varialbe_set = Variable_Set::build_variable_set< dependent_variables_struct >();
 
 	using variables = clumsy_lib::extract_member_type_list_t<dependent_variables_struct>;
 	for_each_depend_type<variables, build_dependent>(*varialbe_set);
