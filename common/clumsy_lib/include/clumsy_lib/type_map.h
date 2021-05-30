@@ -31,8 +31,7 @@ namespace clumsy_lib
 	};
 
 
-	template<typename Base_Type>
-	class Type_Map :public Get_Begin_End<Type_Map<Base_Type>>
+	class Type_Map :public Get_Begin_End<Type_Map>
 	{
 	public:
 		Type_Map() :Get_Begin_End<Type_Map<Base_Type>>(*this) {}
@@ -56,28 +55,23 @@ namespace clumsy_lib
 			auto key = typeid(Sub_Type).name();
 			if (!type_map.count(key))
 			{
-				type_map[key] = std::make_shared<Sub_Type>();
+				type_map[key] = Sub_Type{};
 			}
 		}
 
 		template<typename Sub_Type>
-		std::shared_ptr<Sub_Type> get_type()
+		Sub_Type& get_type()
 		{
 			auto key = typeid(Sub_Type).name();
-			if (type_map.count(key))
+			if (!type_map.count(key))
 			{
-				return std::dynamic_pointer_cast<Sub_Type>(type_map[key]);
+				add_type<Sub_Type>();
 			}
-			else
-			{
-
-				return nullptr;
-			}
-
+			return std::any_cast<Sub_Type&>(type_map[key]);
 		}
 
 	private:
-		std::map<std::string, std::shared_ptr<Base_Type>> type_map;
+		std::map<std::string, std::shared_ptr<void>> type_map;
 	};
 
 
