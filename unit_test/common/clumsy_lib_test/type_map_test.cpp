@@ -28,9 +28,9 @@ TEST(Type_Map_Test,type_map_add_with_object)
 
 	std::shared_ptr<Var_A> va = std::make_shared<Var_A>();
 
-	map.add(va);
+	map.add_type(va);
 
-	auto act = map.get<Var_A>();
+	auto act = map.get_type<Var_A>();
 
 	EXPECT_THAT(act, Eq(va));
 }
@@ -39,8 +39,8 @@ TEST(Type_Map_Test,type_map_add_with_type)
 {
 	Type_Map<Base> map;
 
-	map.add<Var_A>();
-	auto act_type = map.get<Var_A>();
+	map.add_type<Var_A>();
+	auto act_type = map.get_type<Var_A>();
 
 	auto act= std::string( typeid(*act_type.get()).name());
 	std::string exp = "struct Var_A";
@@ -53,7 +53,7 @@ TEST(Type_Map_Test,type_map_set_value)
 {
 	Variable_Set<Base> variable_set;
 
-	variable_set.add_variable<Var_A>();
+	variable_set.add_type<Var_A>();
 
 	variable_set.set_value<Var_A>(10);
 	auto act = variable_set.get_value<Var_A>();
@@ -69,7 +69,7 @@ struct Variable_Record :Base, Data_Holder<value_type> {};
 
 #define DEF_MEM(x,t) DEF_DATA_CLASS_MEM(x,Variable_Record,t)
 
-struct my_variables_struct
+struct variables_struct
 {
 	DEF_MEM(Position, float);
 	DEF_MEM(Velocity, float);
@@ -80,8 +80,79 @@ struct my_variables_struct
 
 TEST(Type_Map_Test,build_variable_set)
 {
-	auto variable_set = build_variable_set<my_variables_struct, Base>();
+	auto variable_set = build_variable_set<variables_struct, Base>();
 
-	auto act = variable_set->get_value<my_variables_struct::Position>();
+	variable_set->set_value < variables_struct::Position>(1.f);
+	auto act = variable_set->get_value<variables_struct::Position>();
+	float exp = 1.f;
 
+	EXPECT_THAT(act, Eq(exp));
+
+}
+
+TEST(Type_Map_Test, data_accecor_test)
+{
+	using v_s_t = Variable_Set<Base>;
+	using v_a_t = Variable_Accecor_With_Constriant<v_s_t, type_list<variables_struct::Velocity>>;
+	auto varialbe_set = build_variable_set<variables_struct, Base>();
+	auto data_accecor = std::make_shared<v_a_t>(*varialbe_set);
+
+	//data_accecor->set_value<variables_struct::Position>(1.f);//constranit violation, compile error
+
+	data_accecor->set_value<variables_struct::Velocity>(1.f);
+	auto act = data_accecor->get_value<variables_struct::Velocity>();
+	float exp = 1.f;
+
+	EXPECT_THAT(act, Eq(exp));
+
+}
+
+
+///////////////////////////////
+
+struct dependent_variables_struct;
+
+struct Compute_Force
+{
+	template<typename data_acc, typename T>
+	static void apply(data_acc& datas, T& d)
+	{
+		auto p = datas.get_value<dependent_variables_struct::Position>();
+		auto v = datas.get_value<dependent_variables_struct::Velocity>();
+		//auto f = datas.get_value<dependent_variables_struct::Force>();
+		d = p + v;
+	}
+};
+
+
+#define DEF_DEPENDENT_MEM(x,value_t,computer,dependent_list) DEF_DATA_CLASS_MEM(x,Dependent_Variable,value_t,Base,computer,dependent_list)
+
+struct dependent_variables_struct
+{
+	DEF_DEPENDENT_MEM(Position, float, Plain_Computer, TMP(type_list<>));
+	DEF_DEPENDENT_MEM(Velocity, float, Plain_Computer, TMP(type_list<>));
+	DEF_DEPENDENT_MEM(Force, float, Compute_Force, TMP(type_list<Velocity, Position>));
+};
+
+
+
+TEST(Type_Map_Test, dependent_data_accecor_test)
+{
+	using v_s_t = Variable_Set<Base>;
+	using v_a_t = Variable_Accecor_With_Constriant<v_s_t, type_list<dependent_variables_struct::Velocity>>;
+	auto varialbe_set = build_variable_set<dependent_variables_struct, Base>();
+
+	using variables = clumsy_lib::extract_member_type_list_t<dependent_variables_struct>;
+	for_each_depend_type<variables, build_dependent>(*varialbe_set);
+
+	varialbe_set->set_value<dependent_variables_struct::Force>(4.f);//will be ignore
+	varialbe_set->set_value<dependent_variables_struct::Position>(1.f);
+	varialbe_set->set_value<dependent_variables_struct::Velocity>(2.f);
+
+	auto p = varialbe_set->get_value<dependent_variables_struct::Position>();
+	auto v = varialbe_set->get_value<dependent_variables_struct::Velocity>();
+	auto f = varialbe_set->get_value<dependent_variables_struct::Force>();
+
+
+	EXPECT_THAT(f, Eq(3.f));
 }
