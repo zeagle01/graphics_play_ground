@@ -6,20 +6,21 @@ namespace clumsy_lib
 {
 
 
-
-
-
 	///////////////////////variable set
 	template  <typename Type_Map,typename Variable_Accecor>
 	class Variable_Set_Compose : public Type_Map, public Variable_Accecor
 	{
 	public:
-		Variable_Set_Compose() : Variable_Accecor(this) { }
-
+		Variable_Set_Compose() 
+		{
+			auto shared_of_this_with_delete = std::shared_ptr<Variable_Set_Compose<Type_Map, Variable_Accecor>>(this, [](auto) {});
+			this->set_type_map(shared_of_this_with_delete);
+		}
 
 		template< typename variables_struct>
 		static auto build_variable_set()
 		{
+
 			using variables = clumsy_lib::extract_member_type_list_t<variables_struct>;
 
 			std::shared_ptr<Variable_Set_Compose> ret = std::make_shared<Variable_Set_Compose>();
@@ -108,7 +109,8 @@ namespace clumsy_lib
 		Dependent_Variable() 
 		{
 			m_upstream_variables = std::make_shared<Variable_Set>();
-			m_upstream_variables_acceccor = std::make_shared<Variable_Accecor_With_Constriant<Variable_Set, dependent_variables>>(m_upstream_variables.get());
+			m_upstream_variables_acceccor = std::make_shared<Variable_Accecor_With_Constriant<Variable_Set, dependent_variables>>();
+			m_upstream_variables_acceccor->set_type_map(m_upstream_variables);
 		}
 
 		void set(const T& d)

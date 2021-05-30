@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 #include <map>
 #include "clumsy_lib/class_reflection.h"
 
@@ -99,16 +100,19 @@ namespace clumsy_lib
 
 
 	//////////////////////////////////////////////////
-	template<typename Variable_Set>
+	template<typename type_map_t>
 	class Variable_Accecor
 	{
 	public:
-		Variable_Accecor(Variable_Set *varialbe_set) :m_varialbe_set(*varialbe_set) { };
+		void set_type_map(std::shared_ptr<type_map_t> type_map)
+		{
+			m_type_map = type_map;
+		}
 
 		template<typename Variable_Type>
 		const auto& get_value()
 		{
-			auto variable = m_varialbe_set.get_type<Variable_Type>();
+			auto variable = m_type_map->get_type<Variable_Type>();
 			return variable->get();
 		}
 
@@ -116,40 +120,34 @@ namespace clumsy_lib
 		void set_value(const Value_Type& d)
 		{
 			//static_assert(std::is_convertible_v<Value_Type, Variable_Type::value_type>);
-			auto variable = m_varialbe_set.get_type<Variable_Type>();
+			auto variable = m_type_map->get_type<Variable_Type>();
 			if (!variable)
 			{
-				m_varialbe_set.add_type<Variable_Type>();
+				m_type_map->add_type<Variable_Type>();
 			}
 			variable->set(d);
 		}
 	private:
-		Variable_Set& m_varialbe_set;
+		std::shared_ptr<type_map_t> m_type_map;
 	};
 
-	template<typename Variable_Set,typename Dependent_Variables>
-	class Variable_Accecor_With_Constriant
+	template<typename type_map_t,typename Dependent_Variables>
+	class Variable_Accecor_With_Constriant :public  Variable_Accecor<type_map_t>
 	{
 	public:
-		template<typename Type_Map>
-		Variable_Accecor_With_Constriant(Type_Map* type_map) :m_variable_accecor(type_map) {};
-
 		template<typename Variable_Type>
 		requires clumsy_lib::Type_In_List<Variable_Type, Dependent_Variables>
 		const auto& get_value()
 		{
-			return m_variable_accecor.get_value<Variable_Type>();
+			return Variable_Accecor<type_map_t>::template get_value<Variable_Type>();
 		}
 
 		template<typename Variable_Type, typename Value_Type = Variable_Type::value_type>
 		requires clumsy_lib::Type_In_List<Variable_Type, Dependent_Variables>
 		void set_value(const Value_Type& d)
 		{
-			m_variable_accecor.set_value<Variable_Type>(d);
+			Variable_Accecor<type_map_t>::template set_value<Variable_Type>(d);
 		}
-
-	private:
-		Variable_Accecor<Variable_Set> m_variable_accecor;
 	};
 
 }

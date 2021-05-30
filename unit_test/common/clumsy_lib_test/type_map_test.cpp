@@ -52,12 +52,12 @@ TEST(Type_Map_Test,type_map_add_with_type)
 
 TEST(Type_Map_Test,type_map_set_value)
 {
-	Variable_Set variable_set;
+	auto variable_set = std::make_shared<Variable_Set>();
 
-	variable_set.add_type<Var_A>();
+	variable_set->add_type<Var_A>();
 
-	variable_set.set_value<Var_A>(10);
-	auto act = variable_set.get_value<Var_A>();
+	variable_set->set_value<Var_A>(10);
+	auto act = variable_set->get_value<Var_A>();
 	int exp = 10;
 
 	EXPECT_THAT(act, Eq(exp));
@@ -97,7 +97,8 @@ TEST(Type_Map_Test, data_accecor_test)
 	auto varialbe_set = Variable_Set::build_variable_set< variables_struct >();
 
 	using v_a_t = Variable_Accecor_With_Constriant<Variable_Set, type_list<variables_struct::Velocity>>;
-	auto data_accecor = std::make_shared<v_a_t>(varialbe_set.get());
+	auto data_accecor = std::make_shared<v_a_t>();
+	data_accecor->set_type_map(varialbe_set);
 
 	//data_accecor->set_value<variables_struct::Position>(1.f);//constranit violation, compile error
 
