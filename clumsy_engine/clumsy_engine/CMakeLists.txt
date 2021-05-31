@@ -61,7 +61,6 @@ src/spring_stretch.cpp
 src/one_point_stencils.h
 src/one_point_stencils.cpp
 src/signal.h
-src/type_map.cpp
 src/data_computes.h
 src/data_computes.cpp
 src/mesh_loader.cpp
@@ -97,7 +96,6 @@ include/clumsy_engine/ref.h
 include/clumsy_engine/file_dialogs.h
 
 include/simulator/simulator.h
-include/simulator/type_map.h
 include/simulator/simulation_data.h
 include/simulator/inertial.h
 include/simulator/interaction.h
