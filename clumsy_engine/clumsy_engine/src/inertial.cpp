@@ -13,7 +13,7 @@ namespace clumsy_engine
 	{
 		One_Point_Stencils st;
 
-		return st(get<data::Vertex_Num>());
+		return st(get_value<data::Vertex_Num>());
 	}
 
 	Element_Equation Inertial::compute_element_equation(stencil st,int ei)
@@ -22,11 +22,11 @@ namespace clumsy_engine
 		Element_Equation eq;
 
 
-		const auto& lastPos = get<data::Last_Frame_Position>();
-		const auto& velocity = get<data::Velocity>();
-		const auto& mass = get<data::Mass>();
+		const auto& lastPos = get_value<data::Last_Frame_Position>();
+		const auto& velocity = get_value<data::Velocity>();
+		const auto& mass = get_value<data::Mass>();
 
-		float time_step = get<data::Time_Step>();
+		float time_step = get_value<data::Time_Step>();
 
 		int v = st[0];
 

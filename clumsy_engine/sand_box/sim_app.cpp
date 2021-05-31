@@ -164,16 +164,16 @@ using namespace clumsy_engine;
 	void Sim_Gui::simulation_init()
 	{
 
-		m_sim.set<data::Time_Step>(0.01);
-		m_sim.set<data::Mass_Density>(1.);
-		m_sim.set<data::Gravity>({ 0,0,0 });
-		m_sim.set<data::Stretch_Stiff>(1e3f);
+		m_sim.set_value<data::Time_Step>(0.01);
+		m_sim.set_value<data::Mass_Density>(1.);
+		m_sim.set_value<data::Gravity>({ 0,0,0 });
+		m_sim.set_value<data::Stretch_Stiff>(1e3f);
 		
-		m_sim.set<clumsy_engine::data::Triangle_Indice>(m_indices);
-		m_sim.set<clumsy_engine::data::Position>(m_positions);
-		m_sim.set<clumsy_engine::data::Ref_Position>(m_positions);
+		m_sim.set_value<clumsy_engine::data::Triangle_Indice>(m_indices);
+		m_sim.set_value<clumsy_engine::data::Position>(m_positions);
+		m_sim.set_value<clumsy_engine::data::Ref_Position>(m_positions);
 		std::vector<vec3f> zero(m_positions.size(), get_uniform<3, 1, float>(0));
-		m_sim.set<clumsy_engine::data::Velocity>(zero);
+		m_sim.set_value<clumsy_engine::data::Velocity>(zero);
 
 	}
 
@@ -233,8 +233,8 @@ using namespace clumsy_engine;
 
 		//simulation update
 		m_sim.update();
-		const auto& new_pos = m_sim.get<data::Position>();
-		const auto& new_normal = m_sim.get<data::Vertex_Normal>();
+		const auto& new_pos = m_sim.get_value<data::Position>();
+		const auto& new_normal = m_sim.get_value<data::Vertex_Normal>();
 
 		//update render data
 		m_vbo_position->set_data(new_pos[0].get_flat(), new_pos.size());
@@ -298,20 +298,20 @@ using namespace clumsy_engine;
 
 		if (ImGui::SliderFloat3("gravity", gravity, -10.f, 10.f))
 		{
-			m_sim.set<data::Gravity>({ gravity[0],gravity[1],gravity[2] });
+			m_sim.set_value<data::Gravity>({ gravity[0],gravity[1],gravity[2] });
 		}
 		if (ImGui::SliderFloat("time step", &time_step, 0.001f, 10.f))
 		{
-			m_sim.set<data::Time_Step>(time_step);
+			m_sim.set_value<data::Time_Step>(time_step);
 		}
 		if (ImGui::SliderFloat("mass density", &rho, 0.001f, 10.f))
 		{
-			m_sim.set<data::Mass_Density>(rho);
+			m_sim.set_value<data::Mass_Density>(rho);
 		}
 
 		if (ImGui::SliderFloat("stretch stiff", &stretch_stiff, 0.001f, 1e7f))
 		{
-			m_sim.set<data::Stretch_Stiff>(stretch_stiff);
+			m_sim.set_value<data::Stretch_Stiff>(stretch_stiff);
 		}
 
 

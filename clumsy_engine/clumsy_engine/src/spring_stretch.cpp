@@ -9,7 +9,7 @@ namespace clumsy_engine
 	std::vector<stencil> Spring_Stretch::compute_stencils()
 	{
 
-		const auto& edge_indice = get<data::Edge_Indice>();
+		const auto& edge_indice = get_value<data::Edge_Indice>();
 
 		std::vector<stencil>ret;
 		for (int i = 0; i < edge_indice.size() / 2; i++)
@@ -25,9 +25,9 @@ namespace clumsy_engine
 		Element_Equation ret = Element_Equation::with_size(st.size());
 		ret.stencil = st;
 
-		const auto& positions = get<data::Position>();
-		const auto& edge_lengths = get<data::Edge_Length>();
-		auto stiff = get<data::Stretch_Stiff>();
+		const auto& positions = get_value<data::Position>();
+		const auto& edge_lengths = get_value<data::Edge_Length>();
+		auto stiff = get_value<data::Stretch_Stiff>();
 
 		vec2f w = { -1,1 };
 		mat3x2f x{

@@ -19,15 +19,9 @@ namespace clumsy_engine
 
 	Simulator::Simulator()
 	{
+		m_data_map = clumsy_lib::build_dependent_variable_set<clumsy_lib::Variable_Set, data>();
 
-		m_data_map = std::make_shared<Simulation_Datas>();
-
-		set_(m_data_map);
-
-		clumsy_lib::for_each_type<all_types, build_sim_data>(*m_data_map);
-
-		for_each_depend_type<all_types ,build_dependent>(*m_data_map);
-
+		set_type_map(m_data_map);
 	}
 
 	void Simulator::assemble_equations()
@@ -56,8 +50,8 @@ namespace clumsy_engine
 		}
 
 		//back up last
-		auto positions = get<data::Position>();
-		set<data::Last_Frame_Position>(positions);
+		auto positions = get_value<data::Position>();
+		set_value<data::Last_Frame_Position>(positions);
 
 
 		///////////// update////////////
@@ -66,23 +60,23 @@ namespace clumsy_engine
 			assemble_equations();
 			m_solver->solve(positions, m_equations);
 		}
-		set<data::Position>(positions);
+		set_value<data::Position>(positions);
 
 
-		auto inertial = m_interactions_map.get<Inertial>();
+		auto inertial = m_interactions_map.get_type<Inertial>();
 
 		if (inertial)
 		{
-			float time_step = get<data::Time_Step>();
+			float time_step = get_value<data::Time_Step>();
 
 			std::vector<vec3f> velocity(positions.size());
 
 			for (int i = 0; i < positions.size(); i++)
 			{
-				velocity[i] = (positions[i] - get<data::Last_Frame_Position>()[i]) / time_step;
+				velocity[i] = (positions[i] - get_value<data::Last_Frame_Position>()[i]) / time_step;
 			}
 
-			set<data::Velocity>(velocity);//maybe optimization?
+			set_value<data::Velocity>(velocity);//maybe optimization?
 		}
 	}
 

@@ -116,6 +116,10 @@ namespace clumsy_lib
 	concept Type_In_List = is_in<T, tl>;
 
 
+	//////////////////////
+	using empty_type_list = type_list<>;
+
+
 
 
 	///

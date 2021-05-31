@@ -8,13 +8,14 @@
 #include "Simulation_Data.h"
 #include <memory>
 #include "clumsy_lib/type_list.h"
+#include "clumsy_lib/type_map.h"
 
 
 
 namespace clumsy_engine
 {
 
-	class Gravity :public Interaction, public Simulation_Data_Acc<clumsy_lib::type_list<data::Gravity,data::Mass, data::Vertex_Num>>
+	class Gravity :public Interaction, public clumsy_lib::Variable_Acc_Constraint<clumsy_lib::type_list<data::Gravity,data::Mass, data::Vertex_Num>>
 	{
 	public:
 

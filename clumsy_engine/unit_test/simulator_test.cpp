@@ -21,7 +21,7 @@ public:
 	{
 		m_sim.add_interaction<Inertial>();
 
-		m_sim.set<data::Time_Step>(0.1);
+		m_sim.set_value<data::Time_Step>(0.1);
 
 		//m_sim.set<data::Mass_Density>(1.);
 
@@ -48,9 +48,9 @@ public:
 	{
 		m_positions = std::vector<vec3f>{ get_uniform<3,1,float>(0) };
 
-		m_sim.set<data::Position>(m_positions);
+		m_sim.set_value<data::Position>(m_positions);
 
-		m_sim.set<data::Mass>({ 1.f });
+		m_sim.set_value<data::Mass>({ 1.f });
 
 	}
 
@@ -60,11 +60,11 @@ public:
 TEST_F(One_Vertex, without_any_interaction_just_floating_there)
 {
 
-	m_sim.set<data::Velocity>({ { 0,0,0 } });
+	m_sim.set_value<data::Velocity>({ { 0,0,0 } });
 
 	 m_sim.update();
 
-	 auto act = m_sim.get<data::Delta_Position>();
+	 auto act = m_sim.get_value<data::Delta_Position>();
 
 	std::vector<vec3f> exp = {
 		{0,0.0,0}
@@ -79,12 +79,12 @@ TEST_F(One_Vertex, update_with_gravity_only)
 {
 	m_sim.add_interaction<Gravity>();
 
-	m_sim.set<data::Gravity>({ 0,-10,0 });
-	m_sim.set<data::Velocity>({ { 0,0,0 } });
+	m_sim.set_value<data::Gravity>({ 0,-10,0 });
+	m_sim.set_value<data::Velocity>({ { 0,0,0 } });
 
 	m_sim.update();
 	
-	auto act = m_sim.get<data::Delta_Position>();
+	auto act = m_sim.get_value<data::Delta_Position>();
 
 	std::vector<vec3f> exp = {
 		{0,-0.1,0}
@@ -106,11 +106,11 @@ public:
 
 		m_sim.add_interaction<Spring_Stretch>();
 
-		m_sim.set<data::Position>(m_positions);
+		m_sim.set_value<data::Position>(m_positions);
 
-		m_sim.set<data::Mass>({ 1.f,1.f });
+		m_sim.set_value<data::Mass>({ 1.f,1.f });
 
-		m_sim.set<data::Edge_Indice>({ 0,1 });
+		m_sim.set_value<data::Edge_Indice>({ 0,1 });
 	}
 
 };

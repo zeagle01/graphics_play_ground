@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include <memory>
 #include <vector>
 #include "type_map.h"
@@ -42,7 +44,7 @@ namespace clumsy_lib
 		};
 	};
 
-	using Variable_Set = Variable_Set_Compose<Type_Map, Variable_Accecor<Type_Map>>;
+	using Variable_Set = Variable_Set_Compose<Type_Map<void>, Variable_Accecor<Type_Map<void>>>;
 
 
 
@@ -72,6 +74,7 @@ namespace clumsy_lib
 			for (auto c : m_children)
 			{
 				c->set_is_changed_by_parent(v);
+				c->set_children_is_changed_by_parent(v);
 			}
 		}
 
@@ -124,6 +127,7 @@ namespace clumsy_lib
 			if (is_changed_by_self())
 			{
 				set_is_changed_by_self(false);
+				set_is_changed_by_parent(false);
 			}
 			else if (is_changed_by_parent())
 			{

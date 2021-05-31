@@ -14,7 +14,7 @@ namespace clumsy_engine
 		One_Point_Stencils st;
 
 
-		return st(get<data::Vertex_Num>());
+		return st(get_value<data::Vertex_Num>());
 
 	}
 
@@ -27,8 +27,8 @@ namespace clumsy_engine
 
 		int v = st[0];
 
-		const auto& gravity = get<data::Gravity>();
-		const auto& mass = get<data::Mass>();
+		const auto& gravity = get_value<data::Gravity>();
+		const auto& mass = get_value<data::Mass>();
 
 		float mass_v = mass[v];//TODO
 

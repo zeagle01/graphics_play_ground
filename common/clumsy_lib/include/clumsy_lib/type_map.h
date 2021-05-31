@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <set>
 #include "clumsy_lib/class_reflection.h"
 
 namespace clumsy_lib
@@ -33,11 +34,10 @@ namespace clumsy_lib
 	};
 
 
-	class Type_Map :public Get_Begin_End<Type_Map>
+	template<typename Base_Type = void>
+	class Type_Map 
 	{
 	public:
-		Type_Map() :Get_Begin_End<Type_Map>(*this) {}
-
 		template<typename Sub_Type>
 		void add_type(std::shared_ptr<Sub_Type> a)
 		{
@@ -46,7 +46,7 @@ namespace clumsy_lib
 				auto key = typeid(Sub_Type).name();
 				if (!type_map.count(key))
 				{
-					type_map[key] = std::static_pointer_cast<void>(a);
+					type_map[key] = std::static_pointer_cast<Base_Type>(a);
 				}
 			}
 		}
@@ -58,7 +58,7 @@ namespace clumsy_lib
 			if (!type_map.count(key))
 			{
 				auto obj = std::make_shared<Sub_Type>();
-				type_map[key] = std::static_pointer_cast<void>(obj);
+				type_map[key] = std::static_pointer_cast<Base_Type>(obj);
 			}
 		}
 
@@ -73,8 +73,11 @@ namespace clumsy_lib
 			return std::static_pointer_cast<Sub_Type>(type_map[key]);
 		}
 
+		/////////////////// for loop
+		auto begin() { return type_map.begin(); } 
+		auto end() { return type_map.end(); }
 	private:
-		std::map<std::string, std::shared_ptr<void>> type_map;
+		std::map<std::string, std::shared_ptr<Base_Type>> type_map;
 	};
 
 
@@ -149,5 +152,11 @@ namespace clumsy_lib
 			Variable_Accecor<type_map_t>::template set_value<Variable_Type>(d);
 		}
 	};
+
+	template<typename Dependent_Variables>
+	using Variable_Acc_Constraint = Variable_Accecor_With_Constriant<Type_Map<void>, Dependent_Variables>;
+
+	using Variable_Acc = Variable_Accecor<Type_Map<void>>;
+
 
 }

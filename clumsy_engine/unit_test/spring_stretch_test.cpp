@@ -19,12 +19,18 @@ public:
 			{0,0,0},
 			{1,0,0 } 
 		};
-		m_spring_stretch = std::make_shared<Spring_Stretch>();
-		m_spring_stretch->set<data::Edge_Indice>({ 0,1 });
-		m_spring_stretch->set<data::Stretch_Stiff>(m_stiffness);
-		m_spring_stretch->set<data::Edge_Length>({ 1.f });
 
-		m_spring_stretch->set<data::Position>(m_positions);
+		auto type_map = std::make_shared<clumsy_lib::Type_Map<void>>();
+
+		m_spring_stretch = std::make_shared<Spring_Stretch>();
+
+		m_spring_stretch->set_type_map(type_map);
+
+		m_spring_stretch->set_value<data::Edge_Indice>({ 0,1 });
+		m_spring_stretch->set_value<data::Stretch_Stiff>(m_stiffness);
+		m_spring_stretch->set_value<data::Edge_Length>({ 1.f });
+
+		m_spring_stretch->set_value<data::Position>(m_positions);
 	}
 
 protected:

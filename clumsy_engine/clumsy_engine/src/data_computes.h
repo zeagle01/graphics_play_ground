@@ -22,10 +22,11 @@ namespace clumsy_engine
 
 	template<typename L, typename V, int N = 1>
 	struct Allocate_With_Size {
+
 		template<typename sim_acc_T>
 		static void apply(sim_acc_T& datas, L& d)
 		{
-			auto size = datas.get<V>();
+			auto size = datas.template get_value<V>();
 			if (d.empty())
 			{
 				d.resize(size * N);
@@ -39,7 +40,7 @@ namespace clumsy_engine
 		template<typename sim_acc_T>
 		static void apply(sim_acc_T& datas, int& d)
 		{
-			d = datas.get<L>().size()/Dim;
+			d = datas.template get_value<L>().size()/Dim;
 		}
 	};
 
@@ -48,8 +49,8 @@ namespace clumsy_engine
 		template<typename sim_acc_T>
 		static void apply(sim_acc_T& datas, std::vector<vec3f>& d)
 		{
-			const auto& positions = datas.get<data::Position>();
-			const auto& last_positions = datas.get<data::Last_Frame_Position>();
+			const auto& positions = datas.template get_value<data::Position>();
+			const auto& last_positions = datas.template get_value<data::Last_Frame_Position>();
 
 			if (d.empty())
 			{
@@ -69,8 +70,8 @@ namespace clumsy_engine
 		static void apply(sim_acc_T& datas, std::vector<float>& edge_length)
 		{
 
-			const auto& positions = datas.get<data::Ref_Position>();
-			const auto& edge_indices = datas.get<data::Edge_Indice>();
+			const auto& positions = datas.template get_value<data::Ref_Position>();
+			const auto& edge_indices = datas.template get_value<data::Edge_Indice>();
 			int eNum = edge_indices.size() / 2;
 			edge_length.resize(eNum);
 			for (int i = 0; i < eNum; i++)
@@ -88,9 +89,9 @@ namespace clumsy_engine
 		template<typename sim_acc_T>
 		static void apply(sim_acc_T& datas, std::vector<int>& d)
 		{
-			auto triangle_indices = datas.get<data::Triangle_Indice>();
+			auto triangle_indices = datas.template get_value<data::Triangle_Indice>();
 			int t_num = triangle_indices.size() / 3;
-			int v_num = datas.get<data::Vertex_Num>();
+			int v_num = datas.template get_value<data::Vertex_Num>();
 
 			d.clear();
 			d.reserve(v_num * 3);
@@ -127,8 +128,8 @@ namespace clumsy_engine
 		template<typename sim_acc_T>
 		static void apply(sim_acc_T& datas, std::vector<float>& triangle_area)
 		{
-			const auto& triangle_indice = datas.get<data::Triangle_Indice>();
-			const auto& position = datas.get<data::Ref_Position>();
+			const auto& triangle_indice = datas.template get_value<data::Triangle_Indice>();
+			const auto& position = datas.template get_value<data::Ref_Position>();
 
 			int t_num = triangle_indice.size() / 3;
 			if (triangle_area.size() != t_num)
@@ -161,8 +162,8 @@ namespace clumsy_engine
 		template<typename sim_acc_T>
 		static void apply(sim_acc_T& datas, std::vector<vec3f>& triangle_normal)
 		{
-			const auto& triangle_indice = datas.get<data::Triangle_Indice>();
-			const auto& position = datas.get<data::Position>();
+			const auto& triangle_indice = datas.template get_value<data::Triangle_Indice>();
+			const auto& position = datas.template get_value<data::Position>();
 
 			int t_num = triangle_indice.size() / 3;
 			if (triangle_normal.size() != t_num)
@@ -191,9 +192,9 @@ namespace clumsy_engine
 		static void apply(sim_acc_T& datas, std::vector<std::vector<int>>& vertex_ajd_triangle)
 		{
 
-			auto triangle_indices = datas.get<data::Triangle_Indice>();
+			auto triangle_indices = datas.template get_value<data::Triangle_Indice>();
 			int t_num = triangle_indices.size() / 3;
-			int v_num = datas.get<data::Vertex_Num>();
+			int v_num = datas.template get_value<data::Vertex_Num>();
 
 			vertex_ajd_triangle.assign(v_num, std::vector<int>());
 
@@ -217,9 +218,9 @@ namespace clumsy_engine
 		template<typename sim_acc_T>
 		static void apply(sim_acc_T& datas, std::vector<vec3f>& vertex_normal)
 		{
-			auto const& triangle_normal = datas.get<data::Triangle_Normal>();
-			auto const& vertext_adj_triangle = datas.get<data::Vertex_Adjacent_Triangle>();
-			auto const& v_num = datas.get<data::Vertex_Num>();
+			auto const& triangle_normal = datas.template get_value<data::Triangle_Normal>();
+			auto const& vertext_adj_triangle = datas.template get_value<data::Vertex_Adjacent_Triangle>();
+			auto const& v_num = datas.template get_value<data::Vertex_Num>();
 
 			vertex_normal.assign(v_num, vec3f{ 0, 0, 0 });
 
@@ -243,9 +244,9 @@ namespace clumsy_engine
 		template<typename sim_acc_T>
 		static void apply(sim_acc_T& datas, std::vector<float>& vertex_area)
 		{
-			auto triangle_area = datas.get<data::Triangle_Area>();
-			auto triangle_indice = datas.get<data::Triangle_Indice>();
-			auto v_num = datas.get<data::Vertex_Num>();
+			auto triangle_area = datas.template get_value<data::Triangle_Area>();
+			auto triangle_indice = datas.template get_value<data::Triangle_Indice>();
+			auto v_num = datas.template get_value<data::Vertex_Num>();
 			if (vertex_area.size() != v_num)
 			{
 				vertex_area.resize(v_num);
@@ -268,8 +269,8 @@ namespace clumsy_engine
 		template<typename sim_acc_T>
 		static void apply(sim_acc_T& datas, std::vector<float>& mass)
 		{
-			auto vertex_areas = datas.get<data::Vertex_Area>();
-			auto density = datas.get<data::Mass_Density>();
+			auto vertex_areas = datas.template get_value<data::Vertex_Area>();
+			auto density = datas.template get_value<data::Mass_Density>();
 
 			Resize_If_Empty(mass, vertex_areas);
 

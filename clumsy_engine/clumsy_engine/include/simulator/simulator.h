@@ -9,7 +9,9 @@
 #include <map>
 #include <string>
 
-#include "type_map.h"
+//#include "type_map.h"
+#include "clumsy_lib/type_map.h"
+#include "clumsy_lib/variable_set.h"
 #include "Simulation_Data.h"
 #include "system_equations_solver.h"
 
@@ -21,7 +23,7 @@ namespace clumsy_engine
 	class Interaction;
 
 
-	class Simulator:public Simulation_Data_Acc<all_types>
+	class Simulator :public clumsy_lib::Variable_Accecor<clumsy_lib::Type_Map<void>>
 	{
 	public:
 
@@ -35,9 +37,9 @@ namespace clumsy_engine
 		{
 			auto inter = std::make_shared<Inter>(std::forward<P>(p)...);
 
-			m_interactions_map.add(inter);
+			m_interactions_map.add_type(inter);
 
-			inter->set_(m_data_map);
+			inter->set_type_map(m_data_map);
 
 		}
 
@@ -46,9 +48,8 @@ namespace clumsy_engine
 
 		void assemble_equations();
 
-
-		Type_Map<Interaction> m_interactions_map;
-		std::shared_ptr< Simulation_Datas> m_data_map;
+		clumsy_lib::Type_Map<Interaction> m_interactions_map;
+		std::shared_ptr<clumsy_lib::Variable_Set> m_data_map;
 
 		std::vector<Element_Equation> m_equations;
 

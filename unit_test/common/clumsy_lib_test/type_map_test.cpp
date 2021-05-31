@@ -127,6 +127,16 @@ struct Compute_Force
 	}
 };
 
+struct Compute_Acceleration
+{
+	template<typename data_acc, typename T>
+	static void apply(data_acc& datas, T& d)
+	{
+		auto f = datas.get_value<dependent_variables_struct::Force>();
+		d = f * 0.5f;
+	}
+};
+
 
 #define DEF_DEPENDENT_MEM(x,value_t,computer,dependent_list) DEF_DATA_CLASS_MEM(x,Dependent_Variable,value_t,computer,dependent_list)
 
@@ -135,6 +145,7 @@ struct dependent_variables_struct
 	DEF_DEPENDENT_MEM(Position, float, Plain_Computer, TMP(type_list<>));
 	DEF_DEPENDENT_MEM(Velocity, float, Plain_Computer, TMP(type_list<>));
 	DEF_DEPENDENT_MEM(Force, float, Compute_Force, TMP(type_list<Velocity, Position>));
+	DEF_DEPENDENT_MEM(Acceleration, float, Compute_Acceleration, TMP(type_list<Force >));
 };
 
 
@@ -150,30 +161,36 @@ TEST(Type_Map_Test, dependent_data_accecor_test)
 	auto p = varialbe_set->get_value<dependent_variables_struct::Position>();
 	auto v = varialbe_set->get_value<dependent_variables_struct::Velocity>();
 	auto f = varialbe_set->get_value<dependent_variables_struct::Force>();
+	auto a = varialbe_set->get_value<dependent_variables_struct::Acceleration>();
 
 	EXPECT_THAT(f, Eq(3.f));
+	EXPECT_THAT(a, Eq(1.5f));
 
 
 	///////force set last
 	varialbe_set->set_value<dependent_variables_struct::Position>(1.f);
 	varialbe_set->set_value<dependent_variables_struct::Velocity>(2.f);
-	varialbe_set->set_value<dependent_variables_struct::Force>(4.f);//will be ignore
+	varialbe_set->set_value<dependent_variables_struct::Force>(4.f);
 
 	p = varialbe_set->get_value<dependent_variables_struct::Position>();
 	v = varialbe_set->get_value<dependent_variables_struct::Velocity>();
 	f = varialbe_set->get_value<dependent_variables_struct::Force>();
+	a = varialbe_set->get_value<dependent_variables_struct::Acceleration>();
 
 	EXPECT_THAT(f, Eq(4.f));
+	EXPECT_THAT(a, Eq(2.f));
 
 	///////force set first
-	varialbe_set->set_value<dependent_variables_struct::Force>(4.f);//will be ignore
+	varialbe_set->set_value<dependent_variables_struct::Force>(4.f);
 	varialbe_set->set_value<dependent_variables_struct::Position>(1.f);
 	varialbe_set->set_value<dependent_variables_struct::Velocity>(2.f);
 
 	p = varialbe_set->get_value<dependent_variables_struct::Position>();
 	v = varialbe_set->get_value<dependent_variables_struct::Velocity>();
 	f = varialbe_set->get_value<dependent_variables_struct::Force>();
+	a = varialbe_set->get_value<dependent_variables_struct::Acceleration>();
 
 	EXPECT_THAT(f, Eq(4.f));
+	EXPECT_THAT(a, Eq(2.f));
 
 }
