@@ -68,6 +68,8 @@ src/data_computes.cpp
 src/mesh_loader.cpp
 src/compute_hessian_gradient.h
 src/compute_hessian_gradient.cpp
+src/discrete_collision_detection.h
+src/discrete_collision_detection.cpp
 src/AABB.h
 
 )

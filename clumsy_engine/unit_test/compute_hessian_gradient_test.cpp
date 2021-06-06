@@ -18,7 +18,7 @@ TEST(Compute_Hessian_Gradient_Test,_1by1_case)
 	float violation_distance = 1e-3f;
 	float stiff = 1e1f;
 
-	Compute_Hessian_Gradient::apply(act_A, act_b, weight, constraint_normal, violation_distance, stiff);
+	clumsy_engine::Compute_Hessian_Gradient::apply(act_A, act_b, weight, constraint_normal, violation_distance, stiff);
 
 	std::vector<mat3x3f> exp_A{
 		{

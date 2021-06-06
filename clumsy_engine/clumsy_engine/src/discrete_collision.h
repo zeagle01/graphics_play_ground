@@ -7,7 +7,7 @@
 
 namespace clumsy_engine
 {
-	class Discrete_Collision :public Interaction, public clumsy_lib::Variable_Acc_Constraint<clumsy_lib::type_list<data::Position, data::Triangle_Indice, data::Edge_Indice>>
+	class Discrete_Collision_EE :public Interaction, public clumsy_lib::Variable_Acc_Constraint<clumsy_lib::type_list<data::Position, data::Triangle_Indice, data::Edge_Indice>>
 	{
 	public:
 		std::vector<stencil> compute_stencils() override;

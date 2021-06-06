@@ -13,6 +13,8 @@ signal_test.cpp
 simulation_data_test.cpp
 data_computes_test.cpp
 compute_hessian_gradient_test.cpp
+discrete_collision_detection_test.cpp
+AABB_test.cpp
 main.cpp
 )
 
