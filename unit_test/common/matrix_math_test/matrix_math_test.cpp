@@ -42,10 +42,10 @@ TEST(Matrix_Test, get_column)
 		{0,1},
 		{2,3}
 	};
-	vec<2,float> c = m.column(0);
+	vec<2,float> act = m.column(0);
+	vec<2, float> exp{ 0,1 };
 
-	EXPECT_THAT(c(0), Eq(0));
-	EXPECT_THAT(c(1), Eq(1));
+	EXPECT_TRUE(is_near<0>(act, exp));
 }
 
 TEST(Vector_Test, get_element)
@@ -65,10 +65,8 @@ TEST(Matrix_Test, assign_construct)
 	};
 	mat<2, 2, float> m1(m);
 
-	EXPECT_THAT(m1(0,0), Eq(0));
-	EXPECT_THAT(m1(1,0), Eq(1));
-	EXPECT_THAT(m1(0,1), Eq(2));
-	EXPECT_THAT(m1(1,1), Eq(3));
+	EXPECT_TRUE(is_near<0>(m1, m));
+
 }
 
 TEST(Vector_Test, assign_construct)
@@ -76,8 +74,7 @@ TEST(Vector_Test, assign_construct)
 	vec2f v{0,1};
 	auto v1 = v;
 
-	EXPECT_THAT(v1(0), Eq(0));
-	EXPECT_THAT(v1(1), Eq(1));
+	EXPECT_TRUE(is_near<0>(v1, v));
 }
 
 
@@ -89,21 +86,22 @@ TEST(Matrix_Test, add)
 	mat2x2f m0 = get_uniform<2, 2, float>(1);
 	mat2x2f m1 = get_uniform<2, 2, float>(1);
 
-	auto exp = m0 + m1;
-	EXPECT_THAT(exp(0,0), Eq(2));
-	EXPECT_THAT(exp(0,1), Eq(2));
-	EXPECT_THAT(exp(1,0), Eq(2));
-	EXPECT_THAT(exp(1,1), Eq(2));
+	auto act = m0 + m1;
+	mat2x2f exp = { {2,2},{2,2} };
+
+	EXPECT_TRUE(is_near<0>(act, exp, 1e-6f));
 }
 
 TEST(Vector_Test, add)
 {
-	vec2f v0{1,1};
-	vec2f v1{1,1};
+	vec2f v0 = get_uniform<2, 1, float>(1);
+	vec2f v1 = get_uniform<2, 1, float>(1);
 
-	auto exp = v0 + v1;
-	EXPECT_THAT(exp(0), Eq(2));
-	EXPECT_THAT(exp(1), Eq(2));
+	auto act = v0 + v1;
+
+	vec2f exp = { 2,2 };
+
+	EXPECT_TRUE(is_near<0>(act, exp, 1e-6f));
 }
 
 
