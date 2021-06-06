@@ -204,7 +204,7 @@ TEST(Vector_Test, cross)
 	vec3f v0{1,0,0};
 	vec3f v1{0,1,0};
 
-	auto exp = v0^v1;
+	auto exp = cross(v0, v1);
 	EXPECT_THAT(exp(0),Eq(0));
 	EXPECT_THAT(exp(1),Eq(0));
 	EXPECT_THAT(exp(2),Eq(1));

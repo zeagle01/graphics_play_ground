@@ -326,15 +326,7 @@ static inline mat<Row, Col, T> operator&(const mat<Row, N, T>& m0, const mat<N, 
 	return ret;
 }
 
-//// v0.v1 (dot)
-//template<size_t N, typename T>
-//static inline T operator&(const vec< N, T>& v0, const vec<N, T>& v1)
-//{
-//	auto m = matrix_elementwise_binary_op(v0, v1, Multiply<T>());
-//	return std::accumulate(m.get_flat(), m.get_flat() + N, T(0));
-//}
-
-
+// dot product
 template<size_t Row, size_t Col, typename T>
 static inline vec<Row, T> operator&( const vec<Row, T>& v,const mat<Row, Col, T>& m)
 {
@@ -344,9 +336,25 @@ static inline vec<Row, T> operator&( const vec<Row, T>& v,const mat<Row, Col, T>
 
 //cross product
 template< typename T>
-static inline vec<3, T> operator^(const vec<3, T>& a, const vec<3, T>& b)
+static inline vec<3, T> cross(const vec<3, T>& a, const vec<3, T>& b)
 {
 	return { a(1) * b(2) - a(2) * b(1), a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0) };
+}
+
+
+//outer product
+template< typename T, int  N>
+static inline mat<N, N, T> operator^(const vec<N, T>& a, const vec<N, T>& b)
+{
+	mat<N, N, T> ret;
+	for (int i = 0; i < N; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			ret(i, j) = a(i) * b(j);
+		}
+	}
+	return ret;
 }
 
 
@@ -411,7 +419,9 @@ template<int P, size_t Row, size_t Col, typename T  >
 static bool is_near(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1, T threshold = 0)
 {
 	T norm = Vectorized_Norm<P>()(m0 - m1);
-	return norm <= threshold;
+	T norm0 = Vectorized_Norm<P>()(m0);
+	T relative_diff = norm / norm0;
+	return relative_diff <= threshold;
 }
 
 template<int P, size_t Row, size_t Col, typename T  >
@@ -421,7 +431,9 @@ struct is_near1
 	bool operator()(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1)
 	{
 		T norm = Vectorized_Norm<P>()(m0 - m1);
-		return norm <= threshold;
+		T norm0 = Vectorized_Norm<P>()(m0);
+		T relative_diff = norm / norm0;
+		return relative_diff <= threshold;
 	}
 };
 

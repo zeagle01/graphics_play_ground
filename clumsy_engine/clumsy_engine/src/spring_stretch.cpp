@@ -22,7 +22,11 @@ namespace clumsy_engine
 
 	Element_Equation Spring_Stretch::compute_element_equation(stencil st,int ei)
 	{
-		Element_Equation ret = Element_Equation::with_size(st.size());
+		int vertex_of_stencel_num = st.size();
+
+		//assert(vertex_of_stencel_num == 2);
+
+		Element_Equation ret = Element_Equation::with_size(vertex_of_stencel_num);
 		ret.stencil = st;
 
 		const auto& positions = get_value<data::Position>();
@@ -41,11 +45,11 @@ namespace clumsy_engine
 
 		d = d * edge_lengths[ei] / l;
 
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < vertex_of_stencel_num; i++)
 		{
-			for (int j = 0; j < 2; j++)
+			for (int j = 0; j < vertex_of_stencel_num; j++)
 			{
-				ret.A[i * 2 + j] = w(i) * w(j) * stiff * get_identity<3, float>();
+				ret.A[i * vertex_of_stencel_num + j] = w(i) * w(j) * stiff * get_identity<3, float>();
 			}
 
 			ret.b[i] = w(i) * d * stiff;

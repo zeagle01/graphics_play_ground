@@ -5,7 +5,6 @@
 #include "interaction.h"
 #include "simulator.h"
 #include "simulation_data.h"
-#include "type_map.h"
 
 namespace clumsy_engine
 {

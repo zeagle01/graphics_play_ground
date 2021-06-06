@@ -145,7 +145,7 @@ namespace clumsy_engine
 					position[v[2]]
 				};
 
-				auto n = (x[0] - x[2]) ^ (x[1] - x[2]);
+				auto n = cross((x[0] - x[2]), (x[1] - x[2]));
 
 				float l = Vectorized_Norm<2>()(n);
 
@@ -180,7 +180,7 @@ namespace clumsy_engine
 					position[tv[2]]
 				};
 
-				auto n = (x[0] - x[2]) ^ (x[1] - x[2]);
+				auto n = cross((x[0] - x[2]), (x[1] - x[2]));
 				triangle_normal[i] = normalize(n);
 			}
 		}

@@ -12,6 +12,7 @@ system_equations_solver_test.cpp
 signal_test.cpp
 simulation_data_test.cpp
 data_computes_test.cpp
+compute_hessian_gradient_test.cpp
 main.cpp
 )
 

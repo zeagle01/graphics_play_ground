@@ -158,6 +158,7 @@ using namespace clumsy_engine;
 		m_sim.add_interaction<clumsy_engine::Inertial>();
 		m_sim.add_interaction<clumsy_engine::Gravity>();
 		m_sim.add_interaction<clumsy_engine::Spring_Stretch>();
+		//m_sim.add_interaction<clumsy_engine::Collision_EE>();
 		simulation_init();
 	}
 

@@ -58,12 +58,16 @@ src/system_equations_solver.cpp
 src/simulation_data.cpp
 src/spring_stretch.h
 src/spring_stretch.cpp
+src/discrete_collision.h
+src/discrete_collision.cpp
 src/one_point_stencils.h
 src/one_point_stencils.cpp
 src/signal.h
 src/data_computes.h
 src/data_computes.cpp
 src/mesh_loader.cpp
+src/compute_hessian_gradient.h
+src/compute_hessian_gradient.cpp
 
 )
 
