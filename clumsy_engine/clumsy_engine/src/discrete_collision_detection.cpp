@@ -24,6 +24,177 @@ namespace clumsy_engine
 		reinterpret_cast<std::atomic<Type>*>(Address)->compare_exchange_weak(Exp, Val); 
 		return Exp; 
 	}
+	
+	int compute_common_leading_zeros(std::pair<unsigned long long, int> m0, const std::vector<std::pair<unsigned long long, int>>& morton_codes, int node_index, int leaf_num)
+	{
+		if (node_index >= 0 && node_index < leaf_num)
+		{
+			return __lzcnt64(m0.first ^ morton_codes[node_index].first);
+		}
+		else
+		{
+			return -1;
+		}
+	}
+
+	vec2i determine_range(const std::vector<std::pair<unsigned long long, int>> & morton_codes, int node_index,int leaf_num)
+	{
+		auto morton_code = morton_codes[node_index];
+		int num_of_common_leading_zeros_left = compute_common_leading_zeros(morton_code, morton_codes, node_index - 1, leaf_num);
+		int num_of_common_leading_zeros_right = compute_common_leading_zeros(morton_code, morton_codes, node_index + 1, leaf_num);
+
+		int dir = num_of_common_leading_zeros_left < num_of_common_leading_zeros_right ? -1 : 1;
+
+		int min_num_of_common_leading_zeros = std::min(num_of_common_leading_zeros_left, num_of_common_leading_zeros_right);
+
+		int lmax = 2;
+		while (compute_common_leading_zeros(morton_code, morton_codes, node_index + lmax * dir, leaf_num) > min_num_of_common_leading_zeros)
+		{
+			lmax *= 2;
+		}
+
+		int l = 0;
+		for (int t = lmax / 2; t >= 1; t /= 2)
+		{
+			if (compute_common_leading_zeros(morton_code, morton_codes, node_index + (l + t) * dir, leaf_num) > min_num_of_common_leading_zeros)
+			{
+				l = l + t;
+			}
+		}
+
+		int split_index = node_index + l * dir;
+		if (split_index < node_index)
+		{
+			return { split_index,node_index };
+		}
+		else
+		{
+			return { node_index ,split_index};
+		}
+	}
+
+	int find_split(const std::vector<std::pair<unsigned long long, int>>& morton_codes, int left, int right)
+	{
+		auto left_morton_code = morton_codes[left].first;
+		auto right_morton_code = morton_codes[right].first;
+		if (left_morton_code == right_morton_code)
+		{
+			return (left + right) >> 1;
+		}
+
+		int num_of_common_zeros = __lzcnt64(left_morton_code ^ right_morton_code);
+		int split = left;
+		int step = right - left;
+		do
+		{
+			step = (step + 1) >> 1;
+			int new_split = split + step;
+			if (new_split < right)
+			{
+				auto split_morton_code = morton_codes[new_split].first;
+				int split_common_zeros = __lzcnt64(left_morton_code ^ split_morton_code);
+				if (split_common_zeros > num_of_common_zeros)
+				{
+					split = new_split;
+				}
+			}
+
+		} while (step >> 1);
+
+		return split;
+	}
+
+	void Discrete_Collision_Detection::construct_ee_bvh1()
+	{
+
+		auto edges = get_value<data::Edge_Indice>();
+		auto positions = get_value<data::Position>();
+
+		int edge_num = edges.size() / 2;
+
+		//compute representive position
+		m_edge_representative_positions.resize(edge_num);
+		for (int i = 0; i < edge_num; i++)
+		{
+			int v0 = edges[i * 2 + 0];
+			int v1 = edges[i * 2 + 1];
+			m_edge_representative_positions[i] = 0.5f * (positions[v0] + positions[v1]);
+		}
+
+		//compute aabb
+		AABB<3> aabb;
+		for (int i = 0; i < edge_num; i++)
+		{
+			int v0 = edges[i * 2 + 0];
+			int v1 = edges[i * 2 + 1];
+			aabb += positions[v0];
+			aabb += positions[v1];
+		}
+
+		//encode position into z-order
+		auto aabb_side_length = aabb.m_upper - aabb.m_lower;
+		aabb_side_length += get_uniform<3, 1, float>(1e-6f);
+		std::vector<std::pair<unsigned long long, int>> encoded_records;
+		for (int i = 0; i < edge_num; i++)
+		{
+			auto reprent_pos = (m_edge_representative_positions[i] - aabb.m_lower) / aabb_side_length;
+
+			constexpr unsigned long long m = 1ll << 21;
+			reprent_pos(0) = std::clamp<float>(reprent_pos(0) * m, 0.0f, m - 1.0f);
+			reprent_pos(1) = std::clamp<float>(reprent_pos(1) * m, 0.0f, m - 1.0f);
+			reprent_pos(2) = std::clamp<float>(reprent_pos(2) * m, 0.0f, m - 1.0f);
+
+			unsigned long long xx = insert_00_after_1(static_cast<unsigned long long>(reprent_pos(0)));
+			unsigned long long yy = insert_00_after_1(static_cast<unsigned long long>(reprent_pos(1)));
+			unsigned long long zz = insert_00_after_1(static_cast<unsigned long long>(reprent_pos(2)));
+
+			unsigned long long encoded_position = (xx << 2) + (yy << 1) + zz;
+			encoded_records.push_back(std::make_pair(encoded_position, i));
+		}
+
+		//sort
+		std::sort(std::begin(encoded_records), std::end(encoded_records), [](const auto& l, const auto& r) {return l.first < r.first; });
+
+		//common_prefixes
+		std::vector<int> common_prefixes(edge_num);
+		for (int i = 1; i < edge_num; i++)
+		{
+			common_prefixes[i] = __lzcnt64(encoded_records[i].first ^ encoded_records[i - 1].first);
+		}
+
+		std::vector<vec2i>					children(edge_num);
+		std::vector<int>					parent(edge_num, -1);
+
+		for (int i = 0; i < edge_num; i++)
+		{
+			vec2i range;
+			if (i == 0)
+			{
+				parent[i] = -1;
+				range = { 0,edge_num };
+			}
+			else
+			{
+				range = determine_range(encoded_records, i, edge_num);
+			}
+
+			int split = find_split(encoded_records, range(0), range(1));
+
+			int child_left = (split == range(0)) ? (edge_num - 1 + split) : split;
+			int child_right = (split == range(0)) ? (edge_num + split) : split + 1;
+
+			parent[child_left] = i;
+			parent[child_right] = i;
+			if (child_right >= edge_num - 1)
+			{
+				std::swap(child_left, child_right);
+			}
+
+			children[i] = { child_left,child_right };
+
+		}
+
+	}
 
 	void Discrete_Collision_Detection::construct_ee_bvh()
 	{
@@ -128,14 +299,15 @@ namespace clumsy_engine
 
 	void Discrete_Collision_Detection::detection()
 	{
-
 		auto edges = get_value<data::Edge_Indice>();
 		auto positions = get_value<data::Position>();
 		int edge_num = edges.size() / 2;
 
 		for (int i = 0; i < edge_num; i++)
 		{
-
+			auto edge = edges[i * 2 + 0];
+			auto edge0 = edges[i * 2 + 1];
+			//auto 
 		}
 	}
 

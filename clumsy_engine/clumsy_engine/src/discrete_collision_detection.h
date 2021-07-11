@@ -13,6 +13,8 @@ namespace clumsy_engine
 	public:
 		void construct_ee_bvh();
 
+		void construct_ee_bvh1();
+
 		void detection();
 
 	private:
