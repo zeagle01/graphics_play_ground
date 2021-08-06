@@ -95,7 +95,12 @@ namespace clumsy_lib
 		{
 			data = d;
 		}
-		const T& get()
+		const T& get() const
+		{
+			return data;
+		}
+
+		T& get_ref()
 		{
 			return data;
 		}
@@ -113,7 +118,14 @@ namespace clumsy_lib
 		}
 
 		template<typename Variable_Type>
-		const auto& get_value()
+		auto& get_ref_value()
+		{
+			auto variable = m_type_map->get_type<Variable_Type>();
+			return variable->get_ref();
+		}
+
+		template<typename Variable_Type>
+		const auto& get_value()  const
 		{
 			auto variable = m_type_map->get_type<Variable_Type>();
 			return variable->get();

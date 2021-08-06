@@ -292,31 +292,10 @@ using namespace clumsy_engine;
 
 		ImGui::Text("hello world from sim app");
 
-		static float gravity[] = { 0.f,-10.f,0.f };
-		static float time_step = 0.01f;
-		static float rho = 1.f;
-		static float stretch_stiff = 1e2f;
-
-		if (ImGui::SliderFloat3("gravity", gravity, -10.f, 10.f))
-		{
-			m_sim.set_value<data::Gravity>({ gravity[0],gravity[1],gravity[2] });
-		}
-		if (ImGui::SliderFloat("time step", &time_step, 0.001f, 10.f))
-		{
-			m_sim.set_value<data::Time_Step>(time_step);
-		}
-		if (ImGui::SliderFloat("mass density", &rho, 0.001f, 10.f))
-		{
-			m_sim.set_value<data::Mass_Density>(rho);
-		}
-
-		if (ImGui::SliderFloat("stretch stiff", &stretch_stiff, 0.001f, 1e7f))
-		{
-			m_sim.set_value<data::Stretch_Stiff>(stretch_stiff);
-		}
-
-
-
+		ImGui::SliderFloat3("gravity", &(m_sim.get_ref_value<data::Gravity>()(0)), -10.f, 10.f);
+		ImGui::SliderFloat("time step", &(m_sim.get_ref_value<data::Time_Step>()), 0.001f, 10.f);
+		ImGui::SliderFloat("mass density", &(m_sim.get_ref_value<data::Mass_Density>()), 0.001f, 10.f);
+		ImGui::SliderFloat("stretch stiff", &(m_sim.get_ref_value<data::Stretch_Stiff>()), 0.001f, 1e7f);
 
 		//set render uniform
 		auto ogl_shader = std::dynamic_pointer_cast<OpenGL_Shader>(m_shader);

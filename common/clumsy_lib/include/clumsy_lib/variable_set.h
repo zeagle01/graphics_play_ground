@@ -122,7 +122,8 @@ namespace clumsy_lib
 			set_is_changed_by_self(true);
 			set_children_is_changed_by_parent(true);
 		}
-		const T& get()
+
+		T& get_ref() 
 		{
 			if (is_changed_by_self())
 			{
@@ -136,6 +137,12 @@ namespace clumsy_lib
 			}
 			return data;
 		}
+
+		const T& get() 
+		{
+			return get_ref();
+		}
+
 
 
 		template<typename T>
