@@ -24,7 +24,9 @@ TEST(Discrete_Collision_Detection_Test,ee_test)
 
 	detector.set_value<clumsy_engine::data::Edge_Indice>( { 0,1,1,2,2,0 } );
 
-	detector.construct_ee_bvh();
+	//detector.construct_ee_bvh();
+	detector.construct_ee_bvh1();
+	detector.detection();
 
 
 }

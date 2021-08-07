@@ -104,6 +104,25 @@ namespace clumsy_engine
 		return split;
 	}
 
+	float shift(float pos, unsigned long long bits)
+	{
+		return std::clamp<float>(pos * bits, 0.0f, bits - 1.0f);
+	}
+
+	unsigned long long encode_component(float pos, unsigned long long bits)
+	{
+		pos = shift(pos, bits);
+		return insert_00_after_1(static_cast<unsigned long long>(pos));
+	}
+
+	unsigned long long encode_positions(float x, float y, float z, unsigned long long bits)
+	{
+		unsigned long long xx = encode_component(x, bits);
+		unsigned long long yy = encode_component(y, bits);
+		unsigned long long zz = encode_component(z, bits);
+		return (xx << 2) + (yy << 1) + zz;
+	}
+
 	void Discrete_Collision_Detection::construct_ee_bvh1()
 	{
 
@@ -133,37 +152,23 @@ namespace clumsy_engine
 
 		//encode position into z-order
 		auto aabb_side_length = aabb.m_upper - aabb.m_lower;
+
+		//auto max_side_length = matrix_math::max(aabb_side_length);
+
 		aabb_side_length += get_uniform<3, 1, float>(1e-6f);
 		std::vector<std::pair<unsigned long long, int>> encoded_records;
 		for (int i = 0; i < edge_num; i++)
 		{
 			auto reprent_pos = (m_edge_representative_positions[i] - aabb.m_lower) / aabb_side_length;
-
-			constexpr unsigned long long m = 1ll << 21;
-			reprent_pos(0) = std::clamp<float>(reprent_pos(0) * m, 0.0f, m - 1.0f);
-			reprent_pos(1) = std::clamp<float>(reprent_pos(1) * m, 0.0f, m - 1.0f);
-			reprent_pos(2) = std::clamp<float>(reprent_pos(2) * m, 0.0f, m - 1.0f);
-
-			unsigned long long xx = insert_00_after_1(static_cast<unsigned long long>(reprent_pos(0)));
-			unsigned long long yy = insert_00_after_1(static_cast<unsigned long long>(reprent_pos(1)));
-			unsigned long long zz = insert_00_after_1(static_cast<unsigned long long>(reprent_pos(2)));
-
-			unsigned long long encoded_position = (xx << 2) + (yy << 1) + zz;
+			unsigned long long encoded_position = encode_positions(reprent_pos(0),reprent_pos(1),reprent_pos(2),1ll << 21);
 			encoded_records.push_back(std::make_pair(encoded_position, i));
 		}
 
 		//sort
 		std::sort(std::begin(encoded_records), std::end(encoded_records), [](const auto& l, const auto& r) {return l.first < r.first; });
 
-		//common_prefixes
-		std::vector<int> common_prefixes(edge_num);
-		for (int i = 1; i < edge_num; i++)
-		{
-			common_prefixes[i] = __lzcnt64(encoded_records[i].first ^ encoded_records[i - 1].first);
-		}
-
 		std::vector<vec2i>					children(edge_num);
-		std::vector<int>					parent(edge_num, -1);
+		std::vector<int>					parent(2 * edge_num - 1, -1);
 
 		for (int i = 0; i < edge_num; i++)
 		{
@@ -171,7 +176,7 @@ namespace clumsy_engine
 			if (i == 0)
 			{
 				parent[i] = -1;
-				range = { 0,edge_num };
+				range = { 0,edge_num - 1 };
 			}
 			else
 			{
@@ -181,7 +186,7 @@ namespace clumsy_engine
 			int split = find_split(encoded_records, range(0), range(1));
 
 			int child_left = (split == range(0)) ? (edge_num - 1 + split) : split;
-			int child_right = (split == range(0)) ? (edge_num + split) : split + 1;
+			int child_right = (split + 1 == range(1)) ? (edge_num + split) : split + 1;
 
 			parent[child_left] = i;
 			parent[child_right] = i;
