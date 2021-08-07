@@ -13,6 +13,7 @@ namespace clumsy_engine
     class OpenGL_Vertex_Buffer:public  Vertex_Buffer
     {
         public:
+            OpenGL_Vertex_Buffer();
             OpenGL_Vertex_Buffer(float *vertices, int size);
             ~OpenGL_Vertex_Buffer();
 

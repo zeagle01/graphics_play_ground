@@ -32,8 +32,8 @@ private:
 
 	clumsy_engine::Ref<clumsy_engine::Shader> m_shader;
 	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array;
-	clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > m_vbo_position;
-	clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > m_vbo_normal;
+	std::string m_attribute_name_position = "v_position";
+	std::string m_attribute_name_normal = "v_normal";
 
 	std::vector<vec3f> m_positions;
 	std::vector<vec3f> m_normals;

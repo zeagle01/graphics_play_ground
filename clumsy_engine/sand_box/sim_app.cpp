@@ -114,24 +114,15 @@ using namespace clumsy_engine;
 
 		//gl data stuff
 		m_vertex_array = clumsy_engine::Vertex_Array::create();
+		int v_num = m_positions.size();
 
-		//vbo position
-		m_vbo_position = clumsy_engine::Vertex_Buffer::create(m_positions[0].get_flat(), m_positions.size() * 3);
-		clumsy_engine::Buffer_Layout vbo_position_layout =
-		{
-			{clumsy_engine::Shader_Data_Type::Float3, "v_position"}
-		};
-		m_vbo_position->set_layout(vbo_position_layout);
-		m_vertex_array->add_vertex_buffer(m_vbo_position,ogl_shader->get_id());
+
+		m_vertex_array->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3, m_attribute_name_position);
+		m_vertex_array->set_vertex_attribute_data(m_attribute_name_position, &m_positions[0](0), v_num);
 
 		//vbo normal
-		m_vbo_normal = clumsy_engine::Vertex_Buffer::create(m_normals[0].get_flat(), m_normals.size() * 3);
-		clumsy_engine::Buffer_Layout vbo_normal_layout =
-		{
-			{clumsy_engine::Shader_Data_Type::Float3, "v_normal"}
-		};
-		m_vbo_normal->set_layout(vbo_normal_layout);
-		m_vertex_array->add_vertex_buffer(m_vbo_normal, ogl_shader->get_id());
+		m_vertex_array->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3, m_attribute_name_normal);
+		m_vertex_array->set_vertex_attribute_data(m_attribute_name_normal, &m_normals[0](0), v_num);
 
 		//ibo 
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(m_indices.data(), m_indices.size());
@@ -236,8 +227,8 @@ using namespace clumsy_engine;
 		const auto& new_normal = m_sim.get_value<data::Vertex_Normal>();
 
 		//update render data
-		m_vbo_position->set_data(new_pos[0].get_flat(), new_pos.size());
-		m_vbo_normal->set_data(new_normal[0].get_flat(), new_normal.size());
+		m_vertex_array->set_vertex_attribute_data(m_attribute_name_position, new_pos[0].get_flat(), new_pos.size());
+		m_vertex_array->set_vertex_attribute_data(m_attribute_name_normal, new_normal[0].get_flat(), new_normal.size());
 
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(m_indices.data(), m_indices.size());
 		m_vertex_array->set_index_buffer(index_buffer);

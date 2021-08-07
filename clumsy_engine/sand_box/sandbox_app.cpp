@@ -186,18 +186,12 @@ private:
 		auto ogl_shader = std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader > (m_shader);
 
 		//gl data stuff
-
-		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > pos_vb = clumsy_engine::Vertex_Buffer::create(m_positions.data(), m_positions.size());
-		clumsy_engine::Buffer_Layout pos_vb_layout = { {clumsy_engine::Shader_Data_Type::Float3, "a_position"} };
-		pos_vb->set_layout(pos_vb_layout);
-
-		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > color_vb = clumsy_engine::Vertex_Buffer::create(m_colors.data(), m_colors.size());
-		clumsy_engine::Buffer_Layout color_vb_layout = { {clumsy_engine::Shader_Data_Type::Float3, "a_color"} };
-		color_vb->set_layout(color_vb_layout);
-
+		int vNum = m_positions.size() / 3;
 		m_vertex_array = clumsy_engine::Vertex_Array::create();
-		m_vertex_array->add_vertex_buffer(pos_vb, ogl_shader->get_id());
-		m_vertex_array->add_vertex_buffer(color_vb, ogl_shader->get_id());
+		m_vertex_array->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3,m_position_name_in_shader);
+		m_vertex_array->set_vertex_attribute_data(m_position_name_in_shader, m_positions.data(), vNum);
+		m_vertex_array->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3, m_color_name_in_shader);
+		m_vertex_array->set_vertex_attribute_data(m_color_name_in_shader, m_colors.data(), vNum);
 
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
 		m_vertex_array->set_index_buffer(index_buffer);
@@ -264,14 +258,11 @@ private:
 
 		//gl data stuff
 		m_vertex_array_plane = clumsy_engine::Vertex_Array::create();
-		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vertex_buffer = clumsy_engine::Vertex_Buffer::create(m_positions_plane.data(), m_positions_plane.size());
+		std::string position_name_in_shader = "position";
+		int v_num = m_positions_plane.size() / 3;
 
-		clumsy_engine::Buffer_Layout layout =
-		{
-			{clumsy_engine::Shader_Data_Type::Float3, "position"},
-		};
-		vertex_buffer->set_layout(layout);
-		m_vertex_array_plane->add_vertex_buffer(vertex_buffer, ogl_shader->get_id());
+		m_vertex_array_plane->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3, position_name_in_shader);
+		m_vertex_array_plane->set_vertex_attribute_data(position_name_in_shader, m_positions_plane.data(), v_num);
 
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
 		m_vertex_array_plane->set_index_buffer(index_buffer);
@@ -302,6 +293,9 @@ private:
 	std::vector<float> m_positions;
 	std::vector<float> m_colors;
 	std::vector<float> m_texture_coodinates;
+	std::string m_position_name_in_shader="a_position";
+	std::string m_color_name_in_shader="a_color";
+	std::string m_texture_coodinate_name_in_shader="a_uv";
 
 	clumsy_engine::Ref<clumsy_engine::Shader> m_shader_plane;
 	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array_plane;
@@ -334,8 +328,8 @@ std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
 
 	clumsy_engine::Log::get_core_logger()->trace("create app");
 
-	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
-	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
+	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
+	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
 
 	return app;
 }

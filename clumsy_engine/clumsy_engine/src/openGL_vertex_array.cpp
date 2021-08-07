@@ -30,13 +30,45 @@ namespace clumsy_engine
 		glBindVertexArray(0);
 	}
 
+	void OpenGL_Vertex_Array::add_vertex_attribute(int shader_program, Shader_Data_Type data_type,const std::string& name_in_shader)
+	{
+		if (m_vertex_buffers.count(name_in_shader) && m_vertex_buffers[name_in_shader] != nullptr)
+		{
+			CE_CORE_ERROR("already have a given name vbo");
+			return;
+		}
+
+		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vbo = clumsy_engine::Vertex_Buffer::create();
+		clumsy_engine::Buffer_Layout pos_vb_layout = { {data_type, name_in_shader} };
+		vbo->set_layout(pos_vb_layout);
+		m_vertex_buffers[name_in_shader] = vbo;
+		add_vertex_buffer(vbo, shader_program);
+	}
+
+	void OpenGL_Vertex_Array::set_vertex_attribute_data(const std::string& name_in_shader, const float* data,int count)
+	{
+		if (m_vertex_buffers.count(name_in_shader))
+		{
+			bind();
+			auto vbo = m_vertex_buffers[name_in_shader];
+			auto layout=vbo->get_layout().get_elements()[0];
+			int size_in_byte = layout.size * count;
+			vbo->set_data(data, size_in_byte);
+		}
+		else
+		{
+			CE_CORE_ERROR("can't find vertex buffer in vertex array ");
+		}
+
+	}
+
+
 	void OpenGL_Vertex_Array::add_vertex_buffer(Ref<Vertex_Buffer> vb, int shader_program)
 	{
 		if (vb->get_layout().get_elements().empty())
 		{
 			CE_CORE_ERROR("vertex buffer got no layout yet");
 		}
-
 
 		glBindVertexArray(m_renderer_id);
 
@@ -51,10 +83,6 @@ namespace clumsy_engine
 			glVertexAttribPointer(location, e.count, e.gl_type, e.normalized, layout.get_stride(), (void*)e.offset);
 			index++;
 		}
-
-		m_vertex_buffers.push_back(vb);
-
-
 	}
 
 	void OpenGL_Vertex_Array::set_index_buffer(Ref<Index_Buffer> ib) 

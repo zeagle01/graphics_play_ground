@@ -27,6 +27,22 @@ namespace clumsy_engine
         return nullptr;
     }
 
+    std::unique_ptr<Vertex_Buffer> Vertex_Buffer::create()
+    {
+        switch (Renderer::get_API())
+        {
+        case Renderer_API::API::None:
+            CE_CORE_ERROR("none api");
+            return nullptr;
+            break;
+        case Renderer_API::API::OpenGL:
+            return std::make_unique<OpenGL_Vertex_Buffer>();
+            break;
+        }
+        CE_CORE_ERROR("no api case");
+        return nullptr;
+    }
+
     std::unique_ptr<Index_Buffer> Index_Buffer::create(int *indices, int size)
     {
         switch (Renderer::get_API())
