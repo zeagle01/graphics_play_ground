@@ -28,4 +28,9 @@ namespace clumsy_engine
 		static std::unique_ptr<Vertex_Array> create();
 	};
 
+	//class Seperate_Layout_Vertex_Array:public Vertex_Array
+	//{
+	//public:
+	//};
+
 }

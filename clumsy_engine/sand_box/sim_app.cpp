@@ -225,7 +225,6 @@ using namespace clumsy_engine;
 		//render
 		clumsy_engine::Renderer::begin_scene(m_camara);
 
-
 		clumsy_engine::Renderer::submit(m_shader, m_vertex_array,glm::mat4(1.f));
 
 		clumsy_engine::Renderer::end_scene();
