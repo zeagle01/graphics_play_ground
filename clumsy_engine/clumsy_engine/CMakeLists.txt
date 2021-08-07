@@ -47,6 +47,10 @@ src/render_command.cpp
 src/openGL_Renderer_API.h
 src/openGL_Renderer_API.cpp
 src/openGL_shader.cpp
+src/texture.h
+src/texture.cpp
+src/openGL_texture.h
+src/openGL_texture.cpp
 
 
 src/simulator.cpp
@@ -167,6 +171,9 @@ target_link_libraries(clumsy_engine PUBLIC matrix_math)
 
 ## clumsy_lib
 target_link_libraries(clumsy_engine PUBLIC clumsy_lib)
+
+########## stb
+target_link_libraries(clumsy_engine PUBLIC my_stb)
 
 
 

@@ -95,7 +95,7 @@ public:
 
 		//clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::mat4(1.f));
 
-		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
+		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(2.5f)));
 
 
 		clumsy_engine::Renderer::end_scene();

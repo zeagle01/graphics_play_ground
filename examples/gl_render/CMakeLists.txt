@@ -52,7 +52,7 @@ find_package(glog CONFIG REQUIRED)
 target_link_libraries(gl_render PUBLIC glog::glog)
 
 ###########stb
-target_include_directories(gl_render PRIVATE ${CMAKE_SOURCE_DIR}/external/stb)
+target_link_libraries(gl_render PRIVATE my_stb)
 
 ###########gflags
 find_package(gflags CONFIG REQUIRED)
