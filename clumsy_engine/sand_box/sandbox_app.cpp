@@ -94,10 +94,16 @@ public:
 
 		plane_update();
 
-		//clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::mat4(1.f));
+		clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::translate(glm::mat4(1.f), glm::vec3(1.1, 0.3, 0)));
+
+
+		m_texture1->bind(m_texture_slot);
+		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
 
 		m_texture->bind(m_texture_slot);
-		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(4.5f)));
+		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
+
+
 
 
 		clumsy_engine::Renderer::end_scene();
@@ -210,7 +216,10 @@ private:
 		//texture
 		std::string resources_dir = "../../../resources/";
 		std::string texture_image = resources_dir + "textures/awesomeface.png";
+		std::string texture_image1 = resources_dir + "textures/container.jpg";
+		//std::string texture_image1 = resources_dir + "textures/green_square.png";
 		m_texture = clumsy_engine::Texture_2D::create(texture_image);
+		m_texture1 = clumsy_engine::Texture_2D::create(texture_image1);
 		ogl_shader->bind();
 		ogl_shader->upload_uniform_int("u_texture", m_texture_slot);
 	}
@@ -281,6 +290,7 @@ private:
 	clumsy_engine::Ref<clumsy_engine::Shader> m_shader_texture;
 	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array_texture;
 	clumsy_engine::Ref<clumsy_engine::Texture> m_texture;
+	clumsy_engine::Ref<clumsy_engine::Texture> m_texture1;
 	int m_texture_slot = 0;
 	std::vector<float> m_texture_coodinates;
 	std::vector<float> m_positions_texture;

@@ -18,6 +18,7 @@ namespace clumsy_engine
 
             static void begin_scene(Ref<Camara> camara);
 
+            static void init();
             static void end_scene();
 			static void submit(Ref<Shader> shader, Ref<Vertex_Array> vertex_array, const glm::mat4& transform);
     private:

@@ -23,6 +23,7 @@ namespace clumsy_engine
 		};
 
 	public:
+		virtual void init() = 0;
 		virtual void clear() = 0;
 		virtual void set_clear_color(const glm::vec4& color ) = 0;
 

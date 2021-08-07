@@ -50,6 +50,8 @@ namespace clumsy_engine
 		m_window->set_event_callback(BIND_MEMBER(on_event));
 		m_window->set_vertical_sync(false);
 
+		Renderer::init();
+
 		m_dispatcher_imp->add<Window_Close_Event>(BIND_MEMBER(On_Window_Close));
 
 		m_imgui_layer = std::make_shared<Imgui_Layer>();

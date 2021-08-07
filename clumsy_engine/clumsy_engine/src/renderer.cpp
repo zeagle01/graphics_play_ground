@@ -34,4 +34,9 @@ namespace clumsy_engine
 			Render_Command::draw_indexed(vertex_array);
 		}
 	}
+
+	void Renderer::init()
+	{
+		Render_Command::init();
+	}
 }

@@ -11,6 +11,8 @@ namespace clumsy_engine
 	{
 	public:
 
+		inline static void init() { s_renderer_API->init(); }
+
 		inline static void clear() { s_renderer_API->clear(); }
 
 		inline static void set_clear_color(const glm::vec4& color) { s_renderer_API->set_clear_color(color); }

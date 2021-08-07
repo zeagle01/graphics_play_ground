@@ -11,6 +11,7 @@ namespace clumsy_engine
 	{
 	public:
 
+		void init() override;
 		void clear() override;
 		void set_clear_color(const glm::vec4& color) override;
 
