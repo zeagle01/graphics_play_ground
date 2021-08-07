@@ -173,8 +173,7 @@ using namespace clumsy_engine;
 		m_sim.set_value<clumsy_engine::data::Triangle_Indice>(m_indices);
 		m_sim.set_value<clumsy_engine::data::Position>(m_positions);
 		m_sim.set_value<clumsy_engine::data::Ref_Position>(m_positions);
-		std::vector<vec3f> zero(m_positions.size(), get_uniform<3, 1, float>(0));
-		m_sim.set_value<clumsy_engine::data::Velocity>(zero);
+		m_sim.get_ref_value<clumsy_engine::data::Velocity>() = std::vector<vec3f>(m_positions.size(), get_uniform<3, 1, float>(0));
 
 	}
 
