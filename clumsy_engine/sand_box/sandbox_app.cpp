@@ -11,6 +11,7 @@
 #include "profiler.h"
 #include "clumsy_engine/ref.h"
 #include "clumsy_engine/file_dialogs.h"
+#include "shader_sources.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -25,7 +26,7 @@ class Layer_Demo :public clumsy_engine::Layer
 public:
 	Layer_Demo() :
 		clumsy_engine::Layer("demo_layer")
-		, m_camara(std::make_shared<clumsy_engine::Orthorgraphic_Camara>())
+		, m_camara(std::make_shared<clumsy_engine::Perspective_Camara>())
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 	{
 
@@ -39,6 +40,7 @@ public:
 		/// data
 		config_shader();
 		config_shader_plane();
+		config_shader_texture();
 
 		auto key_pressed_handler = [](auto& e)
 		{
@@ -91,7 +93,9 @@ public:
 
 		plane_update();
 
-		clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::mat4(1.f));
+		//clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::mat4(1.f));
+
+		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
 
 
 		clumsy_engine::Renderer::end_scene();
@@ -148,41 +152,7 @@ private:
 		};
 
 		//shader
-		std::string vertex_src = R"(
-			#version 330 core
-			layout(location=0 ) in vec3 a_position;
-			layout(location=1 ) in vec3 a_color;
-			out vec3 v_position;
-			out vec3 v_color;
-
-			uniform mat4 u_view_projection;
-			uniform mat4 u_model_matrix;
-
-			void main()
-			{
-
-				v_position=a_position;
-				v_color=a_color;
-				gl_Position=u_view_projection*u_model_matrix*vec4(a_position,1.0);
-			}
-
-		)";
-
-		std::string fragment_src = R"(
-
-			#version 330 core
-			in vec3 v_position;
-			in vec3 v_color;
-			out vec4 color;
-
-			void main()
-			{
-				color=vec4(v_position+v_color,1.0);
-				//color=vec4(v_position,1.0);
-			}
-
-		)";
-		m_shader = clumsy_engine::Shader::create(vertex_src, fragment_src);
+		m_shader = clumsy_engine::Shader::create(sand_box_triangle_vertex_src, sand_box_triangle_fragment_src);
 		auto ogl_shader = std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader > (m_shader);
 
 		//gl data stuff
@@ -196,10 +166,44 @@ private:
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
 		m_vertex_array->set_index_buffer(index_buffer);
 
+	}
+	void config_shader_texture()
+	{
+		m_texture_coodinates=
+		{
+			0,0,
+			1,0,
+			1,1,
+			0,1
+		};
+		m_positions_texture = {
+			0.,0,0,
+			1,0,0,
+			1,1,0,
+			0,1,0
+		};
 
+		std::vector<int> triangles{
+			0,1,2,
+			0,2,3
+		};
 
+		m_shader_texture = clumsy_engine::Shader::create(sand_box_texture_vertex_src, sand_box_texture_fragment_src);
+		auto ogl_shader = std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader > (m_shader_texture);
 
+		m_vertex_array_texture = clumsy_engine::Vertex_Array::create();
+		std::string position_name_in_shader = "position";
+		std::string texture_name_in_shader = "texture";
+		int v_num = m_positions_texture.size() / 3;
 
+		m_vertex_array_texture->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3, position_name_in_shader);
+		m_vertex_array_texture->set_vertex_attribute_data(position_name_in_shader, m_positions_texture.data(), v_num);
+
+		m_vertex_array_texture->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float2, texture_name_in_shader);
+		m_vertex_array_texture->set_vertex_attribute_data(texture_name_in_shader, m_texture_coodinates.data(), v_num);
+
+		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
+		m_vertex_array_texture->set_index_buffer(index_buffer);
 	}
 
 	void config_shader_plane()
@@ -217,42 +221,8 @@ private:
 			0,2,3
 		};
 
-
-
-		std::string vertex_src = R"(
-			#version 330 core
-			layout(location=0 ) in vec3 position;
-
-			uniform  vec3 u_color;
-			uniform mat4 u_view_projection;
-			uniform mat4 u_model_matrix;
-
-			out vec3 v_position;
-			out vec3 v_color;
-
-			void main()
-			{
-				//vec3 t_position=u_view_projection*position;
-				v_position=position;
-				v_color=u_color;
-				gl_Position=u_view_projection*u_model_matrix*vec4(position,1.0);
-			}
-
-		)";
-
-		std::string fragment_src = R"(
-			#version 330 core
-			in vec3 v_position;
-			in vec3 v_color;
-			out vec4 color;
-			void main()
-			{
-				color=vec4(v_color,1.0);
-			}
-		)";
-
 		//shader
-		m_shader_plane = clumsy_engine::Shader::create(vertex_src, fragment_src);
+		m_shader_plane = clumsy_engine::Shader::create(sand_box_plane_vertex_src, sand_box_plane_fragment_src);
 		auto ogl_shader = std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader > (m_shader_plane);
 
 
@@ -284,25 +254,27 @@ private:
 		}
 	}
 
-
-
-
-
+	//triangle shader
 	clumsy_engine::Ref<clumsy_engine::Shader> m_shader;
 	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array;
 	std::vector<float> m_positions;
 	std::vector<float> m_colors;
-	std::vector<float> m_texture_coodinates;
 	std::string m_position_name_in_shader="a_position";
 	std::string m_color_name_in_shader="a_color";
-	std::string m_texture_coodinate_name_in_shader="a_uv";
 
+	//plane shader
 	clumsy_engine::Ref<clumsy_engine::Shader> m_shader_plane;
 	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array_plane;
 	std::vector<float> m_positions_plane;
 	glm::vec3 m_plane_color = glm::vec3(1.f, 0.f, 0.f);
 
-	clumsy_engine::Ref<clumsy_engine::Orthorgraphic_Camara> m_camara;
+	//texture shader
+	clumsy_engine::Ref<clumsy_engine::Shader> m_shader_texture;
+	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array_texture;
+	std::vector<float> m_texture_coodinates;
+	std::vector<float> m_positions_texture;
+
+	clumsy_engine::Ref<clumsy_engine::Camara> m_camara;
 	clumsy_engine::Drag_Delta_Computer m_drag_delta_computer;
 
 	clumsy_engine::Ref<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
@@ -328,8 +300,8 @@ std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
 
 	clumsy_engine::Log::get_core_logger()->trace("create app");
 
-	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
-	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
+	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
+	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
 
 	return app;
 }

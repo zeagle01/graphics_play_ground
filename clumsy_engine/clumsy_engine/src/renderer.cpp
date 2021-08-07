@@ -12,7 +12,7 @@ namespace clumsy_engine
 
 	Ref<Renderer::SceneData> Renderer::s_scene_data = std::make_shared<Renderer::SceneData>();
 
-	void Renderer::begin_scene(Ref<Orthorgraphic_Camara> camara)
+	void Renderer::begin_scene(Ref<Camara> camara)
 	{
 		s_scene_data->view_projection_matrix = camara->get_view_projection_matrix();
 	}

@@ -39,8 +39,8 @@ namespace clumsy_engine
 		}
 
 		clumsy_engine::Ref<clumsy_engine::Vertex_Buffer > vbo = clumsy_engine::Vertex_Buffer::create();
-		clumsy_engine::Buffer_Layout pos_vb_layout = { {data_type, name_in_shader} };
-		vbo->set_layout(pos_vb_layout);
+		clumsy_engine::Buffer_Layout layout = { {data_type, name_in_shader} };
+		vbo->set_layout(layout);
 		m_vertex_buffers[name_in_shader] = vbo;
 		add_vertex_buffer(vbo, shader_program);
 	}

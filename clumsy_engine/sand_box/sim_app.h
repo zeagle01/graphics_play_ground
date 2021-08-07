@@ -39,7 +39,7 @@ private:
 	std::vector<vec3f> m_normals;
 	std::vector<int> m_indices;
 
-	clumsy_engine::Ref<clumsy_engine::Orthorgraphic_Camara> m_camara;
+	clumsy_engine::Ref<clumsy_engine::Camara> m_camara;
 
 	clumsy_engine::Drag_Delta_Computer m_drag_delta_computer;
 

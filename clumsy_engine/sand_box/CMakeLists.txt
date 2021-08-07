@@ -8,6 +8,7 @@ add_executable(sand_box
 sandbox_app.cpp
 sim_app.h
 sim_app.cpp
+shader_sources.h
 )
 
 set_target_properties(sand_box PROPERTIES FOLDER clumsy_engine)

@@ -10,27 +10,41 @@
 namespace clumsy_engine
 {
 
+	class Camara
+	{
+		public:
+		virtual void set_view_field(float left, float right, float bottom, float top, float n, float f) = 0;
+		virtual void dragging_handle(const glm::vec2& delta) = 0;
+		virtual void look_at(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up) = 0;
+
+		////////////getter
+		virtual const glm::mat4& get_view_projection_matrix() const = 0;
+		virtual const glm::vec3& get_position() const = 0;
+		virtual const glm::vec3& get_up_direction() const = 0;
+
+	};
+
 	template<typename Dragging_Handler_T,typename Projection_T>
-	class Camara_Model
+	class Camara_Model :public Camara
 	{
 	public:
 		Camara_Model() :
 			m_view_matrix(glm::mat4(1.f))
 			, m_position(glm::vec3(0.f)) {}
 
-		void set_view_field(float left, float right, float bottom, float top, float n, float f)
+		void set_view_field(float left, float right, float bottom, float top, float n, float f) override
 		{
 			m_projection_matrix = m_projection_handler(left, right, bottom, top, n, f);
 			recompute_view_projection_matrix();
 
 		}
 
-		void dragging_handle(const glm::vec2& delta)
+		void dragging_handle(const glm::vec2& delta)override
 		{
 			m_dragging_handler(m_position, m_target_position, m_up, delta);
 			look_at(m_position, m_target_position, m_up);
 		}
-		void look_at(const glm::vec3& camara_position,const glm::vec3& target_position, const glm::vec3& camara_up)
+		void look_at(const glm::vec3& camara_position,const glm::vec3& target_position, const glm::vec3& camara_up)override
 		{
 			m_up = camara_up;
 			m_target_position = target_position;
@@ -41,17 +55,17 @@ namespace clumsy_engine
 
 		////////////getter
 
-		const glm::mat4& get_view_projection_matrix() const 
+		const glm::mat4& get_view_projection_matrix() const override
 		{ 
 			return m_view_projection_matrix; 
 		}
 
-		const glm::vec3& get_position() const 
+		const glm::vec3& get_position() const override
 		{ 
 			return m_position; 
 		}
 
-		const glm::vec3& get_up_direction() const 
+		const glm::vec3& get_up_direction() const override
 		{ 
 			return m_up; 
 		}
@@ -111,8 +125,8 @@ namespace clumsy_engine
 	};
 
 
-	class Orthorgraphic_Camara :public Camara_Model<Focus_On_Target_Drag, Perspective_Projection> { };
-	//class Perspective_Camara :public Camara_Model<Focus_On_Target_Drag, Perspective_Projection> { };
+	class Orthorgraphic_Camara :public Camara_Model<Focus_On_Target_Drag, Orthorgraphic_Projection> { };
+	class Perspective_Camara :public Camara_Model<Focus_On_Target_Drag, Perspective_Projection> { };
 
 
 }
