@@ -24,6 +24,7 @@ namespace clumsy_engine
 		void upload_uniform_mat4(const std::string& name, const glm::mat4& m);
 		void upload_uniform_vec3(const std::string& name, const glm::vec3& m);
 		void upload_uniform_float(const std::string& name, const float& v);
+		void upload_uniform_int(const std::string& name, const int& v);
 
 		unsigned int get_id() { return m_renderer_id; }
         private:

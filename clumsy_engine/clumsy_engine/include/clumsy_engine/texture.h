@@ -14,7 +14,7 @@ namespace clumsy_engine
 		virtual int get_width() = 0;
 		virtual int get_heigth() = 0;
 
-		virtual void bind() const = 0;
+		virtual void bind(int slot = 0) const = 0;
 	};
 
 	class Texture_2D :public Texture

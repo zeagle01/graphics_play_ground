@@ -29,8 +29,6 @@ test_texture2d.h
 test_batch_rendering.cpp
 test_batch_rendering.h
 
-#${CMAKE_SOURCE_DIR}/external/stb/stb_image.h
-${CMAKE_SOURCE_DIR}/external/stb/stb_image.cpp
 )
 
 

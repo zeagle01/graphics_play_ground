@@ -10,14 +10,16 @@ namespace clumsy_engine
 	{
 	public:
 		OpenGL_Texture_2D(const std::string& path);
+		~OpenGL_Texture_2D();
+
 
 		int get_width() override;
 		int get_heigth() override;
-		void bind() const override;
+		void bind(int slot) const override;
 	private:
 		int m_width;
 		int m_height;
-		int render_id;
+		unsigned int m_render_id;
 	};
 
 }

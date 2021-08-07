@@ -156,4 +156,10 @@ namespace clumsy_engine
 		glUniform1fv(location, 1, &v);
 	}
 
+	void OpenGL_Shader::upload_uniform_int(const std::string& name, const int& v)
+	{
+		auto location = glGetUniformLocation(m_renderer_id, name.c_str());
+		glUniform1iv(location, 1, &v);
+	}
+
 }  

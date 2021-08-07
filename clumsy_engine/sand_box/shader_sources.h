@@ -167,11 +167,11 @@ static inline std::string sand_box_texture_fragment_src = R"(
 			#version 330 core
 			in vec3 v_position;
 			in vec2 v_texture;
+			uniform sampler2D u_texture;
 			out vec4 color;
 			void main()
 			{
-				color=vec4(v_texture,0.,1.0);
-				//color=vec4(v_position,1.0);
+				color=texture(u_texture,v_texture);
 			}
 		)";
 

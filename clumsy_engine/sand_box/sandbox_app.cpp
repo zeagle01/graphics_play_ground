@@ -11,6 +11,7 @@
 #include "profiler.h"
 #include "clumsy_engine/ref.h"
 #include "clumsy_engine/file_dialogs.h"
+#include "clumsy_engine/texture.h"
 #include "shader_sources.h"
 
 #include "glm/glm.hpp"
@@ -95,7 +96,8 @@ public:
 
 		//clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::mat4(1.f));
 
-		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(2.5f)));
+		m_texture->bind(m_texture_slot);
+		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(4.5f)));
 
 
 		clumsy_engine::Renderer::end_scene();
@@ -172,9 +174,9 @@ private:
 		m_texture_coodinates=
 		{
 			0,0,
-			1,0,
-			1,1,
-			0,1
+			1.5,0,
+			1.5,1.5,
+			0,1.5
 		};
 		m_positions_texture = {
 			0.,0,0,
@@ -204,6 +206,13 @@ private:
 
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
 		m_vertex_array_texture->set_index_buffer(index_buffer);
+
+		//texture
+		std::string resources_dir = "../../../resources/";
+		std::string texture_image = resources_dir + "textures/awesomeface.png";
+		m_texture = clumsy_engine::Texture_2D::create(texture_image);
+		ogl_shader->bind();
+		ogl_shader->upload_uniform_int("u_texture", m_texture_slot);
 	}
 
 	void config_shader_plane()
@@ -271,8 +280,11 @@ private:
 	//texture shader
 	clumsy_engine::Ref<clumsy_engine::Shader> m_shader_texture;
 	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array_texture;
+	clumsy_engine::Ref<clumsy_engine::Texture> m_texture;
+	int m_texture_slot = 0;
 	std::vector<float> m_texture_coodinates;
 	std::vector<float> m_positions_texture;
+
 
 	clumsy_engine::Ref<clumsy_engine::Camara> m_camara;
 	clumsy_engine::Drag_Delta_Computer m_drag_delta_computer;
