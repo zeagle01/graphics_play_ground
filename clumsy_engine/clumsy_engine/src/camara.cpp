@@ -35,24 +35,24 @@ namespace clumsy_engine
 
 	////////////////projection
 
-	glm::mat4 Perspective_Projection_New::compute_projection_matrix(float left, float right, float bottom, float top, float n, float f)
+	glm::mat4 Perspective_Projection::compute_projection_matrix(float left, float right, float bottom, float top, float n, float f)
 	{
 		float aspect_ration = (top - bottom) / (right - left);
 		float fov_degree = std::atan(std::abs(top) / std::abs(n)) * 180.f / 3.1415926f;
 		return glm::perspective(fov_degree, aspect_ration, std::abs(n), std::abs(f));
 	}
 
-	glm::mat4 Perspective_Projection_New::zoom(float left, float right, float bottom, float top, float n, float f, float delta)
+	glm::mat4 Perspective_Projection::zoom(float left, float right, float bottom, float top, float n, float f, float delta)
 	{
 		//TODO:
 		return compute_projection_matrix(left, right, bottom, top, n, f);
 	}
 
-	glm::mat4 Orthographic_Projection_New::compute_projection_matrix(float left, float right, float bottom, float top, float n, float f)
+	glm::mat4 Orthographic_Projection::compute_projection_matrix(float left, float right, float bottom, float top, float n, float f)
 	{
 		return glm::ortho(left, right, bottom, top, std::abs(n), std::abs(f));
 	}
-	glm::mat4 Orthographic_Projection_New::zoom(float left, float right, float bottom, float top, float n, float f, float delta)
+	glm::mat4 Orthographic_Projection::zoom(float left, float right, float bottom, float top, float n, float f, float delta)
 	{
 		//TODO:
 		return compute_projection_matrix(left, right, bottom, top, n, f);
@@ -67,13 +67,13 @@ namespace clumsy_engine
 
 
 	///////////
-	void Camara_Model_New::set_view_field(float left, float right, float bottom, float top, float n, float f)
+	void Camara_Model::set_view_field(float left, float right, float bottom, float top, float n, float f)
 	{
 		m_projection_matrix = m_projection_handler->compute_projection_matrix(left, right, bottom, top, n, f);
 		recompute_view_projection_matrix();
 	}
 
-	void Camara_Model_New::set_look_at(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up)
+	void Camara_Model::set_look_at(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up)
 	{
 		m_up = camara_up;
 		m_target_position = target_position;
@@ -82,18 +82,18 @@ namespace clumsy_engine
 		recompute_view_projection_matrix();
 	}
 
-	void Camara_Model_New::move(const glm::vec2& delta_in_screen)
+	void Camara_Model::move(const glm::vec2& delta_in_screen)
 	{
 
 	}
 
-	void Camara_Model_New::rotate(const glm::vec2& delta_theta)
+	void Camara_Model::rotate(const glm::vec2& delta_theta)
 	{
 		m_view_handler->rotate(m_position, m_target_position, m_up, delta_theta);
 		set_look_at(m_position, m_target_position, m_up);
 	}
 
-	void Camara_Model_New::zoom(const float& v)
+	void Camara_Model::zoom(const float& v)
 	{
 
 	}

@@ -27,8 +27,7 @@ class Layer_Demo :public clumsy_engine::Layer
 public:
 	Layer_Demo() :
 		clumsy_engine::Layer("demo_layer")
-		//, m_camara(std::make_shared<clumsy_engine::Perspective_Camara>())
-		, m_camara(clumsy_engine::new_a_camara<clumsy_engine::View_Handler, clumsy_engine::Perspective_Projection_New>())
+		, m_camara(clumsy_engine::new_a_camara<clumsy_engine::View_Handler, clumsy_engine::Perspective_Projection>())
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 	{
 
@@ -86,7 +85,7 @@ public:
 		//mouse handle
 		auto newMousePos = clumsy_engine::Input::get_mouse_position();
 		auto mouse_delta = m_drag_delta_computer(newMousePos.x, newMousePos.y, clumsy_engine::Input::is_mouse_button_pressed(CE_MOUSE_BUTTON_LEFT));
-		m_camara->dragging_handle(glm::vec2(mouse_delta[0], mouse_delta[1]));
+		m_camara->rotate(glm::vec2(mouse_delta[0], mouse_delta[1]));
 
 		clumsy_engine::Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
 		clumsy_engine::Render_Command::clear();
