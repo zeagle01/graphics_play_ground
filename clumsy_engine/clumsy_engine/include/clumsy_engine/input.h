@@ -4,6 +4,9 @@
 
 #include "clumsy_engine_export.h"
 #include <array>
+#include <map>
+#include "log.h"
+#include "mouse_button_codes.h"
 
 namespace clumsy_engine
 {
@@ -39,36 +42,51 @@ namespace clumsy_engine
 		virtual mouse_pos get_mouse_position_impl() = 0;
 	};
 
-	struct Drag_Delta_Computer
+
+	class Drag_Delta_Computer
 	{
-		std::array<float, 2> operator()(int button)
+	public:
+		Drag_Delta_Computer()
+		{
+			m_delta_pos[CE_MOUSE_BUTTON_LEFT] = { 0,0 };
+			m_delta_pos[CE_MOUSE_BUTTON_RIGHT] = { 0,0 };
+			m_delta_pos[CE_MOUSE_BUTTON_MIDDLE] = { 0,0 };
+		}
+
+		void compute()
+		{
+			auto mouse_p = Input::get_mouse_position();
+			for (auto& it : m_delta_pos)
+			{
+				it.second = compute_button_delta(mouse_p.x, mouse_p.y, it.first);
+			}
+			m_mouse_pos_x = mouse_p.x;
+			m_mouse_pos_y = mouse_p.y;
+		}
+
+		std::array<float, 2> get(int button)
+		{
+			return m_delta_pos[button];
+		}
+
+	private:
+
+		std::array<float, 2> compute_button_delta(float mouse_x, float mouse_y, int button)
 		{
 			bool pressing = Input::is_mouse_button_pressed(button);
-			auto mouse_pos = Input::get_mouse_position();
-
-			std::array<float, 2> ret;
-			ret[0] = 0.f;
-			ret[1] = 0.f;
-
+			std::array<float, 2> ret{ 0,0 };
 			if (pressing)
 			{
-				float delta_x = mouse_pos.x - m_mouse_pos_x;
-				float delta_y = mouse_pos.y - m_mouse_pos_y;
-
-				ret[0] = delta_x;
-				ret[1] = delta_y;
+				ret[0] = mouse_x - m_mouse_pos_x;
+				ret[1] = mouse_y - m_mouse_pos_y;
 			}
-
-			m_mouse_pos_x = mouse_pos.x;
-			m_mouse_pos_y = mouse_pos.y;
-
 			return ret;
 		}
 
-		bool m_release = false;
 		float m_mouse_pos_x = 0.f;
 		float m_mouse_pos_y = 0.f;
-
+		std::map<int, std::array<float, 2>> m_delta_pos;
 	};
+
 
 }

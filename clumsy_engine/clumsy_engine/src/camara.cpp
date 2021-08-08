@@ -84,7 +84,8 @@ namespace clumsy_engine
 
 	void Camara_Model::move(const glm::vec2& delta_in_screen)
 	{
-
+		m_view_handler->move(m_position, m_target_position, m_up, delta_in_screen);
+		set_look_at(m_position, m_target_position, m_up);
 	}
 
 	void Camara_Model::rotate(const glm::vec2& delta_theta)

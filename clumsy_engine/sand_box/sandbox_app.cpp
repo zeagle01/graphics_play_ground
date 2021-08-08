@@ -83,8 +83,16 @@ public:
 		RECORD_FUNCTION_DURATION();
 
 		//mouse handle
-		auto mouse_delta = m_drag_delta_computer(CE_MOUSE_BUTTON_LEFT);
-		m_camara->rotate(glm::vec2(mouse_delta[0], mouse_delta[1]));
+		m_drag_delta_computer.compute();
+		{
+			auto mouse_delta = m_drag_delta_computer.get(CE_MOUSE_BUTTON_LEFT);
+			m_camara->rotate(glm::vec2(mouse_delta[0], mouse_delta[1]));
+		}
+		{
+			auto mouse_delta = m_drag_delta_computer.get(CE_MOUSE_BUTTON_RIGHT);
+			m_camara->rotate(glm::vec2(mouse_delta[0], mouse_delta[1]));
+		}
+
 
 		clumsy_engine::Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
 		clumsy_engine::Render_Command::clear();

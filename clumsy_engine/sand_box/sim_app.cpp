@@ -148,8 +148,11 @@ using namespace clumsy_engine;
 		clumsy_engine::Render_Command::clear();
 
 		//mouse handle
-		auto mouse_delta = m_drag_delta_computer(CE_MOUSE_BUTTON_LEFT);
-		m_camara->rotate(glm::vec2(mouse_delta[0], mouse_delta[1]));
+		m_drag_delta_computer.compute();
+		{
+			auto mouse_delta = m_drag_delta_computer.get(CE_MOUSE_BUTTON_LEFT);
+			m_camara->rotate(glm::vec2(mouse_delta[0], mouse_delta[1]));
+		}
 
 		//render
 		clumsy_engine::Renderer::begin_scene(m_camara);

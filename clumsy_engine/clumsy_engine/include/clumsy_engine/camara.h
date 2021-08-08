@@ -15,11 +15,11 @@ namespace clumsy_engine
 	{
 	public:
 		virtual void set_look_at(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up) = 0;
-		virtual void move(const glm::vec2& delta_in_screen) {};
-		virtual void rotate(const glm::vec2& delta_theta) {};
+		virtual void move(const glm::vec2& delta_in_screen) = 0;
+		virtual void rotate(const glm::vec2& delta_theta) = 0;
 
 		virtual void set_view_field(float left, float right, float bottom, float top, float n, float f) = 0;
-		virtual void zoom(const float& v) {};
+		virtual void zoom(const float& v) = 0;
 
 		////////////getter
 		virtual const glm::mat4& get_view_projection_matrix() const = 0;
