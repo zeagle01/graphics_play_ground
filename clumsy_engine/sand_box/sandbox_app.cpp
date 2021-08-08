@@ -12,6 +12,7 @@
 #include "clumsy_engine/ref.h"
 #include "clumsy_engine/file_dialogs.h"
 #include "clumsy_engine/texture.h"
+#include "clumsy_engine/mouse_event.h"
 #include "shader_sources.h"
 
 #include "glm/glm.hpp"
@@ -31,9 +32,9 @@ public:
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 	{
 
-		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f, -0.01f, -1000.f);
+		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f, -1.f, -1000.f);
 		m_camara->set_look_at(
-			glm::vec3(0.f,0.f,3.f),
+			glm::vec3(0.f,0.f,10.f),
 			glm::vec3(0.f,0.f,0.f),
 			glm::vec3(0.f,1.f,0.f)
 		);
@@ -48,35 +49,20 @@ public:
 			return false;
 		};
 
+		m_dispatcher->add<clumsy_engine::Mouse_Scrolled_Event>(std::bind(&Layer_Demo::on_mouse_scroll, this, std::placeholders::_1));
+
 	}
 
-	bool on_key_pressed(clumsy_engine::Key_Pressed_Event& e)
+	bool on_mouse_scroll(clumsy_engine::Mouse_Scrolled_Event& e)
 	{
-//		float speed=0.1f;
-//		if (e.get_key() == CE_KEY_LEFT)
-//		{
-//			m_camara_position.x -= speed;
-//		}
-//		if (e.get_key() == CE_KEY_RIGHT)
-//		{
-//			m_camara_position.x += speed;
-//		}
-//
-//		if (e.get_key() == CE_KEY_UP)
-//		{
-//			m_camara_position.y += speed;
-//		}
-//		if (e.get_key() == CE_KEY_DOWN)
-//		{
-//			m_camara_position.y -= speed;
-//		}
-		return false;
-
+		m_camara->zoom(e.get_y_offset());
+		return true;
 	}
 
 	void on_attach()  override
 	{
 	};
+
 	void on_detach()override {};
 	void on_update(clumsy_engine::Time_Step dt) override
 	{

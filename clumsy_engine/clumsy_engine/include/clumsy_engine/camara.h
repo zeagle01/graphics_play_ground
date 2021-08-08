@@ -54,6 +54,9 @@ namespace clumsy_engine
 		virtual glm::mat4 compute_projection_matrix(float left, float right, float bottom, float top, float n, float f) override;
 		virtual glm::mat4 zoom(float left, float right, float bottom, float top, float n, float f, float delta) override;
 
+	private:
+		float m_fov_in_degree;
+		bool is_init = false;
 	};
 
 	class Orthographic_Projection:public Projection_Handler
@@ -94,6 +97,8 @@ namespace clumsy_engine
 		glm::mat4 m_projection_matrix;
 		glm::mat4 m_view_matrix;
 		glm::mat4 m_view_projection_matrix;
+
+		float m_left, m_right, m_bottom, m_top, m_near, m_far;
 
 		glm::vec3 m_position;
 		glm::vec3 m_up;

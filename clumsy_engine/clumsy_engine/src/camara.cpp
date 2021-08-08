@@ -49,14 +49,27 @@ namespace clumsy_engine
 	glm::mat4 Perspective_Projection::compute_projection_matrix(float left, float right, float bottom, float top, float n, float f)
 	{
 		float aspect_ration = (top - bottom) / (right - left);
-		float fov_degree = std::atan(std::abs(top) / std::abs(n)) * 180.f / 3.1415926f;
+		float fov = std::atan2(std::abs(top), std::abs(n));
+		float fov_degree = glm::degrees(fov);
 		return glm::perspective(fov_degree, aspect_ration, std::abs(n), std::abs(f));
 	}
 
 	glm::mat4 Perspective_Projection::zoom(float left, float right, float bottom, float top, float n, float f, float delta)
 	{
-		//TODO:
-		return compute_projection_matrix(left, right, bottom, top, n, f);
+		float aspect_ration = (top - bottom) / (right - left);
+		float fov = std::atan2(std::abs(top), std::abs(n));
+		float fov_degree = glm::degrees(fov);
+		if (!is_init)
+		{
+			m_fov_in_degree = fov_degree;
+			is_init = true;
+		}
+		m_fov_in_degree += delta;
+		float tolerance = 1e-3f;
+		m_fov_in_degree = std::clamp(m_fov_in_degree, tolerance, 180.f - tolerance);
+
+		//CE_INFO("{0}", m_fov_in_degree);
+		return glm::perspective(glm::radians(m_fov_in_degree), aspect_ration, std::abs(n), std::abs(f));
 	}
 
 	glm::mat4 Orthographic_Projection::compute_projection_matrix(float left, float right, float bottom, float top, float n, float f)
@@ -80,6 +93,13 @@ namespace clumsy_engine
 	///////////
 	void Camara_Model::set_view_field(float left, float right, float bottom, float top, float n, float f)
 	{
+
+		m_left = left;
+		m_right = right;
+		m_bottom = bottom;
+		m_top = top;
+		m_near = n;
+		m_far = f;
 		m_projection_matrix = m_projection_handler->compute_projection_matrix(left, right, bottom, top, n, f);
 		recompute_view_projection_matrix();
 	}
@@ -107,7 +127,8 @@ namespace clumsy_engine
 
 	void Camara_Model::zoom(const float& v)
 	{
-
+		m_projection_matrix = m_projection_handler->zoom(m_left, m_right, m_bottom, m_top, m_near, m_far, v);
+		recompute_view_projection_matrix();
 	}
 
 

@@ -9,7 +9,6 @@ set(source_files
 src/application.cpp
 src/event.cpp
 src/key_event.cpp
-src/mouse_event.h
 src/mouse_event.cpp
 src/application_event.h
 src/application_event.cpp
@@ -103,6 +102,7 @@ include/clumsy_engine/texture.h
 include/clumsy_engine/camara.h
 include/clumsy_engine/dispatcher.h
 include/clumsy_engine/key_event.h
+include/clumsy_engine/mouse_event.h
 include/clumsy_engine/time_step.h
 include/clumsy_engine/ref.h
 include/clumsy_engine/file_dialogs.h
