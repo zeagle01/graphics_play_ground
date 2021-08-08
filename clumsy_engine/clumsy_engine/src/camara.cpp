@@ -18,7 +18,7 @@ namespace clumsy_engine
 		auto y_axis = camara_up;
 		auto x_axis = glm::normalize(glm::cross(y_axis, z_axis));
 
-		float senstive = 1e-3f;
+		float senstive = 1e-2f;
 
 		camara_position += delta_in_screen[0] * x_axis * senstive;
 		camara_position += delta_in_screen[1] * y_axis * senstive;
@@ -29,8 +29,8 @@ namespace clumsy_engine
 
 	void View_Handler::rotate(glm::vec3& camara_position, glm::vec3& target_position, glm::vec3& camara_up, const glm::vec2& delta_in_screen)
 	{
-		m_theta += delta_in_screen.y * 1e-3f;
-		m_phi += delta_in_screen.x * 1e-3f;
+		m_theta += delta_in_screen.y * 3e-3f;
+		m_phi += delta_in_screen.x * 3e-3f;
 
 		float r = glm::length(camara_position - target_position);
 		camara_position.y = target_position.y + r * std::sin(m_theta);
@@ -50,25 +50,22 @@ namespace clumsy_engine
 	{
 		float aspect_ration = (top - bottom) / (right - left);
 		float fov = std::atan2(std::abs(top), std::abs(n));
-		float fov_degree = glm::degrees(fov);
-		return glm::perspective(fov_degree, aspect_ration, std::abs(n), std::abs(f));
+		return glm::perspective(fov, aspect_ration, std::abs(n), std::abs(f));
 	}
 
 	glm::mat4 Perspective_Projection::zoom(float left, float right, float bottom, float top, float n, float f, float delta)
 	{
 		float aspect_ration = (top - bottom) / (right - left);
 		float fov = std::atan2(std::abs(top), std::abs(n));
-		float fov_degree = glm::degrees(fov);
 		if (!is_init)
 		{
-			m_fov_in_degree = fov_degree;
+			m_fov_in_degree = glm::degrees(fov);
 			is_init = true;
 		}
+
 		m_fov_in_degree += delta;
 		float tolerance = 1e-3f;
 		m_fov_in_degree = std::clamp(m_fov_in_degree, tolerance, 180.f - tolerance);
-
-		//CE_INFO("{0}", m_fov_in_degree);
 		return glm::perspective(glm::radians(m_fov_in_degree), aspect_ration, std::abs(n), std::abs(f));
 	}
 
