@@ -41,31 +41,27 @@ namespace clumsy_engine
 
 	struct Drag_Delta_Computer
 	{
-		std::array<float, 2> operator()(float mouse_x, float mouse_y, bool pressing)
+		std::array<float, 2> operator()(int button)
 		{
+			bool pressing = Input::is_mouse_button_pressed(button);
+			auto mouse_pos = Input::get_mouse_position();
+
 			std::array<float, 2> ret;
 			ret[0] = 0.f;
 			ret[1] = 0.f;
-			if (m_release) //click
+
+			if (pressing)
 			{
-				m_release = false;
-				m_mouse_pos_x = mouse_x;
-				m_mouse_pos_y = mouse_y;
-			}
-			else if (!m_release && pressing) //press
-			{
-				float delta_x = mouse_x - m_mouse_pos_x;
-				float delta_y = mouse_y - m_mouse_pos_y;
-				m_mouse_pos_x = mouse_x;
-				m_mouse_pos_y = mouse_y;
+				float delta_x = mouse_pos.x - m_mouse_pos_x;
+				float delta_y = mouse_pos.y - m_mouse_pos_y;
 
 				ret[0] = delta_x;
 				ret[1] = delta_y;
 			}
-			else//release
-			{
-				m_release = true;
-			}
+
+			m_mouse_pos_x = mouse_pos.x;
+			m_mouse_pos_y = mouse_pos.y;
+
 			return ret;
 		}
 
