@@ -7,15 +7,17 @@
 #include "glm/glm.hpp"
 
 #include <string>
+#include <unordered_map>
 
 
 namespace clumsy_engine
 {
 
 	class OpenGL_Shader : public Shader
-    {
-        public:
-        OpenGL_Shader(const std::string &vertex_src,std::string& fragment_src);
+	{
+	public:
+		OpenGL_Shader(const std::string& vertex_src, std::string& fragment_src);
+		OpenGL_Shader(const std::string& shader_file);
 
 		void bind() const override;
 
@@ -27,10 +29,15 @@ namespace clumsy_engine
 		void upload_uniform_int(const std::string& name, const int& v);
 
 		unsigned int get_id() { return m_renderer_id; }
-        private:
-        unsigned int m_renderer_id;
+	private:
+		void compile(const std::unordered_map<unsigned int, std::string>& shader_sources_by_type);
+		std::unordered_map<unsigned int, std::string> split_according_to_shader_type(const std::string& all_in_one_source_code);
+		std::string read_shader_file(const std::string& shader_file);
 
-    };
+	private:
+		unsigned int m_renderer_id;
+		std::unordered_map<unsigned int, std::string> m_shader_sources_by_type;
+	};
 
 }
 

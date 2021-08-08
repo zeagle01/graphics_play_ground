@@ -51,7 +51,9 @@ using namespace clumsy_engine;
 
 
 		//shader
-		m_shader = clumsy_engine::Shader::create(sim_app_vertex_src, sim_app_fragment_src);
+
+		std::string resources_dir = "../../../resources/";
+		m_shader = clumsy_engine::Shader::create(resources_dir + "shaders/cloth_sim.glsl");
 
 
 		auto ogl_shader = std::dynamic_pointer_cast<OpenGL_Shader>(m_shader);

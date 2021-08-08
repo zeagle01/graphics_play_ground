@@ -24,4 +24,16 @@ namespace clumsy_engine
 		return nullptr;
 	}
 
+	std::unique_ptr<Shader> Shader::create(const std::string& shader_file)
+	{
+		switch (Renderer::get_API())
+		{
+		case Renderer_API::API::None: CE_CORE_WARN("rederer api none!"); return nullptr;
+		case Renderer_API::API::OpenGL:  return std::make_unique<OpenGL_Shader>(shader_file);
+		}
+
+		CE_CORE_ERROR("Shader create error!");
+		return nullptr;
+	}
+
 }  

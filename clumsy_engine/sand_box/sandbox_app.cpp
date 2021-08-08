@@ -149,7 +149,9 @@ private:
 		};
 
 		//shader
-		m_shader = clumsy_engine::Shader::create(sand_box_triangle_vertex_src, sand_box_triangle_fragment_src);
+		std::string resources_dir = "../../../resources/";
+		m_shader= clumsy_engine::Shader::create(resources_dir + "shaders/color_triangle.glsl");
+		//m_shader = clumsy_engine::Shader::create(sand_box_triangle_vertex_src, sand_box_triangle_fragment_src);
 		auto ogl_shader = std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader > (m_shader);
 
 		//gl data stuff
@@ -185,7 +187,8 @@ private:
 			0,2,3
 		};
 
-		m_shader_texture = clumsy_engine::Shader::create(sand_box_texture_vertex_src, sand_box_texture_fragment_src);
+		std::string resources_dir = "../../../resources/";
+		m_shader_texture = clumsy_engine::Shader::create(resources_dir + "shaders/plane_texture.glsl");
 		auto ogl_shader = std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader > (m_shader_texture);
 
 		m_vertex_array_texture = clumsy_engine::Vertex_Array::create();
@@ -203,7 +206,6 @@ private:
 		m_vertex_array_texture->set_index_buffer(index_buffer);
 
 		//texture
-		std::string resources_dir = "../../../resources/";
 		std::string texture_image = resources_dir + "textures/awesomeface.png";
 		std::string texture_image1 = resources_dir + "textures/container.jpg";
 		//std::string texture_image1 = resources_dir + "textures/green_square.png";
@@ -229,7 +231,9 @@ private:
 		};
 
 		//shader
-		m_shader_plane = clumsy_engine::Shader::create(sand_box_plane_vertex_src, sand_box_plane_fragment_src);
+
+		std::string resources_dir = "../../../resources/";
+		m_shader_plane = clumsy_engine::Shader::create(resources_dir + "shaders/flat_plane.glsl");
 		auto ogl_shader = std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader > (m_shader_plane);
 
 
@@ -311,8 +315,8 @@ std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
 
 	clumsy_engine::Log::get_core_logger()->trace("create app");
 
-	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
-	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
+	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
+	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
 
 	return app;
 }

@@ -20,6 +20,7 @@ namespace clumsy_engine
 		virtual void unbind() const = 0;
 
 		static std::unique_ptr<Shader> create(const std::string& vertex_src, std::string& fragment_src);
+		static std::unique_ptr<Shader> create(const std::string& shader_file);
 	};
 
 }
