@@ -90,7 +90,7 @@ public:
 		}
 		{
 			auto mouse_delta = m_drag_delta_computer.get(CE_MOUSE_BUTTON_RIGHT);
-			m_camara->rotate(glm::vec2(mouse_delta[0], mouse_delta[1]));
+			m_camara->move(glm::vec2(mouse_delta[0], mouse_delta[1]));
 		}
 
 

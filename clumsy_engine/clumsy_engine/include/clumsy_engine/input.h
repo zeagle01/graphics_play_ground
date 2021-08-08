@@ -78,7 +78,7 @@ namespace clumsy_engine
 			if (pressing)
 			{
 				ret[0] = mouse_x - m_mouse_pos_x;
-				ret[1] = mouse_y - m_mouse_pos_y;
+				ret[1] = -(mouse_y - m_mouse_pos_y);
 			}
 			return ret;
 		}

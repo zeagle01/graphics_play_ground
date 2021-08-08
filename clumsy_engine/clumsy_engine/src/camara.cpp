@@ -2,6 +2,7 @@
 
 
 #include "camara.h"
+#include "log.h"
 
 namespace clumsy_engine
 {
@@ -13,7 +14,17 @@ namespace clumsy_engine
 
 	void View_Handler::move(glm::vec3& camara_position, glm::vec3& target_position, glm::vec3& camara_up, const glm::vec2& delta_in_screen)
 	{
+		auto z_axis = glm::normalize(camara_position - target_position);
+		auto y_axis = camara_up;
+		auto x_axis = glm::normalize(glm::cross(y_axis, z_axis));
 
+		float senstive = 1e-3f;
+
+		camara_position += delta_in_screen[0] * x_axis * senstive;
+		camara_position += delta_in_screen[1] * y_axis * senstive;
+
+		target_position += delta_in_screen[0] * x_axis * senstive;
+		target_position += delta_in_screen[1] * y_axis * senstive;
 	}
 
 	void View_Handler::rotate(glm::vec3& camara_position, glm::vec3& target_position, glm::vec3& camara_up, const glm::vec2& delta_in_screen)
