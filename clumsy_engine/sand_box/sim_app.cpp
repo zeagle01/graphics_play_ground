@@ -8,6 +8,7 @@
 #include "simulator/mesh_loader.h"
 #include "openGL_shader.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "clumsy_engine/mouse_event.h"
 #include "shader_sources.h"
 
 #include "imgui.h"
@@ -15,7 +16,7 @@
 using namespace clumsy_engine;
 	Sim_Gui::Sim_Gui() :
 		clumsy_engine::Layer("sim_gui")
-		, m_camara(clumsy_engine::new_a_camara<clumsy_engine::View_Handler, clumsy_engine::Orthographic_Projection>())
+		, m_camara(clumsy_engine::new_a_camara<clumsy_engine::View_Handler, clumsy_engine::Perspective_Projection>())
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 	{
 		float ss = 0.50f;
@@ -25,6 +26,10 @@ using namespace clumsy_engine;
 			glm::vec3(0.f,0.f,0.f),
 			glm::vec3(0.f,1.f,0.f)
 		);
+
+
+		m_dispatcher->add<clumsy_engine::Mouse_Scrolled_Event>(std::bind(&Sim_Gui::on_mouse_scroll, this, std::placeholders::_1));
+
 
 		m_positions = {
 			{0.,0,0},
@@ -107,29 +112,12 @@ using namespace clumsy_engine;
 
 	}
 
-	bool Sim_Gui::on_key_pressed(clumsy_engine::Key_Pressed_Event& e)
+	bool Sim_Gui::on_mouse_scroll(clumsy_engine::Mouse_Scrolled_Event& e)
 	{
-//		float speed=0.1f;
-//		if (e.get_key() == CE_KEY_LEFT)
-//		{
-//			m_camara_position.x -= speed;
-//		}
-//		if (e.get_key() == CE_KEY_RIGHT)
-//		{
-//			m_camara_position.x += speed;
-//		}
-//
-//		if (e.get_key() == CE_KEY_UP)
-//		{
-//			m_camara_position.y += speed;
-//		}
-//		if (e.get_key() == CE_KEY_DOWN)
-//		{
-//			m_camara_position.y -= speed;
-//		}
-		return false;
-
+		m_camara->zoom(e.get_y_offset());
+		return true;
 	}
+
 
 	void Sim_Gui::on_attach()  
 	{
@@ -152,6 +140,10 @@ using namespace clumsy_engine;
 		{
 			auto mouse_delta = m_drag_delta_computer.get(CE_MOUSE_BUTTON_LEFT);
 			m_camara->rotate(glm::vec2(mouse_delta[0], mouse_delta[1]));
+		}
+		{
+			auto mouse_delta = m_drag_delta_computer.get(CE_MOUSE_BUTTON_RIGHT);
+			m_camara->translate(glm::vec2(mouse_delta[0], mouse_delta[1]));
 		}
 
 		//render

@@ -23,6 +23,7 @@ public:
 
 	virtual void on_event(clumsy_engine::Event& e);
 	
+	bool on_mouse_scroll(clumsy_engine::Mouse_Scrolled_Event& e);
 
 	virtual void on_imgui_render(ImGuiContext* imgui_context);
 	
