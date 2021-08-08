@@ -20,7 +20,7 @@ using namespace clumsy_engine;
 	{
 		float ss = 0.50f;
 		m_camara->set_view_field(-ss, ss, -ss, ss, -0.01f, -100.f);
-		m_camara->look_at(
+		m_camara->set_look_at(
 			glm::vec3(0.f,0.f,3.f),
 			glm::vec3(0.f,0.f,0.f),
 			glm::vec3(0.f,1.f,0.f)

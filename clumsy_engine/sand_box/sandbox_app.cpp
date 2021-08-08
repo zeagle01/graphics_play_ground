@@ -27,12 +27,13 @@ class Layer_Demo :public clumsy_engine::Layer
 public:
 	Layer_Demo() :
 		clumsy_engine::Layer("demo_layer")
-		, m_camara(std::make_shared<clumsy_engine::Perspective_Camara>())
+		//, m_camara(std::make_shared<clumsy_engine::Perspective_Camara>())
+		, m_camara(clumsy_engine::new_a_camara<clumsy_engine::View_Handler, clumsy_engine::Perspective_Projection_New>())
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 	{
 
-		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f, -0.1f, -100.f);
-		m_camara->look_at(
+		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f, -0.01f, -1000.f);
+		m_camara->set_look_at(
 			glm::vec3(0.f,0.f,3.f),
 			glm::vec3(0.f,0.f,0.f),
 			glm::vec3(0.f,1.f,0.f)
@@ -96,15 +97,11 @@ public:
 
 		clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::translate(glm::mat4(1.f), glm::vec3(1.1, 0.3, 0)));
 
-
 		m_texture1->bind(m_texture_slot);
 		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
 
 		m_texture->bind(m_texture_slot);
 		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
-
-
-
 
 		clumsy_engine::Renderer::end_scene();
 

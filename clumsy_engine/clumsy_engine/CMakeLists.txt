@@ -50,6 +50,7 @@ src/openGL_shader.cpp
 src/texture.cpp
 src/openGL_texture.h
 src/openGL_texture.cpp
+src/camara.cpp
 
 
 src/simulator.cpp
