@@ -88,7 +88,7 @@ namespace clumsy_engine
 
 
 	///////////
-	void Camara_Model::set_view_field(float left, float right, float bottom, float top, float n, float f)
+	void Camara::set_view_field(float left, float right, float bottom, float top, float n, float f)
 	{
 
 		m_left = left;
@@ -101,7 +101,7 @@ namespace clumsy_engine
 		recompute_view_projection_matrix();
 	}
 
-	void Camara_Model::set_look_at(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up)
+	void Camara::set_look_at(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up)
 	{
 		m_up = camara_up;
 		m_target_position = target_position;
@@ -110,19 +110,19 @@ namespace clumsy_engine
 		recompute_view_projection_matrix();
 	}
 
-	void Camara_Model::translate(const glm::vec2& delta_in_screen)
+	void Camara::translate(const glm::vec2& delta_in_screen)
 	{
 		m_view_handler->translate(m_position, m_target_position, m_up, delta_in_screen);
 		set_look_at(m_position, m_target_position, m_up);
 	}
 
-	void Camara_Model::rotate(const glm::vec2& delta_theta)
+	void Camara::rotate(const glm::vec2& delta_theta)
 	{
 		m_view_handler->rotate(m_position, m_target_position, m_up, delta_theta);
 		set_look_at(m_position, m_target_position, m_up);
 	}
 
-	void Camara_Model::zoom(const float& v)
+	void Camara::zoom(const float& v)
 	{
 		m_projection_matrix = m_projection_handler->zoom(m_left, m_right, m_bottom, m_top, m_near, m_far, v);
 		recompute_view_projection_matrix();

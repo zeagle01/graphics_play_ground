@@ -11,24 +11,6 @@
 namespace clumsy_engine
 {
 
-	class Camara
-	{
-	public:
-		virtual void set_look_at(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up) = 0;
-		virtual void translate(const glm::vec2& delta_in_screen) = 0;
-		virtual void rotate(const glm::vec2& delta_theta) = 0;
-
-		virtual void set_view_field(float left, float right, float bottom, float top, float n, float f) = 0;
-		virtual void zoom(const float& v) = 0;
-
-		////////////getter
-		virtual const glm::mat4& get_view_projection_matrix() const = 0;
-		virtual const glm::vec3& get_position() const = 0;
-		virtual const glm::vec3& get_up_direction() const = 0;
-
-	};
-
-
 	////////////////////////////
 	class View_Handler
 	{
@@ -67,10 +49,10 @@ namespace clumsy_engine
 	};
 
 
-	class Camara_Model: public Camara
+	class Camara
 	{
 	public:
-		Camara_Model(std::shared_ptr<View_Handler> view_handler,std::shared_ptr<Projection_Handler> projection_handler) :
+		Camara(std::shared_ptr<View_Handler> view_handler,std::shared_ptr<Projection_Handler> projection_handler) :
 			m_view_matrix(glm::mat4(1.f))
 			, m_position(glm::vec3(0.f))
 			, m_view_handler(view_handler)
@@ -78,17 +60,17 @@ namespace clumsy_engine
 		{}
 
 
-		void set_look_at(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up) override;
-		void translate(const glm::vec2& delta_in_screen) override;
-		void rotate(const glm::vec2& delta_theta) override;
+		virtual void set_look_at(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up);
+		virtual void translate(const glm::vec2& delta_in_screen);
+		virtual void rotate(const glm::vec2& delta_theta);
 
-		void set_view_field(float left, float right, float bottom, float top, float n, float f) override;
-		void zoom(const float& v) override;
+		virtual void set_view_field(float left, float right, float bottom, float top, float n, float f);
+		virtual void zoom(const float& v);
 
 		////////////getter
-		const glm::mat4& get_view_projection_matrix() const override { return m_view_projection_matrix; }
-		const glm::vec3& get_position() const override { return m_position; }
-		const glm::vec3& get_up_direction() const override { return m_up; }
+		const glm::mat4& get_view_projection_matrix() const { return m_view_projection_matrix; }
+		const glm::vec3& get_position() const { return m_position; }
+		const glm::vec3& get_up_direction() const { return m_up; }
 
 	private:
 		void recompute_view_projection_matrix() { m_view_projection_matrix = m_projection_matrix * m_view_matrix; }
@@ -111,6 +93,6 @@ namespace clumsy_engine
 
 
 	template<typename View_H,typename Projection_H>
-	static std::shared_ptr<Camara> new_a_camara() { return std::make_shared< Camara_Model> (std::make_shared<View_H>(),std::make_shared<Projection_H>()); };
+	static std::shared_ptr<Camara> new_a_camara() { return std::make_shared< Camara> (std::make_shared<View_H>(),std::make_shared<Projection_H>()); };
 
 }
