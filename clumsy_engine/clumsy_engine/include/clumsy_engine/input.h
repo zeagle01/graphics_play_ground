@@ -11,7 +11,7 @@
 namespace clumsy_engine
 {
 
-	struct mouse_pos
+	struct Mouse_Pos
 	{
 		float x;
 		float y;
@@ -29,7 +29,7 @@ namespace clumsy_engine
 			return Input::get_singleton().is_mouse_button_pressed_impl(button);
 		};
 
-		static inline mouse_pos get_mouse_position()
+		static inline Mouse_Pos get_mouse_position()
 		{
 			return Input::get_singleton().get_mouse_position_impl();
 		}
@@ -39,7 +39,7 @@ namespace clumsy_engine
 	protected:
 		virtual bool is_key_pressed_impl(int keycode) = 0;
 		virtual bool is_mouse_button_pressed_impl(int button) = 0;
-		virtual mouse_pos get_mouse_position_impl() = 0;
+		virtual Mouse_Pos get_mouse_position_impl() = 0;
 	};
 
 

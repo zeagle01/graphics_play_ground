@@ -12,7 +12,7 @@ namespace clumsy_engine
 		return glm::lookAt(camara_position, target_position, camara_up);
 	}
 
-	void View_Handler::move(glm::vec3& camara_position, glm::vec3& target_position, glm::vec3& camara_up, const glm::vec2& delta_in_screen)
+	void View_Handler::translate(glm::vec3& camara_position, glm::vec3& target_position, glm::vec3& camara_up, const glm::vec2& delta_in_screen)
 	{
 		auto z_axis = glm::normalize(camara_position - target_position);
 		auto y_axis = camara_up;
@@ -93,9 +93,9 @@ namespace clumsy_engine
 		recompute_view_projection_matrix();
 	}
 
-	void Camara_Model::move(const glm::vec2& delta_in_screen)
+	void Camara_Model::translate(const glm::vec2& delta_in_screen)
 	{
-		m_view_handler->move(m_position, m_target_position, m_up, delta_in_screen);
+		m_view_handler->translate(m_position, m_target_position, m_up, delta_in_screen);
 		set_look_at(m_position, m_target_position, m_up);
 	}
 

@@ -24,7 +24,7 @@ namespace clumsy_engine
 
 		}
 
-	mouse_pos Windows_Input::get_mouse_position_impl()
+	Mouse_Pos Windows_Input::get_mouse_position_impl()
 	{
 		const auto& window = static_cast<GLFWwindow*>(Application::get_singleton().get_window().get_window_native());
 		double xpos, ypos;

@@ -15,7 +15,7 @@ namespace clumsy_engine
 	{
 	public:
 		virtual void set_look_at(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up) = 0;
-		virtual void move(const glm::vec2& delta_in_screen) = 0;
+		virtual void translate(const glm::vec2& delta_in_screen) = 0;
 		virtual void rotate(const glm::vec2& delta_theta) = 0;
 
 		virtual void set_view_field(float left, float right, float bottom, float top, float n, float f) = 0;
@@ -34,7 +34,7 @@ namespace clumsy_engine
 	{
 	public:
 		virtual glm::mat4 compute_view_matrix(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up);
-		virtual void move(glm::vec3& camara_position, glm::vec3& target_position, glm::vec3& camara_up, const glm::vec2& delta_in_screen);
+		virtual void translate(glm::vec3& camara_position, glm::vec3& target_position, glm::vec3& camara_up, const glm::vec2& delta_in_screen);
 		virtual void rotate(glm::vec3& camara_position, glm::vec3& target_position, glm::vec3& camara_up, const glm::vec2& delta_in_screen);
 	private:
 		float m_theta = 0.f;
@@ -76,7 +76,7 @@ namespace clumsy_engine
 
 
 		void set_look_at(const glm::vec3& camara_position, const glm::vec3& target_position, const glm::vec3& camara_up) override;
-		void move(const glm::vec2& delta_in_screen) override;
+		void translate(const glm::vec2& delta_in_screen) override;
 		void rotate(const glm::vec2& delta_theta) override;
 
 		void set_view_field(float left, float right, float bottom, float top, float n, float f) override;

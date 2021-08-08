@@ -16,7 +16,7 @@ namespace clumsy_engine
 	protected:
 		virtual bool is_key_pressed_impl(int keycode) override;
 		virtual bool is_mouse_button_pressed_impl(int button) override;
-		virtual mouse_pos get_mouse_position_impl() override;
+		virtual Mouse_Pos get_mouse_position_impl() override;
 
 	};
 
