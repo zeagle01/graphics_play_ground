@@ -16,12 +16,14 @@ namespace clumsy_engine
 	class OpenGL_Shader : public Shader
 	{
 	public:
-		OpenGL_Shader(const std::string& vertex_src, std::string& fragment_src);
+		OpenGL_Shader(const std::string& name, const std::string& vertex_src, std::string& fragment_src);
 		OpenGL_Shader(const std::string& shader_file);
 
 		void bind() const override;
 
 		void unbind() const override;
+
+		const std::string& get_name() const override { return m_name;}
 
 		void upload_uniform_mat4(const std::string& name, const glm::mat4& m);
 		void upload_uniform_vec3(const std::string& name, const glm::vec3& m);
@@ -37,6 +39,7 @@ namespace clumsy_engine
 	private:
 		unsigned int m_renderer_id;
 		std::unordered_map<unsigned int, std::string> m_shader_sources_by_type;
+		std::string m_name;
 	};
 
 }

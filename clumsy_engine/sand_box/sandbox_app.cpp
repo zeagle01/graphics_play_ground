@@ -14,6 +14,7 @@
 #include "clumsy_engine/texture.h"
 #include "clumsy_engine/mouse_event.h"
 #include "shader_sources.h"
+#include "clumsy_engine/shader.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -89,11 +90,12 @@ public:
 
 		clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::translate(glm::mat4(1.f), glm::vec3(1.1, 0.3, 0)));
 
+		auto shader_texture = m_shader_library.get("plane_texture");
 		m_texture1->bind(m_texture_slot);
-		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
+		clumsy_engine::Renderer::submit(shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
 
 		m_texture->bind(m_texture_slot);
-		clumsy_engine::Renderer::submit(m_shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
+		clumsy_engine::Renderer::submit(shader_texture, m_vertex_array_texture, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
 
 		clumsy_engine::Renderer::end_scene();
 
@@ -188,8 +190,9 @@ private:
 		};
 
 		std::string resources_dir = "../../../resources/";
-		m_shader_texture = clumsy_engine::Shader::create(resources_dir + "shaders/plane_texture.glsl");
-		auto ogl_shader = std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader > (m_shader_texture);
+
+		auto shader_texture = m_shader_library.load(resources_dir + "shaders/plane_texture.glsl");
+		auto ogl_shader = std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader > (shader_texture);
 
 		m_vertex_array_texture = clumsy_engine::Vertex_Array::create();
 		std::string position_name_in_shader = "position";
@@ -280,13 +283,15 @@ private:
 	glm::vec3 m_plane_color = glm::vec3(1.f, 0.f, 0.f);
 
 	//texture shader
-	clumsy_engine::Ref<clumsy_engine::Shader> m_shader_texture;
+	//clumsy_engine::Ref<clumsy_engine::Shader> m_shader_texture;
 	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array_texture;
 	clumsy_engine::Ref<clumsy_engine::Texture> m_texture;
 	clumsy_engine::Ref<clumsy_engine::Texture> m_texture1;
 	int m_texture_slot = 0;
 	std::vector<float> m_texture_coodinates;
 	std::vector<float> m_positions_texture;
+
+	clumsy_engine::Shader_Library m_shader_library;
 
 
 	clumsy_engine::Ref<clumsy_engine::Camara> m_camara;
