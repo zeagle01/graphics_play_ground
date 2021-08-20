@@ -221,6 +221,17 @@ using namespace clumsy_engine;
 		ImGui::SliderFloat("mass density", &(m_sim.get_ref_value<data::Mass_Density>()), 0.001f, 10.f);
 		ImGui::SliderFloat("stretch stiff", &(m_sim.get_ref_value<data::Stretch_Stiff>()), 0.001f, 1e7f);
 
+        static bool stretchEnable = true;
+        ImGui::Checkbox("spring_stretch", &stretchEnable);
+		if (stretchEnable)
+		{
+			m_sim.add_interaction<clumsy_engine::Spring_Stretch>();
+		}
+		else 
+		{
+			m_sim.remove_interaction<clumsy_engine::Spring_Stretch>();
+		}
+
 		//set render uniform
 		auto ogl_shader = std::dynamic_pointer_cast<OpenGL_Shader>(m_shader);
 		ogl_shader->bind();

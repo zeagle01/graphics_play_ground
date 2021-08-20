@@ -43,6 +43,12 @@ namespace clumsy_engine
 
 		}
 
+		template<typename Inter>
+		void remove_interaction()
+		{
+			m_interactions_map.remove_type<Inter>();
+		}
+
 
 	private:
 

@@ -63,6 +63,16 @@ namespace clumsy_lib
 		}
 
 		template<typename Sub_Type>
+		void remove_type()
+		{
+			auto key = typeid(Sub_Type).name();
+			if (type_map.count(key))
+			{
+				type_map.erase(key);
+			}
+		}
+
+		template<typename Sub_Type>
 		std::shared_ptr<Sub_Type> get_type()
 		{
 			auto key = typeid(Sub_Type).name();
