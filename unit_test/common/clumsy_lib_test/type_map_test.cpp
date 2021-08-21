@@ -50,6 +50,17 @@ struct Var_B :Base {};
 struct Var_C :Base {};
 
 
+
+struct Data_Group
+{
+	DEF_DATA_CLASS_MEM(A, Data_Holder, int);
+	DEF_DATA_CLASS_MEM(B, Data_Holder, float);
+	DEF_DATA_CLASS_MEM(C, Data_Holder, double);
+};
+
+
+
+
 TEST(Type_Map_Test,type_map_add_with_object)
 {
 	Type_Map map;
@@ -72,6 +83,20 @@ TEST(Type_Map_Test,type_map_add_with_type)
 
 	auto act= std::string( typeid(*act_type.get()).name());
 	std::string exp = "struct Var_A";
+
+	EXPECT_THAT(act, Eq(exp));
+
+}
+
+TEST(Type_Map_Test,type_map_add_types_with_group)
+{
+	Type_Map map;
+
+	map.add_types<Data_Group>();
+	auto act_type = map.get_type<Data_Group::A>();
+
+	auto act= std::string( typeid(*act_type.get()).name());
+	std::string exp = "class Data_Group::A";
 
 	EXPECT_THAT(act, Eq(exp));
 
