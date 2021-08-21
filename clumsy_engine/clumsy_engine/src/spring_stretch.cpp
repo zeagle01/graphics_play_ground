@@ -1,11 +1,11 @@
 
 
+#include "interaction.h"
 #include "spring_stretch.h"
 #include "simulation_data.h"
 
 namespace clumsy_engine
 {
-
 	std::vector<stencil> Spring_Stretch::compute_stencils()
 	{
 

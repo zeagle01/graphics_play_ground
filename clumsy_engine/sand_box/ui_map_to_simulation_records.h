@@ -6,6 +6,8 @@
 #include "simulator/simulator.h"
 #include "matrix_math/matrix_math.h"
 #include "ui_simulation_mapper_helpers.h"
+#include "simulator/simulation_data.h"
+#include "simulator/simulation_interactions.h"
 
 
 #include <memory>
@@ -15,17 +17,19 @@
 		ADD_EXIST_TYPE_TO_GROUP_WITH_PREFIX(type_name,clumsy_engine::data::)\
 
 #define ADD_SIM_INTERACTION(type_name) \
-		ADD_EXIST_TYPE_TO_GROUP_WITH_PREFIX(type_name,clumsy_engine::data::)\
+		ADD_EXIST_TYPE_TO_GROUP_WITH_PREFIX(type_name,clumsy_engine::interaction::)\
 
 struct Simulation_Data_Group
 {
 	ADD_SIM_DATA(Time_Step);
-	ADD_SIM_DATA(Gravity);
+	ADD_SIM_DATA(Gravity_Acceleration);
 	ADD_SIM_DATA(Stretch_Stiff);
 	ADD_SIM_DATA(Mass_Density);
 
 	//interaction
-	//ADD_EXIST_TYPE_TO_GROUP_WITH_SIM_PREFIX(Spring_Stretch);
+	ADD_SIM_INTERACTION(Gravity);
+	ADD_SIM_INTERACTION(Spring_Stretch);
+	ADD_SIM_INTERACTION(Inertial);
 };
 
 
@@ -64,5 +68,9 @@ struct Mapper_Records
 	ADD_MAPPER_RECORD(Time_Step, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), float);
 	ADD_MAPPER_RECORD(Mass_Density, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), float);
 	ADD_MAPPER_RECORD(Stretch_Stiff, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 1e7f>), float);
-	ADD_MAPPER_RECORD(Gravity, Set_Value, CE_WRAP(Imgui_SlideFloat3<-10.f, 10.0f>), vec3f);
+	ADD_MAPPER_RECORD(Gravity_Acceleration, Set_Value, CE_WRAP(Imgui_SlideFloat3<-10.f, 10.0f>), vec3f);
+
+	ADD_MAPPER_RECORD(Spring_Stretch, Add_Remove, Imgui_Checkbox, bool);
+	ADD_MAPPER_RECORD(Gravity, Add_Remove, Imgui_Checkbox, bool);
+	ADD_MAPPER_RECORD(Inertial, Add_Remove, Imgui_Checkbox, bool);
 };

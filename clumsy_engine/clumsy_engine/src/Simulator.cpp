@@ -10,6 +10,8 @@
 
 #include "gravity.h"
 #include "Simulation_Data.h"
+#include "simulation_interactions.h"
+
 #include "clumsy_lib/type_list.h"
 
 
@@ -63,7 +65,7 @@ namespace clumsy_engine
 		set_value<data::Position>(positions);
 
 
-		auto inertial = m_interactions_map.get_type<Inertial>();
+		auto inertial = m_interactions_map.get_type<interaction::Inertial>();
 
 		if (inertial)
 		{

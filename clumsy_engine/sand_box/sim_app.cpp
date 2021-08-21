@@ -92,9 +92,9 @@ using namespace clumsy_engine;
 		};
 
 
-		m_sim.add_interaction<clumsy_engine::Inertial>();
-		m_sim.add_interaction<clumsy_engine::Gravity>();
-		m_sim.add_interaction<clumsy_engine::Spring_Stretch>();
+		m_sim.add_interaction<clumsy_engine::interaction::Inertial>();
+		m_sim.add_interaction<clumsy_engine::interaction::Gravity>();
+		m_sim.add_interaction<clumsy_engine::interaction::Spring_Stretch>();
 		//m_sim.add_interaction<clumsy_engine::Collision_EE>();
 		simulation_init();
 
@@ -108,7 +108,7 @@ using namespace clumsy_engine;
 
 		m_sim.set_value<data::Time_Step>(0.01);
 		m_sim.set_value<data::Mass_Density>(1.);
-		m_sim.set_value<data::Gravity>({ 0,0,0 });
+		m_sim.set_value<data::Gravity_Acceleration>({ 0,0,0 });
 		m_sim.set_value<data::Stretch_Stiff>(1e3f);
 		
 		m_sim.set_value<clumsy_engine::data::Triangle_Indice>(m_indices);
@@ -225,16 +225,16 @@ using namespace clumsy_engine;
 			mm->operator()(&m_sim);
 		}
 
-        static bool stretchEnable = true;
-        ImGui::Checkbox("spring_stretch", &stretchEnable);
-		if (stretchEnable)
-		{
-			m_sim.add_interaction<clumsy_engine::Spring_Stretch>();
-		}
-		else 
-		{
-			m_sim.remove_interaction<clumsy_engine::Spring_Stretch>();
-		}
+        //static bool stretchEnable = true;
+        //ImGui::Checkbox("spring_stretch", &stretchEnable);
+		//if (stretchEnable)
+		//{
+		//	m_sim.add_interaction<clumsy_engine::interaction::Spring_Stretch>();
+		//}
+		//else 
+		//{
+		//	m_sim.remove_interaction<clumsy_engine::interaction::Spring_Stretch>();
+		//}
 
 		//set render uniform
 		auto ogl_shader = std::dynamic_pointer_cast<OpenGL_Shader>(m_shader);

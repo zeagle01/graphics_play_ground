@@ -2,6 +2,7 @@
 #include "gmock/gmock.h"
 
 #include "interaction.h"
+#include "simulation_interactions.h"
 #include "gravity.h"
 #include "inertial.h"
 #include "spring_stretch.h"
@@ -19,7 +20,7 @@ class Simulator_Test :public Test
 public:
 	Simulator_Test()
 	{
-		m_sim.add_interaction<Inertial>();
+		m_sim.add_interaction<interaction::Inertial>();
 
 		m_sim.set_value<data::Time_Step>(0.1);
 
@@ -77,9 +78,9 @@ TEST_F(One_Vertex, without_any_interaction_just_floating_there)
 
 TEST_F(One_Vertex, update_with_gravity_only)
 {
-	m_sim.add_interaction<Gravity>();
+	m_sim.add_interaction<interaction::Gravity>();
 
-	m_sim.set_value<data::Gravity>({ 0,-10,0 });
+	m_sim.set_value<data::Gravity_Acceleration>({ 0,-10,0 });
 	m_sim.set_value<data::Velocity>({ { 0,0,0 } });
 
 	m_sim.update();
@@ -104,7 +105,7 @@ public:
 			{1, 0,0}
 			};
 
-		m_sim.add_interaction<Spring_Stretch>();
+		m_sim.add_interaction<interaction::Spring_Stretch>();
 
 		m_sim.set_value<data::Position>(m_positions);
 

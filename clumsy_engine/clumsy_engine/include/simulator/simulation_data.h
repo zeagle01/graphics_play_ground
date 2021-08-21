@@ -25,7 +25,7 @@ namespace clumsy_engine
 		using v_v3i = std::vector<vec3i>;
 		using v_vi = std::vector<std::vector<int>>;
 
-		DEF_MEM(Gravity,					vec3f,		clumsy_lib::Plain_Computer,										clumsy_lib::empty_type_list);
+		DEF_MEM(Gravity_Acceleration,					vec3f,		clumsy_lib::Plain_Computer,										clumsy_lib::empty_type_list);
 		DEF_MEM(Time_Step,					float,		clumsy_lib::Plain_Computer,										clumsy_lib::empty_type_list);
 		DEF_MEM(Mass_Density,				float,		clumsy_lib::Plain_Computer,										clumsy_lib::empty_type_list);
 		DEF_MEM(Stretch_Stiff,				float,		clumsy_lib::Plain_Computer,										clumsy_lib::empty_type_list);

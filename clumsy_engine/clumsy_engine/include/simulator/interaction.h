@@ -23,6 +23,8 @@ namespace clumsy_engine
 
 		virtual Element_Equation compute_element_equation(stencil st,int i) { return Element_Equation(); }
 
+		virtual void set_variable_set(std::shared_ptr<clumsy_lib::Variable_Set>) {};
+
 		std::vector<Element_Equation> compute_element_equations();
 	};
 

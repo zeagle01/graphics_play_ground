@@ -38,7 +38,8 @@ namespace clumsy_engine
 
 			m_interactions_map.add_type(inter);
 
-			inter->set_type_map(m_data_map);
+			inter->set_variable_set(m_data_map);
+			printf("add\n");
 
 		}
 
@@ -46,6 +47,7 @@ namespace clumsy_engine
 		void remove_interaction()
 		{
 			m_interactions_map.remove_type<Inter>();
+			printf("remove\n");
 		}
 
 

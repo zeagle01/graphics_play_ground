@@ -1,6 +1,7 @@
 
 
 
+#include "interaction.h"
 #include "inertial.h"
 #include "Simulation_Data.h"
 #include "one_point_stencils.h"

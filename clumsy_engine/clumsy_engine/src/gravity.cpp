@@ -1,6 +1,7 @@
 
 
 
+#include "interaction.h" 
 #include "gravity.h" 
 
 #include "one_point_stencils.h"
@@ -27,7 +28,7 @@ namespace clumsy_engine
 
 		int v = st[0];
 
-		const auto& gravity = get_value<data::Gravity>();
+		const auto& gravity = get_value<data::Gravity_Acceleration>();
 		const auto& mass = get_value<data::Mass>();
 
 		float mass_v = mass[v];//TODO
