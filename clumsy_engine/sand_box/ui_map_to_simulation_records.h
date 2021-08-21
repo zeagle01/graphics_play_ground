@@ -37,14 +37,15 @@ struct Simulation_Data_Group
 class Simulation_Data_Mapper_Base
 {
 public:
-	virtual void  operator()(clumsy_engine::Simulator* sim) = 0;
+	virtual void  update_from_ui(clumsy_engine::Simulator* sim) = 0;
+	virtual void  set_to_default_value(clumsy_engine::Simulator* sim) = 0;
 };
 
-template<typename Setter, typename Getter, typename UI_Type, char const* UI_tag, typename Sim_Type >
+template<typename Setter, typename Getter, typename default_ui_value, char const* UI_tag, typename Sim_Type >
 class Simulation_Data_Mapper :public Simulation_Data_Mapper_Base
 {
 public:
-	void  operator()(clumsy_engine::Simulator* sim) override
+	void  update_from_ui(clumsy_engine::Simulator* sim) override
 	{
 		auto changed = m_get_fn(m_ui_value, UI_tag);
 		if (changed)
@@ -52,8 +53,17 @@ public:
 			m_set_fn.operator()<UI_Type,Sim_Type>(sim, m_ui_value);
 		}
 	}
+
+	void  set_to_default_value(clumsy_engine::Simulator* sim) override
+	{
+		m_set_fn.operator() < UI_Type, Sim_Type > (sim, default_ui_value::value);
+	}
+
 private:
-	UI_Type m_ui_value;
+
+	using UI_Type = default_ui_value::type;
+	UI_Type m_ui_value = default_ui_value::value;
+
 	Setter m_set_fn;
 	Getter m_get_fn;
 };
@@ -63,14 +73,21 @@ private:
 	static constexpr char tag_##type_name[] = #type_name;\
 	ADD_TYPE_TO_GROUP(type_name, Simulation_Data_Mapper, set_value, get_value, ui_type,tag_##type_name, Simulation_Data_Group::type_name);
 
+
+
+#define DEFAULT_FLOAT(v) CE_WRAP(Type_From_Init_List<float, v>)
+#define DEFAULT_FLOAT3(v0,v1,v2) CE_WRAP(Type_From_Init_List<vec3f, v0,v1,v2>)
+#define DEFAULT_BOOL(v) CE_WRAP(Type_From_Init_List<bool, v>)
+
+
 struct Mapper_Records
 {
-	ADD_MAPPER_RECORD(Time_Step, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), float);
-	ADD_MAPPER_RECORD(Mass_Density, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), float);
-	ADD_MAPPER_RECORD(Stretch_Stiff, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 1e7f>), float);
-	ADD_MAPPER_RECORD(Gravity_Acceleration, Set_Value, CE_WRAP(Imgui_SlideFloat3<-10.f, 10.0f>), vec3f);
+	ADD_MAPPER_RECORD(Time_Step, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), DEFAULT_FLOAT(0.1f));
+	ADD_MAPPER_RECORD(Mass_Density, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), DEFAULT_FLOAT(1.0f));
+	ADD_MAPPER_RECORD(Stretch_Stiff, Set_Value_Exponential, CE_WRAP(Imgui_SlideFloat<-3.f, 7.f>), DEFAULT_FLOAT(3.f));
+	ADD_MAPPER_RECORD(Gravity_Acceleration, Set_Value, CE_WRAP(Imgui_SlideFloat3<-10.f, 10.0f>), DEFAULT_FLOAT3(0.f, -10.f, 0.f));
 
-	ADD_MAPPER_RECORD(Spring_Stretch, Add_Remove, Imgui_Checkbox, bool);
-	ADD_MAPPER_RECORD(Gravity, Add_Remove, Imgui_Checkbox, bool);
-	ADD_MAPPER_RECORD(Inertial, Add_Remove, Imgui_Checkbox, bool);
+	ADD_MAPPER_RECORD(Spring_Stretch, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
+	ADD_MAPPER_RECORD(Gravity, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
+	ADD_MAPPER_RECORD(Inertial, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
 };

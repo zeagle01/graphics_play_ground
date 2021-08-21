@@ -92,25 +92,23 @@ using namespace clumsy_engine;
 		};
 
 
-		m_sim.add_interaction<clumsy_engine::interaction::Inertial>();
-		m_sim.add_interaction<clumsy_engine::interaction::Gravity>();
-		m_sim.add_interaction<clumsy_engine::interaction::Spring_Stretch>();
-		//m_sim.add_interaction<clumsy_engine::Collision_EE>();
+		//simulation data mapper
+		m_simulation_mappers.add_types<Mapper_Records>();
+
 		simulation_init();
 
 
-		//ui mapper
-		m_simulation_mappers.add_types<Mapper_Records>();
 	}
 
 	void Sim_Gui::simulation_init()
 	{
 
-		m_sim.set_value<data::Time_Step>(0.01);
-		m_sim.set_value<data::Mass_Density>(1.);
-		m_sim.set_value<data::Gravity_Acceleration>({ 0,0,0 });
-		m_sim.set_value<data::Stretch_Stiff>(1e3f);
-		
+		for (auto& it : m_simulation_mappers)
+		{
+			auto mapper = it.second;
+			mapper->set_to_default_value(&m_sim);
+		}
+
 		m_sim.set_value<clumsy_engine::data::Triangle_Indice>(m_indices);
 		m_sim.set_value<clumsy_engine::data::Position>(m_positions);
 		m_sim.set_value<clumsy_engine::data::Ref_Position>(m_positions);
@@ -219,22 +217,12 @@ using namespace clumsy_engine;
 		}
 
 		ImGui::Text("hello world from sim app");
-		for (auto& m : m_simulation_mappers)
+		for (auto& it : m_simulation_mappers)
 		{
-			auto mm = m.second;
-			mm->operator()(&m_sim);
+			auto mapper = it.second;
+			mapper->update_from_ui(&m_sim);
 		}
 
-        //static bool stretchEnable = true;
-        //ImGui::Checkbox("spring_stretch", &stretchEnable);
-		//if (stretchEnable)
-		//{
-		//	m_sim.add_interaction<clumsy_engine::interaction::Spring_Stretch>();
-		//}
-		//else 
-		//{
-		//	m_sim.remove_interaction<clumsy_engine::interaction::Spring_Stretch>();
-		//}
 
 		//set render uniform
 		auto ogl_shader = std::dynamic_pointer_cast<OpenGL_Shader>(m_shader);

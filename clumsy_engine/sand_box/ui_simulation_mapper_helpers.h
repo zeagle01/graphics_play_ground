@@ -3,6 +3,17 @@
 
 #include "imgui.h"
 #include "simulator/simulator.h"
+#include <algorithm>
+
+
+template<typename T,auto ...Init_List>
+struct Type_From_Init_List
+{
+	using type = T;
+	static inline const T value = T{ Init_List... };
+};
+
+/////////////////imgui wigets
 
 template<float min,float max>
 struct Imgui_SlideFloat3
@@ -30,6 +41,26 @@ struct Imgui_Checkbox
 	}
 };
 
+//////////////////set value
+struct Set_Value_Exponential
+{
+	template<typename T,typename SimT>
+	void operator()(clumsy_engine::Simulator* sim, const T& v)
+	{
+		float x = std::pow(10.f,v);
+		sim->set_value<SimT>(x);
+	}
+};
+
+struct Set_Value_Logrithm
+{
+	template<typename T,typename SimT>
+	void operator()(clumsy_engine::Simulator* sim, const T& v)
+	{
+		float x = std::log10(v);
+		sim->set_value<SimT>(x);
+	}
+};
 
 struct Set_Value
 {
@@ -40,6 +71,10 @@ struct Set_Value
 	}
 };
 
+
+
+
+/////////////
 
 struct Add_Remove
 {
