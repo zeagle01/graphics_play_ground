@@ -1,7 +1,7 @@
 
 #include "gmock/gmock.h"
 #include "clumsy_lib/type_map.h"
-#include "clumsy_lib/variable_set.h"
+#include "clumsy_lib/dependent_variable_set.h"
 #include "clumsy_lib/class_reflection.h"
 #include <memory>
 #include <string>
@@ -9,6 +9,33 @@
 
 using namespace testing;
 using namespace clumsy_lib;
+
+
+template<typename T>
+class Data_Holder
+{
+private:
+	T data;
+public:
+	Data_Holder() = default;
+
+	using value_type = T;
+
+	void set(const T& d)
+	{
+		data = d;
+	}
+	const T& get() const
+	{
+		return data;
+	}
+
+	T& get_ref()
+	{
+		return data;
+	}
+};
+
 
 struct Base 
 {

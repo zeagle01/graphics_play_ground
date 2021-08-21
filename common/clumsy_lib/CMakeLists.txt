@@ -10,6 +10,8 @@ include/clumsy_lib/macro_loop.h
 include/clumsy_lib/class_reflection.h
 include/clumsy_lib/type_map.h
 include/clumsy_lib/variable_set.h
+include/clumsy_lib/variable_accecor.h
+include/clumsy_lib/dependent_variable_set.h
 clumsy_lib.cpp
 )
 

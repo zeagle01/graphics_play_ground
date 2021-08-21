@@ -8,7 +8,7 @@
 #include <vector> 
 #include "clumsy_lib/type_list.h"
 #include "clumsy_lib/type_map.h"
-#include "clumsy_lib/variable_set.h"
+#include "clumsy_lib/dependent_variable_set.h"
 
 namespace clumsy_engine
 {
