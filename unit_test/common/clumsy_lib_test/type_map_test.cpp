@@ -53,9 +53,9 @@ struct Var_C :Base {};
 
 struct Data_Group
 {
-	DEF_DATA_CLASS_MEM(A, Data_Holder, int);
-	DEF_DATA_CLASS_MEM(B, Data_Holder, float);
-	DEF_DATA_CLASS_MEM(C, Data_Holder, double);
+	ADD_TYPE_TO_GROUP(A, Data_Holder, int);
+	ADD_TYPE_TO_GROUP(B, Data_Holder, float);
+	ADD_TYPE_TO_GROUP(C, Data_Holder, double);
 };
 
 
@@ -120,7 +120,7 @@ TEST(Type_Map_Test,type_map_set_value)
 template<typename value_type>
 struct Variable_Record :Base, Data_Holder<value_type> {};
 
-#define DEF_MEM(x,t) DEF_DATA_CLASS_MEM(x,Variable_Record,t)
+#define DEF_MEM(x,t) ADD_TYPE_TO_GROUP(x,Variable_Record,t)
 
 struct variables_struct
 {
@@ -190,7 +190,7 @@ struct Compute_Acceleration
 };
 
 
-#define DEF_DEPENDENT_MEM(x,value_t,computer,dependent_list) DEF_DATA_CLASS_MEM(x,Dependent_Variable,value_t,computer,dependent_list)
+#define DEF_DEPENDENT_MEM(x,value_t,computer,dependent_list) ADD_TYPE_TO_GROUP(x,Dependent_Variable,value_t,computer,dependent_list)
 
 struct dependent_variables_struct
 {

@@ -15,7 +15,7 @@
 namespace clumsy_engine
 {
 
-#define DEF_MEM(x,t,c,tl) DEF_DATA_CLASS_MEM(x,clumsy_lib::Dependent_Variable,t,c,tl)
+#define DEF_MEM(x,t,c,tl) ADD_TYPE_TO_GROUP(x,clumsy_lib::Dependent_Variable,t,c,tl)
 
 	struct data
 	{

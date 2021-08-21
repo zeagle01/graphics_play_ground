@@ -65,9 +65,12 @@ else if constexpr (get_field_count<T>::value ==num){ \
 	//extract type list from type
 #define TMP(...) __VA_ARGS__ 
 
-#define DEF_DATA_CLASS_MEM(class_name,parent_class,...) \
-		class class_name :public parent_class<__VA_ARGS__> {};\
+#define ADD_EXIST_TYPE_TO_GROUP(class_name) \
 		class_name* class_name##_var;\
+
+#define ADD_TYPE_TO_GROUP(class_name,parent_class,...) \
+		class class_name :public parent_class<__VA_ARGS__> {};\
+		ADD_EXIST_TYPE_TO_GROUP(class_name) \
 
 
 	template<typename tup>
