@@ -97,6 +97,10 @@ using namespace clumsy_engine;
 		m_sim.add_interaction<clumsy_engine::Spring_Stretch>();
 		//m_sim.add_interaction<clumsy_engine::Collision_EE>();
 		simulation_init();
+
+
+		//ui mapper
+		m_simulation_mappers.add_types<Mapper_Records>();
 	}
 
 	void Sim_Gui::simulation_init()
@@ -215,11 +219,11 @@ using namespace clumsy_engine;
 		}
 
 		ImGui::Text("hello world from sim app");
-
-		ImGui::SliderFloat3("gravity", &(m_sim.get_ref_value<data::Gravity>()(0)), -10.f, 10.f);
-		ImGui::SliderFloat("time step", &(m_sim.get_ref_value<data::Time_Step>()), 0.001f, 10.f);
-		ImGui::SliderFloat("mass density", &(m_sim.get_ref_value<data::Mass_Density>()), 0.001f, 10.f);
-		ImGui::SliderFloat("stretch stiff", &(m_sim.get_ref_value<data::Stretch_Stiff>()), 0.001f, 1e7f);
+		for (auto& m : m_simulation_mappers)
+		{
+			auto mm = m.second;
+			mm->operator()(&m_sim);
+		}
 
         static bool stretchEnable = true;
         ImGui::Checkbox("spring_stretch", &stretchEnable);

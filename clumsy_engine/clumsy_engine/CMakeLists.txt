@@ -111,6 +111,7 @@ include/simulator/simulator.h
 include/simulator/simulation_data.h
 include/simulator/inertial.h
 include/simulator/interaction.h
+include/simulator/simulation_interactions.h
 include/simulator/gravity.h
 include/simulator/mesh_loader.h
 )

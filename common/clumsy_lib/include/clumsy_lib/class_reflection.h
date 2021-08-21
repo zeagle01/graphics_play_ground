@@ -63,7 +63,7 @@ else if constexpr (get_field_count<T>::value ==num){ \
 
 
 	//extract type list from type
-#define TMP(...) __VA_ARGS__ 
+#define CE_WRAP(...) __VA_ARGS__ 
 
 #define ADD_EXIST_TYPE_TO_GROUP(class_name) \
 		class_name* class_name##_var;\
@@ -71,6 +71,10 @@ else if constexpr (get_field_count<T>::value ==num){ \
 #define ADD_TYPE_TO_GROUP(class_name,parent_class,...) \
 		class class_name :public parent_class<__VA_ARGS__> {};\
 		ADD_EXIST_TYPE_TO_GROUP(class_name) \
+
+#define ADD_EXIST_TYPE_TO_GROUP_WITH_PREFIX(type_name,prefix) \
+	using type_name=prefix##type_name;\
+	ADD_EXIST_TYPE_TO_GROUP(type_name)\
 
 
 	template<typename tup>

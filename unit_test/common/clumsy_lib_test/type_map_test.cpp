@@ -194,10 +194,10 @@ struct Compute_Acceleration
 
 struct dependent_variables_struct
 {
-	DEF_DEPENDENT_MEM(Position, float, Plain_Computer, TMP(type_list<>));
-	DEF_DEPENDENT_MEM(Velocity, float, Plain_Computer, TMP(type_list<>));
-	DEF_DEPENDENT_MEM(Force, float, Compute_Force, TMP(type_list<Velocity, Position>));
-	DEF_DEPENDENT_MEM(Acceleration, float, Compute_Acceleration, TMP(type_list<Force >));
+	DEF_DEPENDENT_MEM(Position, float, Plain_Computer, CE_WRAP(type_list<>));
+	DEF_DEPENDENT_MEM(Velocity, float, Plain_Computer, CE_WRAP(type_list<>));
+	DEF_DEPENDENT_MEM(Force, float, Compute_Force, CE_WRAP(type_list<Velocity, Position>));
+	DEF_DEPENDENT_MEM(Acceleration, float, Compute_Acceleration, CE_WRAP(type_list<Force >));
 };
 
 

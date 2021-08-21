@@ -3,6 +3,7 @@
 #include "gmock/gmock.h"
 
 #include "simulation_data.h"
+#include "signal.h"
 #include <functional>
 
 

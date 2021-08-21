@@ -4,6 +4,8 @@
 #include "clumsy_engine/clumsy_engine.h"
 #include "simulator/Simulator.h"
 #include "clumsy_engine/ref.h"
+#include "ui_map_to_simulation_records.h"
+
 
 #include <memory>
 
@@ -47,6 +49,10 @@ private:
 	clumsy_engine::Ref<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
 
 	clumsy_engine::Simulator m_sim;
+
+
+	clumsy_lib::Type_Map<Simulation_Data_Mapper_Base> m_simulation_mappers;
+
 };
 
 
