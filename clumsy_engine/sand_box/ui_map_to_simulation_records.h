@@ -98,4 +98,8 @@ struct Mapper_Records
 	static constexpr char tag_Linear_Solver[] = "Linear_Solver";
 	ADD_TYPE_TO_GROUP(Linear_Solver, Simulation_Data_Mapper, CE_WRAP(Set_Linear_Solver_Type<clumsy_engine::linear_solvers>), CE_WRAP(Imgui_Combobox<clumsy_engine::linear_solvers>), DEFAULT_Int(0), tag_Linear_Solver, int)
 
+//		//TODO:
+//		//that's better
+//	ADD_TYPE_TO_GROUP(Linear_Solver, Simulation_Data_Mapper, CE_WRAP(Set_Linear_Solver_Type<clumsy_engine::linear_solvers>), CE_WRAP(Imgui_Combobox<clumsy_engine::linear_solvers>), get_index_v<clumsy_engine::linear_solvers, clumsy_engine::linear_solver::Jacobi>, tag_Linear_Solver, Linear_Solver);
+
 };
