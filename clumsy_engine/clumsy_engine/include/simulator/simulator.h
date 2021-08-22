@@ -10,9 +10,11 @@
 #include <string>
 
 #include "clumsy_lib/type_map.h"
+#include "clumsy_lib/morphism_types.h"
 #include "clumsy_lib/dependent_variable_set.h"
 #include "Simulation_Data.h"
 #include "system_equations_solver.h"
+#include "linear_equations_solver.h"
 
 
 
@@ -48,6 +50,12 @@ namespace clumsy_engine
 			m_interactions_map.remove_type<Inter>();
 		}
 
+		template<typename T>
+		void set_linear_solver()
+		{
+			m_linear_solver.set_current_type<T>();
+		}
+
 
 	private:
 
@@ -55,8 +63,11 @@ namespace clumsy_engine
 
 		clumsy_lib::Type_Map<Interaction> m_interactions_map;
 		std::shared_ptr<clumsy_lib::Variable_Set> m_data_map;
+		clumsy_lib::Morphism_Types<Linear_Equations_Solver_Base> m_linear_solver;
 
 		std::vector<Element_Equation> m_equations;
+
+
 
 
 	};

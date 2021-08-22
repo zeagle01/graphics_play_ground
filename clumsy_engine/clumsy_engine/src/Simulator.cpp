@@ -11,6 +11,7 @@
 #include "gravity.h"
 #include "Simulation_Data.h"
 #include "simulation_interactions.h"
+#include "linear_equations_solver.h"
 
 #include "clumsy_lib/type_list.h"
 
@@ -24,6 +25,9 @@ namespace clumsy_engine
 		m_data_map = clumsy_lib::build_dependent_variable_set<clumsy_lib::Variable_Set, data>();
 
 		set_type_map(m_data_map);
+
+		m_linear_solver.add_types<linear_solver>();
+		m_linear_solver.set_current_type<linear_solver::Jacobi>();
 	}
 
 	void Simulator::assemble_equations()
@@ -57,11 +61,15 @@ namespace clumsy_engine
 
 
 		///////////// update////////////
-		for (int i = 0; i < 1; i++)
+
+		assemble_equations();
+
+		int iteration_num = 50;
+		for (int i = 0; i < iteration_num; i++)
 		{
-			assemble_equations();
-			m_solver->solve(positions, m_equations);
+			positions = m_linear_solver->solve(positions, m_equations);
 		}
+
 		set_value<data::Position>(positions);
 
 

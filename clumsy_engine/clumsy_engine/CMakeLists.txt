@@ -58,6 +58,11 @@ src/gravity.cpp
 src/inertial.cpp
 src/system_equations_solver.h
 src/system_equations_solver.cpp
+src/linear_equations_solver.h
+src/linear_solver_Jacobi.h
+src/linear_solver_Jacobi.cpp
+src/linear_solver_CG.h
+src/linear_solver_CG.cpp
 src/simulation_data.cpp
 src/spring_stretch.h
 src/spring_stretch.cpp
