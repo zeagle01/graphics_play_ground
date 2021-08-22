@@ -64,17 +64,6 @@ namespace clumsy_engine
 		}
 	};
 
-	class System_Equations_Solver
-	{
-	public:
-
-		virtual void solve(std::vector<vec3f>& x, std::vector<Element_Equation> const equations);
-
-		std::vector<mat3x3f> lhs;
-
-		std::vector<vec3f> rhs;
-
-	};
 
 	struct To_CSR
 	{

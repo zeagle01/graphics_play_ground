@@ -11,7 +11,6 @@ namespace clumsy_engine
 	{
 		RECORD_FUNCTION_DURATION();
 		std::vector<vec3f> ret = x0;
-		//auto& x0 = ret;
 		int vertexNum = ret.size() ;
 
 		if (lhs.size() != vertexNum)

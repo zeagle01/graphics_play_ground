@@ -5,6 +5,7 @@
 
 
 #include "system_equations_solver.h"
+#include "linear_equations_solver.h"
 
 
 using namespace testing;
@@ -17,12 +18,12 @@ class System_Equations_Solver_Test :public Test
 public:
 	System_Equations_Solver_Test()
 	{
-		m_solver = std::make_shared<System_Equations_Solver>();
+		m_solver = std::make_shared<Linear_Solver_Jacobi>();
 	}
 
 protected:
 
-	std::shared_ptr<System_Equations_Solver> m_solver;
+	std::shared_ptr<Linear_Solver_Jacobi> m_solver;
 	std::vector<Element_Equation> m_equations;
 	std::vector<vec3f> m_x;
 };

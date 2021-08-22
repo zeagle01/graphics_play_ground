@@ -49,12 +49,6 @@ namespace clumsy_engine
 	{
 		RECORD_FUNCTION_DURATION();
 
-		std::unique_ptr<System_Equations_Solver> m_solver;
-		if (!m_solver)
-		{
-			m_solver = std::make_unique<System_Equations_Solver>();
-		}
-
 		//back up last
 		auto positions = get_value<data::Position>();
 		set_value<data::Last_Frame_Position>(positions);
