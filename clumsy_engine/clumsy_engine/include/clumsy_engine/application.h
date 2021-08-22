@@ -18,7 +18,6 @@ namespace clumsy_engine
 	class Layer;
 	class Window;
 	class Imgui_Layer;
-	class Shader;
 	class Vertex_Buffer;
 	class Index_Buffer;
 	class Vertex_Array;
