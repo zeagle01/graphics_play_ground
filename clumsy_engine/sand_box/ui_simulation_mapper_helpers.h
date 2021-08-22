@@ -3,7 +3,9 @@
 
 #include "imgui.h"
 #include "simulator/simulator.h"
+#include "clumsy_lib/type_list.h"
 #include <algorithm>
+#include <string>
 
 
 template<typename T,auto ...Init_List>
@@ -13,7 +15,11 @@ struct Type_From_Init_List
 	static inline const T value = T{ Init_List... };
 };
 
-/////////////////imgui wigets
+
+
+
+
+/////////////////slider
 
 template<float min,float max>
 struct Imgui_SlideFloat3
@@ -40,6 +46,41 @@ struct Imgui_Checkbox
 		return ImGui::Checkbox(tag, &v);
 	}
 };
+
+struct Append_Name
+{
+	template<typename T>
+	static void apply(std::string& items, int& size)
+	{
+		std::string item_name = std::string(typeid(T).name());
+		auto pos = item_name.find_last_of(":");
+		pos = pos == std::string::npos ? 0 : pos;
+		item_name = item_name.substr(pos + 1, item_name.size() - pos - 1);
+		items += item_name + '\0';
+		size++;
+	}
+};
+
+template<typename Sub_Type_List>
+struct Imgui_Combobox
+{
+	Imgui_Combobox() 
+	{
+		clumsy_lib::for_each_type<Sub_Type_List, Append_Name>(m_items_str, m_item_count);
+	}
+
+	bool operator()(int& v, char const* tag)
+	{
+		return ImGui::Combo(tag, &v, m_items_str.c_str(), m_item_count);
+	}
+
+	std::string m_items_str;
+	int m_item_count = 0;
+
+};
+
+
+
 
 //////////////////set value
 struct Set_Value_Exponential
@@ -73,13 +114,11 @@ struct Set_Value
 
 
 
-
-/////////////
-
+/// add remove type
 struct Add_Remove
 {
-	template<typename T,typename SimT>
-	void operator()(clumsy_engine::Simulator* sim, const T& v)
+	template<typename UI_T,typename SimT>
+	void operator()(clumsy_engine::Simulator* sim, const UI_T& v)
 	{
 		if (v)
 		{
@@ -93,3 +132,28 @@ struct Add_Remove
 };
 
 
+///  set type
+struct Find_Nth
+{
+	template<typename SimT>
+	static void apply(int type_index, clumsy_engine::Simulator* sim, const int& v)
+	{
+		if (type_index == v)
+		{
+			sim->set_linear_solver<SimT>();
+		}
+
+	};
+
+};
+
+
+template<typename Sub_Type_List>
+struct Set_Linear_Solver_Type
+{
+	template<typename T,typename SimT>
+	void operator()(clumsy_engine::Simulator* sim, const T& v)
+	{
+		clumsy_lib::For_Each_Type_With_Index<Sub_Type_List, Find_Nth>::apply(sim, v);
+	}
+};

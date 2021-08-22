@@ -8,6 +8,7 @@
 #include "ui_simulation_mapper_helpers.h"
 #include "simulator/simulation_data.h"
 #include "simulator/simulation_interactions.h"
+#include "simulator/linear_equations_solver.h"
 
 
 #include <memory>
@@ -75,9 +76,11 @@ private:
 
 
 
+#define DEFAULT_Int(v) CE_WRAP(Type_From_Init_List<int, v>)
 #define DEFAULT_FLOAT(v) CE_WRAP(Type_From_Init_List<float, v>)
 #define DEFAULT_FLOAT3(v0,v1,v2) CE_WRAP(Type_From_Init_List<vec3f, v0,v1,v2>)
 #define DEFAULT_BOOL(v) CE_WRAP(Type_From_Init_List<bool, v>)
+#define DEFAULT_C_CHAR(v) CE_WRAP(Type_From_Init_List<char const*, v>)
 
 
 struct Mapper_Records
@@ -90,4 +93,9 @@ struct Mapper_Records
 	ADD_MAPPER_RECORD(Spring_Stretch, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
 	ADD_MAPPER_RECORD(Gravity, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
 	ADD_MAPPER_RECORD(Inertial, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
+
+
+	static constexpr char tag_Linear_Solver[] = "Linear_Solver";
+	ADD_TYPE_TO_GROUP(Linear_Solver, Simulation_Data_Mapper, CE_WRAP(Set_Linear_Solver_Type<clumsy_engine::linear_solvers>), CE_WRAP(Imgui_Combobox<clumsy_engine::linear_solvers>), DEFAULT_Int(0), tag_Linear_Solver, int)
+
 };

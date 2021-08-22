@@ -69,6 +69,19 @@ namespace clumsy_lib
 	template<typename tl, int N>
 	using get_nth_element_t = typename get_nth_element_imp<tl, N>::type;
 
+	//get size
+	template<typename tl>
+	struct	get_size_imp;
+
+	template<typename...Ts>
+	struct	get_size_imp<type_list<Ts...>>
+	{
+		static constexpr int value = sizeof...(Ts);
+	};
+
+	template<typename tl>
+	constexpr int get_size_v = get_size_imp<tl>::value;
+
 	//is empty
 	template<typename tl>
 	struct is_empty_imp
@@ -148,6 +161,30 @@ namespace clumsy_lib
 		for_each_type_inner<func_t, tl >::apply(std::forward<func_t>(parameterized_func));
 	}
 
+
+	template<typename tl, typename F, int N>
+	struct For_Each_Type_With_Index_Imp;
+
+	template< typename F ,int N>
+	struct For_Each_Type_With_Index_Imp<type_list<>, F, N>
+	{
+		template<typename...P>
+		static void apply(P&&...p) {  }
+	};
+
+	template<typename F, int N, typename H, typename ...Ts  >
+	struct For_Each_Type_With_Index_Imp<type_list<H, Ts...>, F, N>
+	{
+		template<typename...P>
+		static void apply(P&&...p) 
+		{ 
+			F::template apply<H>(N - sizeof...(Ts) - 1, std::forward<P>(p)...);
+			For_Each_Type_With_Index_Imp<type_list<Ts...>, F, N>::apply(std::forward<P>(p)...);
+		}
+	};
+
+	template<typename tl, typename F >
+	using For_Each_Type_With_Index = For_Each_Type_With_Index_Imp<tl, F, get_size_v<tl>>;
 
 
 	template<typename tl0, typename tl1, typename F, typename ctl0 = tl0, typename ctl1 = tl1, typename ...P>

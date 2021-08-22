@@ -6,6 +6,7 @@
 #include "system_equations_solver.h"
 #include "clumsy_lib/class_reflection.h"
 #include "linear_solver_Jacobi.h"
+#include "linear_solver_CG.h"
 
 #include <vector>
 
@@ -36,8 +37,10 @@ namespace clumsy_engine
 	struct linear_solver
 	{
 		ADD_LINEAR_SOLVER(Jacobi, Linear_Solver_Jacobi);
+		ADD_LINEAR_SOLVER(Conjugate_Gradient, Linear_Solver_CG);
 	};
 
+	using linear_solvers = clumsy_lib::extract_member_type_list_t<linear_solver>;
 
 
 

@@ -57,8 +57,6 @@ src/interaction.cpp
 src/gravity.cpp
 src/inertial.cpp
 src/system_equations_solver.h
-src/system_equations_solver.cpp
-src/linear_equations_solver.h
 src/linear_solver_Jacobi.h
 src/linear_solver_Jacobi.cpp
 src/linear_solver_CG.h
@@ -117,6 +115,7 @@ include/simulator/simulation_data.h
 include/simulator/inertial.h
 include/simulator/interaction.h
 include/simulator/simulation_interactions.h
+include/simulator/linear_equations_solver.h
 include/simulator/gravity.h
 include/simulator/mesh_loader.h
 )
