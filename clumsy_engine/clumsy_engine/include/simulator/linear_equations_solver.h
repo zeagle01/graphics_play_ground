@@ -34,13 +34,13 @@ namespace clumsy_engine
 #define ADD_LINEAR_SOLVER(name,solver_imp) ADD_TYPE_TO_GROUP(name, Linear_Equations_Solver, solver_imp);
 
 
-	struct linear_solver
+	struct Linear_Equations_Solver_Set
 	{
 		ADD_LINEAR_SOLVER(Jacobi, Linear_Solver_Jacobi);
 		ADD_LINEAR_SOLVER(Conjugate_Gradient, Linear_Solver_CG);
 	};
 
-	using linear_solvers = clumsy_lib::extract_member_type_list_t<linear_solver>;
+	using Linear_Equations_Solver_List = clumsy_lib::extract_member_type_list_t<Linear_Equations_Solver_Set>;
 
 
 

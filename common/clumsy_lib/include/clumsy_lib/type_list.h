@@ -82,6 +82,33 @@ namespace clumsy_lib
 	template<typename tl>
 	constexpr int get_size_v = get_size_imp<tl>::value;
 
+	//get index 
+	template<typename tl,typename T,int N>
+	struct get_index_imp
+	{
+		static constexpr int get_value() { return -1; }
+	};
+
+	template<typename T, int N, typename H, typename... Ts>
+	struct get_index_imp<type_list<H, Ts...>, T, N>
+	{
+
+		static constexpr int get_value() 
+		{
+			if constexpr (std::is_same_v<T, H>)
+			{
+				return N - sizeof...(Ts)-1;
+			}
+			else
+			{
+				return get_index_imp<type_list<Ts...>, T, N>::get_value();
+			}
+		}
+	};
+
+	template<typename tl, typename T>
+	constexpr int get_index_v = get_index_imp<tl, T, get_size_v<tl>>::get_value();
+
 	//is empty
 	template<typename tl>
 	struct is_empty_imp

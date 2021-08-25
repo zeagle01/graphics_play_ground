@@ -26,8 +26,8 @@ namespace clumsy_engine
 
 		set_type_map(m_data_map);
 
-		m_linear_solver.add_types<linear_solver>();
-		m_linear_solver.set_current_type<linear_solver::Jacobi>();
+		m_linear_solver.add_types<Linear_Equations_Solver_Set>();
+		m_linear_solver.set_current_type<Linear_Equations_Solver_Set::Jacobi>();
 	}
 
 	void Simulator::assemble_equations()

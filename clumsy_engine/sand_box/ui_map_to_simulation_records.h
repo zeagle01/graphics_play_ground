@@ -75,6 +75,13 @@ private:
 	ADD_TYPE_TO_GROUP(type_name, Simulation_Data_Mapper, set_value, get_value, ui_type,tag_##type_name, Simulation_Data_Group::type_name);
 
 
+#define ADD_MORPHISM(name,default_type) \
+	static constexpr char tag_##name[] = #name;\
+	using name##_list = clumsy_engine::##name##_List; \
+	using name##_set = clumsy_engine::##name##_Set; \
+	using name##_base = clumsy_engine::##name##_Base; \
+	ADD_TYPE_TO_GROUP(name, Simulation_Data_Mapper, CE_WRAP(Set_Linear_Solver_Type<name##_list>), CE_WRAP(Imgui_Combobox<name##_list>), DEFAULT_Int(CE_WRAP(clumsy_lib::get_index_v<name##_list, name##_set::default_type>)), tag_##name, name##_base);
+
 
 #define DEFAULT_Int(v) CE_WRAP(Type_From_Init_List<int, v>)
 #define DEFAULT_FLOAT(v) CE_WRAP(Type_From_Init_List<float, v>)
@@ -94,12 +101,6 @@ struct Mapper_Records
 	ADD_MAPPER_RECORD(Gravity, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
 	ADD_MAPPER_RECORD(Inertial, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
 
-
-	static constexpr char tag_Linear_Solver[] = "Linear_Solver";
-	ADD_TYPE_TO_GROUP(Linear_Solver, Simulation_Data_Mapper, CE_WRAP(Set_Linear_Solver_Type<clumsy_engine::linear_solvers>), CE_WRAP(Imgui_Combobox<clumsy_engine::linear_solvers>), DEFAULT_Int(0), tag_Linear_Solver, int)
-
-//		//TODO:
-//		//that's better
-//	ADD_TYPE_TO_GROUP(Linear_Solver, Simulation_Data_Mapper, CE_WRAP(Set_Linear_Solver_Type<clumsy_engine::linear_solvers>), CE_WRAP(Imgui_Combobox<clumsy_engine::linear_solvers>), get_index_v<clumsy_engine::linear_solvers, clumsy_engine::linear_solver::Jacobi>, tag_Linear_Solver, Linear_Solver);
+	ADD_MORPHISM(Linear_Equations_Solver, Jacobi);
 
 };
