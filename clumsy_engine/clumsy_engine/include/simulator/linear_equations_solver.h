@@ -21,7 +21,7 @@ namespace clumsy_engine
 
 
 	template<typename Solver_T>
-	class Linear_Equations_Solver :public Linear_Equations_Solver_Base
+	class Linear_Equations_Solver_Wrapper :public Linear_Equations_Solver_Base
 	{
 	public:
 		std::vector<vec3f> solve(std::vector<vec3f> const& x0, std::vector<Element_Equation> const& equations) override { return m_solver.solve(x0, equations); }
@@ -31,18 +31,18 @@ namespace clumsy_engine
 	};
 
 
-#define ADD_LINEAR_SOLVER(name,solver_imp) ADD_TYPE_TO_GROUP(name, Linear_Equations_Solver, solver_imp);
 
 
-	struct Linear_Equations_Solver_Set
+
+#define ADD_LINEAR_SOLVER(name,solver_imp) ADD_TYPE_TO_GROUP(name, Linear_Equations_Solver_Wrapper, solver_imp);
+
+	struct Linear_Equations_Solver
 	{
+		using base_type = Linear_Equations_Solver_Base;
+
 		ADD_LINEAR_SOLVER(Jacobi, Linear_Solver_Jacobi);
 		ADD_LINEAR_SOLVER(Conjugate_Gradient, Linear_Solver_CG);
 	};
-
-	using Linear_Equations_Solver_List = clumsy_lib::extract_member_type_list_t<Linear_Equations_Solver_Set>;
-
-
 
 }
 

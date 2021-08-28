@@ -26,6 +26,18 @@ namespace clumsy_lib
 
 		std::shared_ptr<Interface_T> operator->()
 		{
+			//assert(!m_type_map.empty());
+
+			if (m_type_map.empty())
+			{
+				return nullptr;
+			}
+
+			if (!m_current_type)
+			{
+				m_current_type = m_type_map.begin()->second;
+
+			}
 			return m_current_type;
 		}
 

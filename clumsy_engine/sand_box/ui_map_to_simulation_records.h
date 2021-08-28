@@ -77,10 +77,9 @@ private:
 
 #define ADD_MORPHISM(name,default_type) \
 	static constexpr char tag_##name[] = #name;\
-	using name##_list = clumsy_engine::##name##_List; \
-	using name##_set = clumsy_engine::##name##_Set; \
-	using name##_base = clumsy_engine::##name##_Base; \
-	ADD_TYPE_TO_GROUP(name, Simulation_Data_Mapper, CE_WRAP(Set_Linear_Solver_Type<name##_list>), CE_WRAP(Imgui_Combobox<name##_list>), DEFAULT_Int(CE_WRAP(clumsy_lib::get_index_v<name##_list, name##_set::default_type>)), tag_##name, name##_base);
+	using name##_set = clumsy_engine::##name; \
+	using name##_list = clumsy_lib::extract_member_type_list_t<name##_set>;  \
+	ADD_TYPE_TO_GROUP(name, Simulation_Data_Mapper, CE_WRAP(Set_Morphism_Type), CE_WRAP(Imgui_Combobox<name##_set>), DEFAULT_Int(CE_WRAP(clumsy_lib::get_index_v<name##_list, name##_set::default_type>)), tag_##name, name##_set);
 
 
 #define DEFAULT_Int(v) CE_WRAP(Type_From_Init_List<int, v>)

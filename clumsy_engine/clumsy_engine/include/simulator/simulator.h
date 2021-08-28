@@ -50,20 +50,34 @@ namespace clumsy_engine
 			m_interactions_map.remove_type<Inter>();
 		}
 
-		template<typename T>
-		void set_linear_solver()
+
+
+		template<typename Morphism_T,typename Sub_T>
+		void set_morphism_type()
 		{
-			m_linear_solver.set_current_type<T>();
+			auto m = m_morphisms.get_type<clumsy_lib::Morphism_Types<Morphism_T::base_type>>();
+			m->set_current_type<Sub_T>();
 		}
 
 
+		
+
+
 	private:
+
+		template<typename Morphism_T>
+		auto& get_morphism() 
+		{
+			return *(m_morphisms.get_type<clumsy_lib::Morphism_Types<Morphism_T::base_type>>());
+		}
+
 
 		void assemble_equations();
 
 		clumsy_lib::Type_Map<Interaction> m_interactions_map;
 		std::shared_ptr<clumsy_lib::Variable_Set> m_data_map;
-		clumsy_lib::Morphism_Types<Linear_Equations_Solver_Base> m_linear_solver;
+		//clumsy_lib::Morphism_Types<Linear_Equations_Solver::base_type> m_linear_solver;
+		clumsy_lib::Type_Map<> m_morphisms;
 
 		std::vector<Element_Equation> m_equations;
 

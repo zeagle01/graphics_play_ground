@@ -69,6 +69,7 @@ src/discrete_collision.cpp
 src/one_point_stencils.h
 src/one_point_stencils.cpp
 src/signal.h
+src/morphisms.h
 src/data_computes.h
 src/data_computes.cpp
 src/mesh_loader.cpp

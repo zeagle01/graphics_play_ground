@@ -61,12 +61,13 @@ struct Append_Name
 	}
 };
 
-template<typename Sub_Type_List>
+template<typename Morphism_T>
 struct Imgui_Combobox
 {
 	Imgui_Combobox() 
 	{
-		clumsy_lib::for_each_type<Sub_Type_List, Append_Name>(m_items_str, m_item_count);
+		using Morphism_Sub_Type_List = clumsy_lib::extract_member_type_list_t<Morphism_T>; 
+		clumsy_lib::for_each_type<Morphism_Sub_Type_List, Append_Name>(m_items_str, m_item_count);
 	}
 
 	bool operator()(int& v, char const* tag)
@@ -133,27 +134,27 @@ struct Add_Remove
 
 
 ///  set type
-struct Find_Nth
+template<typename Base_T>
+struct Set_Type
 {
 	template<typename SimT>
 	static void apply(int type_index, clumsy_engine::Simulator* sim, const int& v)
 	{
 		if (type_index == v)
 		{
-			sim->set_linear_solver<SimT>();
+			sim->set_morphism_type<Base_T, SimT>();
 		}
-
 	};
 
 };
 
 
-template<typename Sub_Type_List>
-struct Set_Linear_Solver_Type
+struct Set_Morphism_Type
 {
-	template<typename T,typename SimT>
+	template<typename T,typename Morphism_T>
 	void operator()(clumsy_engine::Simulator* sim, const T& v)
 	{
-		clumsy_lib::For_Each_Type_With_Index<Sub_Type_List, Find_Nth>::apply(sim, v);
+		using Morphism_Sub_Type_List = clumsy_lib::extract_member_type_list_t<Morphism_T>; 
+		clumsy_lib::For_Each_Type_With_Index < Morphism_Sub_Type_List, Set_Type<Morphism_T>>::apply(sim, v);
 	}
 };

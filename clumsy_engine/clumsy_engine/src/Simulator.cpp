@@ -12,13 +12,26 @@
 #include "Simulation_Data.h"
 #include "simulation_interactions.h"
 #include "linear_equations_solver.h"
+#include "morphisms.h"
 
 #include "clumsy_lib/type_list.h"
 
 
 namespace clumsy_engine
 {
-	//using namespace data;
+	
+	struct Add_Morphism_Types
+	{
+		template<typename T>
+		static void apply(auto& morphisms)
+		{
+			auto m = morphisms.get_type<clumsy_lib::Morphism_Types<T::base_type>>();
+			m->add_types<T>();
+		}
+	};
+
+
+
 
 	Simulator::Simulator()
 	{
@@ -26,8 +39,10 @@ namespace clumsy_engine
 
 		set_type_map(m_data_map);
 
-		m_linear_solver.add_types<Linear_Equations_Solver_Set>();
-		m_linear_solver.set_current_type<Linear_Equations_Solver_Set::Jacobi>();
+		m_morphisms.add_types<Morphism>();
+
+		using Morphism_List = clumsy_lib::extract_member_type_list_t<Morphism>;
+		clumsy_lib::for_each_type<Morphism_List, Add_Morphism_Types>(m_morphisms);
 	}
 
 	void Simulator::assemble_equations()
@@ -59,9 +74,12 @@ namespace clumsy_engine
 		assemble_equations();
 
 		int iteration_num = 50;
+
+		auto& linear_solver = get_morphism<Linear_Equations_Solver>();
+
 		for (int i = 0; i < iteration_num; i++)
 		{
-			positions = m_linear_solver->solve(positions, m_equations);
+			positions = linear_solver->solve(positions, m_equations);
 		}
 
 		set_value<data::Position>(positions);

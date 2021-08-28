@@ -85,6 +85,14 @@ namespace clumsy_lib
 			for_each_type<Types, Add_Type>(type_map);
 		}
 
+
+
+		//empty
+		bool empty()
+		{
+			return type_map.empty();
+		}
+
 		/////////////////// for loop
 		auto begin() { return type_map.begin(); } 
 		auto end() { return type_map.end(); }
