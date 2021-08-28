@@ -93,7 +93,7 @@ using namespace clumsy_engine;
 
 
 		//simulation data mapper
-		m_simulation_mappers.add_types<Mapper_Records>();
+		m_simulation_mappers.add_types<UI_Simulation_Mapper>();
 
 		simulation_init();
 
@@ -216,12 +216,13 @@ using namespace clumsy_engine;
 			CE_INFO("save {0}", saved_file);
 		}
 
-		ImGui::Text("hello world from sim app");
+		ImGui::Text("---begin simulation panel");
 		for (auto& it : m_simulation_mappers)
 		{
 			auto mapper = it.second;
 			mapper->update_from_ui(&m_sim);
 		}
+		ImGui::Text("---end simulation panel");
 
 
 		//set render uniform

@@ -10,29 +10,7 @@
 #include "simulator/simulation_interactions.h"
 #include "simulator/linear_equations_solver.h"
 
-
 #include <memory>
-
-
-#define ADD_SIM_DATA(type_name) \
-		ADD_EXIST_TYPE_TO_GROUP_WITH_PREFIX(type_name,clumsy_engine::data::)\
-
-#define ADD_SIM_INTERACTION(type_name) \
-		ADD_EXIST_TYPE_TO_GROUP_WITH_PREFIX(type_name,clumsy_engine::interaction::)\
-
-struct Simulation_Data_Group
-{
-	ADD_SIM_DATA(Time_Step);
-	ADD_SIM_DATA(Gravity_Acceleration);
-	ADD_SIM_DATA(Stretch_Stiff);
-	ADD_SIM_DATA(Mass_Density);
-
-	//interaction
-	ADD_SIM_INTERACTION(Gravity);
-	ADD_SIM_INTERACTION(Spring_Stretch);
-	ADD_SIM_INTERACTION(Inertial);
-};
-
 
 
 class Simulation_Data_Mapper_Base
@@ -70,12 +48,16 @@ private:
 };
 
 
-#define ADD_MAPPER_RECORD(type_name,set_value,get_value,ui_type) \
+
+#define ADD_SIM_DATA_MAPPER(type_name,set_value,get_value,ui_type) \
 	static constexpr char tag_##type_name[] = #type_name;\
-	ADD_TYPE_TO_GROUP(type_name, Simulation_Data_Mapper, set_value, get_value, ui_type,tag_##type_name, Simulation_Data_Group::type_name);
+	ADD_TYPE_TO_GROUP(type_name, Simulation_Data_Mapper, set_value, get_value, ui_type,tag_##type_name, clumsy_engine::data::type_name);
 
+#define ADD_SIM_INTERACTION_MAPPER(type_name,set_value,get_value,ui_type) \
+	static constexpr char tag_##type_name[] = #type_name;\
+	ADD_TYPE_TO_GROUP(type_name, Simulation_Data_Mapper, set_value, get_value, ui_type,tag_##type_name, clumsy_engine::interaction::type_name);
 
-#define ADD_MORPHISM(name,default_type) \
+#define ADD_SIM_MORPHISM(name,default_type) \
 	static constexpr char tag_##name[] = #name;\
 	using name##_set = clumsy_engine::##name; \
 	using name##_list = clumsy_lib::extract_member_type_list_t<name##_set>;  \
@@ -89,17 +71,18 @@ private:
 #define DEFAULT_C_CHAR(v) CE_WRAP(Type_From_Init_List<char const*, v>)
 
 
-struct Mapper_Records
+struct UI_Simulation_Mapper
 {
-	ADD_MAPPER_RECORD(Time_Step, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), DEFAULT_FLOAT(0.1f));
-	ADD_MAPPER_RECORD(Mass_Density, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), DEFAULT_FLOAT(1.0f));
-	ADD_MAPPER_RECORD(Stretch_Stiff, Set_Value_Exponential, CE_WRAP(Imgui_SlideFloat<-3.f, 7.f>), DEFAULT_FLOAT(3.f));
-	ADD_MAPPER_RECORD(Gravity_Acceleration, Set_Value, CE_WRAP(Imgui_SlideFloat3<-10.f, 10.0f>), DEFAULT_FLOAT3(0.f, -10.f, 0.f));
+	ADD_SIM_DATA_MAPPER(Time_Step, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), DEFAULT_FLOAT(0.1f));
+	ADD_SIM_DATA_MAPPER(Mass_Density, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), DEFAULT_FLOAT(1.0f));
+	ADD_SIM_DATA_MAPPER(Stretch_Stiff, Set_Value_Exponential, CE_WRAP(Imgui_SlideFloat<-3.f, 7.f>), DEFAULT_FLOAT(3.f));
+	ADD_SIM_DATA_MAPPER(Gravity_Acceleration, Set_Value, CE_WRAP(Imgui_SlideFloat3<-10.f, 10.0f>), DEFAULT_FLOAT3(0.f, -10.f, 0.f));
 
-	ADD_MAPPER_RECORD(Spring_Stretch, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
-	ADD_MAPPER_RECORD(Gravity, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
-	ADD_MAPPER_RECORD(Inertial, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
+	ADD_SIM_INTERACTION_MAPPER(Spring_Stretch, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
+	ADD_SIM_INTERACTION_MAPPER(Gravity, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
+	ADD_SIM_INTERACTION_MAPPER(Inertial, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
 
-	ADD_MORPHISM(Linear_Equations_Solver, Jacobi);
+	ADD_SIM_MORPHISM(Linear_Equations_Solver, Jacobi);
 
+	using base_type = Simulation_Data_Mapper_Base;
 };

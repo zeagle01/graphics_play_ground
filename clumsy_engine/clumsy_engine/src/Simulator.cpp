@@ -74,14 +74,11 @@ namespace clumsy_engine
 		assemble_equations();
 
 		int iteration_num = 50;
-
 		auto& linear_solver = get_morphism<Linear_Equations_Solver>();
-
 		for (int i = 0; i < iteration_num; i++)
 		{
 			positions = linear_solver->solve(positions, m_equations);
 		}
-
 		set_value<data::Position>(positions);
 
 

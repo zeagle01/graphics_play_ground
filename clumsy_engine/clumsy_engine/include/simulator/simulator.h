@@ -76,13 +76,9 @@ namespace clumsy_engine
 
 		clumsy_lib::Type_Map<Interaction> m_interactions_map;
 		std::shared_ptr<clumsy_lib::Variable_Set> m_data_map;
-		//clumsy_lib::Morphism_Types<Linear_Equations_Solver::base_type> m_linear_solver;
 		clumsy_lib::Type_Map<> m_morphisms;
 
 		std::vector<Element_Equation> m_equations;
-
-
-
 
 	};
 

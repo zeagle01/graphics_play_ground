@@ -51,7 +51,7 @@ private:
 	clumsy_engine::Simulator m_sim;
 
 
-	clumsy_lib::Type_Map<Simulation_Data_Mapper_Base> m_simulation_mappers;
+	clumsy_lib::Type_Map<UI_Simulation_Mapper::base_type> m_simulation_mappers;
 
 };
 
