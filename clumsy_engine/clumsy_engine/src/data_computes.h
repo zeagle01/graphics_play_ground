@@ -84,44 +84,102 @@ namespace clumsy_engine
 		}
 	};
 
+	static void loop_triangle_edges(const std::vector<int>& triangle_indices, int v_num, std::function<void(bool, int, int, int, int)> fn)
+	{
+		int t_num = triangle_indices.size() / 3;
+
+		std::vector<std::vector<int>> vv(v_num);
+		std::vector<std::vector<int>> ve(v_num);
+
+		int e_index = 0;
+		for (int ti = 0; ti < t_num; ti++)
+		{
+			for (int tvi = 0; tvi < 3; tvi++)
+			{
+				int vi = tvi;
+				int vi_next = (tvi + 1) % 3;
+
+				int v = triangle_indices[ti * 3 + vi];
+				int v_next = triangle_indices[ti * 3 + vi_next];
+
+				auto vv_found = std::find(vv[v].begin(), vv[v].end(), v_next);
+
+				if (vv_found == vv[v].end())
+				{
+					vv[v_next].push_back(v);
+					ve[v_next].push_back(e_index);
+
+					fn(true,v,v_next,ti,e_index);
+
+					e_index++;
+				}
+				else
+				{
+					int vv_index = vv_found- vv[v].begin();
+					int e = ve[v][vv_index];
+
+					fn(false, v, v_next, ti, e);
+				}
+			}
+
+		}
+
+	}
+
 	struct Compute_Edge_Indices { 
 
 		template<typename sim_acc_T>
 		static void apply(sim_acc_T& datas, std::vector<int>& d)
 		{
-			auto triangle_indices = datas.template get_value<data::Triangle_Indice>();
-			int t_num = triangle_indices.size() / 3;
+			const auto& triangle_indices = datas.template get_value<data::Triangle_Indice>();
 			int v_num = datas.template get_value<data::Vertex_Num>();
 
 			d.clear();
 			d.reserve(v_num * 3);
 
-			std::vector<std::vector<int>> vv(v_num);
-
-			for (int ti = 0; ti < t_num; ti++)
-			{
-				for (int tvi = 0; tvi < 3; tvi++)
-				{
-					int vi = tvi;
-					int vi_next = (tvi + 1) % 3;
-
-					int v = triangle_indices[ti * 3 + vi];
-					int v_next = triangle_indices[ti * 3 + vi_next];
-
-					if (std::find(vv[v].begin(), vv[v].end(), v_next) == vv[v].end())
+			loop_triangle_edges(triangle_indices, v_num,
+				[&](bool is_new_edge, int v, int v_next, int, int) {
+					if (is_new_edge)
 					{
-						vv[v_next].push_back(v);
-
 						d.push_back(v);
 						d.push_back(v_next);
 					}
-				}
+				});
 
-			}
 			d.shrink_to_fit();
 
 		}
 	};
+
+	struct Compute_Edge_Adjacent_Triangle
+	{
+		template<typename sim_acc_T>
+		static void apply(sim_acc_T& datas, std::vector<int>& edge_adjacent_triangle)
+		{
+			auto triangle_indices = datas.template get_value<data::Triangle_Indice>();
+			int v_num = datas.template get_value<data::Vertex_Num>();
+
+			edge_adjacent_triangle.clear();
+			edge_adjacent_triangle.reserve(v_num * 3 * 2);
+
+			loop_triangle_edges(triangle_indices, v_num,
+				[&](bool is_new_edge, int v, int v_next, int trangle_index, int e_index) {
+					if (is_new_edge)
+					{
+						edge_adjacent_triangle.push_back(trangle_index);
+						edge_adjacent_triangle.push_back(-1);
+					}
+					else
+					{
+						edge_adjacent_triangle[e_index * 2 + 1] = trangle_index; //assume manifold mesh
+					}
+				});
+
+			edge_adjacent_triangle.shrink_to_fit();
+
+		}
+	};
+
 
 	struct Compute_Triangle_Area
 	{

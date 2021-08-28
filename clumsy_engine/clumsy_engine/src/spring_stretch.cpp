@@ -23,10 +23,8 @@ namespace clumsy_engine
 	Element_Equation Spring_Stretch::compute_element_equation(stencil st,int ei)
 	{
 		int vertex_of_stencel_num = st.size();
-
-		//assert(vertex_of_stencel_num == 2);
-
 		Element_Equation ret = Element_Equation::with_size(vertex_of_stencel_num);
+
 		ret.stencil = st;
 
 		const auto& positions = get_value<data::Position>();

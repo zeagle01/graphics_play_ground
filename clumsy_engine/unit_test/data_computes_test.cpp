@@ -31,6 +31,44 @@ TEST(Data_Computes_Test, compute_edge_indices)
 
 }
 
+TEST(Data_Computes_Test, compute_edge_adjacent_triangle)
+{
+
+	auto type_map = std::make_shared<clumsy_lib::Type_Map<void>>();
+	clumsy_lib::Variable_Acc_Constraint<clumsy_lib::type_list<data::Triangle_Indice, data::Vertex_Num>> sim_data;
+	sim_data.set_type_map(type_map);
+
+	sim_data.set_value<data::Triangle_Indice>({ 0,1,2 });
+	sim_data.set_value<data::Vertex_Num>(3);
+
+	std::vector<int> act;
+	Compute_Edge_Adjacent_Triangle::apply(sim_data, act);
+
+	std::vector<int> exp{ 0,-1,0,-1,0,-1 };
+
+	EXPECT_THAT(act, Eq(exp));
+
+}
+
+TEST(Data_Computes_Test, compute_edge_adjacent_triangle_2by2)
+{
+
+	auto type_map = std::make_shared<clumsy_lib::Type_Map<void>>();
+	clumsy_lib::Variable_Acc_Constraint<clumsy_lib::type_list<data::Triangle_Indice, data::Vertex_Num>> sim_data;
+	sim_data.set_type_map(type_map);
+
+	sim_data.set_value<data::Triangle_Indice>({ 0,1,2 ,0,2,3 });
+	sim_data.set_value<data::Vertex_Num>(4);
+
+	std::vector<int> act;
+	Compute_Edge_Adjacent_Triangle::apply(sim_data, act);
+
+	std::vector<int> exp{ 0,-1,0,-1,0,1,1,-1,1,-1 };
+
+	EXPECT_THAT(act, Eq(exp));
+
+}
+
 
 TEST(Data_Computes_Test, compute_triangle_area)
 {

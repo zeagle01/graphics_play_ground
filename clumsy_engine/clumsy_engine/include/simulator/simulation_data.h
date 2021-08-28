@@ -48,6 +48,7 @@ namespace clumsy_engine
 		DEF_MEM(Vertex_Normal,				v_v3f,				Compute_Vertex_Normal,											DEPENDENT_TYPE_LIST(Triangle_Normal,Vertex_Adjacent_Triangle,Vertex_Num)					);
 
 		DEF_MEM(Edge_Indice,				vi,					Compute_Edge_Indices,											DEPENDENT_TYPE_LIST(Triangle_Indice, Vertex_Num)											);
+		DEF_MEM(Edge_Adjacent_Triangle,		vi,					Compute_Edge_Adjacent_Triangle,									DEPENDENT_TYPE_LIST(Triangle_Indice, Vertex_Num)											);
 		DEF_MEM(Edge_Length,				vf,					Compute_Edge_Length,											DEPENDENT_TYPE_LIST(Ref_Position, Edge_Indice)												);
 		DEF_MEM(Delta_Position,				v_v3f,				Delta,															DEPENDENT_TYPE_LIST( Position,Last_Frame_Position )											);
 	} ;

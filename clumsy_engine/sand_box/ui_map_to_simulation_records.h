@@ -79,6 +79,7 @@ struct UI_Simulation_Mapper
 	ADD_SIM_DATA_MAPPER(Gravity_Acceleration, Set_Value, CE_WRAP(Imgui_SlideFloat3<-10.f, 10.0f>), DEFAULT_FLOAT3(0.f, -10.f, 0.f));
 
 	ADD_SIM_INTERACTION_MAPPER(Spring_Stretch, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
+	ADD_SIM_INTERACTION_MAPPER(Quadratic_Bending, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
 	ADD_SIM_INTERACTION_MAPPER(Gravity, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
 	ADD_SIM_INTERACTION_MAPPER(Inertial, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
 

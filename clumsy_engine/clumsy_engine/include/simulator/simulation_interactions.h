@@ -3,6 +3,7 @@
 #include "clumsy_lib/class_reflection.h"
 #include "gravity.h"
 #include "spring_stretch.h"
+#include "quadratic_bending.h"
 #include "inertial.h"
 
 
@@ -42,6 +43,7 @@ private:
 	{
 		ADD_INTERACTION(Gravity);
 		ADD_INTERACTION(Spring_Stretch);
+		ADD_INTERACTION(Quadratic_Bending);
 		ADD_INTERACTION(Inertial);
 	} ;
 

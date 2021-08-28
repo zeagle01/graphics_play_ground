@@ -64,6 +64,8 @@ src/linear_solver_CG.cpp
 src/simulation_data.cpp
 src/spring_stretch.h
 src/spring_stretch.cpp
+src/quadratic_bending.h
+src/quadratic_bending.cpp
 src/discrete_collision.h
 src/discrete_collision.cpp
 src/one_point_stencils.h

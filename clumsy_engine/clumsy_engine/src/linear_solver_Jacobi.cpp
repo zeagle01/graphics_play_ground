@@ -57,7 +57,7 @@ namespace clumsy_engine
 			{
 				continue; //fix point
 			}
-			ret[i ] = rhs[i ] | lhs[i];
+			ret[i] = rhs[i] | lhs[i];
 		}
 		return ret;
 	}
