@@ -7,6 +7,7 @@
 
 #include <functional>
 #include "matrix_math/matrix_math.h"
+#include "compressed_sparse_row.h"
 
 
 namespace clumsy_engine
@@ -64,40 +65,25 @@ namespace clumsy_engine
 		}
 	};
 
-
-	struct To_CSR
+	static void convert_system_equations_to_CSR(CSR<mat3x3f>& A, std::vector<vec3f>& b, std::vector<Element_Equation> const& equations)
 	{
-	public:
-		void operator()(std::vector<Element_Equation> const equations)
+		IJV_To_CSR<mat3x3f> convertor;
+		for (int i = 0; i < equations.size(); i++)
 		{
-			std::vector<std::vector<float>> values;
-			//std::vector<int> I;
-			std::vector<std::vector<int>> J;
-
-			for (int i = 0; i < equations.size(); i++)
+			int stencil_vertex_num = equations[i].stencil.size();
+			for (int si = 0; si < stencil_vertex_num; si++)
 			{
-				int en = equations[i].stencil.size();
-				for (int di = 0; di < 3; di++)
+				int vi = equations[i].stencil[si];
+				b[i] += equations[i].b[si];
+				for (int sj = 0; sj < stencil_vertex_num; sj++)
 				{
-					for (int si = 0; si < en; si++)
-					{
-						for (int sj = 0; sj < en; sj++)
-						{
-							auto vertexMatrix = equations[i].A[si * en + sj];
-
-							int vi = equations[i].stencil[si];
-							int vj = equations[i].stencil[sj];
-							for (int dj = 0; dj < 3; dj++)
-							{
-								values[di].push_back(vertexMatrix(di, dj));
-								J[vi * 3 + di].push_back(vj * 3 + dj);
-							}
-						}
-					}
+					int vj = equations[i].stencil[sj];
+					const auto& v = equations[i].A[si * stencil_vertex_num + sj];
+					convertor.add(vi, vj, v);
 				}
 			}
 		}
-	};
-
+		A = convertor.get_CSR();
+	}
 
 }

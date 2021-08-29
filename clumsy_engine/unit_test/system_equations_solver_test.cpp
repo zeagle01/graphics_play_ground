@@ -4,7 +4,7 @@
 #include <vector>
 
 
-#include "system_equations_solver.h"
+#include "system_equations.h"
 #include "linear_equations_solver.h"
 
 

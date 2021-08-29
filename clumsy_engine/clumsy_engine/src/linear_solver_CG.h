@@ -4,7 +4,7 @@
 #pragma once
 
 #include "matrix_math/matrix_math.h"
-#include "system_equations_solver.h"
+#include "system_equations.h"
 
 #include <vector>
 

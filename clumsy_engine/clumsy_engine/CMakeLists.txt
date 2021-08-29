@@ -56,7 +56,7 @@ src/simulator.cpp
 src/interaction.cpp
 src/gravity.cpp
 src/inertial.cpp
-src/system_equations_solver.h
+src/system_equations.h
 src/linear_solver_Jacobi.h
 src/linear_solver_Jacobi.cpp
 src/linear_solver_CG.h
@@ -70,6 +70,8 @@ src/discrete_collision.h
 src/discrete_collision.cpp
 src/one_point_stencils.h
 src/one_point_stencils.cpp
+src/compressed_sparse_row.h
+src/compressed_sparse_row.cpp
 src/signal.h
 src/morphisms.h
 src/data_computes.h

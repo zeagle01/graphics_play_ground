@@ -2,6 +2,9 @@
 
 #include "linear_solver_Jacobi.h"
 #include "profiler.h"
+#include "compressed_sparse_row.h"
+
+#include <vector>
 
 
 namespace clumsy_engine
@@ -12,6 +15,14 @@ namespace clumsy_engine
 		RECORD_FUNCTION_DURATION();
 		std::vector<vec3f> ret = x0;
 		int vertexNum = ret.size() ;
+
+		//TODO:
+		//CSR<mat3x3f> A;
+		//std::vector<vec3f> b;
+		//convert_system_equations_to_CSR(A, b, equations);
+		//auto r = b - A * x0;
+
+
 
 		if (lhs.size() != vertexNum)
 		{

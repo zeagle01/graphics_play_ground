@@ -3,7 +3,7 @@
 
 #include "clumsy_lib/type_map.h"
 #include "matrix_math/matrix_math.h"
-#include "system_equations_solver.h"
+#include "system_equations.h"
 #include "clumsy_lib/class_reflection.h"
 #include "linear_solver_Jacobi.h"
 #include "linear_solver_CG.h"

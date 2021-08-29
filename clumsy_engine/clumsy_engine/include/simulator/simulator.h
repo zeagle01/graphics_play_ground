@@ -13,7 +13,7 @@
 #include "clumsy_lib/morphism_types.h"
 #include "clumsy_lib/dependent_variable_set.h"
 #include "Simulation_Data.h"
-#include "system_equations_solver.h"
+#include "system_equations.h"
 #include "linear_equations_solver.h"
 
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "system_equations_solver.h" 
+#include "system_equations.h" 
 #include "Simulation_Data.h"
 #include <memory>
 #include <functional>
