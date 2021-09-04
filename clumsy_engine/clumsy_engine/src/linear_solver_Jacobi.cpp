@@ -33,15 +33,19 @@ namespace clumsy_engine
 	std::vector<vec3f> Linear_Solver_Jacobi::solve(const std::vector<vec3f>& x0, std::vector<Element_Equation> const& equations)
 	{
 		RECORD_FUNCTION_DURATION();
-		std::vector<vec3f> ret = x0;
-		int vertexNum = ret.size() ;
 
+		std::vector<vec3f> ret = x0;
 		CSR<mat3x3f> A;
 		std::vector<vec3f> b(x0.size(), get_uniform<3, 1, float>(0));
 		convert_system_equations_to_CSR(A, b, equations);
-		auto r = b - A * x0;
-		auto delta_x= diagonal_inverse(A, r);
-		return x0 + delta_x;
+
+		int iter_name = 50;
+		for (int i = 0; i < iter_name; i++)
+		{
+			auto r = b - A * ret;
+			ret = ret + diagonal_inverse(A, r);
+		}
+		return ret;
 	}
 
 }
