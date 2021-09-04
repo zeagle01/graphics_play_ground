@@ -74,7 +74,7 @@ namespace clumsy_engine
 			for (int si = 0; si < stencil_vertex_num; si++)
 			{
 				int vi = equations[i].stencil[si];
-				b[i] += equations[i].b[si];
+				b[vi] += equations[i].b[si];
 				for (int sj = 0; sj < stencil_vertex_num; sj++)
 				{
 					int vj = equations[i].stencil[sj];
