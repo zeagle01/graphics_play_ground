@@ -103,9 +103,9 @@ using namespace clumsy_engine;
 	void Sim_Gui::simulation_init()
 	{
 
-		for (auto& it : m_simulation_mappers)
+		for (auto& mapper : m_simulation_mappers)
 		{
-			auto mapper = it.second;
+			//auto mapper = it.second;
 			mapper->set_to_default_value(&m_sim);
 		}
 
@@ -217,9 +217,9 @@ using namespace clumsy_engine;
 		}
 
 		ImGui::Text("---begin simulation panel");
-		for (auto& it : m_simulation_mappers)
+		for (auto& mapper : m_simulation_mappers)
 		{
-			auto mapper = it.second;
+			//auto mapper = it.second;
 			mapper->update_from_ui(&m_sim);
 		}
 		ImGui::Text("---end simulation panel");

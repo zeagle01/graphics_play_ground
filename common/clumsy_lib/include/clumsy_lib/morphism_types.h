@@ -35,7 +35,7 @@ namespace clumsy_lib
 
 			if (!m_current_type)
 			{
-				m_current_type = m_type_map.begin()->second;
+				m_current_type = *m_type_map.begin();
 
 			}
 			return m_current_type;

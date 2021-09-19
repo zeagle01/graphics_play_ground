@@ -31,8 +31,6 @@ namespace clumsy_engine
 	};
 
 
-
-
 	Simulator::Simulator()
 	{
 		m_data_map = clumsy_lib::build_dependent_variable_set<clumsy_lib::Variable_Set, data>();
@@ -51,9 +49,9 @@ namespace clumsy_engine
 
 		m_equations.resize(0);
 
-		for (auto& it : m_interactions_map)
+		for (auto& interation : m_interactions_map)
 		{
-			auto& interation = it.second;
+			//auto& interation = it.second;
 			auto ieraction_equations = interation->compute_element_equations();
 			m_equations.insert(m_equations.end(), ieraction_equations.begin(), ieraction_equations.end());
 		}
@@ -67,7 +65,6 @@ namespace clumsy_engine
 		//back up last
 		auto positions = get_value<data::Position>();
 		set_value<data::Last_Frame_Position>(positions);
-
 
 		///////////// update////////////
 

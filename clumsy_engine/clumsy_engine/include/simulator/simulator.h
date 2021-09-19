@@ -59,10 +59,6 @@ namespace clumsy_engine
 			m->set_current_type<Sub_T>();
 		}
 
-
-		
-
-
 	private:
 
 		template<typename Morphism_T>
@@ -70,7 +66,6 @@ namespace clumsy_engine
 		{
 			return *(m_morphisms.get_type<clumsy_lib::Morphism_Types<Morphism_T::base_type>>());
 		}
-
 
 		void assemble_equations();
 

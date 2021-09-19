@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <list>
 #include <string>
 #include <map>
 #include <set>
@@ -12,6 +13,28 @@
 namespace clumsy_lib
 {
 
+	template<typename K,typename V> 
+	struct Order_Helper
+	{
+		std::map<K, typename std::list<V>::iterator> iterators;
+		std::list<V> linked_list;
+
+		void push_back(const K& key, V value)
+		{
+			linked_list.push_back(value);
+			auto back_it = linked_list.end();
+			iterators[key] = --back_it;
+		}
+
+		void erase(const K&  key)
+		{
+			auto it = iterators[key];
+			linked_list.erase(it);
+			iterators.erase(key);
+		}
+
+	};
+
 	//////////// type_map
 	template<typename Base_Type = void>
 	class Type_Map 
@@ -20,40 +43,43 @@ namespace clumsy_lib
 		using type_map_t = std::map<std::string, std::shared_ptr<Base_Type>>;
 		type_map_t type_map;
 
+		Order_Helper<std::string, std::shared_ptr<Base_Type>> order_list;
+
 		struct Add_Type
 		{
+
 			template <typename T>
-			static void apply(auto& type_map)
+			static void apply(auto& type_map, auto& order_list, std::shared_ptr<T> obj)
 			{
 				auto key = typeid(T).name();
 				if (!type_map.count(key))
 				{
-					auto obj = std::make_shared<T>();
 					type_map[key] = std::static_pointer_cast<Base_Type>(obj);
+					order_list.push_back(key, std::static_pointer_cast<Base_Type>(obj));
 				}
 			}
+
+			template <typename T>
+			static void apply(auto& type_map,auto& order_list)
+			{
+				apply<T>(type_map, order_list, std::make_shared<T>());
+			}
+
 		};
 
 
 
 	public:
 		template<typename Sub_Type>
-		void add_type(std::shared_ptr<Sub_Type> a)
+		void add_type(std::shared_ptr<Sub_Type> obj)
 		{
-			//TODO: sub class check;
-			{
-				auto key = typeid(Sub_Type).name();
-				if (!type_map.count(key))
-				{
-					type_map[key] = std::static_pointer_cast<Base_Type>(a);
-				}
-			}
+			Add_Type::template apply<Sub_Type>(type_map, order_list, obj);
 		}
 
 		template<typename Sub_Type>
 		void add_type()
 		{
-			Add_Type::template apply<Sub_Type>(type_map);
+			Add_Type::template apply<Sub_Type>(type_map,order_list);
 		}
 
 		template<typename Sub_Type>
@@ -63,6 +89,7 @@ namespace clumsy_lib
 			if (type_map.count(key))
 			{
 				type_map.erase(key);
+				order_list.erase(key);
 			}
 		}
 
@@ -82,9 +109,8 @@ namespace clumsy_lib
 		void add_types()
 		{
 			using Types = clumsy_lib::extract_member_type_list_t<Type_Group>;
-			for_each_type<Types, Add_Type>(type_map);
+			for_each_type<Types, Add_Type>(type_map,order_list);
 		}
-
 
 
 		//empty
@@ -94,7 +120,7 @@ namespace clumsy_lib
 		}
 
 		/////////////////// for loop
-		auto begin() { return type_map.begin(); } 
-		auto end() { return type_map.end(); }
+		auto begin() { return order_list.linked_list.begin(); } 
+		auto end() { return order_list.linked_list.end(); }
 	};
 }
