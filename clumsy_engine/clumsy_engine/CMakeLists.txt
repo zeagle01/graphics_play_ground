@@ -53,6 +53,9 @@ src/camara.cpp
 
 
 src/simulator.cpp
+src/simulation_solver.cpp
+src/simulation_solver_cpu_serial.h
+src/simulation_solver_cpu_serial.cpp
 src/interaction.cpp
 src/gravity.cpp
 src/inertial.cpp
@@ -116,6 +119,7 @@ include/clumsy_engine/ref.h
 include/clumsy_engine/file_dialogs.h
 
 include/simulator/simulator.h
+include/simulator/simulation_solver.h
 include/simulator/simulation_data.h
 include/simulator/inertial.h
 include/simulator/interaction.h

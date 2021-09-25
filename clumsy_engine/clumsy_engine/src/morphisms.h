@@ -4,6 +4,7 @@
 
 #include "clumsy_lib/class_reflection.h"
 #include "linear_equations_solver.h"
+#include "simulation_solver.h"
 
 
 namespace clumsy_engine
@@ -17,6 +18,7 @@ namespace clumsy_engine
 	struct Morphism
 	{
 		ADD_MORPHISM(Linear_Equations_Solver);
+		//ADD_MORPHISM(Linear_Equations_Solver);
 
 	};
 

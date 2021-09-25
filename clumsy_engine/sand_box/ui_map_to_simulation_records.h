@@ -9,6 +9,7 @@
 #include "simulator/simulation_data.h"
 #include "simulator/simulation_interactions.h"
 #include "simulator/linear_equations_solver.h"
+#include "simulator/simulation_solver.h"
 
 #include <memory>
 
@@ -84,6 +85,7 @@ struct UI_Simulation_Mapper
 	ADD_SIM_INTERACTION_MAPPER(Inertial, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
 
 	ADD_SIM_MORPHISM(Linear_Equations_Solver, Jacobi);
+	ADD_SIM_MORPHISM(Simulation_Solver, CPU_Serial);
 
 	using base_type = Simulation_Data_Mapper_Base;
 };
