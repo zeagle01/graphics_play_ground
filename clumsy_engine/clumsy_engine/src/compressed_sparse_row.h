@@ -5,6 +5,8 @@
 #include <functional>
 #include "matrix_math/matrix_math.h"
 
+using namespace matrix_math;
+
 namespace clumsy_engine
 {
 
@@ -164,7 +166,7 @@ namespace clumsy_engine
 			for (int j = A.I[i]; j < A.I[i + 1]; j++)
 			{
 				int colIndex = A.J[j];
-				ret[i] += A.values[j] & v[colIndex];
+				ret[i] += A.values[j] * v[colIndex];
 			}
 		}
 		return ret;

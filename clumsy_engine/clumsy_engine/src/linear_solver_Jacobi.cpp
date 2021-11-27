@@ -24,7 +24,7 @@ namespace clumsy_engine
 
 			int rowBegin = A.I[i];
 			int colIndex = A.J[rowBegin];
-			ret[i] = v[i] | A.values[rowBegin];
+			ret[i] = v[i] / A.values[rowBegin];
 		}
 		return ret;
 	}

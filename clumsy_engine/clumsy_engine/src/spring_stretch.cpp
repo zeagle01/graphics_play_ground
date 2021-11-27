@@ -4,6 +4,8 @@
 #include "spring_stretch.h"
 #include "simulation_data.h"
 
+using namespace matrix_math;
+
 namespace clumsy_engine
 {
 	std::vector<stencil> Spring_Stretch::compute_stencils()
@@ -32,14 +34,15 @@ namespace clumsy_engine
 		auto stiff = get_value<data::Stretch_Stiff>();
 
 		vec2f w = { -1,1 };
-		mat3x2f x{
-			positions[st[0]],
-			positions[st[1]]
+		mat3x2f x
+		{
+			positions[st[0]](0), positions[st[0]](1),positions[st[0]](2),
+			positions[st[1]](0), positions[st[1]](1),positions[st[1]](2),
 		};
 
-		vec3f d = x & w;
+		auto d = x * w;
 
-		float l = Vectorized_Norm<2>()(d);
+		float l = norm<2>::apply(d);
 
 		d = d * edge_lengths[ei] / l;
 

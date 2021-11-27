@@ -60,7 +60,10 @@ TEST_F(With_Only_Diagnal_Term, equation_with_only_inertial_term)
 
 	std::vector<vec3f> exp{ {0,1,0} ,{0,1,0} };
 	
-	EXPECT_THAT(m_x, Eq(exp));
+	for (int i = 0; i < exp.size(); i++)
+	{
+		EXPECT_TRUE(is_near<2>(m_x[i], exp[i]));
+	}
 }
 
 class With_One_Spring :public System_Equations_Solver_Test
@@ -92,7 +95,10 @@ TEST_F(With_One_Spring, equation_with_one_spring)
 
 	std::vector<vec3f> exp{ {0,0,0} ,{1,0,0} };
 	
-	EXPECT_THAT(m_x, Eq(exp));
+	for (int i = 0; i < exp.size(); i++)
+	{
+		EXPECT_TRUE(is_near<2>(m_x[i], exp[i]));
+	}
 }
 
 

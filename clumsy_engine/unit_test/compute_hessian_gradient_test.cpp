@@ -22,24 +22,24 @@ TEST(Compute_Hessian_Gradient_Test,_1by1_case)
 
 	std::vector<mat3x3f> exp_A{
 		{
-			{0,0,0},
-			{0,0,0},
-			{0,0,stiff},
+			0,0,0,
+			0,0,0,
+			0,0,stiff,
 		},
 		{
-			{0,0,0},
-			{0,0,0},
-			{0,0,-stiff},
+			0,0,0,
+			0,0,0,
+			0,0,-stiff,
 		},
 		{
-			{0,0,0},
-			{0,0,0},
-			{0,0,-stiff},
+			0,0,0,
+			0,0,0,
+			0,0,-stiff,
 		},
 		{
-			{0,0,0},
-			{0,0,0},
-			{0,0,stiff}
+			0,0,0,
+			0,0,0,
+			0,0,stiff
 		}
 	};
 	std::vector<vec3f> exp_b = {
@@ -47,8 +47,15 @@ TEST(Compute_Hessian_Gradient_Test,_1by1_case)
 		{0,0,1e-2f}
 	};
 
-	EXPECT_TRUE(is_near_list<0>(act_A.data(), exp_A.data(), exp_A.size(), 1e-5f));
-	EXPECT_TRUE(is_near_list<0>(act_b.data(), exp_b.data(), exp_b.size(), 1e-5f));
+	for (int i = 0; i < exp_A.size(); i++)
+	{
+		EXPECT_TRUE(is_near<2>(act_A[i], exp_A[i]));
+	}
+
+	for (int i = 0; i < exp_b.size(); i++)
+	{
+		EXPECT_TRUE(is_near<2>(act_b[i], exp_b[i]));
+	}
 }
 
 

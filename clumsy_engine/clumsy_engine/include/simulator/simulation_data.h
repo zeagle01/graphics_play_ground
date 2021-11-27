@@ -11,6 +11,8 @@
 
 #include <vector>
 
+using namespace matrix_math;
+
 namespace clumsy_engine
 {
 

@@ -23,7 +23,7 @@ namespace clumsy_engine
 			{
 				for (int j = 0; j < vertex_of_stencel_num; j++)
 				{
-					A[i * vertex_of_stencel_num + j] = stiff * weight(i) * weight(j) * constraint_normal ^ constraint_normal;
+					A[i * vertex_of_stencel_num + j] = stiff * weight(i) * weight(j) * constraint_normal * transpose(constraint_normal);
 				}
 			}
 

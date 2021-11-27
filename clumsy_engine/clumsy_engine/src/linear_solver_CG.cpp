@@ -13,7 +13,7 @@ namespace clumsy_engine
 		float ret = 0.f;
 		for (int i = 0; i < v0.size(); i++)
 		{
-			ret += transpose(v0[i]) & v1[i];
+			ret += transpose(v0[i]) * v1[i];
 		}
 		return ret;
 	}

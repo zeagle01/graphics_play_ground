@@ -4,6 +4,8 @@
 #include "matrix_math/matrix_math.h"
 #include <numeric>
 
+using namespace matrix_math;
+
 template<int dim, typename T = float>
 struct AABB
 {

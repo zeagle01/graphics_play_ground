@@ -13,6 +13,8 @@
 using namespace testing;
 using namespace clumsy_engine;
 
+using namespace matrix_math;
+
 
 
 class Simulator_Test :public Test
@@ -71,7 +73,10 @@ TEST_F(One_Vertex, without_any_interaction_just_floating_there)
 		{0,0.0,0}
 	};
 
-	EXPECT_THAT(act, exp);
+	for (int i = 0; i < exp.size(); i++)
+	{
+		EXPECT_TRUE(is_near<2>(act[i], exp[i]));
+	}
 }
 
 

@@ -10,6 +10,7 @@
 
 using namespace testing;
 using namespace clumsy_engine;
+using namespace matrix_math;
 
 
 TEST(Data_Computes_Test, compute_edge_indices)
@@ -155,5 +156,9 @@ TEST(Data_Computes_Test, compute_vertex_normal)
 		{0,1,0}
 	};
 
-	EXPECT_TRUE(is_near_list<2>(act.data(), exp.data(), exp.size(), 1e-2f));
+	for (int i = 0; i < exp.size(); i++)
+	{
+		EXPECT_TRUE(is_near<2>(act[i], exp[i]));
+	}
+
 }

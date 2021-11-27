@@ -6,6 +6,7 @@
 #include <atomic>
 #include <intrin.h>
 
+using namespace matrix_math;
 namespace clumsy_engine
 {
 
@@ -159,7 +160,7 @@ namespace clumsy_engine
 		std::vector<std::pair<unsigned long long, int>> encoded_records;
 		for (int i = 0; i < edge_num; i++)
 		{
-			auto reprent_pos = (m_edge_representative_positions[i] - aabb.m_lower) / aabb_side_length;
+			auto reprent_pos = (m_edge_representative_positions[i] - aabb.m_lower) / diagonal(aabb_side_length);
 			unsigned long long encoded_position = encode_positions(reprent_pos(0),reprent_pos(1),reprent_pos(2),1ll << 21);
 			encoded_records.push_back(std::make_pair(encoded_position, i));
 		}
@@ -234,7 +235,7 @@ namespace clumsy_engine
 		std::vector<std::pair<unsigned long long, int>> encoded_records;
 		for (int i = 0; i < edge_num; i++)
 		{
-			auto reprent_pos = (m_edge_representative_positions[i] - aabb.m_lower) / aabb_side_length;
+			auto reprent_pos = (m_edge_representative_positions[i] - aabb.m_lower) / diagonal(aabb_side_length);
 
 			constexpr unsigned long long m = 1ll << 21;
 			reprent_pos(0) = std::clamp<float>(reprent_pos(0) * m, 0.0f, m - 1.0f);

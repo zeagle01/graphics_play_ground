@@ -13,7 +13,10 @@
 
 #include "imgui.h"
 
+using namespace matrix_math;
+
 using namespace clumsy_engine;
+
 	Sim_Gui::Sim_Gui() :
 		clumsy_engine::Layer("sim_gui")
 		, m_camara(clumsy_engine::new_a_camara<clumsy_engine::View_Handler, clumsy_engine::Perspective_Projection>())
@@ -164,8 +167,8 @@ using namespace clumsy_engine;
 		const auto& new_normal = m_sim.get_value<data::Vertex_Normal>();
 
 		//update render data
-		m_vertex_array->set_vertex_attribute_data(m_attribute_name_position, new_pos[0].get_flat(), new_pos.size());
-		m_vertex_array->set_vertex_attribute_data(m_attribute_name_normal, new_normal[0].get_flat(), new_normal.size());
+		m_vertex_array->set_vertex_attribute_data(m_attribute_name_position, &new_pos[0], new_pos.size());
+		m_vertex_array->set_vertex_attribute_data(m_attribute_name_normal, &new_normal[0], new_normal.size());
 
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(m_indices.data(), m_indices.size());
 		m_vertex_array->set_index_buffer(index_buffer);

@@ -78,7 +78,7 @@ namespace clumsy_engine
 			{
 				int v0 = edge_indices[i * 2 + 0];
 				int v1 = edge_indices[i * 2 + 1];
-				edge_length[i] = Vectorized_Norm<2>()(positions[v0] - positions[v1]);
+				edge_length[i] = norm<2>::apply(positions[v0] - positions[v1]);
 			}
 
 		}
@@ -203,9 +203,9 @@ namespace clumsy_engine
 					position[v[2]]
 				};
 
-				auto n = cross((x[0] - x[2]), (x[1] - x[2]));
+				auto n = (x[0] - x[2]) ^ (x[1] - x[2]);
 
-				float l = Vectorized_Norm<2>()(n);
+				float l = norm<2>::apply(n);
 
 				l = 0.5f * l;
 
@@ -238,7 +238,7 @@ namespace clumsy_engine
 					position[tv[2]]
 				};
 
-				auto n = cross((x[0] - x[2]), (x[1] - x[2]));
+				auto n = (x[0] - x[2]) ^ (x[1] - x[2]);
 				triangle_normal[i] = normalize(n);
 			}
 		}

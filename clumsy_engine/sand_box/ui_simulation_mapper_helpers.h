@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <string>
 
+using namespace matrix_math;
 
 template<typename T,auto ...Init_List>
 struct Type_From_Init_List
