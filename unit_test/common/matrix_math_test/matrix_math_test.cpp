@@ -302,6 +302,22 @@ namespace matrix_math
 		EXPECT_THAT(act(1), Eq(0));
 	}
 
+	TEST(Matrix_Math_Test, self_add)
+	{
+		mat< 2, 1, float> a{ 1,2 };
+		mat< 2, 1, float> b{ 1,2 };
+
+		auto act = a ;
+
+		act += b;
+		EXPECT_THAT(act(0), Eq(2));
+		EXPECT_THAT(act(1), Eq(4));
+
+		act -=  b;
+		EXPECT_THAT(act(0), Eq(1));
+		EXPECT_THAT(act(1), Eq(2));
+	}
+
 	TEST(Matrix_Math_Test, matrix_multiply_scalar)
 	{
 		mat< 2, 1, float> a{ 1,2 };
@@ -315,6 +331,11 @@ namespace matrix_math
 
 		EXPECT_THAT(act(0), Eq(3));
 		EXPECT_THAT(act(1), Eq(6));
+
+		act = act / 3.f;
+
+		EXPECT_THAT(act(0), Eq(1));
+		EXPECT_THAT(act(1), Eq(2));
 	}
 
 	TEST(Matrix_Math_Test, matrix_multiply)
@@ -357,5 +378,35 @@ namespace matrix_math
 		EXPECT_THAT(act(0), Eq(exp(0)));
 		EXPECT_THAT(act(1), Eq(exp(1)));
 		EXPECT_THAT(act(2), Eq(exp(2)));
+	}
+
+	TEST(Matrix_Math_Test, vectorize_test)
+	{
+		auto A = get_identity<2, float>();
+
+
+		auto act = vectorize(A);
+	}
+
+	TEST(Matrix_Math_Test, norm_test)
+	{
+		auto A = get_identity<2, float>();
+
+		auto act = norm<2>::apply(A);
+
+		EXPECT_THAT(act, Eq(sqrt(2.f)));
+	}
+
+	TEST(Matrix_Math_Test, is_near_test)
+	{
+		vec3 v0{ 1,0,0 };
+		vec3 v1{ 1,0,0 };
+
+
+		EXPECT_TRUE(is_near<2>(v0, v1));
+
+		 v0(0)+=0.0001;
+
+		EXPECT_FALSE(is_near<2>(v0, v1));
 	}
 }

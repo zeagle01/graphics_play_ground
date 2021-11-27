@@ -590,6 +590,9 @@ namespace matrix_math
 	template<typename T> struct Multiply { static T apply(T v0, T v1) { return v0 * v1; } };
 	template<typename T> struct Divide { static T apply(T v0, T v1) { return v0 / v1; } };
 
+	template<typename T> struct Max { static T apply(T v0, T v1) { return v0 > v1 ? v0 : v1; } };
+	template<typename T> struct Min { static T apply(T v0, T v1) { return v0 < v1 ? v0 : v1; } };
+
 
 	template<typename T, int N, template<typename> typename Op>
 	static inline void BinaryOp(T* a, const T* b, const T* c)
@@ -600,17 +603,38 @@ namespace matrix_math
 		}
 	}
 
+	template<typename T, int N, template<typename> typename Op,typename ...P>
+	static inline void UnaryOp(T* a, const T* b, P&&... p)
+	{
+		for (int i = 0; i < N; i++)
+		{
+			a[i] = Op<T>::apply(b[i], std::forward<P>(p)...);
+		}
+	}
+
+
 #define COMPONENTWISE_BINARY(name,component_op) \
 	template<int Row,int Col,typename T> \
-	static inline mat<Row, Col, T> name(mat<Row, Col, T>& a, mat<Row, Col, T>& b)\
+	static inline mat<Row, Col, T> name(const mat<Row, Col, T>& a, const mat<Row, Col, T>& b)\
 	{\
 		mat<Row, Col, T> ret;\
 		BinaryOp<T, Row* Col, component_op>(&ret, &a, &b);\
 		return ret;\
 	}\
 
+#define COMPONENTWISE_SELF_BINARY(name,component_op) \
+	template<int Row,int Col,typename T> \
+	static inline mat<Row, Col, T>& name(mat<Row, Col, T>& a, const mat<Row, Col, T>& b)\
+	{\
+		BinaryOp<T, Row* Col, component_op>(&a, &a, &b);\
+		return a;\
+	}\
+
 COMPONENTWISE_BINARY(operator+,Add)
 COMPONENTWISE_BINARY(operator-,Substract)
+
+COMPONENTWISE_SELF_BINARY(operator+=,Add)
+COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 
 	template<int Row, int N, int Col, typename T>
 	static inline mat<Row, Col, T> operator*(const mat<Row, N, T>& a, const mat<N, Col, T>& b)
@@ -634,10 +658,7 @@ COMPONENTWISE_BINARY(operator-,Substract)
 	static inline mat<Row, Col, T> operator*(const mat<Row, Col, T>& a, const T& s)
 	{
 		mat<Row, Col, T> ret;
-		for (int i = 0; i < Row * Col; i++)
-		{
-			(&ret)[i] = (&a)[i] * s;
-		}
+		UnaryOp<T, Row* Col, Multiply>(&ret, &a, s);
 		return ret;
 	}
 
@@ -648,10 +669,7 @@ COMPONENTWISE_BINARY(operator-,Substract)
 	static inline mat<Row, Col, T> operator/(const mat<Row, Col, T>& a, const T& s)
 	{
 		mat<Row, Col, T> ret;
-		for (int i = 0; i < Row * Col; i++)
-		{
-			(&ret)[i] = (&a)[i] / s;
-		}
+		UnaryOp<T, Row* Col, Divide>(&ret, &a, s);
 		return ret;
 	}
 
@@ -663,6 +681,7 @@ COMPONENTWISE_BINARY(operator-,Substract)
 		return { a(1) * b(2) - a(2) * b(1), a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0) };
 	}
 
+	/// 
 	template<int Row,int Col, typename T>
 	static inline mat<Row, 1, T> get_column(const mat<Row, Col, T>& a, int column)
 	{
@@ -686,6 +705,12 @@ COMPONENTWISE_BINARY(operator-,Substract)
 			}
 		}
 		return ret;
+	}
+
+	template<int Row,int Col, typename T>
+	static inline const mat<Col* Row, 1, T>& vectorize(const mat<Row, Col, T>& a)
+	{
+		return *reinterpret_cast<const mat<Col* Row, 1, T>*>(&a);
 	}
 
 
@@ -753,10 +778,33 @@ COMPONENTWISE_BINARY(operator-,Substract)
 	}
 
 
+	///norm
+	template<int P >
+	struct norm
+	{
+		template<int Row,int Col,typename T>
+		static inline T apply(const mat<Row,Col,T>& a)
+		{
+			const auto& va = vectorize(a);
+			T dot = transpose(va) * va;
+			return sqrt(dot);
+		}
+	};
+
+	template<int P, int Row, int Col, typename T  >
+	static bool is_near(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1, T threshold = 0)
+	{
+		T diff_norm = norm<P>::apply(m0 - m1);
+		T norm0 = norm<P>::apply(m0);
+		T norm1 = norm<P>::apply(m1);
+		T relative_diff = diff_norm / Max<T>::apply(norm0, norm1);
+		return relative_diff <= threshold;
+	}
+
 
 
 	//////////////////
-	template<size_t N, typename T>
+	template<int N, typename T>
 	static inline mat<N, N, T> get_identity()
 	{
 		mat<N, N, T> ret;
@@ -777,7 +825,7 @@ COMPONENTWISE_BINARY(operator-,Substract)
 		return ret;
 	}
 
-	template<size_t Row, size_t Col, typename T>
+	template<int Row, int Col, typename T>
 	static inline mat<Row, Col, T> get_uniform(T value)
 	{
 		mat<Row, Col, T> ret;
