@@ -9,9 +9,7 @@ namespace clumsy_engine
 	class Simulation_Solver_Base
 	{
 	public:
-		virtual void backup_last() = 0;
 		virtual void solve() = 0;
-		virtual void post_update() = 0;
 	};
 
 
@@ -20,19 +18,9 @@ namespace clumsy_engine
 	{
 	public:
 
-		void backup_last() override
-		{
-			imp.backup_last();
-		}
-
 		void solve() override
 		{
 			imp.solve();
-		}
-
-		void post_update() override
-		{
-			imp.post_update();
 		}
 
 		Imp_T imp;

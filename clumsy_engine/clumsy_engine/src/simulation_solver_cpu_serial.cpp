@@ -4,24 +4,19 @@
 namespace clumsy_engine
 {
 
-	void Simulation_Solver_CPU_Serial::backup_last()
+	void Simulation_Solver_CPU_Serial::solve() 
 	{
 //		//back up last
 //		auto positions = get_value<data::Position>();
 //		set_value<data::Last_Frame_Position>(positions);
-	}
 
-	void Simulation_Solver_CPU_Serial::solve() 
-	{
 //		assemble_equations();
 //
 //		auto& linear_solver = get_morphism<Linear_Equations_Solver>();
 //		positions = linear_solver->solve(positions, m_equations);
 //		set_value<data::Position>(positions);
-	}
 
-	void Simulation_Solver_CPU_Serial::post_update() 
-	{
+
 //		auto inertial = m_interactions_map.get_type<interaction::Inertial>();
 //
 //		if (inertial)
@@ -37,5 +32,6 @@ namespace clumsy_engine
 //
 //			set_value<data::Velocity>(velocity);//maybe optimization?
 //		}
+
 	}
 }
