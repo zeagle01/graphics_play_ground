@@ -246,3 +246,84 @@ TEST(Type_Map_Test, dependent_data_accecor_test)
 	EXPECT_THAT(a, Eq(2.f));
 
 }
+
+
+//////////////////////////
+
+template<int i, int N, typename F >
+struct Static_Loop_Imp
+{
+	template<typename...P>
+	static void apply(P&&... p) 
+	{
+		F::template apply<i>(std::forward<P>(p)...);
+		Static_Loop_Imp<i + 1, N, F>::apply(std::forward<P>(p)...);
+	}
+};
+
+template< int N, typename F >
+struct Static_Loop_Imp<N,N,F>
+{
+	template<typename...P>
+	static void apply(P&&... p) {}
+};
+
+
+template<int N, typename F>
+struct Static_Loop
+{
+	template<typename...P>
+	static void apply(P&&... p)
+	{
+		Static_Loop_Imp<0, N, F>::apply(std::forward<P>(p)...);
+	}
+};
+
+struct add_to_type_map
+{
+	
+	template<int i, typename Type_Map, typename Tuple>
+	static void apply(Type_Map& map,const Tuple& t)
+	{
+		auto& v = std::get<i>(t);
+		map.add_type(v);
+	}
+};
+
+
+
+struct type_map_op
+{
+	template<typename T,typename TM >
+	static void apply(TM& a,TM& b)
+	{
+		auto ta = a.get_type<T>();
+		auto tb = b.get_type<T>();
+
+		ta = tb;
+
+		//*ta = *tb * 2;
+
+	}
+};
+
+TEST(Class_Reflection_Test, build_typemap_from_tuple)
+{
+	using my_tuple = std::tuple<int*, float*>;
+
+	int v0 = 3;
+	float v1 = 1.f;
+	my_tuple a(&v0, &v1);
+	Raw_Ptr_Type_Map ma;
+	Static_Loop<std::tuple_size_v<decltype(a)>, add_to_type_map >::apply(ma, a);
+
+	my_tuple b;
+
+	Raw_Ptr_Type_Map mb;
+	Static_Loop<std::tuple_size_v<decltype(a)>, add_to_type_map >::apply(mb, b);
+
+	clumsy_lib::for_each_type< clumsy_lib::type_list<int*, float*>, type_map_op>(mb, ma);
+
+}
+
+

@@ -33,12 +33,36 @@ namespace clumsy_lib
 			return ret;
 		}
 
+		template< typename variables_struct>
+		static auto build_variable_set(variables_struct& my_struct)
+		{
+
+			using variables = clumsy_lib::extract_member_type_list_t<variables_struct>;
+
+			std::shared_ptr<Variable_Set_Compose> ret = std::make_shared<Variable_Set_Compose>();
+
+			for_each_type<variables, add_variable_with_obj<Variable_Set_Compose> >(*ret, my_struct);
+
+			return ret;
+		}
+
 	private:
+
 		template<typename variable_set>
 		struct add_variable 
 		{
 			template<typename T>
 			static void apply(variable_set& out)
+			{
+				out.add_type<T>();
+			}
+		};
+
+		template<typename variable_set, typename variables_struct>
+		struct add_variable_with_obj
+		{
+			template<typename T>
+			static void apply(variable_set& out, variables_struct& my_struct)
 			{
 				out.add_type<T>();
 			}

@@ -53,10 +53,32 @@ else if constexpr (get_field_count<T>::value ==num){ \
 
 #define TOTUPLES(n) LOOP(n,IF_BRANCH,ELSE_IF_BRANCH)
 
+
 	template<typename T>
 	constexpr auto as_tuple()
 	{
 		EVAL(TOTUPLES(32));
+	}
+
+
+	////////from exsiting object
+#define IF_BRANCH_FROM(num,obj)\
+if constexpr (get_field_count<T>::value ==0){ \
+		return std::make_tuple(); \
+}\
+
+#define ELSE_IF_BRANCH_FROM(num,obj)\
+else if constexpr (get_field_count<T>::value ==num){ \
+		auto [VAR_LIST(num)] = obj; \
+		return std::make_tuple(VAR_LIST(num)); \
+}\
+
+#define TOTUPLES_FROM(a,n) LOOP(n,IF_BRANCH_FROM,ELSE_IF_BRANCH_FROM,a)
+
+	template<typename T>
+	constexpr auto as_tuple(const T& a)
+	{
+		EVAL(TOTUPLES_FROM(a, 32));
 	}
 
 
@@ -75,6 +97,13 @@ else if constexpr (get_field_count<T>::value ==num){ \
 #define ADD_EXIST_TYPE_TO_GROUP_WITH_PREFIX(type_name,prefix) \
 	using type_name=prefix##type_name;\
 	ADD_EXIST_TYPE_TO_GROUP(type_name)\
+
+#define ADD_EXIST_TYPE_TO_GROUP_AS_VALUE(class_name) \
+		class_name class_name##_var;\
+
+#define ADD_TYPE_TO_GROUP_AS_VALUE(class_name,parent_class,...) \
+		class class_name :public parent_class<__VA_ARGS__> {};\
+		ADD_EXIST_TYPE_TO_GROUP_AS_VALUE(class_name) \
 
 
 	template<typename tup>

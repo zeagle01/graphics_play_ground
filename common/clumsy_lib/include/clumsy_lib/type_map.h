@@ -35,21 +35,24 @@ namespace clumsy_lib
 
 	};
 
+
 	//////////// type_map
-	template<typename Base_Type = void>
+	template<typename Base_Type = void >
 	class Type_Map 
 	{
 	private:
-		using type_map_t = std::map<std::string, std::shared_ptr<Base_Type>>;
+		template <typename T>
+		using Ptr_Type = std::shared_ptr<T>;
+		using type_map_t = std::map<std::string, Ptr_Type<Base_Type>>;
 		type_map_t type_map;
 
-		Order_Helper<std::string, std::shared_ptr<Base_Type>> order_list;
+		Order_Helper<std::string, Ptr_Type<Base_Type>> order_list;
 
 		struct Add_Type
 		{
 
 			template <typename T>
-			static void apply(auto& type_map, auto& order_list, std::shared_ptr<T> obj)
+			static void apply(auto& type_map, auto& order_list, Ptr_Type<T> obj)
 			{
 				auto key = typeid(T).name();
 				if (!type_map.count(key))
@@ -62,7 +65,7 @@ namespace clumsy_lib
 			template <typename T>
 			static void apply(auto& type_map,auto& order_list)
 			{
-				apply<T>(type_map, order_list, std::make_shared<T>());
+				apply<T>(type_map, order_list, Ptr_Type<T>());
 			}
 
 		};
@@ -71,7 +74,7 @@ namespace clumsy_lib
 
 	public:
 		template<typename Sub_Type>
-		void add_type(std::shared_ptr<Sub_Type> obj)
+		void add_type(Ptr_Type<Sub_Type> obj)
 		{
 			Add_Type::template apply<Sub_Type>(type_map, order_list, obj);
 		}
@@ -94,15 +97,17 @@ namespace clumsy_lib
 		}
 
 		template<typename Sub_Type>
-		std::shared_ptr<Sub_Type> get_type()
+		Ptr_Type<Sub_Type> get_type()
 		{
 			auto key = typeid(Sub_Type).name();
 			if (!type_map.count(key))
 			{
 				add_type<Sub_Type>();
 			}
+			//return Pointer_Strategy<Base_Type>::template cast_type<Sub_Type>(type_map[key]);
 			return std::static_pointer_cast<Sub_Type>(type_map[key]);
 		}
+
 
 
 		template<typename Type_Group>
@@ -123,4 +128,40 @@ namespace clumsy_lib
 		auto begin() { return order_list.linked_list.begin(); } 
 		auto end() { return order_list.linked_list.end(); }
 	};
+
+
+	template<typename Base_Type = void >
+	struct Raw_Ptr_Type_Map 
+	{
+		using type_map_t = std::map<std::string, Base_Type*>;
+		type_map_t type_map;
+
+		template<typename Sub_Type>
+		void add_type(Sub_Type* obj)
+		{
+			auto key = typeid(Sub_Type).name();
+			if (!type_map.count(key))
+			{
+				type_map[key] = static_cast<Base_Type*>(obj);
+			}
+		}
+
+		template<typename Sub_Type>
+		Sub_Type* get_type()
+		{
+			//TODO check
+			auto key = typeid(Sub_Type).name();
+			return static_cast<Sub_Type*>(type_map[key]);
+		}
+
+//		template<typename Sub_Type>
+//		const Sub_Type* get_type() const 
+//		{
+//			//TODO check
+//			auto key = typeid(Sub_Type).name();
+//			return static_cast<const Sub_Type*>(type_map[key]);
+//		}
+
+	};
+
 }

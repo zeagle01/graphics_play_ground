@@ -10,6 +10,8 @@ main.cpp
 type_list_test.cpp
 macro_loop_test.cpp
 type_map_test.cpp
+copy_struct_test.cpp
+class_reflection_test.cpp
 )
 
 
