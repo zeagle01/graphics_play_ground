@@ -69,14 +69,14 @@ if constexpr (get_field_count<T>::value ==0){ \
 
 #define ELSE_IF_BRANCH_FROM(num,obj)\
 else if constexpr (get_field_count<T>::value ==num){ \
-		auto [VAR_LIST(num)] = obj; \
-		return std::make_tuple(VAR_LIST(num)); \
+		auto& [VAR_LIST(num)] = obj; \
+		return std::tie(VAR_LIST(num)); \
 }\
 
 #define TOTUPLES_FROM(a,n) LOOP(n,IF_BRANCH_FROM,ELSE_IF_BRANCH_FROM,a)
 
 	template<typename T>
-	constexpr auto as_tuple(const T& a)
+	constexpr auto as_tuple(T& a)
 	{
 		EVAL(TOTUPLES_FROM(a, 32));
 	}

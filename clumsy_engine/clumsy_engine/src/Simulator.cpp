@@ -40,6 +40,7 @@ namespace clumsy_engine
 		m_morphisms.add_types<Morphism>();
 
 		using Morphism_List = clumsy_lib::extract_member_type_list_t<Morphism>;
+		//printf("%s\n", typeid(Morphism).name());
 		clumsy_lib::for_each_type<Morphism_List, Add_Morphism_Types>(m_morphisms);
 	}
 
@@ -62,6 +63,12 @@ namespace clumsy_engine
 	{
 		RECORD_FUNCTION_DURATION();
 
+		auto& simulation_solver = get_morphism<Simulation_Solver>();
+
+		//TODO: open this
+		//simulation_solver->solve();
+
+		//TODO: delete below
 		//back up last
 		auto positions = get_value<data::Position>();
 		set_value<data::Last_Frame_Position>(positions);

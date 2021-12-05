@@ -2,6 +2,7 @@
 #pragma once
 
 #include <concepts>
+#include <tuple>
 
 
 namespace clumsy_lib 
@@ -249,6 +250,39 @@ namespace clumsy_lib
 		}
 
 	};
+
+
+	//better force each
+
+	template<typename Type_List>
+	struct For_Each_Type;
+
+	template< typename ...TP>
+	struct For_Each_Type<type_list<TP...>>
+	{
+		template< typename F, typename ...P>
+		static void apply(P&&...p)
+		{
+			(typename F::template apply<TP>(std::forward<P>(p)...), ...);
+		}
+	};
+
+
+	template<typename Seq >
+	struct For_Each_In_Range_Imp;
+
+	template<size_t ... N>
+	struct For_Each_In_Range_Imp<std::index_sequence< N...>>
+	{
+		template<typename F,typename ...P>
+		static void apply(P&&...p)
+		{
+			((typename F:: template apply<N>(std::forward<P>(p)...)), ...);
+		}
+	};
+
+	template<size_t N>
+	using  For_Each_In_Range = For_Each_In_Range_Imp<std::make_index_sequence<N>>;
 
 }
 

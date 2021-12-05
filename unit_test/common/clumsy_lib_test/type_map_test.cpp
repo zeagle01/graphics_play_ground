@@ -5,6 +5,8 @@
 #include "clumsy_lib/class_reflection.h"
 #include <memory>
 #include <string>
+#include <sstream>
+#include <vector>
 
 
 using namespace testing;
@@ -300,30 +302,92 @@ struct type_map_op
 		auto ta = a.get_type<T>();
 		auto tb = b.get_type<T>();
 
-		ta = tb;
-
+		*ta = *tb;
 		//*ta = *tb * 2;
 
 	}
 };
 
+struct My_Data_A
+{
+	int* p0;
+	int* p1;
+	int v;
+};
+
+
+template<typename T>
+struct Copy_Pointers_Member_Of_Struct
+{
+	struct Copy
+	{
+		template<size_t I, typename Tp, typename const_Tp>
+		static void apply(Tp& a, const const_Tp& b, std::vector < std::string>& debug)
+		{
+			using element_type = std::remove_reference_t<decltype(std::get<I>(a))>;
+			debug.push_back(std::string(typeid(element_type).name()));
+			if constexpr (std::is_pointer_v<element_type>)
+			{
+				// *std::get<I>(a) = *std::get<I>(b);
+				auto p_a = std::get<I>(a);
+				auto p_b = std::get<I>(b);
+				*p_a = *p_b;
+
+				std::stringstream ss;
+				ss << "pointer " << I << " " << *std::get<I>(a) << " " << *std::get<I>(b);
+				debug.push_back(ss.str());
+			}
+			else
+			{
+				std::get<I>(a) = std::get<I>(b);
+
+				std::stringstream ss;
+				ss << "value " << I << " " << std::get<I>(a) << " " << std::get<I>(b);
+				debug.push_back(ss.str());
+			}
+
+		}
+
+	};
+
+	static void apply(T& a, const T& b, std::vector < std::string>& debug)
+	{
+		auto a_tuple = clumsy_lib::as_tuple(a);
+		auto b_tuple = clumsy_lib::as_tuple(b);
+
+		using tuple_type = decltype(a_tuple);
+		constexpr auto size = std::tuple_size_v<tuple_type>;
+
+		For_Each_In_Range<size>::template apply<Copy>(a_tuple, b_tuple, debug);
+	}
+
+};
+
+
 TEST(Class_Reflection_Test, build_typemap_from_tuple)
 {
-	using my_tuple = std::tuple<int*, float*>;
+	int f0 = 0;
+	int f1 = 1;
+	int f2 = 2;
+	int f3 = 3;
 
-	int v0 = 3;
-	float v1 = 1.f;
-	my_tuple a(&v0, &v1);
-	Raw_Ptr_Type_Map ma;
-	Static_Loop<std::tuple_size_v<decltype(a)>, add_to_type_map >::apply(ma, a);
+	My_Data_A a;
+	a.p0 = &f0;
+	a.p1 = &f1;
+	a.v = 0;
 
-	my_tuple b;
+	My_Data_A b;
+	b.p0 = &f2;
+	b.p1 = &f3;
+	b.v = 1;
 
-	Raw_Ptr_Type_Map mb;
-	Static_Loop<std::tuple_size_v<decltype(a)>, add_to_type_map >::apply(mb, b);
 
-	clumsy_lib::for_each_type< clumsy_lib::type_list<int*, float*>, type_map_op>(mb, ma);
+	std::vector < std::string> debug;
+	Copy_Pointers_Member_Of_Struct<My_Data_A>::apply(a, b, debug);
 
+
+	EXPECT_THAT(*a.p0, Eq(2));
+	EXPECT_THAT(*a.p1, Eq(3));
 }
 
 
