@@ -15,6 +15,7 @@
 #include "morphisms.h"
 
 #include "clumsy_lib/type_list.h"
+#include "clumsy_lib/static_loop.h"
 
 
 namespace clumsy_engine
@@ -41,7 +42,7 @@ namespace clumsy_engine
 
 		using Morphism_List = clumsy_lib::extract_member_type_list_t<Morphism>;
 		//printf("%s\n", typeid(Morphism).name());
-		clumsy_lib::for_each_type<Morphism_List, Add_Morphism_Types>(m_morphisms);
+		clumsy_lib::For_Each_Type<Morphism_List>::template apply< Add_Morphism_Types>(m_morphisms);
 	}
 
 	void Simulator::assemble_equations()

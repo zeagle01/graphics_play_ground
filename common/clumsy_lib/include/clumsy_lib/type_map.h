@@ -8,6 +8,7 @@
 #include <map>
 #include <set>
 #include "type_list.h"
+#include "static_loop.h"
 #include "class_reflection.h"
 
 namespace clumsy_lib
@@ -109,7 +110,7 @@ namespace clumsy_lib
 		void add_types()
 		{
 			using Types = clumsy_lib::extract_member_type_list_t<Type_Group>;
-			for_each_type<Types, Add_Type>(type_map,order_list);
+			For_Each_Type<Types>::template apply< Add_Type>(type_map, order_list);
 		}
 
 

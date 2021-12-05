@@ -3,6 +3,7 @@
 
 #include "variable_set.h"
 #include "variable_accecor.h"
+#include "static_loop.h"
 
 namespace clumsy_lib
 {
@@ -139,7 +140,7 @@ namespace clumsy_lib
 
 			using current_tl = typename current_t::dependent_variables;
 
-			clumsy_lib::for_each_type<current_tl, F<current_t>>(std::forward<P>(p)...);
+			clumsy_lib::For_Each_Type<current_tl>::template apply<F<current_t>>(std::forward<P>(p)...);
 
 			using poped_list = clumsy_lib::pop_front_t<tl>;
 			for_each_depend_type<poped_list, F>(std::forward<P>(p)...);

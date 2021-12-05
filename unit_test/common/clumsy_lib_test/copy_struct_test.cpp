@@ -1,4 +1,8 @@
 
+
+
+//TODO: may be delete?
+
 #include "gmock/gmock.h"
 #include "clumsy_lib/class_reflection.h"
 #include "clumsy_lib/type_list.h"
@@ -38,7 +42,8 @@ struct copy_struct
 	static void apply(T& a, const T& b)
 	{
 		using member_list = clumsy_lib::extract_member_type_list_t<T>;
-		clumsy_lib::for_each_type<member_list, copy_<T> >(a, b);
+
+		//clumsy_lib::for_each_type<member_list, copy_<T> >(a, b);
 	}
 };
 

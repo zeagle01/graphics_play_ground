@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include "type_map.h"
+#include "static_loop.h"
 #include "variable_accecor.h"
 namespace clumsy_lib
 {
@@ -28,7 +29,7 @@ namespace clumsy_lib
 
 			std::shared_ptr<Variable_Set_Compose> ret = std::make_shared<Variable_Set_Compose>();
 
-			for_each_type<variables, add_variable<Variable_Set_Compose> >(*ret);
+			For_Each_Type<variables >::template apply< add_variable<Variable_Set_Compose>>(*ret);
 
 			return ret;
 		}
@@ -41,7 +42,7 @@ namespace clumsy_lib
 
 			std::shared_ptr<Variable_Set_Compose> ret = std::make_shared<Variable_Set_Compose>();
 
-			for_each_type<variables, add_variable_with_obj<Variable_Set_Compose> >(*ret, my_struct);
+			For_Each_Type<variables >::template apply<add_variable_with_obj<Variable_Set_Compose> >(*ret, my_struct);
 
 			return ret;
 		}

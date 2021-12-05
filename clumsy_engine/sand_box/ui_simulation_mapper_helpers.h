@@ -3,7 +3,8 @@
 
 #include "imgui.h"
 #include "simulator/simulator.h"
-#include "clumsy_lib/type_list.h"
+//#include "clumsy_lib/type_list.h"
+#include "clumsy_lib/type_list_helper.h"
 #include <algorithm>
 #include <string>
 
@@ -68,7 +69,7 @@ struct Imgui_Combobox
 	Imgui_Combobox() 
 	{
 		using Morphism_Sub_Type_List = clumsy_lib::extract_member_type_list_t<Morphism_T>; 
-		clumsy_lib::for_each_type<Morphism_Sub_Type_List, Append_Name>(m_items_str, m_item_count);
+		clumsy_lib::For_Each_Type<Morphism_Sub_Type_List>::template apply<Append_Name>(m_items_str, m_item_count);
 	}
 
 	bool operator()(int& v, char const* tag)
@@ -138,8 +139,8 @@ struct Add_Remove
 template<typename Base_T>
 struct Set_Type
 {
-	template<typename SimT>
-	static void apply(int type_index, clumsy_engine::Simulator* sim, const int& v)
+	template<size_t type_index, typename SimT>
+	static void apply(clumsy_engine::Simulator* sim, const int& v)
 	{
 		if (type_index == v)
 		{
@@ -156,6 +157,7 @@ struct Set_Morphism_Type
 	void operator()(clumsy_engine::Simulator* sim, const T& v)
 	{
 		using Morphism_Sub_Type_List = clumsy_lib::extract_member_type_list_t<Morphism_T>; 
-		clumsy_lib::For_Each_Type_With_Index < Morphism_Sub_Type_List, Set_Type<Morphism_T>>::apply(sim, v);
+		//constexpr auto list_size = clumsy_lib::get_size_v<Morphism_Sub_Type_List>;
+		clumsy_lib::For_Each_Type_Enumerate<Morphism_Sub_Type_List >::template apply<Set_Type<Morphism_T>>(sim, v);
 	}
 };
