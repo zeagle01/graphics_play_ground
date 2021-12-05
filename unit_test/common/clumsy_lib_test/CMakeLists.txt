@@ -12,6 +12,7 @@ macro_loop_test.cpp
 type_map_test.cpp
 copy_struct_test.cpp
 class_reflection_test.cpp
+static_loop_test.cpp
 )
 
 

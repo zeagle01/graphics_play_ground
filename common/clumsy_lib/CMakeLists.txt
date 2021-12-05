@@ -13,6 +13,7 @@ include/clumsy_lib/variable_set.h
 include/clumsy_lib/morphism_types.h
 include/clumsy_lib/variable_accecor.h
 include/clumsy_lib/dependent_variable_set.h
+include/clumsy_lib/static_loop.h
 clumsy_lib.cpp
 )
 
