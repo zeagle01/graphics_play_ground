@@ -36,7 +36,7 @@ namespace clumsy_engine
 	{
 		m_data_map = clumsy_lib::build_dependent_variable_set<clumsy_lib::Variable_Set, data>();
 
-		set_type_map(m_data_map);
+		m_data_accecor.set_type_map(m_data_map);
 
 		m_morphisms.add_types<Morphism>();
 

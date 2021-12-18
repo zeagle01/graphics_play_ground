@@ -24,7 +24,7 @@ namespace clumsy_engine
 	class Interaction;
 
 
-	class Simulator :public clumsy_lib::Variable_Accecor<clumsy_lib::Type_Map<void>>
+	class Simulator 
 	{
 	public:
 
@@ -59,6 +59,26 @@ namespace clumsy_engine
 			m->set_current_type<Sub_T>();
 		}
 
+
+		template<typename Variable_Type>
+		auto& get_ref_value()
+		{
+			return m_data_accecor.get_ref_value<Variable_Type>();
+		}
+
+		template<typename Variable_Type>
+		const auto& get_value()  const
+		{
+			return	m_data_accecor.get_value<Variable_Type>();
+		}
+
+		template<typename Variable_Type, typename Value_Type = Variable_Type::value_type>
+		void set_value(const Value_Type& d)
+		{
+			m_data_accecor.set_value<Variable_Type, Value_Type>(d);
+		}
+
+
 	private:
 
 		template<typename Morphism_T>
@@ -72,6 +92,7 @@ namespace clumsy_engine
 		clumsy_lib::Type_Map<Interaction> m_interactions_map;
 		std::shared_ptr<clumsy_lib::Variable_Set> m_data_map;
 		clumsy_lib::Type_Map<> m_morphisms;
+		clumsy_lib::Variable_Accecor<clumsy_lib::Type_Map<void>> m_data_accecor;
 
 		std::vector<Element_Equation> m_equations;
 
