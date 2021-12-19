@@ -13,7 +13,6 @@
 #include "clumsy_lib/morphism_types.h"
 #include "clumsy_lib/dependent_variable_set.h"
 #include "Simulation_Data.h"
-#include "system_equations.h"
 #include "linear_equations_solver.h"
 
 
@@ -87,15 +86,12 @@ namespace clumsy_engine
 			return *(m_morphisms.get_type<clumsy_lib::Morphism_Types<Morphism_T::base_type>>());
 		}
 
-		void assemble_equations();
 
 		clumsy_lib::Type_Map<Interaction> m_interactions_map;
-		std::shared_ptr<clumsy_lib::Variable_Set> m_data_map;
 		clumsy_lib::Type_Map<> m_morphisms;
+
+		std::shared_ptr<clumsy_lib::Variable_Set> m_data_map;
 		clumsy_lib::Variable_Accecor<clumsy_lib::Type_Map<void>> m_data_accecor;
-
-		std::vector<Element_Equation> m_equations;
-
 	};
 
 }
