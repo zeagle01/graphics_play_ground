@@ -1,6 +1,7 @@
 
 #include "clumsy_lib/class_reflection.h"
 #include "simulation_solver_cpu_serial.h"
+#include "Newton_solver.h"
 
 namespace clumsy_engine
 {
@@ -50,6 +51,7 @@ namespace clumsy_engine
 		using base_type = Simulation_Solver_Base;
 
 		ADD_SIMULATION_SOLVER(CPU_Serial, Simulation_Solver_CPU_Serial);
+		ADD_SIMULATION_SOLVER(Newton, Newton_Solver);
 	};
 
 

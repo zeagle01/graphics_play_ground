@@ -53,10 +53,17 @@ src/camara.cpp
 
 
 src/simulator.cpp
+src/devices.cu
 src/simulation_solver.cpp
 src/simulation_solver_cpu_serial.h
 src/simulation_solver_cpu_serial.cpp
+src/Newton_solver.h
+src/Newton_solver.cpp
 src/interaction.cpp
+src/CPU_serial.h
+src/CUDA.h
+src/CUDA.cu
+src/raw_pointer_kernels.h
 src/gravity.cpp
 src/inertial.cpp
 src/system_equations.h
@@ -119,6 +126,7 @@ include/clumsy_engine/ref.h
 include/clumsy_engine/file_dialogs.h
 
 include/simulator/simulator.h
+include/simulator/devices.h
 include/simulator/simulation_solver.h
 include/simulator/simulation_data.h
 include/simulator/inertial.h
@@ -190,6 +198,17 @@ target_link_libraries(clumsy_engine PUBLIC clumsy_lib)
 ########## stb
 target_link_libraries(clumsy_engine PUBLIC my_stb)
 
+########## cuda
+include(FindCUDAToolkit)
+if(CUDAToolkit_FOUND)
+	message("CUDAToolkit_BIN_DIR: ${CUDAToolkit_BIN_DIR}")
+	message("CUDAToolkit_INCLUDE_DIRS: ${CUDAToolkit_INCLUDE_DIRS}")
+	message("CUDAToolkit_LIBRARY_DIR: ${CUDAToolkit_LIBRARY_DIR}")
+	message("CUDAToolkit_TARGET_DIR: ${CUDAToolkit_TARGET_DIR}")
+	message("CUDAToolkit_NVCC_EXECUTABLE: ${CUDAToolkit_NVCC_EXECUTABLE}")
+
+	enable_language(CUDA)
+endif()
 
 
 

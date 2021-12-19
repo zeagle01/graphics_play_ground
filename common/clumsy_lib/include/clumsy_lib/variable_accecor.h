@@ -40,6 +40,7 @@ namespace clumsy_lib
 			}
 			variable->set(d);
 		}
+
 	private:
 		std::shared_ptr<type_map_t> m_type_map;
 	};

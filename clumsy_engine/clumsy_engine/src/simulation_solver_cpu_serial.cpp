@@ -25,6 +25,7 @@ namespace clumsy_engine
 
 	void Simulation_Solver_CPU_Serial::solve() 
 	{
+		RECORD_FUNCTION_DURATION();
 
 		//back up last
 		auto positions = m_datas->get_value<data::Position>();
