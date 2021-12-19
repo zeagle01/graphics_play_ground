@@ -47,10 +47,20 @@ namespace clumsy_lib
 			return m_is_changed_by_self;
 		}
 
+		void set_is_device_pointer_dirty(bool v)
+		{
+			m_is_device_pointer_dirty=v;
+		}
+		bool is_device_pointer_dirty()
+		{
+			return m_is_device_pointer_dirty;
+		}
+
 	private:
 		std::vector<Tree_Node*> m_children;
 		bool m_is_changed_by_self = false;
 		bool m_is_changed_by_parent = false;
+		bool m_is_device_pointer_dirty = false;
 	};
 
 
@@ -58,6 +68,12 @@ namespace clumsy_lib
 	{
 		template<typename data_acc, typename T>
 		static void apply(data_acc& datas, T& d) {}
+	};
+
+	template<typename T>
+	struct Device_Pointer
+	{
+		void upload(const T& data) { }
 	};
 
 	template<typename T, typename Computer = Plain_Computer, typename dependent_types = clumsy_lib::type_list<>>
@@ -68,6 +84,7 @@ namespace clumsy_lib
 		using value_type = T;
 		using dependent_variables = dependent_types;
 		T data;
+		Device_Pointer<T> device_pointer;
 		Dependent_Variable()
 		{
 			m_upstream_variables = std::make_shared<Variable_Set>();
@@ -77,9 +94,11 @@ namespace clumsy_lib
 
 		void set(const T& d)
 		{
+			//printf("%s set!\n ", typeid(T).name());
 			data = d;
 			set_is_changed_by_self(true);
 			set_children_is_changed_by_parent(true);
+			set_is_device_pointer_dirty(true);
 		}
 
 		T& get_ref()
@@ -95,6 +114,16 @@ namespace clumsy_lib
 				set_is_changed_by_parent(false);
 			}
 			return data;
+		}
+
+		Device_Pointer<T> get_device_pointer()
+		{
+			if (is_device_pointer_dirty())
+			{
+				device_pointer.upload(data);
+				set_is_device_pointer_dirty(false);
+			}
+			return device_pointer;
 		}
 
 		const T& get()
