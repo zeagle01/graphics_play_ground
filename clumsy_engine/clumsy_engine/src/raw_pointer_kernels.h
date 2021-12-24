@@ -16,6 +16,6 @@ struct Copy
 
 	DEVICE_CALLABLE void operator()(int i)
 	{
-		dst[i] = src[i];
+		//dst[i] = src[i];
 	}
 };

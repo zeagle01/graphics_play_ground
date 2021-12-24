@@ -10,6 +10,7 @@
 #include "simulator/simulation_interactions.h"
 #include "simulator/linear_equations_solver.h"
 #include "simulator/simulation_solver.h"
+#include "simulator/devices.h"
 
 #include <memory>
 
@@ -86,6 +87,7 @@ struct UI_Simulation_Mapper
 
 	ADD_SIM_MORPHISM(Linear_Equations_Solver, Jacobi);
 	ADD_SIM_MORPHISM(Simulation_Solver, CPU_Serial);
+	ADD_SIM_MORPHISM(Device, CPU_Serial);
 
 	using base_type = Simulation_Data_Mapper_Base;
 };

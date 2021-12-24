@@ -36,8 +36,27 @@ namespace clumsy_lib
 
 	};
 
+	struct New_Std_Shared_Ptr
+	{
+		template<typename Sub, typename Base>
+		static std::shared_ptr<Sub> apply()
+		{
+			return std::make_shared<Sub>();
+		}
+	};
+
+	struct New_Type_To_Variant
+	{
+		template<typename Sub, typename Base>
+		static std::shared_ptr<Base> apply()
+		{
+			return std::make_shared<Base>(Sub{});
+		}
+
+	};
+
 	//////////// type_map
-	template<typename Base_Type = void>
+	template<typename Base_Type = void, typename New_Type_Fn = New_Std_Shared_Ptr>
 	class Type_Map 
 	{
 	private:
@@ -61,9 +80,21 @@ namespace clumsy_lib
 			}
 
 			template <typename T>
+			static void apply(auto& type_map, auto& order_list, std::shared_ptr<Base_Type> obj)
+			{
+				auto key = typeid(T).name();
+				if (!type_map.count(key))
+				{
+					type_map[key] = obj;
+					order_list.push_back(key, obj);
+				}
+			}
+
+			template <typename T>
 			static void apply(auto& type_map,auto& order_list)
 			{
-				apply<T>(type_map, order_list, std::make_shared<T>());
+				//apply<T>(type_map, order_list, std::make_shared<T>());
+				apply<T>(type_map, order_list, New_Type_Fn::template apply<T, Base_Type>());
 			}
 
 		};
@@ -103,6 +134,17 @@ namespace clumsy_lib
 				add_type<Sub_Type>();
 			}
 			return std::static_pointer_cast<Sub_Type>(type_map[key]);
+		}
+
+		template<typename Sub_Type>
+		std::shared_ptr<Base_Type> get_as_interface_type()
+		{
+			auto key = typeid(Sub_Type).name();
+			if (!type_map.count(key))
+			{
+				add_type<Sub_Type>();
+			}
+			return type_map[key];
 		}
 
 

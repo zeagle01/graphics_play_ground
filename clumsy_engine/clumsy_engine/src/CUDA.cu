@@ -16,6 +16,7 @@ namespace clumsy_engine
 		if (tid < size)
 		{
 			k(tid);
+			printf(" in cuda %d \n", tid);
 		}
 	}
 
@@ -24,8 +25,8 @@ namespace clumsy_engine
 	{
 		int tpb = 128;
 		int bpg = (size - 1) / tpb + 1;
-		cuda_for_loop << <bpg, tpb >> > (k, size);
-		//cuda_for_loop << <1, 1 >> > (k, size);
+		//cuda_for_loop << <bpg, tpb >> > (k, size);
+		cuda_for_loop << <1, 1 >> > (k, size);
 	}
 
 	template void CUDA::loop<Copy<float, float>>(Copy<float, float> k, int size);
