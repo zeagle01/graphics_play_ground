@@ -15,6 +15,7 @@ include/clumsy_lib/morphism_types.h
 include/clumsy_lib/variable_accecor.h
 include/clumsy_lib/dependent_variable_set.h
 include/clumsy_lib/static_loop.h
+include/clumsy_lib/raw_pointer.h
 clumsy_lib.cpp
 )
 

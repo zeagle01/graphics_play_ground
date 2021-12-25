@@ -2,6 +2,7 @@
 #pragma once
 
 #include "type_map.h"
+#include "raw_pointer.h"
 
 namespace clumsy_lib
 {
@@ -27,6 +28,13 @@ namespace clumsy_lib
 		{
 			auto variable = m_type_map->get_type<Variable_Type>();
 			return variable->get();
+		}
+
+		template<typename Variable_Type, typename Device_Type >
+		auto get_device_pointer(Device_Type device)
+		{
+			auto variable = m_type_map->get_type<Variable_Type>();
+			return variable->get_device_pointer(device);
 		}
 
 		template<typename Variable_Type, typename Value_Type = Variable_Type::value_type>

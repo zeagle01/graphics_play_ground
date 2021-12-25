@@ -4,6 +4,7 @@
 #include "variable_set.h"
 #include "variable_accecor.h"
 #include "static_loop.h"
+#include "raw_pointer.h"
 
 namespace clumsy_lib
 {
@@ -70,12 +71,6 @@ namespace clumsy_lib
 		static void apply(data_acc& datas, T& d) {}
 	};
 
-	template<typename T>
-	struct Device_Pointer
-	{
-		void upload(const T& data) { }
-	};
-
 	template<typename T, typename Computer = Plain_Computer, typename dependent_types = clumsy_lib::type_list<>>
 	class Dependent_Variable :public Tree_Node
 	{
@@ -84,7 +79,7 @@ namespace clumsy_lib
 		using value_type = T;
 		using dependent_variables = dependent_types;
 		T data;
-		Device_Pointer<T> device_pointer;
+		Raw_Pointer<T> device_pointer;
 		Dependent_Variable()
 		{
 			m_upstream_variables = std::make_shared<Variable_Set>();
@@ -116,11 +111,12 @@ namespace clumsy_lib
 			return data;
 		}
 
-		Device_Pointer<T> get_device_pointer()
+		template<typename Device_Type >
+		Raw_Pointer<T> get_device_pointer(Device_Type device)
 		{
 			if (is_device_pointer_dirty())
 			{
-				device_pointer.upload(data);
+				device->upload<T>(device_pointer, data);
 				set_is_device_pointer_dirty(false);
 			}
 			return device_pointer;
