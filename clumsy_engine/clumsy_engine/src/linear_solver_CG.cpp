@@ -2,6 +2,7 @@
 #include "linear_solver_CG.h"
 #include "profiler.h"
 #include "matrix_math/matrix_math.h"
+#include "interaction.h"
 
 
 namespace clumsy_engine
@@ -63,4 +64,9 @@ namespace clumsy_engine
 		return ret;
 	}
 
+
+	void Linear_Solver_CG::solve(vec3f* x, const std::vector<Element_Equation_Pointer>& element_equation_pointers, int vertex_num)
+	{
+
+	}
 }

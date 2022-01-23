@@ -38,8 +38,6 @@ namespace clumsy_engine
 		clumsy_lib::Type_Map<Interaction>* m_interactions;
 		clumsy_lib::Type_Map<>* m_morphisms;
 
-		std::vector<Element_Equation> m_equations;
-
 	};
 
 }

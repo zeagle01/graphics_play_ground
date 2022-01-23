@@ -17,6 +17,7 @@ namespace clumsy_engine
 	{
 	public:
 		virtual std::vector<vec3f> solve(std::vector<vec3f> const& x0, std::vector<Element_Equation> const& equations) = 0;
+		virtual void solve(vec3f* x, const std::vector<Element_Equation_Pointer>& element_equation_pointers, int vertex_num) = 0;
 	};
 
 
@@ -25,6 +26,10 @@ namespace clumsy_engine
 	{
 	public:
 		std::vector<vec3f> solve(std::vector<vec3f> const& x0, std::vector<Element_Equation> const& equations) override { return m_solver.solve(x0, equations); }
+		void solve(vec3f* x, const std::vector<Element_Equation_Pointer>& element_equation_pointers, int vertex_num) override 
+		{
+			return m_solver.solve(x, element_equation_pointers, vertex_num);
+		};
 
 	private:
 		Solver_T m_solver;
