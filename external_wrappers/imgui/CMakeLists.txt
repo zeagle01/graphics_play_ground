@@ -40,7 +40,7 @@ target_compile_definitions(my_imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 
 
-#find_package(glfw3 CONFIG REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(my_imgui PUBLIC glfw)
 
 target_link_libraries(my_imgui PUBLIC glad)

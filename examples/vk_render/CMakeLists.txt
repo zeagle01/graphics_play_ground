@@ -14,10 +14,7 @@ target_compile_features(vk_render PRIVATE cxx_std_17)
 set_property(TARGET vk_render PROPERTY FOLDER examples)
 
 
-
-###########glfw
-#hunter_add_package(GLFW)
-#find_package(glfw3 CONFIG REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(vk_render PUBLIC glfw)
 
 

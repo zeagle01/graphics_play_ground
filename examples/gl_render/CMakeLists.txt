@@ -42,6 +42,7 @@ target_link_libraries(gl_render PRIVATE glad)
 
 
 
+find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(gl_render PUBLIC glfw)
 
 
@@ -62,7 +63,7 @@ include(FetchContent)
 target_link_libraries(gl_render PRIVATE my_imgui)
 
 #########glm
-find_package(glm CONFIG REQUIRED PATHS ${CMAKE_BINARY_DIR}  )
+find_package(glm CONFIG REQUIRED )
 target_link_libraries(gl_render PRIVATE glm::glm)
 
 

@@ -170,19 +170,15 @@ src
 )
 
 
-
-
-#hunter_add_package(GLFW)
-#find_package(glfw3 CONFIG REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(clumsy_engine PRIVATE glfw)
-
 
 #
 target_link_libraries(clumsy_engine PRIVATE glad)
 
 
 ## glm
-find_package(glm CONFIG REQUIRED PATHS ${CMAKE_BINARY_DIR})
+find_package(glm CONFIG REQUIRED)
 target_link_libraries(clumsy_engine PUBLIC glm::glm)
 
 ########## imgui
