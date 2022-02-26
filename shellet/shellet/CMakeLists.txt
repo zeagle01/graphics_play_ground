@@ -68,8 +68,8 @@ target_link_libraries(shellet_test PRIVATE shellet)
 
 
 
-find_package(jsoncpp CONFIG REQUIRED PATHS ${CMAKE_SOURCE_DIR}/Install/lib/cmake/jsoncpp)
-target_link_libraries(shellet PRIVATE jsoncpp_lib_static)
+find_package(jsoncpp CONFIG REQUIRED)
+target_link_libraries(shellet PUBLIC JsonCpp::JsonCpp)
 
 
 target_link_libraries(shellet PUBLIC  glad)
@@ -78,10 +78,10 @@ find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(shellet PUBLIC  glfw)
 
 
-find_package(glog CONFIG REQUIRED PATHS ${CMAKE_SOURCE_DIR}/Install/lib/cmake/glog)
+find_package(glog CONFIG REQUIRED )
 target_link_libraries(shellet PUBLIC glog::glog)
 
-find_package(gflags CONFIG REQUIRED PATHS ${CMAKE_SOURCE_DIR}/Install/lib/cmake/gflags)
+find_package(gflags CONFIG REQUIRED )
 target_link_libraries(shellet PUBLIC gflags)
 
 
