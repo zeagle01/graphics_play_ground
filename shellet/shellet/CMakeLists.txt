@@ -85,10 +85,6 @@ find_package(gflags CONFIG REQUIRED )
 target_link_libraries(shellet PUBLIC gflags)
 
 
-
-#find_package(GMock CONFIG REQUIRED PATHS ${CMAKE_SOURCE_DIR}/Install/lib/cmake/GMock)
-#target_link_libraries(shellet_test PRIVATE GMock::gmock)
-
 find_package(GTest CONFIG REQUIRED)
 target_link_libraries(shellet_test PRIVATE  GTest::gmock GTest::gmock_main)
 

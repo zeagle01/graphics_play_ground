@@ -45,9 +45,3 @@ target_link_libraries(clumsy_engine_test PUBLIC clumsy_engine)
 find_package(GTest CONFIG REQUIRED)
 target_link_libraries(clumsy_engine_test PRIVATE GTest::gmock_main)
 
-#find_package(GMock CONFIG REQUIRED ${CMAKE_SOURCE_DIR}/Install/lib/cmake/GMock)
-#target_link_libraries(soft_render PRIVATE GMock::gmock)
-
-#include(${CMAKE_SOURCE_DIR}/cmake/gtest.cmake)
-#link_to_gtest(clumsy_engine_test ${CMAKE_SOURCE_DIR}/external/gtest)
-

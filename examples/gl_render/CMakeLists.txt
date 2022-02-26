@@ -57,8 +57,6 @@ target_link_libraries(gl_render PRIVATE my_stb)
 find_package(gflags CONFIG REQUIRED)
 target_link_libraries(gl_render PUBLIC gflags)
 
-include(FetchContent)
-
 ##########imgui
 target_link_libraries(gl_render PRIVATE my_imgui)
 
