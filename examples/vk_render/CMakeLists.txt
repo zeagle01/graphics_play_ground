@@ -21,7 +21,7 @@ set_property(TARGET vk_render PROPERTY FOLDER examples)
 target_link_libraries(vk_render PUBLIC glfw)
 
 
-find_package(glm CONFIG REQUIRED PATHS ${CMAKE_BINARY_DIR})
+find_package(glm CONFIG REQUIRED)
 target_link_libraries(vk_render PRIVATE glm::glm)
 
 

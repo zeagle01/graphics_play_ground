@@ -42,7 +42,7 @@ public:
 	void push(unsigned int count)
 	{
 		//m_elements.push_back({ .count = count,.type = T });
-		static_assert(false);
+		//static_assert(false);
 	}
 
 	template<>
