@@ -17,6 +17,9 @@ target_link_libraries(matrix_math_test PRIVATE matrix_math)
 set_target_properties(matrix_math_test PROPERTIES FOLDER unit_test/common)
 
 
-include(${CMAKE_SOURCE_DIR}/cmake/gtest.cmake)
-link_to_gtest(matrix_math_test ${CMAKE_SOURCE_DIR}/external/gtest)
+find_package(GTest CONFIG REQUIRED)
+target_link_libraries(matrix_math_test PRIVATE GTest::gmock_main)
+
+#include(${CMAKE_SOURCE_DIR}/cmake/gtest.cmake)
+#link_to_gtest(matrix_math_test ${CMAKE_SOURCE_DIR}/external/gtest)
 

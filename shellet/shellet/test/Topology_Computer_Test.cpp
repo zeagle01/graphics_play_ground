@@ -28,8 +28,6 @@ TEST_F(Topology_Computer_Test, test_compute_edge_of_one_triangle) {
 
 	//EXPECT_THAT(act_EV, Eq(exp_EV));
 
-
-
 }
 
 TEST_F(Topology_Computer_Test, test_compute_edge_of_2_by_2_square) {

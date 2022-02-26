@@ -23,5 +23,8 @@ target_link_libraries(clumsy_lib_test PRIVATE clumsy_lib)
 set_target_properties(clumsy_lib_test PROPERTIES FOLDER unit_test/common)
 
 
-include(${CMAKE_SOURCE_DIR}/cmake/gtest.cmake)
-link_to_gtest(clumsy_lib_test ${CMAKE_SOURCE_DIR}/external/gtest)
+find_package(GTest CONFIG REQUIRED)
+target_link_libraries(clumsy_lib_test PRIVATE GTest::gmock_main)
+
+#include(${CMAKE_SOURCE_DIR}/cmake/gtest.cmake)
+#link_to_gtest(clumsy_lib_test ${CMAKE_SOURCE_DIR}/external/gtest)
