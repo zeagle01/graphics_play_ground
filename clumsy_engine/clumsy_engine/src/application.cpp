@@ -53,6 +53,7 @@ namespace clumsy_engine
 		Renderer::init();
 
 		m_dispatcher_imp->add<Window_Close_Event>(BIND_MEMBER(On_Window_Close));
+		m_dispatcher_imp->add<Window_Resize_Event>(BIND_MEMBER(On_Window_Resized));
 
 		m_imgui_layer = std::make_shared<Imgui_Layer>();
 		push_overlay(m_imgui_layer);
@@ -70,7 +71,6 @@ namespace clumsy_engine
 
 		m_dispatcher(e);
 
-
 		for (auto it = m_layer_stack->end(); it != m_layer_stack->begin();)
 		{
 			(*(--it))->on_event(e);
@@ -80,7 +80,6 @@ namespace clumsy_engine
 				break;
 			}
 		}
-
 
 		//CE_TRACE(e.to_string());
 
@@ -98,9 +97,12 @@ namespace clumsy_engine
 
 		m_last_frame_time = time;
 
-		for (auto& layer : *m_layer_stack)
+		if (!m_is_minimized)
 		{
-			layer->on_update(time_step);
+			for (auto& layer : *m_layer_stack)
+			{
+				layer->on_update(time_step);
+			}
 		}
 
 		if (m_imgui_layer)
@@ -130,8 +132,25 @@ namespace clumsy_engine
 
 	bool Application::On_Window_Close(Window_Close_Event& e)
 	{
+		
 		m_is_running = false;
 		return true;
+	}
+
+	bool Application::On_Window_Resized(Window_Resize_Event& e)
+	{
+		if (e.get_width() == 0 || e.get_height() == 0)
+		{
+			m_is_minimized = true;
+		}
+		else
+		{
+			m_is_minimized = false;
+		}
+
+		Renderer::on_window_resized(e.get_width(), e.get_height());
+
+		return false;
 	}
 
 	void Application::push_layer(Ref<Layer> layer)

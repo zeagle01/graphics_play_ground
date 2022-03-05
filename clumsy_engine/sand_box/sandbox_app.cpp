@@ -30,7 +30,7 @@ class Layer_Demo :public clumsy_engine::Layer
 public:
 	Layer_Demo() :
 		clumsy_engine::Layer("demo_layer")
-		, m_camara_controller(clumsy_engine::new_a_conmara_controller<clumsy_engine::Orthographic_Projection>())
+		, m_camara_controller(clumsy_engine::new_a_conmara_controller<clumsy_engine::Perspective_Projection>())
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 	{
 
@@ -74,6 +74,7 @@ public:
 		clumsy_engine::Renderer::end_scene();
 
 	};
+
 	virtual void on_event(clumsy_engine::Event& e) 
 	{
 		m_camara_controller->on_event(e);

@@ -16,6 +16,8 @@ namespace clumsy_engine
         public:
 			static inline Renderer_API::API get_API() { return Renderer_API::get_API(); }
 
+            static void on_window_resized(int width, int height);
+
             static void begin_scene(Ref<Camara> camara);
 
             static void init();

@@ -44,38 +44,41 @@ namespace clumsy_engine
 
 
 
-	////////////////projection
+	//////////////// perspective projection
 
 	glm::mat4 Perspective_Projection::compute_projection_matrix(float left, float right, float bottom, float top, float n, float f)
 	{
-		float aspect_ration = (top - bottom) / (right - left);
+		float aspect_ration = 1.f * (right - left) / (top - bottom);
 		float fov = std::atan2(std::abs(top), std::abs(n));
 		return glm::perspective(fov, aspect_ration, std::abs(n), std::abs(f));
 	}
 
-	glm::mat4 Perspective_Projection::zoom(float left, float right, float bottom, float top, float n, float f, float delta)
+	glm::mat4 Perspective_Projection::zoom(float left, float right, float bottom, float top, float n, float f, float zoom_level)
 	{
-		float aspect_ration = (top - bottom) / (right - left);
+		float aspect_ration = 1.f * (right - left) / (top - bottom);
 		float fov = std::atan2(std::abs(top), std::abs(n));
-		if (!is_init)
-		{
-			m_fov_in_degree = glm::degrees(fov);
-			is_init = true;
-		}
+		//if (!is_init)
+		//{
+		//	m_fov_in_degree = glm::degrees(fov);
+		//	is_init = true;
+		//}
+		printf("%f \n", zoom_level);
 
-		m_fov_in_degree += delta;
+		float zoomed_fov = glm::degrees(fov) + zoom_level * 2.f;
 		float tolerance = 1e-3f;
-		m_fov_in_degree = std::clamp(m_fov_in_degree, tolerance, 180.f - tolerance);
-		return glm::perspective(glm::radians(m_fov_in_degree), aspect_ration, std::abs(n), std::abs(f));
+		zoomed_fov = std::clamp(zoomed_fov, tolerance, 180.f - tolerance);
+		return glm::perspective(glm::radians(zoomed_fov), aspect_ration, std::abs(n), std::abs(f));
 	}
 
+
+	//////////////// orthogonal projection
 	glm::mat4 Orthographic_Projection::compute_projection_matrix(float left, float right, float bottom, float top, float n, float f)
 	{
 		return glm::ortho(left, right, bottom, top, std::abs(n), std::abs(f));
 	}
-	glm::mat4 Orthographic_Projection::zoom(float left, float right, float bottom, float top, float n, float f, float delta)
+
+	glm::mat4 Orthographic_Projection::zoom(float left, float right, float bottom, float top, float n, float f, float zoom_level)
 	{
-		zoom_level += delta;
 		return compute_projection_matrix(left * zoom_level, right * zoom_level, bottom * zoom_level, top * zoom_level, n, f);
 	}
 
@@ -122,11 +125,10 @@ namespace clumsy_engine
 		set_look_at(m_position, m_target_position, m_up);
 	}
 
-	void Camara::zoom(const float& v)
+	void Camara::zoom(const float& zoom_level)
 	{
-		m_projection_matrix = m_projection_handler->zoom(m_left, m_right, m_bottom, m_top, m_near, m_far, v);
+		m_projection_matrix = m_projection_handler->zoom(m_left, m_right, m_bottom, m_top, m_near, m_far, zoom_level);
 		recompute_view_projection_matrix();
 	}
-
 
 }

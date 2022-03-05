@@ -33,21 +33,16 @@ namespace clumsy_engine
 	class Perspective_Projection:public Projection_Handler
 	{
 	public:
-		virtual glm::mat4 compute_projection_matrix(float left, float right, float bottom, float top, float n, float f) override;
-		virtual glm::mat4 zoom(float left, float right, float bottom, float top, float n, float f, float delta) override;
+		glm::mat4 compute_projection_matrix(float left, float right, float bottom, float top, float n, float f) override;
+		glm::mat4 zoom(float left, float right, float bottom, float top, float n, float f, float zoom_level) override;
 
-	private:
-		float m_fov_in_degree;
-		bool is_init = false;
 	};
 
 	class Orthographic_Projection:public Projection_Handler
 	{
 	public:
-		virtual glm::mat4 compute_projection_matrix(float left, float right, float bottom, float top, float n, float f) override;
-		virtual glm::mat4 zoom(float left, float right, float bottom, float top, float n, float f, float delta) override;
-	private:
-		float zoom_level = 1.f;
+		glm::mat4 compute_projection_matrix(float left, float right, float bottom, float top, float n, float f) override;
+		glm::mat4 zoom(float left, float right, float bottom, float top, float n, float f, float zoom_level) override;
 	};
 
 
@@ -67,7 +62,7 @@ namespace clumsy_engine
 		virtual void rotate(const glm::vec2& delta_theta);
 
 		virtual void set_view_field(float left, float right, float bottom, float top, float n, float f);
-		virtual void zoom(const float& v);
+		virtual void zoom(const float& zoom_level);
 
 		////////////getter
 		const glm::mat4& get_view_projection_matrix() const { return m_view_projection_matrix; }

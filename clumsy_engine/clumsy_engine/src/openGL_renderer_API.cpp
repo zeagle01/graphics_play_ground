@@ -31,4 +31,10 @@ namespace clumsy_engine
 
 	}
 
+	void OpenGL_Renderer_API::set_viewport(int x, int y, int  width, int height)
+	{
+		glViewport(x, y, width, height);
+	}
+
+
 }

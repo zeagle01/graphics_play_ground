@@ -53,17 +53,21 @@ namespace clumsy_engine
 
 	bool Camara_Controller::on_mouse_scrolled(Mouse_Scrolled_Event& e)
 	{
-		m_camara->zoom(e.get_y_offset());
-		return true;
+		m_zoom_level += e.get_y_offset();
+		m_camara->zoom(m_zoom_level);
+		return false;
 
 	}
 	bool Camara_Controller::on_window_resized(Window_Resize_Event& e)
 	{
-		m_aspect_ratio = e.get_width() / e.get_height();
+		if (e.get_height() != 0)
+		{
+			m_aspect_ratio = 1.f * e.get_width() / e.get_height();
 
-		m_camara->set_view_field(-m_zoom_level * m_aspect_ratio, m_zoom_level * m_aspect_ratio, -m_zoom_level, m_zoom_level, m_near_plane, m_far_plane);
+			m_camara->set_view_field(-m_zoom_level * m_aspect_ratio, m_zoom_level * m_aspect_ratio, -m_zoom_level, m_zoom_level, m_near_plane , m_far_plane );
+		}
 
-		return true;
+		return false;
 	}
 }
 

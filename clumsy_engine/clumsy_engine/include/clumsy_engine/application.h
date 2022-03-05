@@ -14,6 +14,7 @@ namespace clumsy_engine
 
 	class Event;
 	class Window_Close_Event;
+	class Window_Resize_Event;
 	class Layer_Stack;
 	class Layer;
 	class Window;
@@ -63,9 +64,11 @@ namespace clumsy_engine
 		float m_last_frame_time;
 
 		bool m_is_running;
+		bool m_is_minimized = false;
 
 	private:
 		bool On_Window_Close(Window_Close_Event& e);
+		bool On_Window_Resized(Window_Resize_Event& e);
 
 	};
 

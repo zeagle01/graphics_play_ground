@@ -39,4 +39,9 @@ namespace clumsy_engine
 	{
 		Render_Command::init();
 	}
+
+	void Renderer::on_window_resized(int width, int height)
+	{
+		Render_Command::set_viewport(0, 0, width, height);
+	}
 }
