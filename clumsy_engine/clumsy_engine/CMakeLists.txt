@@ -50,6 +50,7 @@ src/texture.cpp
 src/openGL_texture.h
 src/openGL_texture.cpp
 src/camara.cpp
+src/camara_controller.cpp
 
 
 src/simulator.cpp
@@ -124,6 +125,7 @@ include/clumsy_engine/mouse_event.h
 include/clumsy_engine/time_step.h
 include/clumsy_engine/ref.h
 include/clumsy_engine/file_dialogs.h
+include/clumsy_engine/camara_controller.h
 
 include/simulator/simulator.h
 include/simulator/devices.h

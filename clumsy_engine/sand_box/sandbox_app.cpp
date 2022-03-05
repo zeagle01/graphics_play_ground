@@ -15,6 +15,7 @@
 #include "clumsy_engine/mouse_event.h"
 #include "shader_sources.h"
 #include "clumsy_engine/shader.h"
+#include "clumsy_engine/camara_controller.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -29,16 +30,11 @@ class Layer_Demo :public clumsy_engine::Layer
 public:
 	Layer_Demo() :
 		clumsy_engine::Layer("demo_layer")
-		, m_camara(clumsy_engine::new_a_camara<clumsy_engine::View_Handler, clumsy_engine::Perspective_Projection>())
+		, m_camara_controller(clumsy_engine::new_a_conmara_controller<clumsy_engine::Orthographic_Projection>())
 		, m_dispatcher(std::make_shared < clumsy_engine::Dispatcher<clumsy_engine::Event, bool>>())
 	{
 
-		m_camara->set_view_field(-1.f, 1.f, -1.f, 1.f, -1.f, -1000.f);
-		m_camara->set_look_at(
-			glm::vec3(0.f,0.f,10.f),
-			glm::vec3(0.f,0.f,0.f),
-			glm::vec3(0.f,1.f,0.f)
-		);
+		m_camara_controller->set_aspect_ratio(800.f/600.f);
 
 		/// data
 		config_shader();
@@ -50,41 +46,19 @@ public:
 			return false;
 		};
 
-		m_dispatcher->add<clumsy_engine::Mouse_Scrolled_Event>(std::bind(&Layer_Demo::on_mouse_scroll, this, std::placeholders::_1));
-
 	}
 
-	bool on_mouse_scroll(clumsy_engine::Mouse_Scrolled_Event& e)
-	{
-		m_camara->zoom(e.get_y_offset());
-		return true;
-	}
-
-	void on_attach()  override
-	{
-	};
-
-	void on_detach()override {};
 	void on_update(clumsy_engine::Time_Step dt) override
 	{
 		RECORD_FUNCTION_DURATION();
 
-		//mouse handle
-		m_drag_delta_computer.compute();
-		{
-			auto mouse_delta = m_drag_delta_computer.get(CE_MOUSE_BUTTON_LEFT);
-			m_camara->rotate(glm::vec2(mouse_delta[0], mouse_delta[1]));
-		}
-		{
-			auto mouse_delta = m_drag_delta_computer.get(CE_MOUSE_BUTTON_RIGHT);
-			m_camara->translate(glm::vec2(mouse_delta[0], mouse_delta[1]));
-		}
+		m_camara_controller->on_update(dt);
 
 
 		clumsy_engine::Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
 		clumsy_engine::Render_Command::clear();
 
-		clumsy_engine::Renderer::begin_scene(m_camara);
+		clumsy_engine::Renderer::begin_scene(m_camara_controller->get_camara());
 
 		plane_update();
 
@@ -102,6 +76,7 @@ public:
 	};
 	virtual void on_event(clumsy_engine::Event& e) 
 	{
+		m_camara_controller->on_event(e);
 		(*m_dispatcher)(e);
 	}
 
@@ -294,7 +269,8 @@ private:
 	clumsy_engine::Shader_Library m_shader_library;
 
 
-	clumsy_engine::Ref<clumsy_engine::Camara> m_camara;
+	clumsy_engine::Ref<clumsy_engine::Camara_Controller> m_camara_controller;
+
 	clumsy_engine::Drag_Delta_Computer m_drag_delta_computer;
 
 	clumsy_engine::Ref<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
@@ -320,8 +296,8 @@ std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
 
 	clumsy_engine::Log::get_core_logger()->trace("create app");
 
-	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
-	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
+	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
+	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
 
 	return app;
 }

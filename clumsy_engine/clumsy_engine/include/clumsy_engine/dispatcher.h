@@ -21,11 +21,7 @@ namespace clumsy_engine
 
 	public:
 
-		~Dispatcher() {
-
-			printf("in \n");
-
-		}
+		~Dispatcher() { }
 
 		template<typename Sub_T>
 		void add(std::function < Ret(Sub_T& )> fn)
@@ -55,60 +51,6 @@ namespace clumsy_engine
 			}
 
 		}
-
-//		template<typename poly_base_t>
-//		Ret invoke(poly_base_t&& b)
-//		{
-//			using std::forward<poly_base_t>(b);
-//			static_assert(std::is_same_v<std::decay<poly_base_t>, Base_T>);
-//
-//			key_t key = typeid(b).name();
-//
-//			if constexpr (std::is_reference_v<poly_base_t>)
-//			{
-//				return m_function_map[key](&b);
-//			}
-//			else if constexpr (std::is_pointer_v<poly_base_t>)
-//			{
-//				return m_function_map[key](b);
-//			}
-//			else
-//			{
-//				static_assert(0);
-//				return R{};
-//			}
-//
-//		}
-//
-//		template<typename Sub_T>
-//		void add(std::function < Ret(Sub_T)> fn)
-//		{
-//			fn_t auto_cast_wrapper; 
-//
-//			if constexpr (std::is_reference_v<Sub_T>)
-//			{
-//				auto_cast_wrapper = [fn](Base_T* s)
-//				{
-//					return fn(*dynamic_cast<Sub_T*>(s));
-//				};
-//			}
-//			else if constexpr (std::is_pointer_v<Sub_T>)
-//			{
-//				auto_cast_wrapper = [fn](Base_T* s)
-//				{
-//					return fn(dynamic_cast<Sub_T*>(s));
-//				};
-//			}
-//			else
-//			{
-//				static_assert(0);
-//			}
-//
-//			key_t key = typeid(std::decay_t<Sub_T>).name();
-//
-//			m_function_map[key] = auto_cast_wrapper;
-//		}
-
 	};
 
 

@@ -46,6 +46,8 @@ namespace clumsy_engine
 	public:
 		virtual glm::mat4 compute_projection_matrix(float left, float right, float bottom, float top, float n, float f) override;
 		virtual glm::mat4 zoom(float left, float right, float bottom, float top, float n, float f, float delta) override;
+	private:
+		float zoom_level = 1.f;
 	};
 
 

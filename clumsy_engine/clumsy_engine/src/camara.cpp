@@ -75,8 +75,8 @@ namespace clumsy_engine
 	}
 	glm::mat4 Orthographic_Projection::zoom(float left, float right, float bottom, float top, float n, float f, float delta)
 	{
-		//TODO:
-		return compute_projection_matrix(left, right, bottom, top, n, f);
+		zoom_level += delta;
+		return compute_projection_matrix(left * zoom_level, right * zoom_level, bottom * zoom_level, top * zoom_level, n, f);
 	}
 
 
