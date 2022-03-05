@@ -1,6 +1,6 @@
 
-#include <iostream>
-#include <memory>
+
+#include "sandbox_2D.h"
 
 #include "imgui.h"
 #include "clumsy_engine/clumsy_engine.h"
@@ -23,6 +23,8 @@
 
 #include "log.h"
 #include <algorithm>
+#include <iostream>
+#include <memory>
 
 
 class Layer_Demo :public clumsy_engine::Layer
@@ -272,8 +274,6 @@ private:
 
 	clumsy_engine::Ref<clumsy_engine::Camara_Controller> m_camara_controller;
 
-	clumsy_engine::Drag_Delta_Computer m_drag_delta_computer;
-
 	clumsy_engine::Ref<clumsy_engine::Dispatcher<clumsy_engine::Event, bool>> m_dispatcher;
 };
 
@@ -283,7 +283,8 @@ class SanBox_App:public clumsy_engine::Application
 	public:
 		SanBox_App() 
 		{
-			push_layer(std::make_shared<Layer_Demo>());
+			//push_layer(std::make_shared<Layer_Demo>());
+			push_layer(std::make_shared<Sandbox_2D>());
 		}
 
 };
