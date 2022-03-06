@@ -25,13 +25,13 @@ namespace clumsy_engine
 
 		const std::string& get_name() const override { return m_name;}
 
-		void upload_uniform_mat4(const std::string& name, const glm::mat4& m);
-		void upload_uniform_vec3(const std::string& name, const glm::vec3& m);
-		void upload_uniform_vec4(const std::string& name, const glm::vec4& m);
-		void upload_uniform_float(const std::string& name, const float& v);
-		void upload_uniform_int(const std::string& name, const int& v);
+		void upload_uniform_mat4(const std::string& name, const glm::mat4& m) override;
+		void upload_uniform_vec3(const std::string& name, const glm::vec3& m) override;
+		void upload_uniform_vec4(const std::string& name, const glm::vec4& m) override;
+		void upload_uniform_float(const std::string& name, const float& v) override;
+		void upload_uniform_int(const std::string& name, const int& v) override;
 
-		unsigned int get_id() { return m_renderer_id; }
+		unsigned int get_id() override { return m_renderer_id; }
 	private:
 		void compile(const std::unordered_map<unsigned int, std::string>& shader_sources_by_type);
 		std::unordered_map<unsigned int, std::string> split_according_to_shader_type(const std::string& all_in_one_source_code);

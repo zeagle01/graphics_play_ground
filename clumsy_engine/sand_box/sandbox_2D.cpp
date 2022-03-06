@@ -18,7 +18,10 @@ void Sandbox_2D::on_update(clumsy_engine::Time_Step dt)
 	clumsy_engine::Render_Command::clear();
 
 	clumsy_engine::Renderer_2D::begin_scene(m_camara_controller->get_camara());
-	clumsy_engine::Renderer_2D::draw_quad({ 0.f,0.f }, { 1.f,1.f }, { 0.8,0.2,0.3,1.f });
+	for (int i = 0; i < 3; i++)
+	{
+		clumsy_engine::Renderer_2D::draw_quad({ 0.f,-i * 0.6f }, { 0.5f,0.5f }, { 0.8,0.2,0.3,1.f });
+	}
 	clumsy_engine::Renderer_2D::end_scene();
 
 	//std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader>(m_shader_plane)->upload_uniform_vec4("u_color", m_plane_color);
