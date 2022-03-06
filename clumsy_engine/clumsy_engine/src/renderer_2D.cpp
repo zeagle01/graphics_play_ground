@@ -2,6 +2,7 @@
 
 #include "renderer_2D.h"
 #include "clumsy_engine.h"
+#include "texture.h"
 
 #include <vector>
 
@@ -11,6 +12,7 @@ namespace clumsy_engine
 	struct Render_2D_Storage
 	{
 		clumsy_engine::Ref<clumsy_engine::Shader> m_shader_plane;
+		clumsy_engine::Ref<clumsy_engine::Shader> m_shader_texture;
 		clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array_plane;
 	};
 
@@ -47,6 +49,10 @@ namespace clumsy_engine
 
 		Ref<Index_Buffer> index_buffer = Index_Buffer::create(triangles.data(), triangles.size());
 		s_data->m_vertex_array_plane->set_index_buffer(index_buffer);
+
+		s_data->m_shader_texture = Shader::create(resources_dir + "shaders/flat_plane_texture_2d.glsl");
+		s_data->m_shader_texture->bind();
+		s_data->m_shader_texture->upload_uniform_int("u_texture", 0);
 	}
 
 	void Renderer_2D::shutdown()
@@ -58,9 +64,12 @@ namespace clumsy_engine
 	{
 		s_data->m_shader_plane->bind();
 		s_data->m_shader_plane->upload_uniform_mat4("u_view_projection", camara->get_view_projection_matrix());
+
+		s_data->m_shader_texture->bind();
+		s_data->m_shader_texture->upload_uniform_mat4("u_view_projection", camara->get_view_projection_matrix());
 	}
 
-	void	Renderer_2D::end_scene()
+	void Renderer_2D::end_scene()
 	{
 
 	}
@@ -84,5 +93,28 @@ namespace clumsy_engine
 
 		s_data->m_vertex_array_plane->bind();
 		Render_Command::draw_indexed(s_data->m_vertex_array_plane);
+	}
+
+	void Renderer_2D::draw_quad(const glm::vec2& position, const glm::vec2& size, Ref<Texture_2D> texture)
+	{
+
+	}
+
+	void Renderer_2D::draw_quad(const glm::vec3& position, const glm::vec2& size, Ref<Texture_2D> texture)
+	{
+
+		s_data->m_shader_texture->bind();
+
+		auto model_matrix = glm::mat4(1.f);
+		model_matrix = glm::translate(model_matrix, glm::vec3(position.x, position.y, 0.f));
+		model_matrix = glm::scale(model_matrix, glm::vec3(size.x, size.y, 1.f));
+
+		s_data->m_shader_texture->upload_uniform_mat4("u_model_matrix", model_matrix);
+
+		texture->bind();
+
+		s_data->m_vertex_array_plane->bind();
+		Render_Command::draw_indexed(s_data->m_vertex_array_plane);
+
 	}
 }

@@ -8,6 +8,7 @@ namespace clumsy_engine
 {
 
     class Camara;
+    class Texture_2D;
 
 	class Renderer_2D
 	{
@@ -21,6 +22,9 @@ namespace clumsy_engine
 			//
 		static void draw_quad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
 		static void draw_quad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
+
+		static void draw_quad(const glm::vec2& position, const glm::vec2& size, Ref<Texture_2D> texture);
+		static void draw_quad(const glm::vec3& position, const glm::vec2& size, Ref<Texture_2D> texture);
 
 	};
 

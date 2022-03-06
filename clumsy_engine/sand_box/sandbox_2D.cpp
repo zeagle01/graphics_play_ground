@@ -22,6 +22,9 @@ void Sandbox_2D::on_update(clumsy_engine::Time_Step dt)
 	{
 		clumsy_engine::Renderer_2D::draw_quad({ 0.f,-i * 0.6f }, { 0.5f,0.5f }, { 0.8,0.2,0.3,1.f });
 	}
+
+	clumsy_engine::Renderer_2D::draw_quad({ -0.5f, 0.6f }, { 0.5f,0.5f }, m_texture);
+
 	clumsy_engine::Renderer_2D::end_scene();
 
 	//std::dynamic_pointer_cast<clumsy_engine::OpenGL_Shader>(m_shader_plane)->upload_uniform_vec4("u_color", m_plane_color);
@@ -50,6 +53,9 @@ void Sandbox_2D::on_attach()
 
 	m_camara_controller->set_aspect_ratio(800.f / 600.f);
 
+	std::string resources_dir = "../../../resources/";
+	std::string texture_image = resources_dir + "textures/awesomeface.png";
+	m_texture = clumsy_engine::Texture_2D::create(texture_image);
 
 
 }
