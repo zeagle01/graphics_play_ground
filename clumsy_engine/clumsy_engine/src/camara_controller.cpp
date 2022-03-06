@@ -53,7 +53,7 @@ namespace clumsy_engine
 
 	bool Camara_Controller::on_mouse_scrolled(Mouse_Scrolled_Event& e)
 	{
-		m_zoom_level += e.get_y_offset();
+		m_zoom_level += e.get_y_offset()*0.2f;
 		m_camara->zoom(m_zoom_level);
 		return false;
 
