@@ -66,11 +66,11 @@ using namespace clumsy_engine;
 		int v_num = m_positions.size();
 
 
-		m_vertex_array->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3, m_attribute_name_position);
+		m_vertex_array->add_vertex_attribute(clumsy_engine::Shader_Data_Type::Float3, m_attribute_name_position);
 		m_vertex_array->set_vertex_attribute_data(m_attribute_name_position, &m_positions[0](0), v_num);
 
 		//vbo normal
-		m_vertex_array->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3, m_attribute_name_normal);
+		m_vertex_array->add_vertex_attribute(clumsy_engine::Shader_Data_Type::Float3, m_attribute_name_normal);
 		m_vertex_array->set_vertex_attribute_data(m_attribute_name_normal, &m_normals[0](0), v_num);
 
 		//ibo 

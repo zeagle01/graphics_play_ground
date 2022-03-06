@@ -137,9 +137,9 @@ private:
 		//gl data stuff
 		int vNum = m_positions.size() / 3;
 		m_vertex_array = clumsy_engine::Vertex_Array::create();
-		m_vertex_array->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3,m_position_name_in_shader);
+		m_vertex_array->add_vertex_attribute(clumsy_engine::Shader_Data_Type::Float3, m_position_name_in_shader);
 		m_vertex_array->set_vertex_attribute_data(m_position_name_in_shader, m_positions.data(), vNum);
-		m_vertex_array->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3, m_color_name_in_shader);
+		m_vertex_array->add_vertex_attribute(clumsy_engine::Shader_Data_Type::Float3, m_color_name_in_shader);
 		m_vertex_array->set_vertex_attribute_data(m_color_name_in_shader, m_colors.data(), vNum);
 
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
@@ -177,10 +177,10 @@ private:
 		std::string texture_name_in_shader = "texture";
 		int v_num = m_positions_texture.size() / 3;
 
-		m_vertex_array_texture->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3, position_name_in_shader);
+		m_vertex_array_texture->add_vertex_attribute(clumsy_engine::Shader_Data_Type::Float3, position_name_in_shader);
 		m_vertex_array_texture->set_vertex_attribute_data(position_name_in_shader, m_positions_texture.data(), v_num);
 
-		m_vertex_array_texture->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float2, texture_name_in_shader);
+		m_vertex_array_texture->add_vertex_attribute(clumsy_engine::Shader_Data_Type::Float2, texture_name_in_shader);
 		m_vertex_array_texture->set_vertex_attribute_data(texture_name_in_shader, m_texture_coodinates.data(), v_num);
 
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
@@ -223,7 +223,7 @@ private:
 		std::string position_name_in_shader = "position";
 		int v_num = m_positions_plane.size() / 3;
 
-		m_vertex_array_plane->add_vertex_attribute(ogl_shader->get_id(), clumsy_engine::Shader_Data_Type::Float3, position_name_in_shader);
+		m_vertex_array_plane->add_vertex_attribute( clumsy_engine::Shader_Data_Type::Float3, position_name_in_shader);
 		m_vertex_array_plane->set_vertex_attribute_data(position_name_in_shader, m_positions_plane.data(), v_num);
 
 		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(triangles.data(), triangles.size());
@@ -251,8 +251,8 @@ private:
 	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array;
 	std::vector<float> m_positions;
 	std::vector<float> m_colors;
-	std::string m_position_name_in_shader="a_position";
-	std::string m_color_name_in_shader="a_color";
+	std::string m_position_name_in_shader = "a_position";
+	std::string m_color_name_in_shader = "a_color";
 
 	//plane shader
 	clumsy_engine::Ref<clumsy_engine::Shader> m_shader_plane;

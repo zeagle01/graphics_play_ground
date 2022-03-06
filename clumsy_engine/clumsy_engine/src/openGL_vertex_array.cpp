@@ -30,7 +30,7 @@ namespace clumsy_engine
 		glBindVertexArray(0);
 	}
 
-	void OpenGL_Vertex_Array::add_vertex_attribute(int shader_program, Shader_Data_Type data_type,const std::string& name_in_shader)
+	void OpenGL_Vertex_Array::add_vertex_attribute(Shader_Data_Type data_type, const std::string& name_in_shader)
 	{
 		if (m_vertex_buffers.count(name_in_shader) && m_vertex_buffers[name_in_shader] != nullptr)
 		{
@@ -42,7 +42,7 @@ namespace clumsy_engine
 		clumsy_engine::Buffer_Layout layout = { {data_type, name_in_shader} };
 		vbo->set_layout(layout);
 		m_vertex_buffers[name_in_shader] = vbo;
-		add_vertex_buffer(vbo, shader_program);
+		add_vertex_buffer(vbo);
 	}
 
 	void OpenGL_Vertex_Array::set_vertex_attribute_data(const std::string& name_in_shader, const float* data,int count)
@@ -51,7 +51,7 @@ namespace clumsy_engine
 		{
 			bind();
 			auto vbo = m_vertex_buffers[name_in_shader];
-			auto layout=vbo->get_layout().get_elements()[0];
+			auto layout = vbo->get_layout().get_elements()[0];
 			int size_in_byte = layout.size * count;
 			vbo->set_data(data, size_in_byte);
 		}
@@ -63,7 +63,7 @@ namespace clumsy_engine
 	}
 
 
-	void OpenGL_Vertex_Array::add_vertex_buffer(Ref<Vertex_Buffer> vb, int shader_program)
+	void OpenGL_Vertex_Array::add_vertex_buffer(Ref<Vertex_Buffer> vb)
 	{
 		if (vb->get_layout().get_elements().empty())
 		{
@@ -73,15 +73,13 @@ namespace clumsy_engine
 		glBindVertexArray(m_renderer_id);
 
 		vb->bind();
-		const auto& layout = vb->get_layout();
-		int index= 0;
-		for (const auto& e : layout)
-		{
-			auto location=glGetAttribLocation(shader_program, e.name.c_str());
 
-			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, e.count, e.gl_type, e.normalized, layout.get_stride(), (void*)e.offset);
-			index++;
+		const auto& layout = vb->get_layout();
+		for (const auto& e : layout) //make sure consistent with shader
+		{
+			glEnableVertexAttribArray(m_location_in_shader);
+			glVertexAttribPointer(m_location_in_shader, e.count, e.gl_type, e.normalized, layout.get_stride(), (void*)e.offset);
+			m_location_in_shader++;
 		}
 	}
 

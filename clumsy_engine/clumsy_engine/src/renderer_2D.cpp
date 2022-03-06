@@ -29,6 +29,13 @@ namespace clumsy_engine
 			0,1,0
 		};
 
+		std::vector<float> m_texture_cood_plane = {
+			0.f,0.f,
+			1.f,0.f,
+			1.f,1.f,
+			0.f,1.f
+		};
+
 		std::vector<int> triangles{
 			0,1,2,
 			0,2,3
@@ -41,11 +48,15 @@ namespace clumsy_engine
 
 		//gl data stuff
 		s_data->m_vertex_array_plane = Vertex_Array::create();
-		std::string position_name_in_shader = "position";
 		int v_num = m_positions_plane.size() / 3;
 
-		s_data->m_vertex_array_plane->add_vertex_attribute(s_data->m_shader_plane->get_id(), Shader_Data_Type::Float3, position_name_in_shader);
+		std::string position_name_in_shader = "position";
+		s_data->m_vertex_array_plane->add_vertex_attribute(Shader_Data_Type::Float3, position_name_in_shader);
 		s_data->m_vertex_array_plane->set_vertex_attribute_data(position_name_in_shader, m_positions_plane.data(), v_num);
+
+		std::string texture_coodinate_name_in_shader = "texture_coodinate";
+		s_data->m_vertex_array_plane->add_vertex_attribute(Shader_Data_Type::Float2, texture_coodinate_name_in_shader);
+		s_data->m_vertex_array_plane->set_vertex_attribute_data(texture_coodinate_name_in_shader, m_texture_cood_plane.data(), v_num);
 
 		Ref<Index_Buffer> index_buffer = Index_Buffer::create(triangles.data(), triangles.size());
 		s_data->m_vertex_array_plane->set_index_buffer(index_buffer);
@@ -97,7 +108,7 @@ namespace clumsy_engine
 
 	void Renderer_2D::draw_quad(const glm::vec2& position, const glm::vec2& size, Ref<Texture_2D> texture)
 	{
-
+		draw_quad({ position.x,position.y,0.f }, size, texture);
 	}
 
 	void Renderer_2D::draw_quad(const glm::vec3& position, const glm::vec2& size, Ref<Texture_2D> texture)
@@ -111,7 +122,7 @@ namespace clumsy_engine
 
 		s_data->m_shader_texture->upload_uniform_mat4("u_model_matrix", model_matrix);
 
-		texture->bind();
+		texture->bind(0);
 
 		s_data->m_vertex_array_plane->bind();
 		Render_Command::draw_indexed(s_data->m_vertex_array_plane);

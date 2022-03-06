@@ -22,18 +22,18 @@ namespace clumsy_engine
 
 		 void set_index_buffer(Ref<Index_Buffer> ib) override;
 
-		 void add_vertex_attribute(int shader_program, Shader_Data_Type data_type,const std::string& name_in_shader);
+		 void add_vertex_attribute(Shader_Data_Type data_type, const std::string& name_in_shader);
 		 void set_vertex_attribute_data(const std::string& name_in_shader, const float* data,int count);
-
 
 		 Ref<Index_Buffer> get_index_buffer() const override{ return m_index_buffer; };
 
 	private:
-		void add_vertex_buffer(Ref<Vertex_Buffer> vb, int shader_program);
+		void add_vertex_buffer(Ref<Vertex_Buffer> vb);
 
 	private:
 		Ref<Index_Buffer> m_index_buffer;
 		unsigned int m_renderer_id;
+		unsigned int m_location_in_shader = 0;
 		std::map<std::string, Ref<Vertex_Buffer>> m_vertex_buffers;
 	};
 

@@ -21,7 +21,7 @@ namespace clumsy_engine
 		virtual void set_index_buffer(Ref<Index_Buffer> ib)  = 0;
 		virtual Ref<Index_Buffer> get_index_buffer() const = 0;
 
-		virtual void add_vertex_attribute(int shader_program, Shader_Data_Type data_type, const std::string& name_in_shader) = 0;
+		virtual void add_vertex_attribute( Shader_Data_Type data_type, const std::string& name_in_shader) = 0;
 		virtual void set_vertex_attribute_data(const std::string& name_in_shader, const float* data, int count) = 0;
 
 
