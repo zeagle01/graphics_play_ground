@@ -12,6 +12,7 @@
 #include "buffer.h"
 #include "vertex_array.h"
 #include "renderer.h"
+#include "renderer_2D.h"
 #include "render_command.h"
 #include "camara.h"
 #include "time_step.h"
@@ -51,6 +52,7 @@ namespace clumsy_engine
 		m_window->set_vertical_sync(false);
 
 		Renderer::init();
+		Renderer_2D::init();
 
 		m_dispatcher_imp->add<Window_Close_Event>(BIND_MEMBER(On_Window_Close));
 		m_dispatcher_imp->add<Window_Resize_Event>(BIND_MEMBER(On_Window_Resized));

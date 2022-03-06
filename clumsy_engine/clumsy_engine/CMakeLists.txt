@@ -37,6 +37,7 @@ src/shader.cpp
 src/buffer.cpp
 src/opengl_buffer.cpp
 src/renderer.cpp
+src/renderer_2D.cpp
 src/enum_loop.h
 src/vertex_array.cpp
 src/openGL_vertex_array.h
@@ -111,6 +112,7 @@ include/clumsy_engine/key_codes.h
 include/clumsy_engine/mouse_button_codes.h
 include/clumsy_engine/input.h
 include/clumsy_engine/renderer.h
+include/clumsy_engine/renderer_2D.h
 include/clumsy_engine/render_command.h
 include/clumsy_engine/renderer_API.h
 include/clumsy_engine/buffer.h
