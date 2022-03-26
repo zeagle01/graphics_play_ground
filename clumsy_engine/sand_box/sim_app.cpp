@@ -50,11 +50,7 @@ using namespace clumsy_engine;
 					0,1,2
 		};
 
-
-
-
 		//shader
-
 		std::string resources_dir = "../../../resources/";
 		m_shader = clumsy_engine::Shader::create(resources_dir + "shaders/cloth_sim.glsl");
 
@@ -87,19 +83,10 @@ using namespace clumsy_engine;
 		ogl_shader->upload_uniform_float("u_kd", 0.5f);
 		ogl_shader->upload_uniform_float("u_specular_steep", 40.f);
 
-
-
-		auto key_pressed_handler = [](auto& e)
-		{
-			return false;
-		};
-
-
 		//simulation data mapper
 		m_simulation_mappers.add_types<UI_Simulation_Mapper>();
 
 		simulation_init();
-
 
 	}
 
@@ -170,10 +157,6 @@ using namespace clumsy_engine;
 		m_vertex_array->set_vertex_attribute_data(m_attribute_name_position, &new_pos[0], new_pos.size());
 		m_vertex_array->set_vertex_attribute_data(m_attribute_name_normal, &new_normal[0], new_normal.size());
 
-		clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(m_indices.data(), m_indices.size());
-		m_vertex_array->set_index_buffer(index_buffer);
-
-
 	};
 
 	void Sim_Gui::on_event(clumsy_engine::Event& e) 
@@ -222,7 +205,6 @@ using namespace clumsy_engine;
 		ImGui::Text("---begin simulation panel");
 		for (auto& mapper : m_simulation_mappers)
 		{
-			//auto mapper = it.second;
 			mapper->update_from_ui(&m_sim);
 		}
 		ImGui::Text("---end simulation panel");
@@ -271,8 +253,6 @@ using namespace clumsy_engine;
 		}
 
 		ImGui::End();
-
-
 
 	}
 

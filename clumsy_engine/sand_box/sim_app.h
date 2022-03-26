@@ -15,9 +15,6 @@ class Sim_Gui :public clumsy_engine::Layer
 public:
 	Sim_Gui() ;
 	
-
-	bool on_key_pressed(clumsy_engine::Key_Pressed_Event& e);
-
 	void on_attach()  override;
 
 	void on_detach()override ;
