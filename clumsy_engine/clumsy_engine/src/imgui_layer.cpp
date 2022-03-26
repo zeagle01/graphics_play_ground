@@ -100,21 +100,4 @@ namespace clumsy_engine
 			ImGui::DestroyContext();
 		}
 
-
-		void Imgui_Layer::on_imgui_render(ImGuiContext* imgui_context)
-		{
-			RECORD_FUNCTION_DURATION();
-
-			static bool show = true;
-			ImGui::ShowDemoWindow(&show);
-
-			ImGui::Begin("Test from imgui layer");
-			ImGui::Text("hello world from imgui layer");
-			ImGui::End();
-
-
-		}
-
-
-
 }

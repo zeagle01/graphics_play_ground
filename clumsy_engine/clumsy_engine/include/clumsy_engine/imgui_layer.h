@@ -35,8 +35,6 @@ namespace clumsy_engine
 
 		virtual void on_attach() override;
 		virtual void on_detach() override;
-	//	virtual void on_update() override;
-		virtual void on_imgui_render(ImGuiContext* imgui_context) override;
 		ImGuiContext* get_imgui_context() { return m_imgui_context; };
 
 		void begin();
