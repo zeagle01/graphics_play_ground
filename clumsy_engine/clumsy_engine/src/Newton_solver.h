@@ -34,6 +34,13 @@ namespace clumsy_engine
 			return *(m_morphisms->get_type<clumsy_lib::Morphism_Types<Morphism_T::base_type>>());
 		}
 
+		template<typename Morphism_T>
+		std::string get_morphism_type_name()
+		{
+			auto m = m_morphisms->get_type<clumsy_lib::Morphism_Types<Morphism_T::base_type>>();
+			return m->get_current_type_name();
+		}
+
 		clumsy_lib::Variable_Accecor<clumsy_lib::Type_Map<void>>* m_datas;
 		clumsy_lib::Type_Map<Interaction>* m_interactions;
 		clumsy_lib::Type_Map<>* m_morphisms;

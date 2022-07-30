@@ -66,6 +66,16 @@ namespace clumsy_engine
 		{
 			CPU_Data_IO<T>::download(host_data, device_pointer);
 		};
+
+		template<typename T>
+		void free(clumsy_lib::Raw_Pointer<T>& device_ptr, const T& host_data)
+		{
+		};
+
+		template<typename T>
+		void allocate(clumsy_lib::Raw_Pointer<T>& device_ptr, const T& host_data)
+		{
+		};
 	};
 
 }

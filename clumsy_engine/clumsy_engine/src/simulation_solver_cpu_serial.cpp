@@ -15,8 +15,9 @@ namespace clumsy_engine
 
 		m_equations.resize(0);
 
-		for (auto& interation : *m_interactions)
+		for (auto& it : *m_interactions)
 		{
+			auto interation = it.obj;
 			auto ieraction_equations = interation->compute_element_equations();
 			m_equations.insert(m_equations.end(), ieraction_equations.begin(), ieraction_equations.end());
 		}

@@ -92,9 +92,16 @@ namespace clumsy_lib
 		}
 
 		template<typename Device_Type >
-		Raw_Pointer<T> get_device_pointer(Device_Type device)
+		Raw_Pointer<T> get_device_pointer(Device_Type device, std::string device_type_name)
 		{
 			check_n_upate();
+
+			if (m_device_type_name != device_type_name)
+			{
+				device->free<T>(device_pointer, data);
+				device->allocate<T>(device_pointer, data);
+				m_device_type_name = device_type_name;
+			}
 
 			if (m_device_poiter_is_dirty)
 			{
@@ -152,6 +159,7 @@ namespace clumsy_lib
 		std::shared_ptr<Variable_Set> m_upstream_variables;
 	private:
 		bool m_device_poiter_is_dirty = true;
+		std::string  m_device_type_name;
 	};
 
 	////////////////build dependent

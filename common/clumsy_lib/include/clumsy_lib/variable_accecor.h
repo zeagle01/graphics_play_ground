@@ -31,10 +31,10 @@ namespace clumsy_lib
 		}
 
 		template<typename Variable_Type, typename Device_Type >
-		auto get_device_pointer(Device_Type device)
+		auto get_device_pointer(Device_Type device, std::string device_type_name)
 		{
 			auto variable = m_type_map->get_type<Variable_Type>();
-			return variable->get_device_pointer(device);
+			return variable->get_device_pointer(device, device_type_name);
 		}
 
 		template<typename Variable_Type, typename Value_Type = Variable_Type::value_type>

@@ -73,6 +73,28 @@ namespace clumsy_engine
 				},
 				device);
 		};
+
+		template<typename T>
+		void free(clumsy_lib::Raw_Pointer<T>& device_ptr, const T& host_data)
+		{
+			std::visit(
+				[&](auto& device)
+				{
+					return device.free(device_ptr, host_data);
+				},
+				device);
+		};
+
+		template<typename T>
+		void allocate(clumsy_lib::Raw_Pointer<T>& device_ptr, const T& host_data)
+		{
+			std::visit(
+				[&](auto& device)
+				{
+					return device.allocate(device_ptr, host_data);
+				},
+				device);
+		};
 	};
 
 

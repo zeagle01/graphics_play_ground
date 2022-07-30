@@ -39,9 +39,10 @@ namespace clumsy_engine
 		RECORD_FUNCTION_DURATION();
 
 		auto device = get_morphism<Device>();
+		auto device_type = get_morphism_type_name<Device>();
 
-		auto last_pos = m_datas->get_device_pointer<data::Last_Frame_Position>(device);
-		auto cur_pos= m_datas->get_device_pointer<data::Position>(device);
+		auto last_pos = m_datas->get_device_pointer<data::Last_Frame_Position>(device, device_type);
+		auto cur_pos = m_datas->get_device_pointer<data::Position>(device, device_type);
 
 		static float t = 0.f;
 		float a = 1e-3f;

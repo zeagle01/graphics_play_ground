@@ -17,12 +17,20 @@ namespace clumsy_lib
 	template<typename K,typename V> 
 	struct Order_Helper
 	{
-		std::map<K, typename std::list<V>::iterator> iterators;
-		std::list<V> linked_list;
+		struct K_V 
+		{
+			std::string type_name;
+			V obj;
+		};
+
+		using list_t = std::list<K_V>;
+
+		std::map<K, typename list_t::iterator> iterators;
+		list_t linked_list;
 
 		void push_back(const K& key, V value)
 		{
-			linked_list.push_back(value);
+			linked_list.push_back({ std::string(typeid(key).name()),value });
 			auto back_it = linked_list.end();
 			iterators[key] = --back_it;
 		}
