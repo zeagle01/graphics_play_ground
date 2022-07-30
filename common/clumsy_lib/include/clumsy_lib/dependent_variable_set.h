@@ -48,20 +48,11 @@ namespace clumsy_lib
 			return m_is_changed_by_self;
 		}
 
-		void set_is_device_pointer_dirty(bool v)
-		{
-			m_is_device_pointer_dirty=v;
-		}
-		bool is_device_pointer_dirty()
-		{
-			return m_is_device_pointer_dirty;
-		}
 
 	private:
 		std::vector<Tree_Node*> m_children;
 		bool m_is_changed_by_self = false;
 		bool m_is_changed_by_parent = false;
-		bool m_is_device_pointer_dirty = false;
 	};
 
 
@@ -89,15 +80,48 @@ namespace clumsy_lib
 
 		void set(const T& d)
 		{
-			//printf("%s set!\n ", typeid(T).name());
 			data = d;
 			set_is_changed_by_self(true);
 			set_children_is_changed_by_parent(true);
-			set_is_device_pointer_dirty(true);
 		}
 
 		T& get_ref()
 		{
+			check_n_upate();
+			return data;
+		}
+
+		template<typename Device_Type >
+		Raw_Pointer<T> get_device_pointer(Device_Type device)
+		{
+			check_n_upate();
+
+			if (m_device_poiter_is_dirty)
+			{
+				device->upload<T>(device_pointer, data);
+				m_device_poiter_is_dirty = false;
+			}
+
+			return device_pointer;
+		}
+
+		const T& get()
+		{
+			return get_ref();
+		}
+
+		template<typename T>
+		void add_upstream_variable(std::shared_ptr<T> upstream_variable)
+		{
+			upstream_variable->add_child(this);
+
+			m_upstream_variables->add_type(upstream_variable);
+		}
+	private:
+		bool check_n_upate()
+		{
+			bool changed = true;
+
 			if (is_changed_by_self())
 			{
 				set_is_changed_by_self(false);
@@ -108,39 +132,26 @@ namespace clumsy_lib
 				Computer::apply(*m_upstream_variables_acceccor, data);
 				set_is_changed_by_parent(false);
 			}
-			return data;
-		}
-
-		template<typename Device_Type >
-		Raw_Pointer<T> get_device_pointer(Device_Type device)
-		{
-			if (is_device_pointer_dirty())
+			else
 			{
-				device->upload<T>(device_pointer, data);
-				set_is_device_pointer_dirty(false);
+				changed = false;
 			}
-			return device_pointer;
+
+			if (changed)
+			{
+				m_device_poiter_is_dirty = true;
+			}
+
+			return changed;
 		}
 
-		const T& get()
-		{
-			return get_ref();
-		}
-
-
-
-		template<typename T>
-		void add_upstream_variable(std::shared_ptr<T> upstream_variable)
-		{
-			upstream_variable->add_child(this);
-
-			m_upstream_variables->add_type(upstream_variable);
-		}
 
 	protected:
 
 		std::shared_ptr<Variable_Accecor_With_Constriant<Variable_Set, dependent_variables>> m_upstream_variables_acceccor;
 		std::shared_ptr<Variable_Set> m_upstream_variables;
+	private:
+		bool m_device_poiter_is_dirty = true;
 	};
 
 	////////////////build dependent

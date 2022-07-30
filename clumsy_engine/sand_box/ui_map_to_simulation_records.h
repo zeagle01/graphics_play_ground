@@ -51,13 +51,13 @@ private:
 
 
 
-#define ADD_SIM_DATA_MAPPER(type_name,set_value,get_value,ui_type) \
+#define ADD_SIM_DATA_MAPPER(type_name,set_value,get_value,default_value) \
 	static constexpr char tag_##type_name[] = #type_name;\
-	ADD_TYPE_TO_GROUP(type_name, Simulation_Data_Mapper, set_value, get_value, ui_type,tag_##type_name, clumsy_engine::data::type_name);
+	ADD_TYPE_TO_GROUP(type_name, Simulation_Data_Mapper, set_value, get_value, default_value,tag_##type_name, clumsy_engine::data::type_name);
 
-#define ADD_SIM_INTERACTION_MAPPER(type_name,set_value,get_value,ui_type) \
+#define ADD_SIM_INTERACTION_MAPPER(type_name,set_value,get_value,default_value) \
 	static constexpr char tag_##type_name[] = #type_name;\
-	ADD_TYPE_TO_GROUP(type_name, Simulation_Data_Mapper, set_value, get_value, ui_type,tag_##type_name, clumsy_engine::interaction::type_name);
+	ADD_TYPE_TO_GROUP(type_name, Simulation_Data_Mapper, set_value, get_value, default_value,tag_##type_name, clumsy_engine::interaction::type_name);
 
 #define ADD_SIM_MORPHISM(name,default_type) \
 	static constexpr char tag_##name[] = #name;\
@@ -86,8 +86,8 @@ struct UI_Simulation_Mapper
 	ADD_SIM_INTERACTION_MAPPER(Inertial, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));
 
 	ADD_SIM_MORPHISM(Linear_Equations_Solver, Jacobi);
-	ADD_SIM_MORPHISM(Simulation_Solver, CPU_Serial);
-	ADD_SIM_MORPHISM(Device, CPU_Serial);
+	ADD_SIM_MORPHISM(Simulation_Solver, Newton);
+	ADD_SIM_MORPHISM(Device, CUDA);
 
 	using base_type = Simulation_Data_Mapper_Base;
 };

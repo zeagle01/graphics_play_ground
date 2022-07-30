@@ -40,26 +40,15 @@ namespace clumsy_engine
 
 		auto device = get_morphism<Device>();
 
-
 		auto last_pos = m_datas->get_device_pointer<data::Last_Frame_Position>(device);
-		auto cur_pos = m_datas->get_device_pointer<data::Position>(device);
-		//auto aa = lastPos.ptr;
-		float a[1];
-		float b[]{ 2.f };
+		auto cur_pos= m_datas->get_device_pointer<data::Position>(device);
 
-		std::vector<Element_Equation_Pointer> element_equation_pointers;
-		for (auto& interation : *m_interactions)
-		{
-			auto element_equation_pointer = interation->compute_element_equations_pointers();
-			element_equation_pointers.push_back(element_equation_pointer);
-		}
+		static float t = 0.f;
+		float a = 1e-3f;
+		device->loop(DummyMove{ cur_pos.ptr,a,t }, cur_pos.size);
+		t += 0.001f;
 
-		auto& linear_solver = get_morphism<Linear_Equations_Solver>();
-		linear_solver->solve(cur_pos.ptr, element_equation_pointers, cur_pos.size);
-
-		device->loop(Copy{ last_pos.ptr,cur_pos.ptr }, cur_pos.size);
-		std::vector<vec3f> h_pos;
-		device->download(h_pos, last_pos);
-		printf("last pos is %f \n", h_pos[1](1));
+		auto& h_pos = m_datas->get_ref_value<data::Position>();
+		device->download<std::vector<vec3f>>(h_pos, cur_pos);
 	}
 }

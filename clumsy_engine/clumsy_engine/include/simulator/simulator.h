@@ -87,11 +87,11 @@ namespace clumsy_engine
 		}
 
 
-		clumsy_lib::Type_Map<Interaction> m_interactions_map;
-		clumsy_lib::Type_Map<> m_morphisms;
+		clumsy_lib::Type_Map<Interaction> m_interactions_map;//check box
+		clumsy_lib::Type_Map<> m_morphisms;//drop box
 
 		std::shared_ptr<clumsy_lib::Variable_Set> m_data_map;
-		clumsy_lib::Variable_Accecor<clumsy_lib::Type_Map<void>> m_data_accecor;
+		clumsy_lib::Variable_Accecor<clumsy_lib::Type_Map<void>> m_data_accecor; //slide bar
 	};
 
 }

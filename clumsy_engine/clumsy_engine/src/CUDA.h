@@ -21,11 +21,14 @@ namespace clumsy_engine
 		using T = std::vector<E>;
 		static void upload(clumsy_lib::Raw_Pointer<T>& device_pointer, const T& host_data) 
 		{
-			cudaFree(device_pointer.ptr);
-			cudaMalloc(&device_pointer.ptr, sizeof(E) * host_data.size());
+			if (device_pointer.size != host_data.size())
+			{
+				cudaFree(device_pointer.ptr);
+				cudaMalloc(&device_pointer.ptr, sizeof(E) * host_data.size());
+				device_pointer.size = host_data.size();
+			}
 
 			cudaMemcpy(device_pointer.ptr, host_data.data(), sizeof(E) * host_data.size(), cudaMemcpyHostToDevice);
-			device_pointer.size = host_data.size();
 		};
 
 		static void download(T& host_data, clumsy_lib::Raw_Pointer<T> device_pointer) 

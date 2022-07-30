@@ -7,6 +7,12 @@
 #include <limits>
 #include <functional>
 
+#ifdef __CUDACC__
+#define DEVICE_CALLABLE __device__  __host__
+#else
+#define DEVICE_CALLABLE  
+#endif
+
 namespace matrix_math
 {
 
@@ -14,14 +20,14 @@ namespace matrix_math
 
 #define MAT_DATA(Row,Col,T) \
 	T data[Row * Col]; \
-	const T& operator()(int ri, int ci) const { return data[ri + ci * Row]; }\
-	T& operator()(int ri, int ci) { return data[ri + ci * Row]; } \
-	const T* operator&() const {return data;} \
-	T* operator&(){ return data;} \
+	DEVICE_CALLABLE const T& operator()(int ri, int ci) const { return data[ri + ci * Row]; }\
+	DEVICE_CALLABLE T& operator()(int ri, int ci) { return data[ri + ci * Row]; } \
+	DEVICE_CALLABLE const T* operator&() const {return data;} \
+	DEVICE_CALLABLE T* operator&(){ return data;} \
 
 #define VEC_ACCESS(T) \
-		const T& operator()(int i) const { return data[i]; } \
-		T& operator()(int i) { return data[i]; }  \
+		DEVICE_CALLABLE const T& operator()(int i) const { return data[i]; } \
+		DEVICE_CALLABLE T& operator()(int i) { return data[i]; }  \
 
 
 	template<int Row, int Col, typename T>
@@ -55,17 +61,17 @@ namespace matrix_math
 
 
 ////////////////////////////////////operation //////////////////////////////
-	template<typename T> struct Add { static T apply(T v0, T v1) { return v0 + v1; } };
-	template<typename T> struct Substract { static T apply(T v0, T v1) { return v0 - v1; } };
-	template<typename T> struct Multiply { static T apply(T v0, T v1) { return v0 * v1; } };
-	template<typename T> struct Divide { static T apply(T v0, T v1) { return v0 / v1; } };
+	template<typename T> struct Add { static DEVICE_CALLABLE T apply(T v0, T v1) { return v0 + v1; } };
+	template<typename T> struct Substract { static DEVICE_CALLABLE T apply(T v0, T v1) { return v0 - v1; } };
+	template<typename T> struct Multiply { static DEVICE_CALLABLE T apply(T v0, T v1) { return v0 * v1; } };
+	template<typename T> struct Divide { static DEVICE_CALLABLE T apply(T v0, T v1) { return v0 / v1; } };
 
-	template<typename T> struct Max { static T apply(T v0, T v1) { return v0 > v1 ? v0 : v1; } };
-	template<typename T> struct Min { static T apply(T v0, T v1) { return v0 < v1 ? v0 : v1; } };
+	template<typename T> struct Max { static DEVICE_CALLABLE T apply(T v0, T v1) { return v0 > v1 ? v0 : v1; } };
+	template<typename T> struct Min { static DEVICE_CALLABLE T apply(T v0, T v1) { return v0 < v1 ? v0 : v1; } };
 
 
 	template<typename T, int N, template<typename> typename Op>
-	static inline void BinaryOp(T* a, const T* b, const T* c)
+	static DEVICE_CALLABLE inline void BinaryOp(T* a, const T* b, const T* c)
 	{
 		for (int i = 0; i < N; i++)
 		{
@@ -74,7 +80,7 @@ namespace matrix_math
 	}
 
 	template<typename T, int N, template<typename> typename Op,typename ...P>
-	static inline void UnaryOp(T* a, const T* b, P&&... p)
+	static DEVICE_CALLABLE inline void UnaryOp(T* a, const T* b, P&&... p)
 	{
 		for (int i = 0; i < N; i++)
 		{
@@ -85,7 +91,7 @@ namespace matrix_math
 
 ////////////////////////////////////init //////////////////////////////
 	template<int N, typename T>
-	static inline mat<N, N, T> get_identity()
+	static DEVICE_CALLABLE inline mat<N, N, T> get_identity()
 	{
 		mat<N, N, T> ret;
 		for (int ri = 0; ri < N; ri++)
@@ -106,7 +112,7 @@ namespace matrix_math
 	}
 
 	template<int Row, int Col, typename T>
-	static inline mat<Row, Col, T> get_uniform(T value)
+	static DEVICE_CALLABLE inline mat<Row, Col, T> get_uniform(T value)
 	{
 		mat<Row, Col, T> ret;
 		for (int i = 0; i < Row * Col; i++)
@@ -119,7 +125,7 @@ namespace matrix_math
 ////////////////////////////////////plus minus //////////////////////////////
 #define COMPONENTWISE_BINARY(name,component_op) \
 	template<int Row,int Col,typename T> \
-	static inline mat<Row, Col, T> name(const mat<Row, Col, T>& a, const mat<Row, Col, T>& b)\
+	static DEVICE_CALLABLE inline mat<Row, Col, T> name(const mat<Row, Col, T>& a, const mat<Row, Col, T>& b)\
 	{\
 		mat<Row, Col, T> ret;\
 		BinaryOp<T, Row* Col, component_op>(&ret, &a, &b);\
@@ -128,7 +134,7 @@ namespace matrix_math
 
 #define COMPONENTWISE_SELF_BINARY(name,component_op) \
 	template<int Row,int Col,typename T> \
-	static inline mat<Row, Col, T>& name(mat<Row, Col, T>& a, const mat<Row, Col, T>& b)\
+	static DEVICE_CALLABLE inline mat<Row, Col, T>& name(mat<Row, Col, T>& a, const mat<Row, Col, T>& b)\
 	{\
 		BinaryOp<T, Row* Col, component_op>(&a, &a, &b);\
 		return a;\
@@ -143,7 +149,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 
 ////////////////////////////////////the matrix product//////////////////////////////
 	template<int Row, int N, int Col, typename T>
-	static inline mat<Row, Col, T> operator*(const mat<Row, N, T>& a, const mat<N, Col, T>& b)
+	static DEVICE_CALLABLE inline mat<Row, Col, T> operator*(const mat<Row, N, T>& a, const mat<N, Col, T>& b)
 	{
 		mat<Row, Col, T> ret;
 		for (int ri = 0; ri < Row; ri++)
@@ -162,7 +168,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 
 ////////////////////////////////////scalar product/divide//////////////////////////////
 	template<int Row,int Col, typename T>
-	static inline mat<Row, Col, T> operator*(const mat<Row, Col, T>& a, const T& s)
+	static DEVICE_CALLABLE inline mat<Row, Col, T> operator*(const mat<Row, Col, T>& a, const T& s)
 	{
 		mat<Row, Col, T> ret;
 		UnaryOp<T, Row* Col, Multiply>(&ret, &a, s);
@@ -170,10 +176,10 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 	}
 
 	template<int Row,int Col, typename T>
-	static inline mat<Row, Col, T> operator*(const T& s, const mat<Row, Col, T>& a) { return a * s; }
+	static DEVICE_CALLABLE inline mat<Row, Col, T> operator*(const T& s, const mat<Row, Col, T>& a) { return a * s; }
 
 	template<int Row,int Col, typename T>
-	static inline mat<Row, Col, T> operator/(const mat<Row, Col, T>& a, const T& s)
+	static DEVICE_CALLABLE inline mat<Row, Col, T> operator/(const mat<Row, Col, T>& a, const T& s)
 	{
 		mat<Row, Col, T> ret;
 		UnaryOp<T, Row* Col, Divide>(&ret, &a, s);
@@ -183,7 +189,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 
 ////////////////////////////////////cross hadamar kronecker//////////////////////////////
 	template< typename T>
-	static inline mat<3, 1, T> operator ^ (const mat<3, 1, T>& a, const mat<3, 1, T>& b)
+	static DEVICE_CALLABLE inline mat<3, 1, T> operator ^ (const mat<3, 1, T>& a, const mat<3, 1, T>& b)
 	{
 		return { a(1) * b(2) - a(2) * b(1), a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0) };
 	}
@@ -191,7 +197,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 
 	// hadamard
 	template<int Row,int Col,typename T>
-	static inline mat<Row, Col, T> operator&(const mat<Row, Col, T>& a, const mat<Row, Col, T>& b)
+	static DEVICE_CALLABLE inline mat<Row, Col, T> operator&(const mat<Row, Col, T>& a, const mat<Row, Col, T>& b)
 	{
 		mat<Row, Col, T> ret;
 		BinaryOp<T, Row* Col, Multiply>(&ret, &a, &b);
@@ -200,7 +206,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 
 	//kronecker
 	template<int Row0,int Col0,int Row1,int Col1,typename T>
-	static inline mat<Row0* Row1, Col0* Col1, T> operator%(const mat<Row0, Col0, T>& a, const mat<Row1, Col1, T>& b)
+	static DEVICE_CALLABLE inline mat<Row0* Row1, Col0* Col1, T> operator%(const mat<Row0, Col0, T>& a, const mat<Row1, Col1, T>& b)
 	{
 		mat<Row0* Row1, Col0* Col1, T> ret;
 		//BinaryOp<T, Row* Col, Multiply>(&ret, &a, &b);
@@ -210,7 +216,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 
 ////////////////////////////////////rearrange//////////////////////////////
 	template<int Row,int Col, typename T>
-	static inline mat<Row, 1, T> get_column(const mat<Row, Col, T>& a, int column)
+	static DEVICE_CALLABLE inline mat<Row, 1, T> get_column(const mat<Row, Col, T>& a, int column)
 	{
 		mat<Row, 1, T> ret;
 		for (int i = 0; i < Row; i++)
@@ -221,7 +227,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 	}
 
 	template<int Row,int Col, typename T>
-	static inline mat<Col, Row, T> transpose(const mat<Row, Col, T>& a)
+	static DEVICE_CALLABLE inline mat<Col, Row, T> transpose(const mat<Row, Col, T>& a)
 	{
 		mat<Col, Row, T> ret;
 		for (int ri = 0; ri < Row; ri++)
@@ -235,7 +241,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 	}
 
 	template<int N, typename T>
-	static inline mat<N, 1, T> diagonal(const mat<N, N, T>& a)
+	static DEVICE_CALLABLE inline mat<N, 1, T> diagonal(const mat<N, N, T>& a)
 	{
 		mat<N, 1, T> ret;
 		for (int i = 0; i < N; i++)
@@ -246,7 +252,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 	}
 
 	template<int N, typename T>
-	static inline mat<N, N, T> diagonal(const mat<N, 1, T>& v)
+	static DEVICE_CALLABLE inline mat<N, N, T> diagonal(const mat<N, 1, T>& v)
 	{
 		mat<N, N, T> ret = get_uniform<N, N, T>(T(0));
 		for (int i = 0; i < N; i++)
@@ -257,7 +263,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 	}
 
 	template<int Row,int Col, typename T>
-	static inline const mat<Col* Row, 1, T>& vectorize(const mat<Row, Col, T>& a)
+	static DEVICE_CALLABLE inline const mat<Col* Row, 1, T>& vectorize(const mat<Row, Col, T>& a)
 	{
 		return *reinterpret_cast<const mat<Col* Row, 1, T>*>(&a);
 	}
@@ -266,7 +272,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 
 ////////////////////////////////////matrix inverse //////////////////////////////
 	template<int N, typename T>
-	static	T determinant(const mat<N, N, T>& a) {
+	static	DEVICE_CALLABLE T determinant(const mat<N, N, T>& a) {
 		if constexpr (N == 1)
 		{
 			return a;
@@ -283,7 +289,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 	}
 
 	template<int N, typename T>
-	static inline mat<N - 1, N - 1, T> get_minor(const mat<N, N, T>& a, const int r, const int c)
+	static DEVICE_CALLABLE inline mat<N - 1, N - 1, T> get_minor(const mat<N, N, T>& a, const int r, const int c)
 	{
 		mat<N - 1, N - 1, T> ret;
 		for (int ri = 0; ri < N - 1; ri++)
@@ -299,14 +305,14 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 	}
 
 	template<int N, typename T>
-	constexpr inline T cofactor(const mat<N, N, T>& a, const int row, const int col)
+	constexpr DEVICE_CALLABLE inline T cofactor(const mat<N, N, T>& a, const int row, const int col)
 	{
 		T sign = (row + col) % 2 ? -1 : 1;
 		return  determinant<N - 1, T>(get_minor(a, row, col)) * sign;
 	}
 
 	template<int N, typename T>
-	inline mat<N, N, T> adjoint(const mat<N, N, T>& a) {
+	DEVICE_CALLABLE inline mat<N, N, T> adjoint(const mat<N, N, T>& a) {
 		mat<N, N, T> ret;
 		for (int ri = 0; ri < N; ri++) {
 			for (int ci = 0; ci < N; ci++)
@@ -318,7 +324,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 	}
 
 	template<int Row, int Col, typename T>
-	static inline mat<Row, Col, T> operator/(const mat<Row, Col, T>& m0, const mat<Row, Row, T>& m1) {
+	static DEVICE_CALLABLE inline mat<Row, Col, T> operator/(const mat<Row, Col, T>& m0, const mat<Row, Row, T>& m1) {
 
 		mat<Row, Row, T> adj = adjoint(m1);
 		T det = determinant<Row, T>(m1);
@@ -332,7 +338,7 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 	struct norm
 	{
 		template<int Row,int Col,typename T>
-		static inline T apply(const mat<Row,Col,T>& a)
+		static DEVICE_CALLABLE inline T apply(const mat<Row,Col,T>& a)
 		{
 			const auto& va = vectorize(a);
 			T dot = transpose(va) * va;
@@ -341,13 +347,13 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 	};
 
 	template<int Row, int Col, typename T>
-	static inline mat<Row, Col, T> normalize(const mat<Row, Col, T>& a)
+	static DEVICE_CALLABLE inline mat<Row, Col, T> normalize(const mat<Row, Col, T>& a)
 	{
 		return a / norm<2>::apply(a);
 	}
 
 	template<int P, int Row, int Col, typename T  >
-	static bool is_near(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1, T threshold = 0)
+	static DEVICE_CALLABLE  bool is_near(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1, T threshold = 0)
 	{
 		T diff_norm = norm<P>::apply(m0 - m1);
 		T norm0 = norm<P>::apply(m0);

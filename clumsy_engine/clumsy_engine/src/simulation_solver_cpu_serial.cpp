@@ -46,10 +46,11 @@ namespace clumsy_engine
 			float time_step = m_datas->get_value<data::Time_Step>();
 
 			std::vector<vec3f> velocity(positions.size());
+			auto& lastFramePos = m_datas->get_value<data::Last_Frame_Position>();
 
 			for (int i = 0; i < positions.size(); i++)
 			{
-				velocity[i] = (positions[i] - m_datas->get_value<data::Last_Frame_Position>()[i]) / time_step;
+				velocity[i] = (positions[i] - lastFramePos[i]) / time_step;
 			}
 
 			m_datas->set_value<data::Velocity>(velocity);//maybe optimization?

@@ -33,6 +33,8 @@ namespace clumsy_engine
 
 	template void CUDA::loop<Copy<float, float>>(Copy<float, float> k, int size);
 	template void CUDA::loop<Copy<vec3f, vec3f>>(Copy<vec3f, vec3f> k, int size);
+
+	template void CUDA::loop<DummyMove>(DummyMove k, int size);
 }
 
 

@@ -1,9 +1,9 @@
 #include "cuda_runtime.h"
 
 #ifdef __CUDACC__
-#define DEVICE_CALLABLE __device__ inline
+#define DEVICE_CALLABLE __device__ __host__ 
 #else
-#define DEVICE_CALLABLE  inline
+#define DEVICE_CALLABLE  
 #endif
 
 
@@ -17,5 +17,17 @@ struct Copy
 	DEVICE_CALLABLE void operator()(int i)
 	{
 		dst[i] = src[i];
+	}
+};
+
+struct DummyMove
+{
+	vec3f* pos;
+	float a;
+	float t;
+
+	DEVICE_CALLABLE inline void operator()(int i)
+	{
+		pos[i] += a * sin(t) * vec3f { 1.f, 0.f, 0.f };
 	}
 };

@@ -40,6 +40,7 @@ namespace clumsy_lib
 		template<typename Variable_Type, typename Value_Type = Variable_Type::value_type>
 		void set_value(const Value_Type& d)
 		{
+			//printf("set %s!\n ", typeid(Variable_Type).name());
 			static_assert(std::is_convertible_v<Value_Type, Variable_Type::value_type>);
 			auto variable = m_type_map->get_type<Variable_Type>();
 			if (!variable)
