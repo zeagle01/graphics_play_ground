@@ -47,6 +47,11 @@ namespace clumsy_lib
 			return m_current_type.obj;
 		}
 
+		std::shared_ptr<Interface_T> get_curretn_type()
+		{
+			return m_current_type.obj;
+		}
+
 		std::string get_current_type_name()
 		{
 			return m_current_type.concret_type_name;

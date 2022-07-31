@@ -94,6 +94,7 @@ src/compute_hessian_gradient.cpp
 src/discrete_collision_detection.h
 src/discrete_collision_detection.cpp
 src/AABB.h
+src/dependent_variable_set.h
 
 )
 

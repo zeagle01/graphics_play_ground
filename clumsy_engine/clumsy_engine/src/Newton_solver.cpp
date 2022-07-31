@@ -27,7 +27,6 @@ namespace clumsy_engine
 			{
 
 			}
-
 		}
 	};
 
@@ -38,7 +37,7 @@ namespace clumsy_engine
 	{
 		RECORD_FUNCTION_DURATION();
 
-		auto device = get_morphism<Device>();
+		auto device = get_morphism<Device>().get_curretn_type();
 		auto device_type = get_morphism_type_name<Device>();
 
 		auto last_pos = m_datas->get_device_pointer<data::Last_Frame_Position>(device, device_type);

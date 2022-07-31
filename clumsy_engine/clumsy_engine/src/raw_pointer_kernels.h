@@ -29,5 +29,10 @@ struct DummyMove
 	DEVICE_CALLABLE inline void operator()(int i)
 	{
 		pos[i] += a * sin(t) * vec3f { 1.f, 0.f, 0.f };
+
+		if (i == 1)
+		{
+			printf(" %f \n", pos[i](0));
+		}
 	}
 };

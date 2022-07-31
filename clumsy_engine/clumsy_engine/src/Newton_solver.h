@@ -1,6 +1,9 @@
+
+#pragma once
+
 #include "system_equations.h"
 #include "clumsy_lib/type_map.h"
-#include "clumsy_lib/dependent_variable_set.h"
+#include "dependent_variable_set.h"
 #include "clumsy_lib/morphism_types.h"
 
 

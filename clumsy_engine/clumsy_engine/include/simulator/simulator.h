@@ -11,7 +11,7 @@
 
 #include "clumsy_lib/type_map.h"
 #include "clumsy_lib/morphism_types.h"
-#include "clumsy_lib/dependent_variable_set.h"
+#include "dependent_variable_set.h"
 #include "Simulation_Data.h"
 #include "linear_equations_solver.h"
 

@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "clumsy_lib/class_reflection.h"
 #include "clumsy_lib/type_map.h"
 #include "CPU_serial.h"

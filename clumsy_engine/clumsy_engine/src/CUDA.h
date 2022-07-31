@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include  "cuda_runtime.h"
 #include "clumsy_lib/raw_pointer.h"
 #include <vector>

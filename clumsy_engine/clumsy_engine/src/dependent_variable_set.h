@@ -1,12 +1,15 @@
 
 #pragma once
 
-#include "variable_set.h"
-#include "variable_accecor.h"
-#include "static_loop.h"
-#include "raw_pointer.h"
+#include "clumsy_lib/variable_set.h"
+#include "clumsy_lib/variable_accecor.h"
+#include "clumsy_lib/static_loop.h"
+#include "clumsy_lib/raw_pointer.h"
+#include "devices.h"
 
-namespace clumsy_lib
+using namespace clumsy_lib;
+
+namespace clumsy_engine
 {
 
 	class Tree_Node
@@ -91,21 +94,25 @@ namespace clumsy_lib
 			return data;
 		}
 
-		template<typename Device_Type >
-		Raw_Pointer<T> get_device_pointer(Device_Type device, std::string device_type_name)
+		Raw_Pointer<T> get_device_pointer(std::shared_ptr<Device_Base> device, std::string device_type_name)
 		{
 			check_n_upate();
 
-			if (m_device_type_name != device_type_name)
+			if (m_device != device)
 			{
-				device->free<T>(device_pointer, data);
-				device->allocate<T>(device_pointer, data);
-				m_device_type_name = device_type_name;
+				if (m_device)
+				{
+					m_device->free<T>(device_pointer, data);
+					device_pointer.size = 0;
+				}
+
+				m_device_poiter_is_dirty = true;
+				m_device = device;
 			}
 
 			if (m_device_poiter_is_dirty)
 			{
-				device->upload<T>(device_pointer, data);
+				m_device->upload<T>(device_pointer, data);
 				m_device_poiter_is_dirty = false;
 			}
 
@@ -159,7 +166,7 @@ namespace clumsy_lib
 		std::shared_ptr<Variable_Set> m_upstream_variables;
 	private:
 		bool m_device_poiter_is_dirty = true;
-		std::string  m_device_type_name;
+		std::shared_ptr<clumsy_engine::Device_Base> m_device;
 	};
 
 	////////////////build dependent

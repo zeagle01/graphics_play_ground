@@ -5,7 +5,7 @@
 #include "clumsy_lib/type_list.h"
 #include "clumsy_lib/class_reflection.h"
 #include "clumsy_lib/type_map.h"
-#include "clumsy_lib/dependent_variable_set.h"
+#include "dependent_variable_set.h"
 #include "data_computes.h"
 #include "matrix_math/matrix_math.h"
 
@@ -16,7 +16,7 @@ using namespace matrix_math;
 namespace clumsy_engine
 {
 
-#define DEF_MEM(x,t,c,tl) ADD_TYPE_TO_GROUP(x,clumsy_lib::Dependent_Variable,t,c,tl)
+#define DEF_MEM(x,t,c,tl) ADD_TYPE_TO_GROUP(x,Dependent_Variable,t,c,tl)
 
 #define DEPENDENT_TYPE_LIST(...) CE_WRAP(clumsy_lib::type_list<__VA_ARGS__>)
 
@@ -29,13 +29,13 @@ namespace clumsy_engine
 		using v_v3i = std::vector<vec3i>;
 		using v_vi = std::vector<std::vector<int>>;
 
-		DEF_MEM(Gravity_Acceleration,		vec3f,				clumsy_lib::Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
-		DEF_MEM(Time_Step,					float,				clumsy_lib::Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
-		DEF_MEM(Mass_Density,				float,				clumsy_lib::Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
-		DEF_MEM(Stretch_Stiff,				float,				clumsy_lib::Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
-		DEF_MEM(Ref_Position,				v_v3f,				clumsy_lib::Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
-		DEF_MEM(Position,					v_v3f,				clumsy_lib::Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
-		DEF_MEM(Triangle_Indice,			vi,					clumsy_lib::Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
+		DEF_MEM(Gravity_Acceleration,		vec3f,				Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
+		DEF_MEM(Time_Step,					float,				Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
+		DEF_MEM(Mass_Density,				float,				Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
+		DEF_MEM(Stretch_Stiff,				float,				Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
+		DEF_MEM(Ref_Position,				v_v3f,				Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
+		DEF_MEM(Position,					v_v3f,				Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
+		DEF_MEM(Triangle_Indice,			vi,					Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
 
 		DEF_MEM(Vertex_Num,					int,				CE_WRAP(Get_List_Size<Position, 1>),							DEPENDENT_TYPE_LIST(Position)																);
 		DEF_MEM(Velocity,					v_v3f,				CE_WRAP(Allocate_With_Size<v_v3f, Vertex_Num, 1>),				DEPENDENT_TYPE_LIST(Vertex_Num)																);

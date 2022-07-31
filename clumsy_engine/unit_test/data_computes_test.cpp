@@ -4,7 +4,7 @@
 
 #include "simulation_data.h"
 #include "clumsy_lib/type_map.h"
-#include "clumsy_lib/dependent_variable_set.h"
+#include "dependent_variable_set.h"
 
 
 

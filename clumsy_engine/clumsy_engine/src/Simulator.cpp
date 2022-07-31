@@ -33,7 +33,7 @@ namespace clumsy_engine
 
 	Simulator::Simulator()
 	{
-		m_data_map = clumsy_lib::build_dependent_variable_set<clumsy_lib::Variable_Set, data>();
+		m_data_map = build_dependent_variable_set<clumsy_lib::Variable_Set, data>();
 
 		m_data_accecor.set_type_map(m_data_map);
 
