@@ -27,7 +27,7 @@ namespace clumsy_engine
 		static void apply(sim_acc_T& datas, L& d)
 		{
 			auto size = datas.template get_value<V>();
-			if (d.empty())
+			if (d.size() != size)
 			{
 				d.resize(size * N);
 			}

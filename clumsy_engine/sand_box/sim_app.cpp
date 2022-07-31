@@ -13,6 +13,9 @@
 
 #include "imgui.h"
 
+#include <chrono>
+#include <sstream>
+
 using namespace matrix_math;
 
 using namespace clumsy_engine;
@@ -149,9 +152,12 @@ using namespace clumsy_engine;
 
 
 		//simulation update
+		auto t0 = std::chrono::high_resolution_clock::now();
 		m_sim.update();
 		const auto& new_pos = m_sim.get_value<data::Position>();
 		const auto& new_normal = m_sim.get_value<data::Vertex_Normal>();
+		auto t1 = std::chrono::high_resolution_clock::now();
+		m_fps = 1.f / ((t1 - t0).count() * 1e-9f);
 
 		//update render data
 		m_vertex_array->set_vertex_attribute_data(m_attribute_name_position, &new_pos[0], new_pos.size());
@@ -192,6 +198,10 @@ using namespace clumsy_engine;
 				}
 
 				m_indices = loader.get_indices();
+
+				clumsy_engine::Ref<clumsy_engine::Index_Buffer> index_buffer = clumsy_engine::Index_Buffer::create(m_indices.data(), m_indices.size());
+				m_vertex_array->set_index_buffer(index_buffer);
+
 				simulation_init();
 				CE_INFO("opened {0}", opend_file);
 			}
@@ -202,6 +212,11 @@ using namespace clumsy_engine;
 			CE_INFO("save {0}", saved_file);
 		}
 
+		std::stringstream ss;
+		ss << m_fps;
+		std::string simualtion_fps_str = "---simulation fps: " + ss.str();
+		ImGui::Text(simualtion_fps_str.c_str());
+
 		ImGui::Text("---begin simulation panel");
 		for (auto& it : m_simulation_mappers)
 		{
@@ -209,6 +224,8 @@ using namespace clumsy_engine;
 			mapper->update_from_ui(&m_sim);
 		}
 		ImGui::Text("---end simulation panel");
+
+
 
 
 		//set render uniform

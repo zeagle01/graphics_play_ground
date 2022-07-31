@@ -51,7 +51,7 @@ namespace clumsy_engine
 		{
 			for (int i = 0; i < size; i++)
 			{
-				printf(" in cpu %d \n", i);
+				//printf(" in cpu %d \n", i);
 				k(i);
 			}
 

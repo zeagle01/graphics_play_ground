@@ -30,6 +30,8 @@ public:
 private:
 	void simulation_init();
 
+	float m_fps = 0.f;
+
 	clumsy_engine::Ref<clumsy_engine::Shader> m_shader;
 	clumsy_engine::Ref<clumsy_engine::Vertex_Array> m_vertex_array;
 	std::string m_attribute_name_position = "v_position";

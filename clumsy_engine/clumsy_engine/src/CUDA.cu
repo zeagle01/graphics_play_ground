@@ -17,7 +17,7 @@ namespace clumsy_engine
 		int tid = blockIdx.x * blockDim.x + threadIdx.x;
 		if (tid < size)
 		{
-			printf(" in cuda %d \n", tid);
+			//printf(" in cuda %d \n", tid);
 			k(tid);
 		}
 	}
