@@ -1,10 +1,23 @@
 
 
+
 #include "OpenGL_Wrapper.h"
 
 
-void OpenGL_Wrapper::init()
+void OpenGL_Wrapper::init(int width,int height)
 {
+	m_width = width;
+	m_height = height;
+
+    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+		printf("glad load failed\n");
+	}
+	else {
+
+		printf("glad load succend\n");
+	}
+	printf("gl version %s\n", glGetString(GL_VERSION));
+
 	create_shader();
 	make_buffer();
 	create_texture();
@@ -49,12 +62,20 @@ void OpenGL_Wrapper::make_buffer()
 
 }
 
-void OpenGL_Wrapper::draw()
+void OpenGL_Wrapper::clear()
+{
+	glClearColor(0., 0.3, 0.5, 1.);//default color;
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void OpenGL_Wrapper::draw(void* data)
 {
 
 	shader.use();
 
 	glBindTexture(GL_TEXTURE_2D, m_texture_id);
+	auto m_data_format = GL_RGBA;
+	glTextureSubImage2D(m_texture_id, 0, 0, 0, m_width, m_height, m_data_format, GL_UNSIGNED_BYTE, data);
 
 	glBindVertexArray(m_vao);
 

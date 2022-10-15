@@ -13,9 +13,11 @@
 class OpenGL_Wrapper
 {
 public:
-	void init();
+	void init(int width, int height);
 
-	void draw();
+	void clear();
+
+	void draw(void* data);
 
 private:
 
@@ -46,8 +48,8 @@ private:
 
 	Shader shader;
 
-	int m_width = 100;
-	int m_height = 100;
+	int m_width ;
+	int m_height ;
 	int m_texture_id;
 
 };

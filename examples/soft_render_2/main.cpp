@@ -1,113 +1,20 @@
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-
-#include "OpenGL_Wrapper.h"
-
-#include <iostream> 
-#include <string>
-#include <vector> 
-
-
-
-void init_openGL()
-{
-
-}
-
-void init_window()
-{
-
-
-	auto status = glfwInit();
-	if (status == GLFW_TRUE)
-	{
-		printf("glfw init succeed! \n");
-	}
-	else
-	{
-		printf("glfw init error! \n");
-	}
-
-	GLFWwindow* window;
-	window = glfwCreateWindow(800, 600, "gl window", nullptr, nullptr);
-
-	if (window)
-	{
-		printf(" window %p is created\n", window);
-	}
-	else
-	{
-		printf(" window can't be created\n");
-	}
-
-	glfwMakeContextCurrent(window);
-
-	glfwSwapInterval(1);
-
-
-    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-		printf("glad load failed\n");
-	}
-	else {
-
-		printf("glad load succend\n");
-	}
-	printf("gl version %s\n", glGetString(GL_VERSION));
-
-	OpenGL_Wrapper gl;
-
-	gl.init();
-
-	// Setup Dear ImGui context
-	ImGui::CreateContext();
-
-	// Setup Platform/Renderer bindings
-	const char* glsl_version = "#version 130";
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(glsl_version);
-	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
-
-	while (!glfwWindowShouldClose(window))
-	{
-
-		glClearColor(0., 0.3, 0.5, 1.);//default color;
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		gl.draw();
-
-
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-
-		ImGui::Begin("Test from demo layer");
-		ImGui::Text("hello world from demo layer");
-		//ImGui::ShowDemoWindow();
-		ImGui::End();
-
-		// Rendering
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-
-	}
-
-}
+#include "Drawing_Buffer.h"
 
 int main()
 {
-	printf(" hello world");
+	Drawing_Buffer screen;
 
-	init_window();
+	screen.init(800, 600);
+
+	screen.main_loop([](void* data)
+		{
+			uint32_t* a = reinterpret_cast<uint32_t*>(data);
+			for (int i = 0; i < 800 * 600; i++)
+			{
+				a[i]++;
+			}
+		});
 
 	return 0;
 }

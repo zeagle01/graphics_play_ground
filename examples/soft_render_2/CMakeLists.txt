@@ -9,6 +9,12 @@ add_executable(
 	Shader.cpp
 	OpenGL_Wrapper.h
 	OpenGL_Wrapper.cpp
+	Glfw_Window.h
+	Glfw_Window.cpp
+	Drawing_Buffer.h
+	Drawing_Buffer.cpp
+	Imgui_Wrapper.h
+	Imgui_Wrapper.cpp
 )
 
 ##########imgui
