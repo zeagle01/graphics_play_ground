@@ -5,6 +5,10 @@ project(soft_render_2)
 add_executable(
 	soft_render_2
 	main.cpp
+	Shader.h
+	Shader.cpp
+	OpenGL_Wrapper.h
+	OpenGL_Wrapper.cpp
 )
 
 ##########imgui

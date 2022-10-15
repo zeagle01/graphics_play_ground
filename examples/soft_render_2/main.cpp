@@ -1,9 +1,23 @@
 
-#include <iostream> 
-
-
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
+#include "OpenGL_Wrapper.h"
+
+#include <iostream> 
+#include <string>
+#include <vector> 
+
+
+
+void init_openGL()
+{
+
+}
 
 void init_window()
 {
@@ -45,11 +59,32 @@ void init_window()
 	}
 	printf("gl version %s\n", glGetString(GL_VERSION));
 
+	OpenGL_Wrapper gl;
+
+	gl.init();
+
 	while (!glfwWindowShouldClose(window))
 	{
 
 		glClearColor(0., 0.3, 0.5, 1.);//default color;
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		gl.draw();
+
+
+//		ImGui_ImplOpenGL3_NewFrame();
+//		ImGui_ImplGlfw_NewFrame();
+//		ImGui::NewFrame();
+//
+//		ImGui::Begin("Test from demo layer");
+//		ImGui::Text("hello world from demo layer");
+//		//ImGui::ShowDemoWindow();
+//		ImGui::End();
+//
+//		// Rendering
+//		ImGui::Render();
+//		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -66,3 +101,5 @@ int main()
 
 	return 0;
 }
+
+
