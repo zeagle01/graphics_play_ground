@@ -1,6 +1,8 @@
 
 #include "Drawing_Buffer.h"
 
+
+
 int main()
 {
 	Drawing_Buffer screen;
@@ -11,10 +13,21 @@ int main()
 
 	screen.main_loop([width, height](uint32_t* data)
 		{
-			for (int i = 0; i < width * height; i++)
+			for (int i = 0; i < width; i++)
 			{
-				data[i]++;
+				for (int j = 0; j < height; j++)
+				{
+
+					//int b = (1.f * i / width) * 255;
+					int b = 0;
+					int g = (1.f * j / height) * 255;
+					//int g = 0;
+					int r = 0;
+					data[i * height + j] = (255 << 24) + (int(r) << 16) + (int(g) << 8) + int(b);
+
+				}
 			}
+
 		});
 
 	return 0;

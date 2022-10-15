@@ -1,6 +1,7 @@
 
 
 #include "OpenGL_Wrapper.h"
+#include <string> 
 
 
 void OpenGL_Wrapper::init(int width,int height)
@@ -8,6 +9,19 @@ void OpenGL_Wrapper::init(int width,int height)
 	m_width = width;
 	m_height = height;
 
+	load_glad();
+
+	create_shader();
+    glUseProgram(shader_program);
+
+	make_buffer();
+
+	create_texture();
+	bind_texture();
+}
+
+void OpenGL_Wrapper::load_glad()
+{
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
 		printf("glad load failed\n");
 	}
@@ -17,23 +31,98 @@ void OpenGL_Wrapper::init(int width,int height)
 	}
 	printf("gl version %s\n", glGetString(GL_VERSION));
 
-	create_shader();
-	make_buffer();
-	create_texture();
+}
 
+void OpenGL_Wrapper::bind_texture()
+{
 	int active_texture_slot = 0;
-
 	glBindTextureUnit(active_texture_slot, m_texture_id);
 	glBindTexture(GL_TEXTURE_2D, m_texture_id);
 
-	shader.use();
-	shader.set_int("u_texture", active_texture_slot);
-
+	glUniform1i(glGetUniformLocation(shader_program, "u_texture"), active_texture_slot);
 }
 
 void OpenGL_Wrapper::create_shader()
 {
-	shader.init();
+	static std::string vertex_shader_code_as_string = R"(
+			#version 330 core
+			layout(location=0 ) in vec3 position;
+			layout(location=1 ) in vec2 texture;
+
+			out vec3 v_position;
+			out vec2 v_texture;
+
+			void main()
+			{
+				v_position=position;
+				v_texture=texture;
+				gl_Position=vec4(position,1.0);
+			}
+
+		)";
+
+	static std::string fragment_shader_code_as_string = R"(
+			#version 330 core
+			in vec3 v_position;
+			in vec2 v_texture;
+			uniform sampler2D u_texture;
+			out vec4 color;
+			void main()
+			{
+				color=texture(u_texture,v_texture);
+				//color=vec4(v_texture,0.8,1.0);
+			}
+		)";
+
+	const char* vertex_shader_code = vertex_shader_code_as_string.c_str();
+	const char* fragment_shader_code = fragment_shader_code_as_string.c_str();
+
+	GLuint verts_shader;
+	verts_shader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(verts_shader, 1, &vertex_shader_code, NULL);
+	glCompileShader(verts_shader);
+	GLint success;
+	GLchar infoLog[512];
+	glGetShaderiv(verts_shader, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		glGetShaderInfoLog(verts_shader, 512, NULL, infoLog);
+		printf("error vertex shader compilation at vertex shader %s\n", infoLog);
+	}
+	else {
+		printf("vertex shader compiled\n");
+	}
+
+
+	GLuint fragement_shader;
+	fragement_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragement_shader, 1, &fragment_shader_code, NULL);
+	glCompileShader(fragement_shader);
+	glGetShaderiv(fragement_shader, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		glGetShaderInfoLog(fragement_shader, 512, NULL, infoLog);
+		printf("error fragment shader compilation at  %s\n", infoLog);
+	}
+	else {
+		printf("fragment shader compiled\n");
+	}
+
+
+	shader_program = glCreateProgram();
+	glAttachShader(shader_program, verts_shader);
+	glAttachShader(shader_program, fragement_shader);
+	glLinkProgram(shader_program);
+
+	glGetShaderiv(shader_program, GL_LINK_STATUS, &success);
+	if (!success) {
+		glGetShaderInfoLog(shader_program, 512, NULL, infoLog);
+		printf(" link error %s\n", infoLog);
+	}
+	else {
+		printf(" shader program linking succeed!");
+	}
+
+	glDeleteShader(verts_shader);
+	glDeleteShader(fragement_shader);
 }
 
 void OpenGL_Wrapper::make_buffer()
@@ -69,8 +158,7 @@ void OpenGL_Wrapper::clear()
 
 void OpenGL_Wrapper::draw(void* data)
 {
-
-	shader.use();
+    glUseProgram(shader_program);
 
 	glBindTexture(GL_TEXTURE_2D, m_texture_id);
 	auto m_data_format = GL_RGBA;
