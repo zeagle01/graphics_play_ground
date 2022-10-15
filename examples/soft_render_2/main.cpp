@@ -5,14 +5,15 @@ int main()
 {
 	Drawing_Buffer screen;
 
-	screen.init(800, 600);
+	int width = 800;
+	int height = 600;
+	screen.init(width, height);
 
-	screen.main_loop([](void* data)
+	screen.main_loop([width, height](uint32_t* data)
 		{
-			uint32_t* a = reinterpret_cast<uint32_t*>(data);
-			for (int i = 0; i < 800 * 600; i++)
+			for (int i = 0; i < width * height; i++)
 			{
-				a[i]++;
+				data[i]++;
 			}
 		});
 

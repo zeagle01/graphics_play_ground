@@ -1,9 +1,9 @@
 
-#include "Glfw_Window.h"
+#include "GLFW_Wrapper.h"
 
 #include <iostream>
 
-GLFWwindow* Glfw_Window::create_window(int width, int height)
+GLFWwindow* GLFW_Wrapper::create_window(int width, int height)
 {
 	auto status = glfwInit();
 	if (status == GLFW_TRUE)
@@ -35,7 +35,7 @@ GLFWwindow* Glfw_Window::create_window(int width, int height)
 	return window;
 }
 
-void Glfw_Window::main_loop(std::function<void()> fn)
+void GLFW_Wrapper::main_loop(std::function<void()> fn)
 {
 
 	while (!glfwWindowShouldClose(m_window))

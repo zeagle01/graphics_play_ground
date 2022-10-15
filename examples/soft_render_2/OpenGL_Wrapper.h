@@ -34,13 +34,6 @@ private:
 		0,1,0,	0.f,1.f
 	};
 
-//	std::vector<float> m_texture_cood_plane = {
-//		0.f,0.f,
-//		1.f,0.f,
-//		1.f,1.f,
-//		0.f,1.f
-//	};
-
 	std::vector<int> m_triangles{
 		0,1,2,
 		0,2,3

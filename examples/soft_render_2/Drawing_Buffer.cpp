@@ -3,14 +3,14 @@
 
 #include "glad/glad.h"
 
-#include "Glfw_Window.h"
+#include "GLFW_Wrapper.h"
 
 #include "Imgui_Wrapper.h"
 
 #include "OpenGL_Wrapper.h"
 
 
-Glfw_Window glfw_win;
+GLFW_Wrapper glfw_win;
 OpenGL_Wrapper gl;
 Imgui_Wrapper imgui_wrapper;
 GLFWwindow* window;
@@ -28,7 +28,7 @@ void Drawing_Buffer::init(int width, int height)
 	}
 }
 
-void Drawing_Buffer::main_loop(std::function<void(void*)> fn)
+void Drawing_Buffer::main_loop(std::function<void(uint32_t*)> fn)
 {
 	glfw_win.main_loop(
 		[this, fn]()
