@@ -10,8 +10,14 @@ public:
 
 	void init(int width, int height);
 
-	void main_loop(std::function<void(uint32_t*)>);
+	void main_loop(std::function<void()>);
+
+	void set_color(int wi, int wj, float r, float g, float b);
 
 private:
 	std::vector<uint32_t> buffer;
+	int m_width;
+	int m_height;
+
+
 };

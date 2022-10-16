@@ -27,6 +27,8 @@ private:
 	void create_shader();
 	void make_buffer();
 
+	void adjust_uv_aspect();
+
 	int m_vbo, m_ebo, m_vao;
 
 	std::vector<float> m_positions = {
@@ -34,6 +36,7 @@ private:
 		1.f,-1.f,0,  1.f,0.f,
 		1.f,1.f,0,	 1.f,1.f,
 		-1.f,1.f,0,	 0.f,1.f
+
 	};
 
 	std::vector<int> m_triangles{

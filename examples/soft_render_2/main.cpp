@@ -1,6 +1,7 @@
 
-#include "Drawing_Buffer.h"
+#include <cmath>
 
+#include "Drawing_Buffer.h"
 
 
 int main()
@@ -11,22 +12,23 @@ int main()
 	int height = 600;
 	screen.init(width, height);
 
-	screen.main_loop([width, height](uint32_t* data)
+	float t = 0.f;
+	screen.main_loop([&screen, width, height, &t]()
 		{
+
+			float dt = 0.01;
+			float pi = 3.1415926f;
+
 			for (int i = 0; i < width; i++)
 			{
 				for (int j = 0; j < height; j++)
 				{
-
-					//int b = (1.f * i / width) * 255;
-					int b = 0;
-					int g = (1.f * j / height) * 255;
-					//int g = 0;
-					int r = 0;
-					data[i * height + j] = (255 << 24) + (int(r) << 16) + (int(g) << 8) + int(b);
-
+					float r = (0.3f * (std::sin(t * pi + 1.f * i / width * pi * 6) + 1.f) + 0.4f);
+					float b = 1.f * j / height * (0.3f * (std::cos(t * pi) + 1.f) + 0.4f);
+					screen.set_color(i, j, r, 0.f, b);
 				}
 			}
+			t += dt;
 
 		});
 

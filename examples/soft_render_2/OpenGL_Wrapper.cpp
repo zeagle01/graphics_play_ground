@@ -9,6 +9,8 @@ void OpenGL_Wrapper::init(int width,int height)
 	m_width = width;
 	m_height = height;
 
+	adjust_uv_aspect();
+
 	load_glad();
 
 	create_shader();
@@ -18,6 +20,16 @@ void OpenGL_Wrapper::init(int width,int height)
 
 	create_texture();
 	bind_texture();
+}
+
+void OpenGL_Wrapper::adjust_uv_aspect()
+{
+	float aspect = 1.f * m_width / m_height;
+	for (int i = 0; i < 4; i++)
+	{
+		m_positions[i * 5 + 3] /= aspect;
+	}
+
 }
 
 void OpenGL_Wrapper::load_glad()
