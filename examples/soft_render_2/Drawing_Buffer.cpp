@@ -24,10 +24,7 @@ void Drawing_Buffer::init(int width, int height)
 	imgui_wrapper.init(window);
 	buffer.resize(width * height);
 
-	for (int i = 0; i < buffer.size(); i++)
-	{
-		buffer[i] = 0xffffffff - i;
-	}
+	clear();
 }
 
 void Drawing_Buffer::main_loop(std::function<void()> fn)
@@ -44,6 +41,14 @@ void Drawing_Buffer::main_loop(std::function<void()> fn)
 			imgui_wrapper.update();
 
 		});
+}
+
+void Drawing_Buffer::clear()
+{
+	for (int i = 0; i < buffer.size(); i++)
+	{
+		buffer[i] = 0xffffffff ;
+	}
 }
 
 void Drawing_Buffer::set_color(int wi, int hi, float r, float g, float b)

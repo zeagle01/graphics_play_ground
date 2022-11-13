@@ -23,11 +23,10 @@ private:
 
 	void create_texture();
 	void bind_texture();
+	void init_texture_data();
 
 	void create_shader();
 	void make_buffer();
-
-	void adjust_uv_aspect();
 
 	int m_vbo, m_ebo, m_vao;
 

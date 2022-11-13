@@ -9,8 +9,6 @@ void OpenGL_Wrapper::init(int width,int height)
 	m_width = width;
 	m_height = height;
 
-	adjust_uv_aspect();
-
 	load_glad();
 
 	create_shader();
@@ -22,15 +20,6 @@ void OpenGL_Wrapper::init(int width,int height)
 	bind_texture();
 }
 
-void OpenGL_Wrapper::adjust_uv_aspect()
-{
-	float aspect = 1.f * m_width / m_height;
-	for (int i = 0; i < 4; i++)
-	{
-		m_positions[i * 5 + 3] /= aspect;
-	}
-
-}
 
 void OpenGL_Wrapper::load_glad()
 {
@@ -182,11 +171,26 @@ void OpenGL_Wrapper::draw(void* data)
 
 }
 
+void OpenGL_Wrapper::init_texture_data()
+{
+	//set data
+	int size = m_width * m_height;
+	std::vector<uint32_t> white_pixel(size);
+	for (int i = 0; i < white_pixel.size(); i++)
+	{
+		white_pixel[i] = 0xffffffff - i;
+	}
+
+	auto m_data_format = GL_RGBA;
+	int bpc = m_data_format == GL_RGBA ? 4 : 3;
+
+	glTextureSubImage2D(m_texture_id, 0, 0, 0, m_width, m_height, m_data_format, GL_UNSIGNED_BYTE, white_pixel.data());
+
+}
+
 void OpenGL_Wrapper::create_texture()
 {
-
 	auto m_internal_format = GL_RGBA8;
-	auto m_data_format = GL_RGBA;
 
 	glCreateTextures(GL_TEXTURE_2D, 1, (GLuint*) & m_texture_id);
 	glTextureStorage2D(m_texture_id, 1, m_internal_format, m_width, m_height);
@@ -196,16 +200,5 @@ void OpenGL_Wrapper::create_texture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	//set data
-	int size = m_width * m_height;
-	std::vector<uint32_t> white_pixel(size);
-	for (int i = 0; i < white_pixel.size(); i++)
-	{
-		white_pixel[i] = 0xffffffff-i;
-	}
-
-	int bpc = m_data_format == GL_RGBA ? 4 : 3;
-
-	glTextureSubImage2D(m_texture_id, 0, 0, 0, m_width, m_height, m_data_format, GL_UNSIGNED_BYTE, white_pixel.data());
 
 }
