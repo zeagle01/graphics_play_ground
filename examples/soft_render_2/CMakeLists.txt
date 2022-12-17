@@ -18,6 +18,8 @@ add_executable(
 	mat.h
 	type_list.h
 	type_map.h
+	macro_loop.h
+	member_extractor.h
 )
 
 target_compile_features(soft_render_2 PRIVATE cxx_std_20)

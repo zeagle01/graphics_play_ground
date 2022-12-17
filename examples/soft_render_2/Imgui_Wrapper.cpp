@@ -3,6 +3,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "Imgui_Wrapper.h"
+#include "type_list.h"
+#include "member_extractor.h"
 
 #include <string>
 #include <vector>
@@ -30,6 +32,8 @@ namespace soft_render
 
 	}
 
+
+
 	void Imgui_Wrapper::update()
 	{
 		ImGui_ImplOpenGL3_NewFrame();
@@ -40,13 +44,7 @@ namespace soft_render
 		ImGui::Text("hello world from demo layer");
 		//ImGui::ShowDemoWindow();
 
-		for (auto it : m_ui_components)
-		{
-			auto fn = *(std::static_pointer_cast<ui_slider_bar_float3>(it));
-			
-			fn();
-		}
-
+		for_each_type<extract_member_type_list_t<gui_component>>::template apply<call>(m_ui_components);
 
 		ImGui::End();
 

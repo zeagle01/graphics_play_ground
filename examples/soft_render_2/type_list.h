@@ -157,4 +157,23 @@ namespace soft_render
 
 	//////////////////////
 	using empty_type_list = type_list<>;
+
+
+
+	/////////////////////For_Each_Type///////////////////////
+	template<typename tl>
+	struct for_each_type;
+
+	//public:
+	template< template <typename ...> typename tl, typename ...TP>
+	struct for_each_type<tl<TP...>>
+	{
+		// template<typename T> struct F{ apply (p) {} }
+		template< typename F, typename ...P>
+		static void apply(P&&...p)
+		{
+			(typename F::template apply<TP>(std::forward<P>(p)...), ...);
+		}
+	};
+
 }
