@@ -13,6 +13,9 @@ add_executable(
 	Drawing_Buffer.cpp
 	Imgui_Wrapper.h
 	Imgui_Wrapper.cpp
+	Spinning_Cube.h
+	Spinning_Cube.cpp
+	mat.h
 )
 
 ##########imgui
