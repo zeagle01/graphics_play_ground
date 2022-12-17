@@ -11,7 +11,7 @@ namespace soft_render
 	Spinning_Cube::Spinning_Cube(int w, int h, Drawing_Buffer* sc)
 		:m_width(w), m_height(h), screen(sc)
 	{
-		m_datas.add_type<config::angle_rate>();
+		m_datas.add_type<config::angle_rate>(vec3{ 0.1f, 0.2f, 0.001f });
 	}
 
 	mat4 Spinning_Cube::get_rotation_matrix()

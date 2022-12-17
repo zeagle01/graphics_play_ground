@@ -13,7 +13,7 @@ namespace soft_render
 
 	struct config
 	{
-		struct angle_rate : type_map::variable < vec3, vec3{ 0.1f,0.2f,0.001f } > {};
+		struct angle_rate : type_map::variable < vec3  > {};
 
 	};
 

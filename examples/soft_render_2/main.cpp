@@ -24,15 +24,11 @@ int main()
 	//connect(sc_p0, ui_component0)
 	//connect(sc_p1, ui_component1)
 	//...
-	//imgui_wrapper.add_slider_bar([&sc]()->float& {return sc.get_config<Spinning_Cube::angle_rate_x>(); });
-	//imgui_wrapper.add_slider_bar([&sc]()->float& {return sc.get_config<Spinning_Cube::angle_rate_y>(); });
-	//imgui_wrapper.add_slider_bar([&sc]()->float& {return sc.get_config<Spinning_Cube::angle_rate_z>(); });
 
-	auto fn = [&sc]()->soft_render::vec3& {return sc.get_config<config::angle_rate>(); };
-	auto a = fn();
+	//std::function<soft_render::vec3& ()> fn = [&sc]()->soft_render::vec3& {return sc.get_config<config::angle_rate>(); };
+	vec3& v = sc.get_config<config::angle_rate>();
+	imgui_wrapper.add_ui_component<gui_component::slider_bar_float3>(v);
 
-	//imgui_wrapper.add_slider_bar_float3([&sc]()->soft_render::vec3& {return sc.get_config_new<config::angle_rate>(); });
-	imgui_wrapper.add_slider_bar_float3(fn);
 
 	screen.main_loop([&screen, &sc, &imgui_wrapper, width, height ]()
 		{
