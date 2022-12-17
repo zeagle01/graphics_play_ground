@@ -3,86 +3,63 @@
 #pragma once
 
 #include "mat.h"
+#include "type_map.h"
 
-class Drawing_Buffer;
-
-struct Spinning_Cube
+namespace soft_render 
 {
-	int m_width;
-	int m_height;
-	Drawing_Buffer* screen;
-	float m_aspect = float(m_width) / float(m_height);
-	float cube_side = 100.f;
-	float cube_unit = 1.2f;
-	float m_world_height = 400.f;
-
-	vec3 m_up{0,1,0};
-	vec3 m_lookat{50,50,0};
-	vec3 m_camara_location{ 600,600,100 };
-
-	float m_angle_x = 0.f;
-	float m_angle_y = 0.f;
-	float m_angle_z = 0.f;
-
-	float m_angle_rate_x = 0.1;
-	float m_angle_rate_y = 0.2;
-	float m_angle_rate_z = 0.03;
+	class Drawing_Buffer;
+	class type_map;
 
 
-	mat4 get_rotation_matrix();
-	
-	mat4 get_camara_matrix();
-	
-	mat4 get_scale_and_translate(const std::array<vec3, 2>& box_from, const std::array<vec3, 2>& box_dst);
-
-	mat4 to_pixel_space();
-	void compute_pixel(float x, float y, float z);
-
-	void update();
-
-
-	struct angle_rate_x {};
-	struct angle_rate_y {};
-	struct angle_rate_z {};
-
-	auto& get_angle_rate_x()
+	struct config
 	{
-		return m_angle_rate_x;
-	}
+		struct angle_rate : type_map::variable < vec3, vec3{ 0.1f,0.2f,0.001f } > {};
 
-	auto& get_angle_rate_y()
+	};
+
+
+	class Spinning_Cube
 	{
-		return m_angle_rate_y;
-	}
+	public:
+		Spinning_Cube(int w, int h, Drawing_Buffer* sc);
 
-	auto& get_angle_rate_z()
-	{
-		return m_angle_rate_z;
-	}
+		int m_width;
+		int m_height;
+		Drawing_Buffer* screen;
+		float m_aspect = float(m_width) / float(m_height);
+		float cube_side = 100.f;
+		float cube_unit = 1.2f;
+		float m_world_height = 400.f;
+
+		vec3 m_up{ 0,1,0 };
+		vec3 m_lookat{ 50,50,0 };
+		vec3 m_camara_location{ 600,600,100 };
+
+		float m_angle_x = 0.f;
+		float m_angle_y = 0.f;
+		float m_angle_z = 0.f;
 
 
-	template<typename name>
-	auto& get_config()
-	{
-		if constexpr (std::is_same_v<name, angle_rate_x>)
+		mat4 get_rotation_matrix();
+
+		mat4 get_camara_matrix();
+
+		mat4 get_scale_and_translate(const std::array<vec3, 2>& box_from, const std::array<vec3, 2>& box_dst);
+
+		mat4 to_pixel_space();
+		void compute_pixel(float x, float y, float z);
+
+		void update();
+
+		template<typename name>
+		auto& get_config()
 		{
-			return m_angle_rate_x;
+			return m_datas.get_ref<name>();
+		}
 
-		}
-		else if constexpr (std::is_same_v<name, angle_rate_y>)
-		{
-			return m_angle_rate_y;
-		}
-		else if constexpr(std::is_same_v<name, angle_rate_z>)
-		{
-			return m_angle_rate_z;
-		}
-		else
-		{
-			printf("error\n");
-			float a;
-			return a;
-		}
-	}
+	private:
+		type_map m_datas;
+	};
 
-};
+}
+

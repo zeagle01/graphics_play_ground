@@ -4,11 +4,16 @@
 #include "GLFW/glfw3.h"
 #include <functional>
 
-class GLFW_Wrapper
+namespace soft_render
 {
-public:
-	GLFWwindow* create_window(int width,int height);
-	void main_loop(std::function<void()>);
-private:
-	GLFWwindow* m_window;
-};
+
+
+	class GLFW_Wrapper
+	{
+	public:
+		GLFWwindow* create_window(int width, int height);
+		void main_loop(std::function<void()>);
+	private:
+		GLFWwindow* m_window;
+	};
+}

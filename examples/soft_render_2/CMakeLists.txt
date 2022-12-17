@@ -16,7 +16,11 @@ add_executable(
 	Spinning_Cube.h
 	Spinning_Cube.cpp
 	mat.h
+	type_list.h
+	type_map.h
 )
+
+target_compile_features(soft_render_2 PRIVATE cxx_std_20)
 
 ##########imgui
 target_link_libraries(soft_render_2 PRIVATE my_imgui)

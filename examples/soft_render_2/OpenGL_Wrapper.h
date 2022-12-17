@@ -8,45 +8,49 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-
-class OpenGL_Wrapper
+namespace soft_render
 {
-public:
-	void init(int width, int height);
 
-	void clear();
 
-	void draw(void* data);
+	class OpenGL_Wrapper
+	{
+	public:
+		void init(int width, int height);
 
-private:
-	void load_glad();
+		void clear();
 
-	void create_texture();
-	void bind_texture();
-	void init_texture_data();
+		void draw(void* data);
 
-	void create_shader();
-	void make_buffer();
+	private:
+		void load_glad();
 
-	int m_vbo, m_ebo, m_vao;
+		void create_texture();
+		void bind_texture();
+		void init_texture_data();
 
-	std::vector<float> m_positions = {
-		-1.f,-1.f,0, 0.f,0.f,
-		1.f,-1.f,0,  1.f,0.f,
-		1.f,1.f,0,	 1.f,1.f,
-		-1.f,1.f,0,	 0.f,1.f
+		void create_shader();
+		void make_buffer();
+
+		int m_vbo, m_ebo, m_vao;
+
+		std::vector<float> m_positions = {
+			-1.f,-1.f,0, 0.f,0.f,
+			1.f,-1.f,0,  1.f,0.f,
+			1.f,1.f,0,	 1.f,1.f,
+			-1.f,1.f,0,	 0.f,1.f
+
+		};
+
+		std::vector<int> m_triangles{
+			0,1,2,
+			0,2,3
+		};
+
+		int m_width;
+		int m_height;
+		int m_texture_id;
+
+		int shader_program;
 
 	};
-
-	std::vector<int> m_triangles{
-		0,1,2,
-		0,2,3
-	};
-
-	int m_width ;
-	int m_height ;
-	int m_texture_id;
-
-	int shader_program;
-
-};
+}

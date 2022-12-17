@@ -3,20 +3,27 @@
 
 #include <functional>
 #include <vector>
+#include "mat.h"
 
 
 struct GLFWwindow;
 
-class Imgui_Wrapper
+namespace soft_render
 {
-	using get_value_t = std::function<float& ()>;
-public:
-	void init(GLFWwindow* window);
-	void update();
+	class Imgui_Wrapper
+	{
+		using get_value_t = std::function<float& ()>;
+		using get_vec3_t = std::function<vec3& ()>;
+	public:
+		void init(GLFWwindow* window);
+		void update();
 
-	void add_slider_bar(get_value_t get_value);
-	//void add_button();
+		void add_slider_bar(get_value_t get_value);
+		void add_slider_bar_float3(get_vec3_t get_value);
+		//void add_button();
 
-private:
-	std::vector<get_value_t> m_sliders;
-};
+	private:
+		std::vector<get_value_t> m_sliders;
+		std::vector<get_vec3_t> m_sliders_float3;
+	};
+}

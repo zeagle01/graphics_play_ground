@@ -4,28 +4,33 @@
 #include <functional>
 #include <vector>
 
-struct GLFWwindow ;
+struct GLFWwindow;
 
-class Drawing_Buffer
+namespace soft_render
 {
-public:
 
-	void init(int width, int height);
+	class Drawing_Buffer
+	{
+	public:
 
-	void main_loop(std::function<void()>);
+		void init(int width, int height);
 
-	void set_color(int wi, int hi, float r, float g, float b);
+		void main_loop(std::function<void()>);
 
-	void clear();
+		void set_color(int wi, int hi, float r, float g, float b);
 
-	GLFWwindow* get_window() { return m_window; }
+		void clear();
 
-private:
-	std::vector<uint32_t> buffer;
-	int m_width;
-	int m_height;
+		GLFWwindow* get_window() { return m_window; }
 
-	GLFWwindow* m_window;
+	private:
+		std::vector<uint32_t> buffer;
+		int m_width;
+		int m_height;
+
+		GLFWwindow* m_window;
 
 
-};
+	};
+
+}
