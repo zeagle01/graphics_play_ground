@@ -28,6 +28,12 @@ namespace soft_render
 	};
 
 
+	template<float f0, float f1>
+	struct range
+	{
+		static constexpr float min = f0;
+		static constexpr float max = f1;
+	};
 
 	class Imgui_Wrapper
 	{
@@ -36,16 +42,19 @@ namespace soft_render
 		void init(GLFWwindow* window);
 		void update();
 
-		template<typename ui,typename value_t>
-		void add_ui_component(const std::string& name, value_t& value)
+		template<typename ui, typename value_t,typename range_t >
+		void add_ui_component(const std::string& name, value_t& value, range_t min, range_t max)
 		{
 			auto ui_component = std::make_shared<ui>();
 			ui_component->value = &value;
 			ui_component->name = name;
-			m_ui_components_new.push_back(ui_component);
+			ui_component->min = min;
+			ui_component->max = max;
+
+			m_ui_components.push_back(ui_component);
 		}
 
 	private:
-		std::vector<std::shared_ptr<ui_component_base>> m_ui_components_new;
+		std::vector<std::shared_ptr<ui_component_base>> m_ui_components;
 	};
 }

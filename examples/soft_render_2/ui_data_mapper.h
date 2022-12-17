@@ -14,8 +14,8 @@ namespace soft_render
 
 	struct ui_data_map
 	{
-		ADD_RELATION_PAIR_RECORD(angle_rate, config::angle_rate, slider_bar_float3);
-		ADD_RELATION_PAIR_RECORD(lookat, config::lookat, slider_bar_float3);
+		ADD_RELATION_PAIR_RECORD(angle_rate, config::angle_rate, slider_bar_float3,soft_render::range<0.f,1.f>);
+		ADD_RELATION_PAIR_RECORD(lookat, config::lookat, slider_bar_float3, soft_render::range<-1e3f, 1e3f>);
 	};
 
 
@@ -24,12 +24,16 @@ namespace soft_render
 		template<typename rec>
 		static void apply(Spinning_Cube& sc, Imgui_Wrapper& ui)
 		{
-			using data_tag = rec::t0;
-			using ui_component = rec::t1;
+			using tl = rec::type;
+			using data_tag = get_nth_element_t<tl, 0>;
+			using ui_component = get_nth_element_t<tl, 1>;
+			using rg = get_nth_element_t<tl, 2>;
 			vec3& v = sc.get_config<data_tag>();
 
-			printf(" add %s %s\n", typeid(data_tag).name(), typeid(ui_component).name());
-			ui.add_ui_component<ui_component>(typeid(data_tag).name(), v);
+			//printf(" %s -- %s -- %s %f %f \n", typeid(data_tag).name(), typeid(ui_component).name(), typeid(rg).name(),rg::min,rg::max);
+
+			std::string name = typeid(data_tag).name();
+			ui.add_ui_component<ui_component, data_tag::type >(name, v, rg::min, rg::max);
 		}
 
 	};

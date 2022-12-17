@@ -53,7 +53,7 @@ namespace soft_render
 		ImGui::Text("hello world from demo layer");
 		//ImGui::ShowDemoWindow();
 
-		for (auto it : m_ui_components_new)
+		for (auto it : m_ui_components)
 		{
 			it->operator()();
 		}
