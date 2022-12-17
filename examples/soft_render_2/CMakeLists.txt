@@ -20,6 +20,7 @@ add_executable(
 	type_map.h
 	macro_loop.h
 	member_extractor.h
+	ui_data_mapper.h
 )
 
 target_compile_features(soft_render_2 PRIVATE cxx_std_20)

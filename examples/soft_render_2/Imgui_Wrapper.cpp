@@ -53,7 +53,10 @@ namespace soft_render
 		ImGui::Text("hello world from demo layer");
 		//ImGui::ShowDemoWindow();
 
-		for_each_type<extract_member_type_list_t<gui_component>>::template apply<call_ui_component>(m_ui_components);
+		for (auto it : m_ui_components_new)
+		{
+			it->operator()();
+		}
 
 		ImGui::End();
 

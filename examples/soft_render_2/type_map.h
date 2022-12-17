@@ -7,7 +7,8 @@
 #include <vector>
 #include <type_traits>
 
-#define ADD_MEMBER_POINTER(name,type,...) struct name: type_map::variable<type,__VA_ARGS__> {}; name* name_var;
+#define ADD_MEMBER_POINTER(name,type,...) struct name: type_map::variable<type,__VA_ARGS__> {}; name* name##_var;
+#define ADD_RELATION_PAIR_RECORD(name,t0,t1) struct name: type_map::record<t0,t1> {}; name* name##_var;
 
 namespace soft_render
 {
@@ -37,6 +38,13 @@ namespace soft_render
 					return {};
 				}
 			}
+		};
+
+		template<typename u0, typename u1>
+		struct record
+		{
+			using t0 = u0;
+			using t1 = u1;
 		};
 
 		template<typename Var>

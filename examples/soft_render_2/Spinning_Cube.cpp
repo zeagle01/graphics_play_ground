@@ -29,6 +29,11 @@ namespace soft_render
 
 	mat4 Spinning_Cube::get_rotation_matrix()
 	{
+		auto init_angle = m_datas.get_ref<config::init_angle>();
+		float m_angle_x = init_angle(0);
+		float m_angle_y = init_angle(1);
+		float m_angle_z = init_angle(2);
+
 		float cx = std::cos(m_angle_x);
 		float sx = std::sin(m_angle_x);
 		mat4 rotx
@@ -70,6 +75,7 @@ namespace soft_render
 
 	mat4 Spinning_Cube::get_camara_matrix()
 	{
+		auto& m_lookat = m_datas.get_ref<config::lookat>();
 
 		vec3 z = normalize(m_camara_location - m_lookat);
 		vec3 x = normalize(cross(m_up, z));
@@ -140,6 +146,8 @@ namespace soft_render
 
 		};
 
+		auto& m_lookat = m_datas.get_ref<config::lookat>();
+
 		std::array<vec3, 2> object_space_box{
 			{
 				{m_lookat(0) - m_aspect * m_world_height / 2  ,m_lookat(1) - m_world_height / 2 ,-1},
@@ -189,8 +197,7 @@ namespace soft_render
 		}
 
 		const auto& angle_rate = get_config<config::angle_rate>();
-		m_angle_x += angle_rate(0);
-		m_angle_y += angle_rate(1);
-		m_angle_z += angle_rate(2);
+		auto& init_angle = get_config<config::init_angle>();
+		init_angle = init_angle + angle_rate;
 	}
 }
