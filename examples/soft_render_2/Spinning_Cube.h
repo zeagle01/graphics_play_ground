@@ -16,6 +16,8 @@ namespace soft_render
 		ADD_MEMBER_POINTER(init_angle, vec3);
 		ADD_MEMBER_POINTER(lookat, vec3, vec3{ 50,50,0 });
 		ADD_MEMBER_POINTER(camara_location, vec3, vec3{ 600,600,100 });
+		ADD_MEMBER_POINTER(cube_side, float, 100.f);
+		ADD_MEMBER_POINTER(cube_unit, float, 1.2f);
 	};
 
 
@@ -23,17 +25,6 @@ namespace soft_render
 	{
 	public:
 		Spinning_Cube(int w, int h, Drawing_Buffer* sc);
-
-		int m_width;
-		int m_height;
-		Drawing_Buffer* screen;
-		float m_aspect = float(m_width) / float(m_height);
-		float cube_side = 100.f;
-		float cube_unit = 1.2f;
-		float m_world_height = 400.f;
-
-		vec3 m_up{ 0,1,0 };
-
 
 		mat4 get_rotation_matrix();
 
@@ -53,6 +44,14 @@ namespace soft_render
 		}
 
 	private:
+
+		int m_width;
+		int m_height;
+		Drawing_Buffer* screen;
+		float m_aspect = float(m_width) / float(m_height);
+		float m_world_height = 400.f;
+		vec3 m_up{ 0,1,0 };
+
 		type_map m_datas;
 	};
 

@@ -5,8 +5,9 @@
 
 #include "GLFW_Wrapper.h"
 
-
 #include "OpenGL_Wrapper.h"
+
+#include <functional>
 
 namespace soft_render
 {

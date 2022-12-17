@@ -27,6 +27,16 @@ namespace soft_render
 		void operator()()override;
 	};
 
+	struct slider_bar_float :ui_component_base
+	{
+		std::string name;
+		float min = 0.f;
+		float max = 1.f;
+		float* value;
+
+		void operator()()override;
+	};
+
 
 	template<float f0, float f1>
 	struct range

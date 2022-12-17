@@ -4,9 +4,10 @@
 #include "GLFW/glfw3.h"
 #include <functional>
 
+struct GLFWwindow;
+
 namespace soft_render
 {
-
 
 	class GLFW_Wrapper
 	{

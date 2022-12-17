@@ -183,7 +183,9 @@ namespace soft_render
 
 	void Spinning_Cube::update()
 	{
-
+		auto cube_side = m_datas.get_ref<config::cube_side>();
+		auto cube_unit = m_datas.get_ref<config::cube_unit>();
+		
 		for (float xi = 0.f; xi < cube_side; xi += cube_unit)
 		{
 			for (float yi = 0.f; yi < cube_side; yi += cube_unit)
