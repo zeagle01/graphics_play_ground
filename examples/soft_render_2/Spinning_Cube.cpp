@@ -76,6 +76,7 @@ namespace soft_render
 	mat4 Spinning_Cube::get_camara_matrix()
 	{
 		auto& m_lookat = m_datas.get_ref<config::lookat>();
+		auto& m_camara_location = m_datas.get_ref<config::camara_location>();
 
 		vec3 z = normalize(m_camara_location - m_lookat);
 		vec3 x = normalize(cross(m_up, z));

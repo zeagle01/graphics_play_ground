@@ -15,6 +15,7 @@ namespace soft_render
 		ADD_MEMBER_POINTER(angle_rate, vec3, vec3{ 0.1f,0.2f,0.03f });
 		ADD_MEMBER_POINTER(init_angle, vec3);
 		ADD_MEMBER_POINTER(lookat, vec3, vec3{ 50,50,0 });
+		ADD_MEMBER_POINTER(camara_location, vec3, vec3{ 600,600,100 });
 	};
 
 
@@ -32,7 +33,6 @@ namespace soft_render
 		float m_world_height = 400.f;
 
 		vec3 m_up{ 0,1,0 };
-		vec3 m_camara_location{ 600,600,100 };
 
 
 		mat4 get_rotation_matrix();
