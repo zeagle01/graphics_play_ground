@@ -283,8 +283,8 @@ class SanBox_App:public clumsy_engine::Application
 	public:
 		SanBox_App() 
 		{
-			//push_layer(std::make_shared<Layer_Demo>());
-			push_layer(std::make_shared<Sandbox_2D>());
+			push_layer(std::make_shared<Layer_Demo>());
+			//push_layer(std::make_shared<Sandbox_2D>());
 		}
 
 };
@@ -298,8 +298,8 @@ std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
 
 	clumsy_engine::Log::get_core_logger()->trace("create app");
 
-	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
-	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
+	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
+	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
 
 	return app;
 }

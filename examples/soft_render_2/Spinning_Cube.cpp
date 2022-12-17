@@ -166,7 +166,7 @@ void Spinning_Cube::update()
 		}
 	}
 
-	m_angle_x += 0.01;
-	m_angle_y += 0.05;
-	m_angle_z += 0.03;
+	m_angle_x += m_angle_rate_x;
+	m_angle_y += m_angle_rate_y;
+	m_angle_z += m_angle_rate_z;
 }

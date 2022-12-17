@@ -15,12 +15,18 @@ int main()
 
 	screen.init(width, height);
 	imgui_wrapper.init(screen.get_window());
-	float a = 0.5f;
-	imgui_wrapper.add_slider_bar([&a]()->float& {return a; });
 
 	Spinning_Cube sc{ width,height, &screen };
 
-	screen.main_loop([&screen, &sc, &imgui_wrapper, width, height, &a]()
+	//TODO:
+	//connect(sc_p0, ui_component0)
+	//connect(sc_p1, ui_component1)
+	//...
+	imgui_wrapper.add_slider_bar([&sc]()->float& {return sc.get_config<Spinning_Cube::angle_rate_x>(); });
+	imgui_wrapper.add_slider_bar([&sc]()->float& {return sc.get_config<Spinning_Cube::angle_rate_y>(); });
+	imgui_wrapper.add_slider_bar([&sc]()->float& {return sc.get_config<Spinning_Cube::angle_rate_z>(); });
+
+	screen.main_loop([&screen, &sc, &imgui_wrapper, width, height ]()
 		{
 			screen.clear();
 

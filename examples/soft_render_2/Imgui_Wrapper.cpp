@@ -4,6 +4,9 @@
 #include "imgui_impl_opengl3.h"
 #include "Imgui_Wrapper.h"
 
+#include <string>
+#include <vector>
+
 void Imgui_Wrapper::init(GLFWwindow* window)
 {
 	// Setup Dear ImGui context
@@ -27,12 +30,19 @@ void Imgui_Wrapper::update()
 		ImGui::Begin("Test from demo layer");
 		ImGui::Text("hello world from demo layer");
 		//ImGui::ShowDemoWindow();
-		ImGui::End();
 
+		std::vector < std::string> tag{"a", "b", "c"};
 		for (int i = 0; i < m_sliders.size(); i++)
 		{
-			ImGui::SliderFloat("" + i, &m_sliders[i](), 0.f, 1.f);
+			auto& a = m_sliders[i]();
+			if (ImGui::SliderFloat(tag[i].c_str(), &((m_sliders[i])()), 0.f, 1.f))
+			{
+				printf(" %d %f\n", i, a);
+			}
 		}
+
+
+		ImGui::End();
 
 		// Rendering
 		ImGui::Render();

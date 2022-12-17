@@ -24,6 +24,10 @@ struct Spinning_Cube
 	float m_angle_y = 0.f;
 	float m_angle_z = 0.f;
 
+	float m_angle_rate_x = 0.1;
+	float m_angle_rate_y = 0.2;
+	float m_angle_rate_z = 0.03;
+
 
 	mat4 get_rotation_matrix();
 	
@@ -36,5 +40,49 @@ struct Spinning_Cube
 
 	void update();
 
+
+	struct angle_rate_x {};
+	struct angle_rate_y {};
+	struct angle_rate_z {};
+
+	auto& get_angle_rate_x()
+	{
+		return m_angle_rate_x;
+	}
+
+	auto& get_angle_rate_y()
+	{
+		return m_angle_rate_y;
+	}
+
+	auto& get_angle_rate_z()
+	{
+		return m_angle_rate_z;
+	}
+
+
+	template<typename name>
+	auto& get_config()
+	{
+		if constexpr (std::is_same_v<name, angle_rate_x>)
+		{
+			return m_angle_rate_x;
+
+		}
+		else if constexpr (std::is_same_v<name, angle_rate_y>)
+		{
+			return m_angle_rate_y;
+		}
+		else if constexpr(std::is_same_v<name, angle_rate_z>)
+		{
+			return m_angle_rate_z;
+		}
+		else
+		{
+			printf("error\n");
+			float a;
+			return a;
+		}
+	}
 
 };
