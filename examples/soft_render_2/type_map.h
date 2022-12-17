@@ -20,13 +20,6 @@ namespace soft_render
 			using type = variable_type;
 		};
 
-
-		template<typename group>
-		void build_from_groups()
-		{
-
-		}
-
 		template<typename Var>
 		auto& get_ref()
 		{
@@ -53,23 +46,10 @@ namespace soft_render
 			}
 
 			m_datas[key] = obj;
-			m_ordered_datas.push_back(obj);
-		}
-
-
-		auto begin()
-		{
-			return m_ordered_datas.begin();
-		}
-
-		auto end()
-		{
-			return m_ordered_datas.end();
 		}
 
 	private:
 		std::map<std::string, std::shared_ptr<void>> m_datas;
-		std::vector<std::shared_ptr<void>> m_ordered_datas; // to keep insert order
 
 	};
 
