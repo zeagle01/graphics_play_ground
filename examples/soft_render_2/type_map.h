@@ -7,7 +7,7 @@
 #include <vector>
 #include <type_traits>
 
-#define ADD_MEMBER_POINTER(name,type) struct name: type_map::variable<type> {}; name* name_var;
+#define ADD_MEMBER_POINTER(name,type,...) struct name: type_map::variable<type,__VA_ARGS__> {}; name* name_var;
 
 namespace soft_render
 {
@@ -16,10 +16,27 @@ namespace soft_render
 	{
 	public:
 
-		template<typename variable_type>
+		template<typename variable_type, variable_type ... values>
 		struct variable
 		{
 			using type = variable_type;
+
+			constexpr  static variable_type get_default_value()
+			{
+				if constexpr (sizeof...(values) == 0)
+				{
+					return {};
+				}
+				else if constexpr (sizeof...(values) == 1)
+				{
+					return (values, ...);
+				}
+				else
+				{
+					static_assert(false, "shouldn't be more default values size greater than one !");
+					return {};
+				}
+			}
 		};
 
 		template<typename Var>

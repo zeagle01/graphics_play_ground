@@ -12,7 +12,7 @@ namespace soft_render
 
 	struct config
 	{
-		ADD_MEMBER_POINTER(angle_rate, vec3);
+		ADD_MEMBER_POINTER(angle_rate, vec3, vec3{ 0.1f,0.2f,0.03f });
 	};
 
 

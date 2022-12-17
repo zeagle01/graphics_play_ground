@@ -16,6 +16,7 @@ namespace soft_render
 		static void apply(type_map& tm )
 		{
 			tm.add_type<T>();
+			tm.get_ref<T>() = T::get_default_value();
 		}
 
 	};
@@ -24,7 +25,6 @@ namespace soft_render
 		:m_width(w), m_height(h), screen(sc)
 	{
 		for_each_type< extract_member_type_list_t<config>>::apply<add_spinning_config>(m_datas);
-		m_datas.get_ref<config::angle_rate>() = vec3{0.1f, 0.2f, 0.03f};
 	}
 
 	mat4 Spinning_Cube::get_rotation_matrix()
