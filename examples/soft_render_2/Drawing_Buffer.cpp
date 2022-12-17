@@ -5,23 +5,19 @@
 
 #include "GLFW_Wrapper.h"
 
-#include "Imgui_Wrapper.h"
 
 #include "OpenGL_Wrapper.h"
 
 
 GLFW_Wrapper glfw_win;
 OpenGL_Wrapper gl;
-Imgui_Wrapper imgui_wrapper;
-GLFWwindow* window;
 
 void Drawing_Buffer::init(int width, int height)
 {
 	m_width = width;
 	m_height = height;
-	window = glfw_win.create_window(width, height);
+	m_window = glfw_win.create_window(width, height);
 	gl.init(width, height);
-	imgui_wrapper.init(window);
 	buffer.resize(width * height);
 
 	clear();
@@ -32,13 +28,11 @@ void Drawing_Buffer::main_loop(std::function<void()> fn)
 	glfw_win.main_loop(
 		[this, fn]()
 		{
+
 			gl.clear();
-
-			fn();
-
 			gl.draw(buffer.data());
 
-			imgui_wrapper.update();
+			fn();
 
 		});
 }

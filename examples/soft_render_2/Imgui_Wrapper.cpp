@@ -1,4 +1,7 @@
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include "Imgui_Wrapper.h"
 
 void Imgui_Wrapper::init(GLFWwindow* window)
@@ -26,8 +29,18 @@ void Imgui_Wrapper::update()
 		//ImGui::ShowDemoWindow();
 		ImGui::End();
 
+		for (int i = 0; i < m_sliders.size(); i++)
+		{
+			ImGui::SliderFloat("" + i, &m_sliders[i](), 0.f, 1.f);
+		}
+
 		// Rendering
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+}
+
+void Imgui_Wrapper::add_slider_bar(std::function<float& ()> get_value)
+{
+	m_sliders.push_back(get_value);
 }

@@ -1,18 +1,22 @@
 
 #pragma once
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include <functional>
+#include <vector>
 
 
 struct GLFWwindow;
 
 class Imgui_Wrapper
 {
+	using get_value_t = std::function<float& ()>;
 public:
 	void init(GLFWwindow* window);
 	void update();
-private:
 
+	void add_slider_bar(get_value_t get_value);
+	//void add_button();
+
+private:
+	std::vector<get_value_t> m_sliders;
 };

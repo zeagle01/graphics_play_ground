@@ -4,6 +4,8 @@
 #include <functional>
 #include <vector>
 
+struct GLFWwindow ;
+
 class Drawing_Buffer
 {
 public:
@@ -16,10 +18,14 @@ public:
 
 	void clear();
 
+	GLFWwindow* get_window() { return m_window; }
+
 private:
 	std::vector<uint32_t> buffer;
 	int m_width;
 	int m_height;
+
+	GLFWwindow* m_window;
 
 
 };
