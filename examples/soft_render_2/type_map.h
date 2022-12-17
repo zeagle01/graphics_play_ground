@@ -7,6 +7,8 @@
 #include <vector>
 #include <type_traits>
 
+#define ADD_MEMBER_POINTER(name,type) struct name: type_map::variable<type> {}; name* name_var;
+
 namespace soft_render
 {
 
@@ -52,6 +54,5 @@ namespace soft_render
 		std::map<std::string, std::shared_ptr<void>> m_datas;
 
 	};
-
-
 }
+

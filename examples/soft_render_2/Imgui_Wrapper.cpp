@@ -12,7 +12,7 @@
 namespace soft_render
 {
 
-	void ui_slider_bar_float3::operator()()
+	void slider_bar_float3::operator()()
 	{
 		ImGui::SliderFloat3(name.c_str(), &(*value)(0), min, max);
 	}
@@ -33,6 +33,15 @@ namespace soft_render
 	}
 
 
+	struct call_ui_component
+	{
+		template<typename T>
+		static void apply(type_map& tm)
+		{
+			auto fn = tm.get_ref<T>();
+			fn();
+		}
+	};
 
 	void Imgui_Wrapper::update()
 	{
@@ -44,7 +53,7 @@ namespace soft_render
 		ImGui::Text("hello world from demo layer");
 		//ImGui::ShowDemoWindow();
 
-		for_each_type<extract_member_type_list_t<gui_component>>::template apply<call>(m_ui_components);
+		for_each_type<extract_member_type_list_t<gui_component>>::template apply<call_ui_component>(m_ui_components);
 
 		ImGui::End();
 

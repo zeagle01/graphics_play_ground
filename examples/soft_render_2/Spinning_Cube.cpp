@@ -4,14 +4,27 @@
 #include "Spinning_Cube.h"
 #include "Drawing_Buffer.h"
 
+#include "member_extractor.h"
+
 
 namespace soft_render
 {
 
+	struct add_spinning_config
+	{
+		template<typename T> 
+		static void apply(type_map& tm )
+		{
+			tm.add_type<T>();
+		}
+
+	};
+
 	Spinning_Cube::Spinning_Cube(int w, int h, Drawing_Buffer* sc)
 		:m_width(w), m_height(h), screen(sc)
 	{
-		m_datas.add_type<config::angle_rate>(vec3{ 0.1f, 0.2f, 0.001f });
+		for_each_type< extract_member_type_list_t<config>>::apply<add_spinning_config>(m_datas);
+		m_datas.get_ref<config::angle_rate>() = vec3{0.1f, 0.2f, 0.03f};
 	}
 
 	mat4 Spinning_Cube::get_rotation_matrix()

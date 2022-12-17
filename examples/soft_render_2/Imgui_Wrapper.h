@@ -12,7 +12,7 @@ struct GLFWwindow;
 namespace soft_render
 {
 
-	struct ui_slider_bar_float3
+	struct slider_bar_float3
 	{
 		vec3* value;
 		float min = 0.f;
@@ -24,8 +24,7 @@ namespace soft_render
 
 	struct gui_component
 	{
-		struct slider_bar_float3 : type_map::variable<soft_render::ui_slider_bar_float3> {} ;
-		slider_bar_float3* aa;
+		ADD_MEMBER_POINTER(slider_bar_float3, soft_render::slider_bar_float3);
 	};
 
 
@@ -41,17 +40,6 @@ namespace soft_render
 		{
 			m_ui_components.add_type<ui>(&value);
 		}
-	private:
-
-		struct call
-		{
-			template<typename T>
-			static void apply(type_map& tm)
-			{
-				auto fn = tm.get_ref<T>();
-				fn();
-			}
-		};
 
 	private:
 		type_map m_ui_components;

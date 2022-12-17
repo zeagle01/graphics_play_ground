@@ -8,13 +8,11 @@
 namespace soft_render 
 {
 	class Drawing_Buffer;
-	class type_map;
 
 
 	struct config
 	{
-		struct angle_rate : type_map::variable < vec3  > {};
-
+		ADD_MEMBER_POINTER(angle_rate, vec3);
 	};
 
 
