@@ -48,6 +48,14 @@ namespace soft_render
 			return *(std::static_pointer_cast<Var::type>(m_datas[key]));
 		}
 
+		//template<typename Var>
+		//const auto& get_ref() const
+		//{
+		//	auto key = typeid(Var).name();
+		//	const  auto& ret = *(std::static_pointer_cast<Var::type>(m_datas[key]));
+		//	return ret;
+		//}
+
 		template<typename Var,typename ...P>
 		void add_type(P&&... p)
 		{

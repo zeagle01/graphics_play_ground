@@ -13,11 +13,11 @@ namespace soft_render
 
 	struct ui_data_map
 	{
-		ADD_RELATION_PAIR_RECORD(angle_rate, config::angle_rate, slider_bar_float3,soft_render::range<0.f,1.f>);
-		ADD_RELATION_PAIR_RECORD(lookat, config::lookat, slider_bar_float3, soft_render::range<-1e3f, 1e3f>);
-		ADD_RELATION_PAIR_RECORD(camara_location, config::camara_location, slider_bar_float3, soft_render::range<-1e3f, 1e3f>);
-		ADD_RELATION_PAIR_RECORD(cube_side, config::cube_side, slider_bar_float, soft_render::range<0.f, 1e3f>);
-		ADD_RELATION_PAIR_RECORD(cube_unit, config::cube_unit, slider_bar_float, soft_render::range<0.8f, 10.f>);
+		ADD_RELATION_PAIR_RECORD(angle_rate, Spinning_Cube::config::angle_rate, slider_bar_float3,soft_render::range<0.f,1.f>);
+		ADD_RELATION_PAIR_RECORD(lookat, Spinning_Cube::config::lookat, slider_bar_float3, soft_render::range<-1e3f, 1e3f>);
+		ADD_RELATION_PAIR_RECORD(camara_location, Spinning_Cube::config::camara_location, slider_bar_float3, soft_render::range<-1e3f, 1e3f>);
+		ADD_RELATION_PAIR_RECORD(cube_side, Spinning_Cube::config::cube_side, slider_bar_float, soft_render::range<0.f, 1e3f>);
+		ADD_RELATION_PAIR_RECORD(cube_unit, Spinning_Cube::config::cube_unit, slider_bar_float, soft_render::range<0.8f, 10.f>);
 	};
 
 

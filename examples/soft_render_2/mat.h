@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <array>
+#include <iostream>
 
 namespace soft_render
 {
@@ -43,6 +44,16 @@ namespace soft_render
 			}
 		}
 		return ret;
+	}
+
+	template<int Row, int Col>
+	static std::ostream& operator<<(std::ostream& out, const mat<Row, Col>& m)
+	{
+		for (int i = 0; i < Row * Col; i++)
+		{
+			out << m.data[i]<<" ";
+		}
+		return out;
 	}
 
 

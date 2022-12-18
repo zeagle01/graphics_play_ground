@@ -21,15 +21,20 @@ namespace soft_render
 
 	};
 
-	Spinning_Cube::Spinning_Cube(int w, int h, Drawing_Buffer* sc)
-		:m_width(w), m_height(h), screen(sc)
+	void Spinning_Cube::init(int w, int h, Drawing_Buffer* sc)
 	{
-		for_each_type< extract_member_type_list_t<config>>::apply<add_spinning_config>(m_datas);
+		m_width=w;
+		m_height=h;
+
+		m_aspect = float(m_width) / float(m_height);
+
+		screen = sc;
+		for_each_type< extract_member_type_list_t<config>>::apply<add_spinning_config>(m_configs);
 	}
 
 	mat4 Spinning_Cube::get_rotation_matrix()
 	{
-		auto init_angle = m_datas.get_ref<config::init_angle>();
+		auto init_angle = m_configs.get_ref<config::init_angle>();
 		float m_angle_x = init_angle(0);
 		float m_angle_y = init_angle(1);
 		float m_angle_z = init_angle(2);
@@ -75,8 +80,8 @@ namespace soft_render
 
 	mat4 Spinning_Cube::get_camara_matrix()
 	{
-		auto& m_lookat = m_datas.get_ref<config::lookat>();
-		auto& m_camara_location = m_datas.get_ref<config::camara_location>();
+		auto& m_lookat = m_configs.get_ref<config::lookat>();
+		auto& m_camara_location = m_configs.get_ref<config::camara_location>();
 
 		vec3 z = normalize(m_camara_location - m_lookat);
 		vec3 x = normalize(cross(m_up, z));
@@ -147,7 +152,7 @@ namespace soft_render
 
 		};
 
-		auto& m_lookat = m_datas.get_ref<config::lookat>();
+		auto& m_lookat = m_configs.get_ref<config::lookat>();
 
 		std::array<vec3, 2> object_space_box{
 			{
@@ -183,8 +188,8 @@ namespace soft_render
 
 	void Spinning_Cube::update()
 	{
-		auto cube_side = m_datas.get_ref<config::cube_side>();
-		auto cube_unit = m_datas.get_ref<config::cube_unit>();
+		auto cube_side = m_configs.get_ref<config::cube_side>();
+		auto cube_unit = m_configs.get_ref<config::cube_unit>();
 		
 		for (float xi = 0.f; xi < cube_side; xi += cube_unit)
 		{

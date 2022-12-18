@@ -122,7 +122,7 @@ namespace soft_render
 			printf(" link error %s\n", infoLog);
 		}
 		else {
-			printf(" shader program linking succeed!");
+			printf(" shader program linking succeed!\n");
 		}
 
 		glDeleteShader(verts_shader);
