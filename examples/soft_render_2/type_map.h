@@ -58,7 +58,6 @@ namespace soft_render
 			{
 				obj = std::make_shared<Var::type>();
 				typename Var::type& value = *obj;
-				//value = Var::type{ ( std::forward<P>(p),... ) };
 				value = typename Var::type { std::forward<P>(p)... };
 			}
 			else

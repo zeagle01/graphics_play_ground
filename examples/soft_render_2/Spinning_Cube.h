@@ -26,6 +26,16 @@ namespace soft_render
 	public:
 		Spinning_Cube(int w, int h, Drawing_Buffer* sc);
 
+		void update();
+
+		template<typename name>
+		auto& get_config()
+		{
+			return m_datas.get_ref<name>();
+		}
+
+	private:
+
 		mat4 get_rotation_matrix();
 
 		mat4 get_camara_matrix();
@@ -34,14 +44,6 @@ namespace soft_render
 
 		mat4 to_pixel_space();
 		void compute_pixel(float x, float y, float z);
-
-		void update();
-
-		template<typename name>
-		auto& get_config()
-		{
-			return m_datas.get_ref<name>();
-		}
 
 	private:
 
