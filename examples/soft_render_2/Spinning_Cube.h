@@ -17,6 +17,8 @@ namespace soft_render
 	public:
 		void init(int w, int h, Drawing_Buffer* sc);
 
+		void set_spinning_cube_default_value();
+
 		void update();
 
 		template<typename name>
@@ -41,7 +43,7 @@ namespace soft_render
 
 		int m_width;
 		int m_height;
-		Drawing_Buffer* screen;
+		Drawing_Buffer* m_screen;
 		float m_aspect;
 		float m_world_height = 400.f;
 		vec3 m_up{ 0,1,0 };

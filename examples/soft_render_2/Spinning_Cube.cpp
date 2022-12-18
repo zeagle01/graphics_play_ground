@@ -21,15 +21,20 @@ namespace soft_render
 
 	};
 
+	void Spinning_Cube::set_spinning_cube_default_value()
+	{
+		for_each_type< extract_member_type_list_t<config>>::apply<add_spinning_config>(m_configs);
+	}
+
 	void Spinning_Cube::init(int w, int h, Drawing_Buffer* sc)
 	{
-		m_width=w;
-		m_height=h;
+		m_width = w;
+		m_height = h;
 
 		m_aspect = float(m_width) / float(m_height);
 
-		screen = sc;
-		for_each_type< extract_member_type_list_t<config>>::apply<add_spinning_config>(m_configs);
+		m_screen = sc;
+
 	}
 
 	mat4 Spinning_Cube::get_rotation_matrix()
@@ -181,7 +186,7 @@ namespace soft_render
 		int yi = p(1);
 		if (xi >= 0 && xi < m_width && yi >= 0 && yi < m_height)
 		{
-			screen->set_color(xi, yi, 0.2, 0.3, 0.5);
+			m_screen->set_color(xi, yi, 0.2, 0.3, 0.5);
 		}
 
 	}

@@ -22,32 +22,37 @@ namespace soft_render
 
 	};
 
-	void Spinning_Cube_App::run()
+	void Spinning_Cube_App::init()
 	{
+
+		m_drawing_buffer = std::make_shared<Drawing_Buffer>();
+		m_gui = std::make_shared<Imgui_Wrapper>();
+
+
+		m_drawing_buffer->init(m_width, m_height);
+		m_gui->init(m_drawing_buffer->get_window());
 
 		for_each_type<extract_member_type_list_t<config>>::apply<init_app>(m_configs);
 
-		Drawing_Buffer screen;
-		Imgui_Wrapper imgui_wrapper;
+		Spinning_Cube& sc = m_configs.get_ref<config::model>();
+		sc.set_spinning_cube_default_value();
+	}
 
-		int width = 800;
-		int height = 600;
-
-		screen.init(width, height);
-		imgui_wrapper.init(screen.get_window());
+	void Spinning_Cube_App::run()
+	{
 
 		Spinning_Cube& sc = m_configs.get_ref<config::model>();
-		sc.init(width, height, &screen);
+		sc.init(m_width, m_height, m_drawing_buffer.get());
 
-		add_all_ui_components(sc, imgui_wrapper);
+		add_all_ui_components(sc, *m_gui);
 
-		screen.main_loop([&screen, &sc, &imgui_wrapper]()
+		m_drawing_buffer->main_loop([this, &sc]()
 			{
-				screen.clear();
+				m_drawing_buffer->clear();
 
 				sc.update();
 
-				imgui_wrapper.update();
+				m_gui->update();
 
 			});
 

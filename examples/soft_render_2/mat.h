@@ -56,6 +56,16 @@ namespace soft_render
 		return out;
 	}
 
+	template<int Row, int Col>
+	static std::istream& operator>>(std::istream& in,  mat<Row, Col>& m)
+	{
+		for (int i = 0; i < Row * Col; i++)
+		{
+			in >> m.data[i];
+		}
+		return in;
+	}
+
 
 	template<int Row, int Col>
 	static mat<Row, Col> operator+(const mat<Row, Col>& a, const mat<Row, Col>& b)
