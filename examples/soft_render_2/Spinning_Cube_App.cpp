@@ -44,7 +44,7 @@ namespace soft_render
 		Spinning_Cube& sc = m_configs.get_ref<config::model>();
 		sc.init(m_width, m_height, m_drawing_buffer.get());
 
-		add_all_ui_components(sc, *m_gui);
+		add_all_ui::apply(sc, *m_gui);
 
 		m_drawing_buffer->main_loop([this, &sc]()
 			{

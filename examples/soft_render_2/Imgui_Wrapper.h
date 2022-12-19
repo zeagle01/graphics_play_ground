@@ -12,38 +12,38 @@ struct GLFWwindow;
 namespace soft_render
 {
 
+
+	struct range
+	{
+		float min;
+		float max;
+	};
+
+
 	struct ui_component_base
 	{
+		std::string name;
 		void virtual operator()() = 0;
 	};
 
-	struct slider_bar_float3 :ui_component_base
+	template< typename T,typename extra_data> 
+	struct value_and_extra_data
 	{
-		std::string name;
-		float min = 0.f;
-		float max = 1.f;
-		vec3* value;
+		T* value;
+		extra_data extra;
+	};
 
+	struct slider_bar_float3 :ui_component_base, value_and_extra_data<vec3, range>
+	{
 		void operator()()override;
 	};
 
-	struct slider_bar_float :ui_component_base
+	struct slider_bar_float :ui_component_base, value_and_extra_data<float, range>
 	{
-		std::string name;
-		float min = 0.f;
-		float max = 1.f;
-		float* value;
-
 		void operator()()override;
 	};
 
 
-	template<float f0, float f1>
-	struct range
-	{
-		static constexpr float min = f0;
-		static constexpr float max = f1;
-	};
 
 	class Imgui_Wrapper
 	{
@@ -52,15 +52,8 @@ namespace soft_render
 		void init(GLFWwindow* window);
 		void update();
 
-		template<typename ui, typename value_t,typename range_t >
-		void add_ui_component(const std::string& name, value_t& value, range_t min, range_t max)
+		void add_ui_component(std::shared_ptr<ui_component_base> ui_component)
 		{
-			auto ui_component = std::make_shared<ui>();
-			ui_component->value = &value;
-			ui_component->name = name;
-			ui_component->min = min;
-			ui_component->max = max;
-
 			m_ui_components.push_back(ui_component);
 		}
 

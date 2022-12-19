@@ -26,8 +26,6 @@ namespace soft_render
 		type_map m_configs;
 
 	private:
-		void set_connection();
-
 		std::shared_ptr<Drawing_Buffer> m_drawing_buffer;
 		std::shared_ptr<Imgui_Wrapper> m_gui;
 

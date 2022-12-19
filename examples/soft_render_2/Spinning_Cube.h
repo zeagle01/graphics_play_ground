@@ -9,9 +9,6 @@ namespace soft_render
 {
 	class Drawing_Buffer;
 
-
-
-
 	class Spinning_Cube
 	{
 	public:
