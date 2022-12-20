@@ -9,6 +9,8 @@
 
 #define ADD_MEMBER_POINTER(name,type,...) struct name: type_map::variable<type,__VA_ARGS__> {}; name* name##_var;
 #define ADD_RELATION_PAIR_RECORD(name,...) struct name: std::type_identity<soft_render::type_list<__VA_ARGS__>> {}; name* name##_var;
+#define ADD_RELATION_RECORD_KEY_FIRST( key0, ...) struct key0##key1: std::type_identity<soft_render::type_list<key0,__VA_ARGS__>> {}; key0* key0##_var;
+#define ADD_RELATION_RECORD_KEY_FIRST_TWO( key0, key1,...) struct key0##key1: std::type_identity<soft_render::type_list<key0,key1,__VA_ARGS__>> {}; key0##key1* key0##key1##_var;
 
 namespace soft_render
 {
@@ -48,14 +50,6 @@ namespace soft_render
 			return *(std::static_pointer_cast<Var::type>(m_datas[key]));
 		}
 
-		//template<typename Var>
-		//const auto& get_ref() const
-		//{
-		//	auto key = typeid(Var).name();
-		//	const  auto& ret = *(std::static_pointer_cast<Var::type>(m_datas[key]));
-		//	return ret;
-		//}
-
 		template<typename Var,typename ...P>
 		void add_type(P&&... p)
 		{
@@ -79,6 +73,28 @@ namespace soft_render
 	private:
 		std::map<std::string, std::shared_ptr<void>> m_datas;
 
+	};
+
+	class type_map_view
+	{
+	public:
+		template<typename Var>
+		auto& get_ref()
+		{
+			auto key = typeid(Var).name();
+			return *(static_cast<Var*>(m_datas[key]));
+		}
+
+		template<typename Var >
+		void add_type(Var* obj)
+		{
+			auto key = typeid(Var).name();
+
+			m_datas[key] = obj;
+		}
+
+	private:
+		std::map<std::string, void*> m_datas;
 	};
 }
 

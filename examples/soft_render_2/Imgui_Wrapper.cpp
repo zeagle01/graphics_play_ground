@@ -17,6 +17,11 @@ namespace soft_render
 		ImGui::SliderFloat3(name.c_str(), &(*value)(0), extra.min, extra.max);
 	}
 
+	void slider_bar_float2::operator()()
+	{
+		ImGui::SliderFloat2(name.c_str(), &(*value)(0), extra.min, extra.max);
+	};
+
 	void slider_bar_float::operator()()
 	{
 		ImGui::SliderFloat(name.c_str(), value, extra.min, extra.max);

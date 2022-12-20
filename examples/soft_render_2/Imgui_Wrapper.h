@@ -38,6 +38,11 @@ namespace soft_render
 		void operator()()override;
 	};
 
+	struct slider_bar_float2 :ui_component_base, value_and_extra_data<vec2, range>
+	{
+		void operator()()override;
+	};
+
 	struct slider_bar_float :ui_component_base, value_and_extra_data<float, range>
 	{
 		void operator()()override;
