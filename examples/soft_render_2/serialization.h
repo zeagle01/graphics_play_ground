@@ -16,19 +16,6 @@ namespace soft_render
 			typename T::config;
 		};
 
-		static std::string extract_name(std::string s)
-		{
-			//return s;
-			auto it = s.find_last_of(':');
-			if (it != std::string::npos)
-			{
-				return s.substr(it + 1, it + s.size());
-			}
-			else
-			{
-				return s;
-			}
-		}
 
 		struct write
 		{
@@ -133,8 +120,6 @@ namespace soft_render
 		template<typename obj_t>
 		static bool  read(obj_t& obj, std::istream& is)
 		{
-			//for_each_type< extract_member_type_list_t<obj_t::config> >:: template apply<details::read>(obj, is, 0);
-
 			struct root_name { using type = obj_t; };
 			return details::read::apply<root_name>(obj, is, 0);
 		}
