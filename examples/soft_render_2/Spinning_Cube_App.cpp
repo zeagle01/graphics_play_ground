@@ -12,20 +12,9 @@
 namespace soft_render
 {
 
-	struct init_app
-	{
-		template<typename T>
-		static void apply(type_map& tm)
-		{
-			tm.add_type<T>();
-			tm.get_ref<T>() = T::get_default_value();
-		}
-
-	};
-
 	void Spinning_Cube_App::init()
 	{
-		for_each_type<extract_member_type_list_t<config>>::apply<init_app>(m_configs);
+		type_map::fill_types<config>(m_configs);
 
 		m_drawing_buffer = std::make_shared<Drawing_Buffer>();
 		m_gui = std::make_shared<Imgui_Wrapper>();
@@ -53,11 +42,11 @@ namespace soft_render
 		tm.add_type<Spinning_Cube_App>(this);
 		add_all_ui::apply(tm, *m_gui);
 
-		m_drawing_buffer->main_loop([this, &sc]()
+		m_drawing_buffer->main_loop([this, &sc](int cursor_x, int cursor_y)
 			{
 				m_drawing_buffer->clear();
 
-				sc.update();
+				sc.update(cursor_x, cursor_y);
 
 				m_gui->update();
 

@@ -35,6 +35,8 @@ namespace soft_render
 		glfwSwapInterval(1);
 
 		m_window = window;
+		glfwSetWindowUserPointer(m_window, &m_call_back);
+
 		return window;
 	}
 
@@ -51,4 +53,33 @@ namespace soft_render
 		}
 
 	}
+
+	void GLFW_Wrapper::add_click_fn(std::function<void()> pressed_fn, std::function<void()> release_fn)
+	{
+		m_call_back.press_fn = pressed_fn;
+		m_call_back.release_fn = release_fn;
+
+		glfwSetMouseButtonCallback(m_window, 
+			[](GLFWwindow* window, int button, int action, int mods)
+			{
+				auto callbacks = *(call_back*)glfwGetWindowUserPointer(window);
+
+				switch (action)
+				{
+				case GLFW_PRESS:
+				{
+					callbacks.press_fn();
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					callbacks.release_fn();
+					break;
+				}
+				}
+
+			}
+		);
+	}
+
 }

@@ -14,8 +14,8 @@ namespace soft_render
 		//std::array< float, Row* Col> data;
 		float data[Row * Col];
 
-		float& operator()(int ri, int ci) { return data[ci * Row + ri]; }
-		const float& operator() (int ri, int ci) const { return data[ci * Row + ri]; }
+		float& operator()(int ri, int ci) { return data[ri * Col + ci]; }
+		const float& operator() (int ri, int ci) const { return data[ri * Col + ci]; }
 
 		float& operator()(int i) { return data[i]; }
 		const float& operator() (int i) const { return data[i]; }
@@ -124,7 +124,7 @@ namespace soft_render
 	template<int N>
 	static float dot(const mat<N, 1>& a, const mat<N, 1>& b)
 	{
-		float ret;
+		float ret = 0.f;
 		for (int i = 0; i < N; i++)
 		{
 			ret += a.data[i] * b.data[i];

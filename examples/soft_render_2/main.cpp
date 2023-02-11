@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "Spinning_Cube.h"
+#include "Camara.h"
 
 
 int main()
@@ -15,7 +16,12 @@ int main()
 
 	std::string project_file_name = "app.txt";
 	std::ifstream fin(project_file_name);
-	soft_render::serilizer::read<soft_render::Spinning_Cube_App>(app, fin);
+
+	if (!soft_render::serilizer::read<soft_render::Spinning_Cube_App>(app, fin))
+	{
+		printf(" read cache file failed !\n");
+
+	}
 
 	app.run();
 

@@ -7,6 +7,9 @@
 #include <vector>
 #include <type_traits>
 
+#include "type_list.h"
+#include "member_extractor.h"
+
 #define ADD_MEMBER_POINTER(name,type,...) struct name: type_map::variable<type,__VA_ARGS__> {}; name* name##_var;
 #define ADD_RELATION_PAIR_RECORD(name,...) struct name: std::type_identity<soft_render::type_list<__VA_ARGS__>> {}; name* name##_var;
 #define ADD_RELATION_RECORD_KEY_FIRST( key0, ...) struct key0##key1: std::type_identity<soft_render::type_list<key0,__VA_ARGS__>> {}; key0* key0##_var;
@@ -67,8 +70,27 @@ namespace soft_render
 				obj = std::make_shared<Var::type>(std::forward<P>(p)...);
 			}
 
-			m_datas[key] = obj;
+			m_datas[key] = obj;//override
 		}
+
+
+	template<typename config>
+	static void fill_types(type_map& tm)
+	{
+		for_each_type< extract_member_type_list_t<config>>::template apply<add_type_by_default_value>(tm);
+	}
+
+	private:
+		struct add_type_by_default_value
+		{
+			template<typename T> 
+			static void apply(type_map& tm )
+			{
+				tm.add_type<T>();
+				tm.get_ref<T>() = T::get_default_value();
+			}
+
+		};
 
 	private:
 		std::map<std::string, std::shared_ptr<void>> m_datas;
@@ -96,5 +118,43 @@ namespace soft_render
 	private:
 		std::map<std::string, void*> m_datas;
 	};
+
+
+	/////////////////////For_Each_Type///////////////////////
+	namespace details
+	{
+		template<typename tl>
+		struct for_each_obj_with_type;
+
+		//public:
+		template< template <typename ...> typename tl, typename ...TP>
+		struct for_each_obj_with_type<tl<TP...>>
+		{
+			// template<typename T> struct F{ apply (p) {} }
+			template< typename F, typename ...P>
+			static void apply(type_map& tm, P&&...p)
+			{
+				(typename F::template apply<TP>(tm.get_ref<TP>(), std::forward<P>(p)...), ...);
+			}
+		};
+
+	}
+
+	template<typename tl>
+	using for_each_obj_with_type = details::for_each_obj_with_type<tl>;
+
+
+	static std::string extract_name(std::string s)
+	{
+		auto it = s.find_last_of(':');
+		if (it != std::string::npos)
+		{
+			return s.substr(it + 1, it + s.size());
+		}
+		else
+		{
+			return s;
+		}
+	}
 }
 

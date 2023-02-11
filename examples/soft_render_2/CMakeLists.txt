@@ -15,6 +15,8 @@ add_executable(
 	Imgui_Wrapper.cpp
 	Spinning_Cube.h
 	Spinning_Cube.cpp
+	Camara.h
+	Camara.cpp
 	mat.h
 	type_list.h
 	type_map.h

@@ -32,105 +32,87 @@ namespace soft_render
 
 		struct write
 		{
-			template <typename field_name, typename obj_t>
-			static void apply(obj_t& obj, std::ostream& os, int indent_depth)
+			static void indent(std::ostream& os, int indent_depth)
 			{
-				auto& tm = obj.m_configs;
-				using field_type = field_name::type;
-				if constexpr (configarable<field_type>)
+				for (int i = 0; i < indent_depth; i++)
 				{
-					auto& sub_obj = tm.get_ref<field_name>();
+					os << "  ";
+				}
+			}
 
-					for (int i = 0; i < indent_depth; i++)
-					{
-						os << "\t";
-					}
+			template<typename obj_name>
+			static void apply( typename obj_name::type& obj, std::ostream& os, int indent_depth)
+			{
+				using obj_t = obj_name::type;
+				if constexpr (configarable<obj_t>)
+				{
+					indent(os, indent_depth);
+
 					os << extract_name(typeid(obj_t).name()) << " :\n";
+
+					indent(os, indent_depth);
+
 					os << "{\n";
 
-					for_each_type< extract_member_type_list_t<field_type::config> >:: template apply<write>(sub_obj, os, indent_depth + 1);
+					for_each_obj_with_type< extract_member_type_list_t<obj_t::config> >:: template apply<write>(obj.m_configs, os, indent_depth + 1);
 
-					for (int i = 0; i < indent_depth; i++)
-					{
-						os << "\t";
-					}
+					indent(os, indent_depth);
+
 					os << "}\n";
 				}
 				else
 				{
-					const auto& v = tm.get_ref<field_name>();
+					indent(os, indent_depth);
 
-					for (int i = 0; i < indent_depth; i++)
-					{
-						os << "\t";
-					}
+					os << extract_name(typeid(obj_name).name()) << " : ";
 
-					os << extract_name(typeid(field_name).name()) << " : ";
-					os << v;
+					os << obj;
+
 					os << "\n";
 				}
+
 			}
 		};
 
+
 		struct read
 		{
-			template <typename field_name, typename obj_t>
-			static void apply(obj_t& obj, std::istream& is, int indent_depth)
+			template<typename obj_name>
+			static bool apply(typename obj_name::type& obj, std::istream& is, int indent_depth)
 			{
-				auto& tm = obj.m_configs;
-				using field_type = field_name::type;
-				if constexpr (configarable<field_type>)
+
+				using obj_t = obj_name::type;
+				if constexpr (configarable<obj_t>)
 				{
-					tm.add_type<field_name>();
-					auto& sub_obj = tm.get_ref<field_name>();
 
-					for (int i = 0; i < indent_depth; i++)
+					std::string node_name,semi_colon;
+					is >> node_name>>semi_colon;
+
+					std::string obj_type_name_str = extract_name(typeid(obj_t).name());
+					if (obj_type_name_str != node_name)
 					{
-						std::string s_tab;
-						is >> s_tab;
-					}
-					std::string node_name;
-					is >> node_name;
-					auto in_node_name = extract_name(typeid(obj_t).name());
-					if (node_name != in_node_name)
-					{
-						printf(" wrong node %s vs %s\n", node_name.c_str(), in_node_name.c_str());
-						return;
+						printf(" wrong node %s vs %s\n", node_name.c_str(), obj_type_name_str.c_str());
+						return false;;
 					}
 
-					{
-						std::string semicolon,begin_brace;
-						is >> semicolon >> begin_brace;
-					}
+					std::string open_curl;
+					is >> open_curl;
 
-					for_each_type< extract_member_type_list_t<field_type::config> >:: template apply<read>(sub_obj, is, indent_depth + 1);
+					for_each_obj_with_type< extract_member_type_list_t<obj_t::config> >:: template apply<read>(obj.m_configs, is, indent_depth + 1);
 
-					std::string end_brace;
-					is >> end_brace;
+					std::string close_curl;
+					is >> close_curl;
 				}
 				else
 				{
-					tm.add_type<field_name>();
-					auto& v = tm.get_ref<field_name>();
-
-					std::string node_name;
-					is >> node_name;
-
-					auto in_node_name = extract_name(typeid(field_name).name());
-					if (node_name != in_node_name)
-					{
-						printf(" wrong node %s vs %s\n", node_name.c_str(), in_node_name.c_str());
-						return;
-					}
-
-					{
-						std::string semicolon;
-						is >> semicolon;
-					}
-
-					is >> v;
+					std::string node_name,semi_colon;
+					is >> node_name>>semi_colon;
+					is >> obj;
 				}
+
+				return true;
 			}
+
 		};
 
 	}
@@ -143,14 +125,18 @@ namespace soft_render
 		template<typename obj_t>
 		static void write(obj_t& obj, std::ostream& os)
 		{
-			for_each_type< extract_member_type_list_t<obj_t::config> >:: template apply<details::write>(obj, os, 0);
+			struct root_name { using type = obj_t; };
+			details::write::apply<root_name>(obj, os, 0);
 		}
 
 
 		template<typename obj_t>
-		static void  read(obj_t& obj, std::istream& is)
+		static bool  read(obj_t& obj, std::istream& is)
 		{
-			for_each_type< extract_member_type_list_t<obj_t::config> >:: template apply<details::read>(obj, is, 0);
+			//for_each_type< extract_member_type_list_t<obj_t::config> >:: template apply<details::read>(obj, is, 0);
+
+			struct root_name { using type = obj_t; };
+			return details::read::apply<root_name>(obj, is, 0);
 		}
 	};
 

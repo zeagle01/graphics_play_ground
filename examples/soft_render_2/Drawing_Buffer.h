@@ -3,11 +3,14 @@
 
 #include <vector>
 #include <functional>
+#include <memory>
 
 struct GLFWwindow;
 
 namespace soft_render
 {
+
+	class GLFW_Wrapper;
 
 	class Drawing_Buffer
 	{
@@ -15,9 +18,11 @@ namespace soft_render
 
 		void init(int width, int height);
 
-		void main_loop(std::function<void()>);
+		void main_loop(std::function<void(int, int)> fn);
 
 		void set_color(int wi, int hi, float r, float g, float b);
+
+		void add_click_fn(std::function<void()> pressed_fn, std::function<void()> release_fn);
 
 		void clear();
 
@@ -29,6 +34,7 @@ namespace soft_render
 		int m_height;
 
 		GLFWwindow* m_window;
+		std::shared_ptr<GLFW_Wrapper> glfw_win;
 
 
 	};

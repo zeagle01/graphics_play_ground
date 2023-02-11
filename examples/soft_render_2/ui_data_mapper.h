@@ -18,8 +18,6 @@ namespace soft_render
 		struct config
 		{
 			ADD_UI_RECORD(angle_rate,			Spinning_Cube,			slider_bar_float3,			 range, 0.0f, 1.f);
-			ADD_UI_RECORD(lookat,				Spinning_Cube,			slider_bar_float3,			 range, -1e3f, 1e3f);
-			ADD_UI_RECORD(camara_location,		Spinning_Cube,			slider_bar_float3,			 range, -1e3f, 1e3f);
 			ADD_UI_RECORD(cube_side,			Spinning_Cube,			slider_bar_float,			 range, 1e1f, 1e3f);
 			ADD_UI_RECORD(cube_unit,			Spinning_Cube,			slider_bar_float,			 range, 0.8f, 10.f);
 			ADD_UI_RECORD(screen_size,			Spinning_Cube_App,		slider_bar_float2,			 range, 100.f, 1000.f);
@@ -40,7 +38,7 @@ namespace soft_render
 				auto& obj = tm.get_ref<obj_t>();
 				auto& v = obj.m_configs.get_ref<obj_field_t>();
 
-				std::string name = typeid(obj_field_t).name();
+				std::string name = extract_name(typeid(obj_field_t).name());
 				auto ui_component_obj = std::make_shared<ui_component_t>();
 
 				ui_component_obj->value = &v;

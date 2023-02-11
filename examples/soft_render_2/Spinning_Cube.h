@@ -8,6 +8,7 @@
 namespace soft_render 
 {
 	class Drawing_Buffer;
+	class Camara;
 
 	class Spinning_Cube
 	{
@@ -16,7 +17,7 @@ namespace soft_render
 
 		void set_spinning_cube_default_value();
 
-		void update();
+		void update(int cx, int cy);
 
 		template<typename name>
 		auto& get_config()
@@ -26,15 +27,19 @@ namespace soft_render
 
 	private:
 
-		mat4 get_rotation_matrix();
+		mat4 get_translate_matrix(const vec3& translate);
+
+		mat4 get_model_matrix(const vec3& translate);
 
 		mat4 get_camara_matrix();
 
 		mat4 get_scale_and_translate(const std::array<vec3, 2>& box_from, const std::array<vec3, 2>& box_dst);
 
-		mat4 to_pixel_space();
+		mat4 view_port_matrix();
 
-		void compute_pixel(float x, float y, float z);
+		void compute_pixel(float x, float y, float z, const mat4& model_matrix);
+
+		void draw_cubic(const mat4& model_matrix, float cube_side, float cube_unit);
 
 	private:
 
@@ -42,18 +47,16 @@ namespace soft_render
 		int m_height;
 		Drawing_Buffer* m_screen;
 		float m_aspect;
-		float m_world_height = 400.f;
-		vec3 m_up{ 0,1,0 };
+		float m_world_height = 800.f;
 
 	public:
 		struct config
 		{
 			ADD_MEMBER_POINTER(angle_rate, vec3, vec3{ 0.1f,0.2f,0.03f });
 			ADD_MEMBER_POINTER(init_angle, vec3);
-			ADD_MEMBER_POINTER(lookat, vec3, vec3{ 50,50,0 });
-			ADD_MEMBER_POINTER(camara_location, vec3, vec3{ 600,600,100 });
+			ADD_MEMBER_POINTER(camara, Camara);
 			ADD_MEMBER_POINTER(cube_side, float, 100.f);
-			ADD_MEMBER_POINTER(cube_unit, float, 1.2f);
+			ADD_MEMBER_POINTER(cube_unit, float, 5.f);
 		};
 		type_map m_configs;
 	};

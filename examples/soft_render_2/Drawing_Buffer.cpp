@@ -13,31 +13,41 @@ namespace soft_render
 {
 
 
-	GLFW_Wrapper glfw_win;
 	OpenGL_Wrapper gl;
 
 	void Drawing_Buffer::init(int width, int height)
 	{
+		glfw_win = std::make_shared<GLFW_Wrapper>();
 		m_width = width;
 		m_height = height;
-		m_window = glfw_win.create_window(width, height);
+		m_window = glfw_win->create_window(width, height);
 		gl.init(width, height);
 		buffer.resize(width * height);
 
 		clear();
 	}
 
-	void Drawing_Buffer::main_loop(std::function<void()> fn)
+	void Drawing_Buffer::add_click_fn(std::function<void()> pressed_fn, std::function<void()> release_fn)
 	{
-		glfw_win.main_loop(
+		glfw_win->add_click_fn(pressed_fn, release_fn);
+	}
+
+
+	void Drawing_Buffer::main_loop(std::function<void(int ,int)> fn)
+	{
+		glfw_win->main_loop(
 			[this, fn]()
 			{
 
 				gl.clear();
 				gl.draw(buffer.data());
 
-				fn();
+				double cx;
+				double cy;
 
+				glfwGetCursorPos(m_window, &cx, &cy);
+
+				fn(int(cx), int(cy));
 			});
 	}
 
