@@ -20,6 +20,10 @@ namespace soft_render
 			ADD_UI_RECORD(angle_rate,			Spinning_Cube,			slider_bar_float3,			 range, 0.0f, 1.f);
 			ADD_UI_RECORD(cube_side,			Spinning_Cube,			slider_bar_float,			 range, 1e1f, 1e3f);
 			ADD_UI_RECORD(cube_unit,			Spinning_Cube,			slider_bar_float,			 range, 0.8f, 10.f);
+			ADD_UI_RECORD(near,					Spinning_Cube,			slider_bar_float,			 range, -1e3f, 1e2);
+			ADD_UI_RECORD(far,					Spinning_Cube,			slider_bar_float,			 range, -1e4f, 1e2f);
+			ADD_UI_RECORD(fov,					Spinning_Cube,			slider_bar_float,			 range, 1e-5f, 90.f);
+			ADD_UI_RECORD(perpective,			Spinning_Cube,			check_box,					 no_extra			);
 			ADD_UI_RECORD(screen_size,			Spinning_Cube_App,		slider_bar_float2,			 range, 100.f, 1000.f);
 		};
 
@@ -36,12 +40,12 @@ namespace soft_render
 				using ui_extra_data_t = get_nth_element_t<tl, 3>;
 
 				auto& obj = tm.get_ref<obj_t>();
-				auto& v = obj.m_configs.get_ref<obj_field_t>();
+				auto& value = obj.m_configs.get_ref<obj_field_t>();
 
 				std::string name = extract_name(typeid(obj_field_t).name());
 				auto ui_component_obj = std::make_shared<ui_component_t>();
 
-				ui_component_obj->value = &v;
+				ui_component_obj->value = &value;
 				ui_component_obj->name = name;
 				ui_component_obj->extra = ui_extra_data_t::get_default_value();
 

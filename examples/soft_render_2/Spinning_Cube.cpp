@@ -111,9 +111,9 @@ namespace soft_render
 		mat4 frame
 		{
 			{
-				x.data[0],y.data[0],z.data[0],0,
-				x.data[1],y.data[1],z.data[1],0,
-				x.data[2],y.data[2],z.data[2],0,
+				x(0),y(0),z(0),0,
+				x(1),y(1),z(1),0,
+				x(2),y(2),z(2),0,
 				0,0,0,1,
 			}
 		};
@@ -159,21 +159,50 @@ namespace soft_render
 		return  translate_to_dst * scale_to_dst * translate_back_to_origin;
 	}
 
+	mat4 Spinning_Cube::get_projection_matrix()
+	{
+		auto m_near = m_configs.get_ref<config::near>();
+		auto m_far = m_configs.get_ref<config::far>();
+		mat4 ret
+		{
+			m_near,0,0,0,
+			0,m_near,0,0,
+			0,0,m_near + m_far,-m_near * m_far,
+			0,0,1,0
+		};
+
+		return ret;
+	}
+
+	float degree_2_radian(float d)
+	{
+		const float pi = 3.1415926f;
+		return d * pi / 180.f;
+	}
+
 	mat4 Spinning_Cube::view_port_matrix()
 	{
+
+		auto m_near = m_configs.get_ref<config::near>();
+		auto m_far = m_configs.get_ref<config::far>();
+		auto m_fov = m_configs.get_ref<config::fov>();
+
 		std::array<vec3, 2> screen_space_box{
 			{
-				{0,0,0},
-				{float(m_width),float(m_height) ,1.f}
+				{0,0,m_near},
+				{float(m_width),float(m_height) ,m_far}
 			}
 
 		};
 
+		float tangent = std::tan(degree_2_radian(m_fov));
+		float half_height = std::abs(m_near) * tangent;
+		float half_width = half_height * m_aspect;
 
 		std::array<vec3, 2> object_space_box{
 			{
-				{ -0.5f * m_world_height  , -0.5f * m_world_height ,0},
-				{  0.5f * m_world_height  ,  0.5f * m_world_height  , -m_world_height }
+				{ -half_width  , -half_height  , m_near},
+				{  half_width  ,  half_height  , m_far }
 			}
 
 		};
@@ -182,23 +211,40 @@ namespace soft_render
 	}
 
 
-
-
-	void Spinning_Cube::compute_pixel(float x, float y, float z, const mat4& model_matrix)
+	void Spinning_Cube::compute_view_projection_matrix()
 	{
 
-		mat<4, 1> p{ {x,y,z,1.f} };
 		auto camara_matrix = get_camara_matrix();
 
-		auto view_port = view_port_matrix();
-		p = view_port * camara_matrix * model_matrix * p;
+		auto projection = get_projection_matrix();
 
-		int xi = p(0);
-		int yi = p(1);
+		auto view_port = view_port_matrix();
+
+		if (m_configs.get_ref<config::perpective>())
+		{
+			m_vp = view_port * projection * camara_matrix;
+		}
+		else
+		{
+			m_vp = view_port *  camara_matrix;
+		}
+	}
+
+
+	void Spinning_Cube::compute_pixel(const vec3& pos,const vec3& color, const mat4& model_matrix)
+	{
+
+		mat<4, 1> p{ pos(0), pos(1), pos(2), 1.f };
+
+		p = m_vp * model_matrix * p;
+
+		int xi = p(0) / p(3);
+		int yi = p(1) / p(3);
+		float depth = p(2) / p(3);
 
 		if (xi >= 0 && xi < m_width && yi >= 0 && yi < m_height)
 		{
-			m_screen->set_color(xi, yi, 0.2, 0.3, 0.5);
+			m_screen->set_color(xi, yi, depth, color(0), color(1), color(2));
 		}
 
 	}
@@ -213,12 +259,12 @@ namespace soft_render
 				float y = yi ;
 				float z0 = 0 ;
 				float z1 = cube_side ;
-				compute_pixel(x, y, z0, model_matrix);
-				compute_pixel(x, y, z1, model_matrix);
-				compute_pixel(x, z0, y, model_matrix);
-				compute_pixel(x, z1, y, model_matrix);
-				compute_pixel(z0, x, y, model_matrix);
-				compute_pixel(z1, x, y, model_matrix);
+				compute_pixel({ x, y, z0 }, { 0.2,0.5,0.8 }, model_matrix);
+				compute_pixel({ x, y, z1 }, { 0.2,0.5,0.8 }, model_matrix);
+				compute_pixel({ x, z0, y }, { 0.2,0.8,0.5 }, model_matrix);
+				compute_pixel({ x, z1, y }, { 0.2,0.8,0.5 }, model_matrix);
+				compute_pixel({ z0, x, y }, { 0.5,0.2,0.3 }, model_matrix);
+				compute_pixel({ z1, x, y }, { 0.5,0.2,0.3 }, model_matrix);
 			}
 		}
 
@@ -226,6 +272,8 @@ namespace soft_render
 
 	void Spinning_Cube::update(int cx, int cy)
 	{
+
+		compute_view_projection_matrix();
 
 		m_configs.get_ref<config::camara>().update(cx, cy);
 
@@ -236,6 +284,8 @@ namespace soft_render
 		auto model = get_model_matrix({});
 		draw_cubic(model, cube_side, cube_unit);
 		
+		bool draw_axis = false;
+		if (draw_axis)
 		{
 			float litte_cube_side = cube_side / 30;
 			float litte_cube_unit = cube_unit / 6;
@@ -244,18 +294,17 @@ namespace soft_render
 			draw_cubic(get_translate_matrix(lookat), litte_cube_side, litte_cube_unit);
 
 			const auto& cam_location = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::location>();
-			draw_cubic(get_translate_matrix(cam_location), litte_cube_side, litte_cube_unit);
-
+			const auto& cam_up = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::up>();
+			vec3 front_dir = normalize(lookat - cam_location);
+			vec3 cam_right = normalize(cross(front_dir, cam_up));
 
 			float axis_length = litte_cube_side * 10;
-			const auto& cam_up = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::up>();
-			draw_cubic(get_translate_matrix(cam_location + 2 * axis_length * cam_up), litte_cube_side, litte_cube_unit);
 
-			vec3 front_dir = normalize(lookat - cam_location);
-			draw_cubic(get_translate_matrix(cam_location + 3 * axis_length * front_dir), litte_cube_side, litte_cube_unit);
-
-			vec3 cam_right = normalize(cross(front_dir, cam_up));
-			draw_cubic(get_translate_matrix(cam_location + 1 * axis_length * cam_right), litte_cube_side, litte_cube_unit);
+			auto cam_presentation_location = cam_location + 5 * axis_length * front_dir;
+			draw_cubic(get_translate_matrix(cam_presentation_location), litte_cube_side, litte_cube_unit);
+			draw_cubic(get_translate_matrix(cam_presentation_location + 1 * axis_length * cam_right), litte_cube_side, litte_cube_unit);
+			draw_cubic(get_translate_matrix(cam_presentation_location + 2 * axis_length * cam_up), litte_cube_side, litte_cube_unit);
+			draw_cubic(get_translate_matrix(cam_presentation_location + 3 * axis_length * front_dir), litte_cube_side, litte_cube_unit);
 
 		}
 

@@ -35,19 +35,25 @@ namespace soft_render
 
 		mat4 get_scale_and_translate(const std::array<vec3, 2>& box_from, const std::array<vec3, 2>& box_dst);
 
+		mat4 get_projection_matrix();
+
 		mat4 view_port_matrix();
 
-		void compute_pixel(float x, float y, float z, const mat4& model_matrix);
+		void compute_view_projection_matrix();
+
+		void compute_pixel(const vec3& pos, const vec3& color, const mat4& model_matrix);
 
 		void draw_cubic(const mat4& model_matrix, float cube_side, float cube_unit);
 
 	private:
 
+		mat4 m_vp;
+
 		int m_width;
 		int m_height;
-		Drawing_Buffer* m_screen;
 		float m_aspect;
-		float m_world_height = 800.f;
+
+		Drawing_Buffer* m_screen;
 
 	public:
 		struct config
@@ -55,8 +61,13 @@ namespace soft_render
 			ADD_MEMBER_POINTER(angle_rate, vec3, vec3{ 0.1f,0.2f,0.03f });
 			ADD_MEMBER_POINTER(init_angle, vec3);
 			ADD_MEMBER_POINTER(camara, Camara);
-			ADD_MEMBER_POINTER(cube_side, float, 100.f);
-			ADD_MEMBER_POINTER(cube_unit, float, 5.f);
+			ADD_MEMBER_POINTER(cube_side, float, 50.f);
+			ADD_MEMBER_POINTER(cube_unit, float, 1.f);
+
+			ADD_MEMBER_POINTER(perpective, bool, false);
+			ADD_MEMBER_POINTER(near, float, -400.f);
+			ADD_MEMBER_POINTER(far, float, -1000.f);
+			ADD_MEMBER_POINTER(fov, float, 45.f);
 		};
 		type_map m_configs;
 	};

@@ -20,7 +20,7 @@ namespace soft_render
 
 		void main_loop(std::function<void(int, int)> fn);
 
-		void set_color(int wi, int hi, float r, float g, float b);
+		void set_color(int wi, int hi, float depth, float r, float g, float b);
 
 		void add_click_fn(std::function<void()> pressed_fn, std::function<void()> release_fn);
 
@@ -30,6 +30,7 @@ namespace soft_render
 
 	private:
 		std::vector<uint32_t> buffer;
+		std::vector<float > depth_buffer;
 		int m_width;
 		int m_height;
 

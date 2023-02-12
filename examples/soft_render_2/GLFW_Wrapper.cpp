@@ -49,6 +49,8 @@ namespace soft_render
 
 			fn();
 
+			glfwMakeContextCurrent(m_window); //in case for docking gui
+
 			glfwSwapBuffers(m_window);
 		}
 

@@ -8,6 +8,7 @@
 #include "OpenGL_Wrapper.h"
 
 #include <functional>
+#include <limits>
 
 namespace soft_render
 {
@@ -23,6 +24,7 @@ namespace soft_render
 		m_window = glfw_win->create_window(width, height);
 		gl.init(width, height);
 		buffer.resize(width * height);
+		depth_buffer.resize(width * height);
 
 		clear();
 	}
@@ -56,16 +58,22 @@ namespace soft_render
 		for (int i = 0; i < buffer.size(); i++)
 		{
 			buffer[i] = 0xffffffff;
+			depth_buffer[i] = std::numeric_limits<float>::lowest();
 		}
 	}
 
-	void Drawing_Buffer::set_color(int wi, int hi, float r, float g, float b)
+	void Drawing_Buffer::set_color(int wi, int hi, float depth, float r, float g, float b)
 	{
-		int ri = r * 255;
-		int gi = g * 255;
-		int bi = b * 255;
+		if (depth > depth_buffer[hi * m_width + wi])
+		{
+			int ri = r * 255;
+			int gi = g * 255;
+			int bi = b * 255;
 
-		buffer[hi * m_width + wi] =
-			(255 << 24) + (int(bi) << 16) + (int(gi) << 8) + int(ri);
+			buffer[hi * m_width + wi] =
+				(255 << 24) + (int(bi) << 16) + (int(gi) << 8) + int(ri);
+
+			depth_buffer[hi * m_width + wi] = depth;
+		}
 	}
 }

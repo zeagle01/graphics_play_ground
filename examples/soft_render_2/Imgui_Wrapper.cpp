@@ -27,11 +27,22 @@ namespace soft_render
 		ImGui::SliderFloat(name.c_str(), value, extra.min, extra.max);
 	};
 
+	void check_box::operator()()
+	{
+		ImGui::Checkbox(name.c_str(), value);
+	}
+
 
 	void Imgui_Wrapper::init(GLFWwindow* window)
 	{
 		// Setup Dear ImGui context
 		ImGui::CreateContext();
+
+		ImGuiIO& io = ImGui::GetIO(); 
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
 		// Setup Platform/Renderer bindings
 		const char* glsl_version = "#version 130";
@@ -73,6 +84,13 @@ namespace soft_render
 		// Rendering
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
 
 	}
 

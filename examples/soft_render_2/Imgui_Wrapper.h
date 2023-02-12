@@ -12,6 +12,7 @@ struct GLFWwindow;
 namespace soft_render
 {
 
+	struct no_extra {};
 
 	struct range
 	{
@@ -33,6 +34,7 @@ namespace soft_render
 		extra_data extra;
 	};
 
+
 	struct slider_bar_float3 :ui_component_base, value_and_extra_data<vec3, range>
 	{
 		void operator()()override;
@@ -44,6 +46,11 @@ namespace soft_render
 	};
 
 	struct slider_bar_float :ui_component_base, value_and_extra_data<float, range>
+	{
+		void operator()()override;
+	};
+
+	struct check_box :ui_component_base, value_and_extra_data<bool, no_extra>
 	{
 		void operator()()override;
 	};

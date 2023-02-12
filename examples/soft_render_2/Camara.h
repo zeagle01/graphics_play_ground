@@ -31,7 +31,7 @@ namespace soft_render
 		{
 			ADD_MEMBER_POINTER(lookat, vec3, vec3{ 50,50,0 });
 			ADD_MEMBER_POINTER(up, vec3, vec3{ 0,1,0 });
-			ADD_MEMBER_POINTER(location, vec3, vec3{ 1000,1000,1000 });
+			ADD_MEMBER_POINTER(location, vec3, vec3{ 50,50,400 });
 		};
 		type_map m_configs;
 	};
