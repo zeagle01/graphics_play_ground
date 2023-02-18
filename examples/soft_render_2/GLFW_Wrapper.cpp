@@ -92,7 +92,7 @@ namespace soft_render
 
 				case GLFW_PRESS:
 				{
-					KeyPress e;
+					Key_Pressed e;
 					e.key_code = key;
 					e.repeat_count = 0;
 					callbacks(e);
@@ -100,7 +100,7 @@ namespace soft_render
 				}
 				case GLFW_REPEAT:
 				{
-					KeyPress e;
+					Key_Pressed e;
 					e.key_code = key;
 					e.repeat_count = 1;
 					callbacks(e);
@@ -108,7 +108,7 @@ namespace soft_render
 				}
 				case GLFW_RELEASE:
 				{
-					KeyRelease e;
+					Key_Released e;
 					e.key_code = key;
 					callbacks(e);
 					break;
@@ -127,14 +127,14 @@ namespace soft_render
 				{
 				case GLFW_PRESS:
 				{
-					MousePress e;
+					Mouse_Pressed e;
 					e.button = button;
 					callbacks(e);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					MouseRelease e;
+					Mouse_Released e;
 					e.button = button;
 					callbacks(e);
 					break;

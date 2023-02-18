@@ -46,8 +46,8 @@ namespace soft_render
 	void Spinning_Cube_App::register_event_handlers()
 	{
 		Spinning_Cube& sc = m_configs.get_ref<config::model>();
-		m_glfw_win->add_event_handler<MousePress>(std::bind(&Spinning_Cube::on_mouse_pressed, &sc, std::placeholders::_1));
-		m_glfw_win->add_event_handler<MouseRelease>(std::bind(&Spinning_Cube::on_mouse_released, &sc, std::placeholders::_1));
+		m_glfw_win->add_event_handler<Mouse_Pressed>(std::bind(&Spinning_Cube::on_mouse_pressed, &sc, std::placeholders::_1));
+		m_glfw_win->add_event_handler<Mouse_Released>(std::bind(&Spinning_Cube::on_mouse_released, &sc, std::placeholders::_1));
 		m_glfw_win->add_event_handler<Mouse_Scrolled_Event>(std::bind(&Spinning_Cube::on_mouse_scroll, &sc, std::placeholders::_1));
 		m_glfw_win->setup_input();
 

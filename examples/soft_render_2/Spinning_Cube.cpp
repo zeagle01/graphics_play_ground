@@ -28,7 +28,7 @@ namespace soft_render
 	}
 
 
-	bool Spinning_Cube::on_mouse_pressed(const MousePress& e)
+	bool Spinning_Cube::on_mouse_pressed(const Mouse_Pressed& e)
 	{
 		if (e.button == CE_MOUSE_BUTTON_RIGHT)
 		{
@@ -37,7 +37,7 @@ namespace soft_render
 		return true;
 	}
 
-	bool Spinning_Cube::on_mouse_released(const MouseRelease& e)
+	bool Spinning_Cube::on_mouse_released(const Mouse_Released& e)
 	{
 		if (e.button == CE_MOUSE_BUTTON_RIGHT)
 		{

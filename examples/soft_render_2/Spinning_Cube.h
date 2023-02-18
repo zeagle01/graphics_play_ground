@@ -26,8 +26,8 @@ namespace soft_render
 			return m_configs.get_ref<name>();
 		}
 
-		bool on_mouse_pressed(const MousePress& e);
-		bool on_mouse_released(const MouseRelease& e);
+		bool on_mouse_pressed(const Mouse_Pressed& e);
+		bool on_mouse_released(const Mouse_Released& e);
 		bool on_mouse_scroll(const Mouse_Scrolled_Event& e);
 
 	private:

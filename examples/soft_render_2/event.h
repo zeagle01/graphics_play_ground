@@ -149,14 +149,14 @@ namespace soft_render
 
 	struct Event { virtual ~Event() {} };
 
-	struct MousePress				:Event { int button; };
-	struct MouseRelease				:Event	{ int button; };
+	struct Mouse_Pressed			:Event { int button; };
+	struct Mouse_Released			:Event	{ int button; };
 	struct Mouse_Moved				:Event { int x; int y; };
 	struct Mouse_Scrolled_Event		:Event { int dx; int dy; };
 	struct Mouse_Button_Event		:Event { int button; };
-	struct KeyPress					:Event { int key_code; int repeat_count; };
-	struct KeyRelease				:Event { int key_code; };
-	struct KeyTyped					:Event { int key_code; };
+	struct Key_Pressed				:Event { int key_code; int repeat_count; };
+	struct Key_Released				:Event { int key_code; };
+	struct Key_Typed				:Event { int key_code; };
 	struct Window_Resize_Event		:Event { int width, height; };
 	struct Window_Close_Event		:Event {};
 	struct Window_Tick_Event		:Event {};
