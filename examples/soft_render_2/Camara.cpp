@@ -26,8 +26,11 @@ namespace soft_render
 	void Camara::on_scroll(int dx, int dy)
 	{
 		auto& fov = m_configs.get_ref<config::fov>();
-		fov += dy;
-		fov = std::clamp<float>(fov, 0.f, 90.f);
+		float max = 90.f;
+		float uniform_fov = fov / max;
+		float factor = 3.f * std::pow(uniform_fov, 1.02);
+		fov += dy * factor;
+		fov = std::clamp<float>(fov, 0.f, max);
 	}
 
 	void Camara::update(int x, int y)
