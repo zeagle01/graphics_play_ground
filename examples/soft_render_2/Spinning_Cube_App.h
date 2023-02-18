@@ -13,25 +13,16 @@ namespace soft_render
 	class Imgui_Wrapper;
 	class GLFW_Wrapper;
 
-	struct rectangle_size { int width; int height; };
-	static std::ostream& operator<<(std::ostream& out, const rectangle_size& r)
-	{
-		out << r.width << " " << r.height;
-		return out;
-	}
-	static std::istream& operator>>(std::istream& in, rectangle_size& r)
-	{
-		in >> r.width >> r.height;
-		return in;
-	}
-
-
 	class Spinning_Cube_App
 	{
 	public:
 
 		void init();
 		void run();
+
+	private:
+		void connect_data_and_ui_component();
+		void register_event_handlers();
 
 	public:
 
