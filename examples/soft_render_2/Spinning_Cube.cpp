@@ -4,6 +4,7 @@
 #include "Spinning_Cube.h"
 #include "Drawing_Buffer.h"
 #include "Camara.h"
+#include "mat.h"
 
 #include "member_extractor.h"
 
@@ -134,9 +135,9 @@ namespace soft_render
 
 		mat4 trans{
 			{
-				1,0,0,-m_camara_location.data[0],
-				0,1,0,-m_camara_location.data[1],
-				0,0,1,-m_camara_location.data[2],
+				1,0,0,-m_camara_location(0),
+				0,1,0,-m_camara_location(1),
+				0,0,1,-m_camara_location(2),
 				0,0,0,1.f
 			}
 		};
@@ -147,7 +148,7 @@ namespace soft_render
 
 	mat4 Spinning_Cube::get_scale_and_translate(const std::array<vec3, 2>& box_from, const std::array<vec3, 2>& box_dst)
 	{
-		mat4 translate_back_to_origin = get_identity<4>();
+		mat4 translate_back_to_origin = get_identity<float,4>();
 
 		translate_back_to_origin(0, 3) = -box_from[0](0);
 		translate_back_to_origin(1, 3) = -box_from[0](1);
@@ -156,13 +157,13 @@ namespace soft_render
 		auto dx_from = box_from[1] - box_from[0];
 
 
-		mat4 translate_to_dst = get_identity<4>();
+		mat4 translate_to_dst = get_identity<float,4>();
 
 		translate_to_dst(0, 3) = box_dst[0](0);
 		translate_to_dst(1, 3) = box_dst[0](1);
 		translate_to_dst(2, 3) = box_dst[0](2);
 
-		mat4 scale_to_dst = get_identity<4>();
+		mat4 scale_to_dst = get_identity<float,4>();
 		auto dx_dst = box_dst[1] - box_dst[0];
 
 		scale_to_dst(0, 0) = dx_dst(0) / dx_from(0);
@@ -241,13 +242,14 @@ namespace soft_render
 		{
 			m_vp = view_port *  camara_matrix;
 		}
+
 	}
 
 
 	void Spinning_Cube::compute_pixel(const vec3& pos,const vec3& color, const mat4& model_matrix)
 	{
 
-		mat<4, 1> p{ pos(0), pos(1), pos(2), 1.f };
+		vec4 p{ pos(0), pos(1), pos(2), 1.f };
 
 		p = m_vp * model_matrix * p;
 
@@ -283,6 +285,24 @@ namespace soft_render
 
 	}
 
+	vec3 Spinning_Cube::map_point_to_screen(const vec3& p, const mat4& model_matrix)
+	{
+		vec4 x{ p(0),p(1),p(2),1.f };
+		x = m_vp * model_matrix * x;
+
+		x(0) = x(0) / x(3);
+		x(1) = x(1) / x(3);
+		x(2) = x(2) / x(3);
+		return { x(0),x(1),x(2) };
+	}
+
+	void Spinning_Cube::draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix)
+	{
+		auto x0 = map_point_to_screen(x[0], model_matrix);
+		auto x1 = map_point_to_screen(x[1], model_matrix);
+		m_screen->draw_line({ x0, x1 }, color);
+	}
+
 	void Spinning_Cube::update(int cx, int cy)
 	{
 
@@ -297,15 +317,13 @@ namespace soft_render
 		auto model = get_model_matrix({});
 		draw_cubic(model, cube_side, cube_unit);
 		
-		bool draw_axis = false;
+		bool draw_axis = true;
 		if (draw_axis)
 		{
 			float litte_cube_side = cube_side / 30;
 			float litte_cube_unit = cube_unit / 6;
 
 			const auto& lookat = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::lookat>();
-			draw_cubic(get_translate_matrix(lookat), litte_cube_side, litte_cube_unit);
-
 			const auto& cam_location = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::location>();
 			const auto& cam_up = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::up>();
 			vec3 front_dir = normalize(lookat - cam_location);
@@ -314,11 +332,10 @@ namespace soft_render
 			float axis_length = litte_cube_side * 10;
 
 			auto cam_presentation_location = cam_location + 5 * axis_length * front_dir;
-			draw_cubic(get_translate_matrix(cam_presentation_location), litte_cube_side, litte_cube_unit);
-			draw_cubic(get_translate_matrix(cam_presentation_location + 1 * axis_length * cam_right), litte_cube_side, litte_cube_unit);
-			draw_cubic(get_translate_matrix(cam_presentation_location + 2 * axis_length * cam_up), litte_cube_side, litte_cube_unit);
-			draw_cubic(get_translate_matrix(cam_presentation_location + 3 * axis_length * front_dir), litte_cube_side, litte_cube_unit);
 
+			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_right }, { 1.f,0.f,0.f }, get_identity<float, 4>());
+			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_up }, { 0.f,1.0f,0.f }, get_identity<float, 4>());
+			draw_line({ cam_presentation_location,  cam_presentation_location - axis_length * front_dir }, { 0.0f,0.0f,1.0f }, get_identity<float, 4>());
 		}
 
 		const auto& angle_rate = get_config<config::angle_rate>();

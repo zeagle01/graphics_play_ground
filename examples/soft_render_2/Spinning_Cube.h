@@ -50,6 +50,10 @@ namespace soft_render
 
 		void draw_cubic(const mat4& model_matrix, float cube_side, float cube_unit);
 
+		vec3 map_point_to_screen(const vec3& p, const mat4& model_matrix);
+
+		void draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix);
+
 	private:
 
 		mat4 m_vp;

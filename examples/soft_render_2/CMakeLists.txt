@@ -28,6 +28,7 @@ add_executable(
 	serialization.h
 	dispatcher.h
 	event.h
+	rasterizer.h
 )
 
 target_compile_features(soft_render_2 PRIVATE cxx_std_20)

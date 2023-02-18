@@ -8,31 +8,33 @@
 
 namespace soft_render
 {
-	template<int Row, int Col>
+	template<typename T, int Row, int Col>
 	struct mat
 	{
-		//std::array< float, Row* Col> data;
-		float data[Row * Col];
+		//std::array< T, Row* Col> data;
+		T data[Row * Col];
 
-		float& operator()(int ri, int ci) { return data[ri * Col + ci]; }
-		const float& operator() (int ri, int ci) const { return data[ri * Col + ci]; }
+		T& operator()(int ri, int ci) { return data[ri * Col + ci]; }
+		const T& operator() (int ri, int ci) const { return data[ri * Col + ci]; }
 
-		float& operator()(int i) { return data[i]; }
-		const float& operator() (int i) const { return data[i]; }
+		T& operator()(int i) { return data[i]; }
+		const T& operator() (int i) const { return data[i]; }
 
 	};
 
+	using mat4 = mat<float, 4, 4>;
+	using vec3 = mat<float, 3, 1>;
+	using vec2 = mat<float, 2, 1>;
+	using vec4 = mat<float, 4, 1>;
 
-	using mat4 = mat<4, 4>;
-	using vec3 = mat<3, 1>;
-	using vec2 = mat<2, 1>;
-	using vec4 = mat<4, 1>;
+	using vec2i = mat<int,2, 1>;
 
 
-	template<int Row, int N, int Col>
-	static mat<Row, Col> operator*(const mat<Row, N>& a, const mat<N, Col>& b)
+
+	template<typename T,int Row, int N, int Col>
+	static mat<T,Row, Col> operator*(const mat<T,Row, N>& a, const mat<T,N, Col>& b)
 	{
-		mat<Row, Col> ret;
+		mat<T,Row, Col> ret;
 		for (int ri = 0; ri < Row; ri++)
 		{
 			for (int ci = 0; ci < Col; ci++)
@@ -47,8 +49,8 @@ namespace soft_render
 		return ret;
 	}
 
-	template<int Row, int Col>
-	static std::ostream& operator<<(std::ostream& out, const mat<Row, Col>& m)
+	template<typename T, int Row, int Col>
+	static std::ostream& operator<<(std::ostream& out, const mat<T,Row, Col>& m)
 	{
 		for (int i = 0; i < Row * Col; i++)
 		{
@@ -57,8 +59,8 @@ namespace soft_render
 		return out;
 	}
 
-	template<int Row, int Col>
-	static std::istream& operator>>(std::istream& in,  mat<Row, Col>& m)
+	template<typename T, int Row, int Col>
+	static std::istream& operator>>(std::istream& in,  mat<T,Row, Col>& m)
 	{
 		for (int i = 0; i < Row * Col; i++)
 		{
@@ -68,10 +70,10 @@ namespace soft_render
 	}
 
 
-	template<int Row, int Col>
-	static mat<Row, Col> operator+(const mat<Row, Col>& a, const mat<Row, Col>& b)
+	template<typename T, int Row, int Col>
+	static mat<T, Row, Col> operator+(const mat<T, Row, Col>& a, const mat<T, Row, Col>& b)
 	{
-		mat<Row, Col> ret;
+		mat<T,Row, Col> ret;
 		for (int i = 0; i < Row * Col; i++)
 		{
 			ret.data[i] = a.data[i] + b.data[i];
@@ -79,10 +81,10 @@ namespace soft_render
 		return ret;
 	}
 
-	template<int Row, int Col>
-	static mat<Row, Col> operator-(const mat<Row, Col>& a, const mat<Row, Col>& b)
+	template<typename T,int Row, int Col>
+	static mat<T, Row, Col> operator-(const mat<T, Row, Col>& a, const mat<T, Row, Col>& b)
 	{
-		mat<Row, Col> ret;
+		mat<T,Row, Col> ret;
 		for (int i = 0; i < Row * Col; i++)
 		{
 			ret.data[i] = a.data[i] - b.data[i];
@@ -90,10 +92,10 @@ namespace soft_render
 		return ret;
 	}
 
-	template<int Row, int Col>
-	static mat<Row, Col> operator*(float s, const mat<Row, Col>& a)
+	template<typename T, int Row, int Col>
+	static mat<T,Row, Col> operator*(T s, const mat<T,Row, Col>& a)
 	{
-		mat<Row, Col> ret;
+		mat<T,Row, Col> ret;
 		for (int i = 0; i < Row * Col; i++)
 		{
 			ret.data[i] = s * a.data[i];
@@ -101,10 +103,10 @@ namespace soft_render
 		return ret;
 	}
 
-	template<int Row, int Col>
-	static mat<Row, Col> operator/(const mat<Row, Col>& a, float s)
+	template<typename  T, int Row, int Col>
+	static mat<T,Row, Col> operator/(const mat<T,Row, Col>& a, T s)
 	{
-		mat<Row, Col> ret;
+		mat<T,Row, Col> ret;
 		for (int i = 0; i < Row * Col; i++)
 		{
 			ret.data[i] = a.data[i] / s;
@@ -121,10 +123,10 @@ namespace soft_render
 		return ret;
 	}
 
-	template<int N>
-	static float dot(const mat<N, 1>& a, const mat<N, 1>& b)
+	template<typename T,int N>
+	static T dot(const mat<T, N, 1>& a, const mat<T, N, 1>& b)
 	{
-		float ret = 0.f;
+		T ret = 0.f;
 		for (int i = 0; i < N; i++)
 		{
 			ret += a.data[i] * b.data[i];
@@ -132,22 +134,22 @@ namespace soft_render
 		return ret;
 	}
 
-	template<int N>
-	static float length(const mat<N, 1>& v)
+	template<typename T, int N>
+	static T length(const mat<T,N, 1>& v)
 	{
 		return std::sqrt(dot(v, v));
 	}
 
-	template<int N>
-	static mat<N, 1> normalize(const mat<N, 1>& v)
+	template<typename T, int N>
+	static mat<T, N, 1> normalize(const mat<T, N, 1>& v)
 	{
 		return v / length(v);
 	}
 
-	template<int N>
-	static mat<N, N> get_identity()
+	template<typename T, int N>
+	static mat<T, N, N> get_identity()
 	{
-		mat<N, N> ret;
+		mat<T,N, N> ret;
 		for (int i = 0; i < N; i++)
 		{
 			for (int j = 0; j < N; j++)
@@ -164,6 +166,7 @@ namespace soft_render
 		}
 		return ret;
 	}
+
 
 }
 
