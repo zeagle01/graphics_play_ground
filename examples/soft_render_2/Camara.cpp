@@ -1,6 +1,7 @@
 
 #include "Camara.h"
 #include <iostream>
+#include <algorithm>
 
 namespace soft_render
 {
@@ -20,6 +21,13 @@ namespace soft_render
 	{
 		pressed = false;
 		isCursorAssigned = false;
+	}
+
+	void Camara::on_scroll(int dx, int dy)
+	{
+		auto& fov = m_configs.get_ref<config::fov>();
+		fov += dy;
+		fov = std::clamp<float>(fov, 0.f, 90.f);
 	}
 
 	void Camara::update(int x, int y)

@@ -40,6 +40,8 @@ namespace soft_render
 		type_map_view tm;
 		tm.add_type<Spinning_Cube>(&sc);
 		tm.add_type<Spinning_Cube_App>(this);
+		auto camara = sc.m_configs.get_ref<Spinning_Cube::config::camara>();
+		tm.add_type<Camara>(&camara);
 		add_all_ui::apply(tm, *m_gui);
 
 		m_drawing_buffer->main_loop([this, &sc](int cursor_x, int cursor_y)

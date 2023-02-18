@@ -29,10 +29,11 @@ namespace soft_render
 		clear();
 	}
 
-	void Drawing_Buffer::add_click_fn(std::function<bool(const MousePress&)>  pressed_fn, std::function<bool(const MouseRelease&)> release_fn)
+	void Drawing_Buffer::add_click_fn(std::function<bool(const MousePress&)>  pressed_fn, std::function<bool(const MouseRelease&)> release_fn,std::function<bool(const Mouse_Scrolled_Event&)> scroll_fn)
 	{
 		glfw_win->add_event_handler<MousePress>(pressed_fn);
 		glfw_win->add_event_handler<MouseRelease>(release_fn);
+		glfw_win->add_event_handler<Mouse_Scrolled_Event>(scroll_fn);
 
 		glfw_win->setup_input();
 

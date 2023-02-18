@@ -38,7 +38,13 @@ namespace soft_render
 			m_configs.get_ref<config::camara>().on_release(e.button);
 			return true;
 		};
-		m_screen->add_click_fn(press_fn, release_fn);
+
+		auto scroll_fn = [this](const Mouse_Scrolled_Event& e)
+		{
+			m_configs.get_ref<config::camara>().on_scroll(e.dx,e.dy);
+			return true;
+		};
+		m_screen->add_click_fn(press_fn, release_fn, scroll_fn);
 
 	}
 
@@ -164,8 +170,8 @@ namespace soft_render
 
 	mat4 Spinning_Cube::get_projection_matrix()
 	{
-		auto m_near = m_configs.get_ref<config::near>();
-		auto m_far = m_configs.get_ref<config::far>();
+		auto m_near = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::near>();
+		auto m_far = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::far>();
 		mat4 ret
 		{
 			m_near,0,0,0,
@@ -186,9 +192,9 @@ namespace soft_render
 	mat4 Spinning_Cube::view_port_matrix()
 	{
 
-		auto m_near = m_configs.get_ref<config::near>();
-		auto m_far = m_configs.get_ref<config::far>();
-		auto m_fov = m_configs.get_ref<config::fov>();
+		auto m_near = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::near>();
+		auto m_far = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::far>();
+		auto m_fov = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::fov>();
 
 		std::array<vec3, 2> screen_space_box{
 			{

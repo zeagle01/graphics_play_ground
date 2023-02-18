@@ -23,7 +23,7 @@ namespace soft_render
 
 		void set_color(int wi, int hi, float depth, float r, float g, float b);
 
-		void add_click_fn(std::function<bool(const MousePress&)>  pressed_fn, std::function<bool(const MouseRelease&)> release_fn);
+		void add_click_fn(std::function<bool(const MousePress&)>  pressed_fn, std::function<bool(const MouseRelease&)> release_fn, std::function<bool(const Mouse_Scrolled_Event&)> scroll_fn);
 
 		void clear();
 
