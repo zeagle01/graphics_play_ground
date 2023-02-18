@@ -4,7 +4,6 @@
 #include "Spinning_Cube.h"
 #include "Drawing_Buffer.h"
 #include "Camara.h"
-#include "event.h"
 
 #include "member_extractor.h"
 
@@ -26,26 +25,31 @@ namespace soft_render
 		m_aspect = float(m_width) / float(m_height);
 
 		m_screen = sc;
+	}
 
-		auto press_fn = [this](const MousePress& e)
+
+	bool Spinning_Cube::on_mouse_pressed(const MousePress& e)
+	{
+		if (e.button == CE_MOUSE_BUTTON_RIGHT)
 		{
-			m_configs.get_ref<config::camara>().on_press(e.button);
-			return true;
-		};
+			m_configs.get_ref<config::camara>().drag_begin();
+		}
+		return true;
+	}
 
-		auto release_fn = [this](const MouseRelease& e)
+	bool Spinning_Cube::on_mouse_released(const MouseRelease& e)
+	{
+		if (e.button == CE_MOUSE_BUTTON_RIGHT)
 		{
-			m_configs.get_ref<config::camara>().on_release(e.button);
-			return true;
-		};
+			m_configs.get_ref<config::camara>().drag_end();
+		}
+		return true;
+	}
 
-		auto scroll_fn = [this](const Mouse_Scrolled_Event& e)
-		{
-			m_configs.get_ref<config::camara>().on_scroll(e.dx,e.dy);
-			return true;
-		};
-		m_screen->add_click_fn(press_fn, release_fn, scroll_fn);
-
+	bool Spinning_Cube::on_mouse_scroll(const Mouse_Scrolled_Event& e)
+	{
+		m_configs.get_ref<config::camara>().increase_fov(e.dy);
+		return true;
 	}
 
 	mat4 Spinning_Cube::get_translate_matrix(const vec3& translate)
@@ -284,7 +288,7 @@ namespace soft_render
 
 		compute_view_projection_matrix();
 
-		m_configs.get_ref<config::camara>().update(cx, cy);
+		m_configs.get_ref<config::camara>().drag(cx, cy);
 
 		auto cube_side = m_configs.get_ref<config::cube_side>();
 		auto cube_unit = m_configs.get_ref<config::cube_unit>();

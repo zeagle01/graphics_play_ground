@@ -2,7 +2,6 @@
 #pragma once
 
 #include "dispatcher.h"
-#include "GLFW/glfw3.h"
 #include "event.h"
 #include <functional>
 
@@ -11,16 +10,11 @@ struct GLFWwindow;
 
 namespace soft_render
 {
-
-
-
-
-
 	class GLFW_Wrapper
 	{
 	public:
-		GLFWwindow* create_window(int width, int height);
-		void main_loop(std::function<void()>);
+		void create_window(int width, int height);
+		void main_loop(std::function<void(int,int)> fn);
 
 
 		template<typename E>
@@ -31,10 +25,11 @@ namespace soft_render
 
 		void setup_input();
 
+		GLFWwindow* get_window() { return m_window; }
+
 	private:
 		GLFWwindow* m_window;
 
-
-		dispatcher <Event, bool> m_dispatcher;
+		dispatcher<Event, bool> m_dispatcher;
 	};
 }

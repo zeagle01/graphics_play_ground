@@ -1,5 +1,7 @@
 
 
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
 #include "OpenGL_Wrapper.h"
 #include <string> 
 

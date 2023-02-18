@@ -10,10 +10,10 @@ namespace soft_render
 	{
 	public:
 		Camara();
-		void on_press(int button);
-		void on_release(int button);
-		void on_scroll(int dx, int dy);
-		void update(int x, int y);
+		void drag_begin();
+		void drag_end();
+		void increase_fov(float delta);
+		void drag(int dx, int dy);
 
 	private:
 		void rotate(float dx, float dy);
@@ -21,9 +21,8 @@ namespace soft_render
 	private:
 		bool pressed = false;
 		bool isCursorAssigned = false;
-		int x;
-		int y;
-
+		int m_theta_x;
+		int m_theta_y;
 
 		float m_theta = 0.f;
 		float m_phi = 0.f;

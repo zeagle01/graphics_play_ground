@@ -11,6 +11,7 @@ namespace soft_render
 	class Spinning_Cube;
 	class Drawing_Buffer;
 	class Imgui_Wrapper;
+	class GLFW_Wrapper;
 
 	struct rectangle_size { int width; int height; };
 	static std::ostream& operator<<(std::ostream& out, const rectangle_size& r)
@@ -44,6 +45,7 @@ namespace soft_render
 	private:
 		std::shared_ptr<Drawing_Buffer> m_drawing_buffer;
 		std::shared_ptr<Imgui_Wrapper> m_gui;
+		std::shared_ptr<GLFW_Wrapper> m_glfw_win;
 
 	};
 

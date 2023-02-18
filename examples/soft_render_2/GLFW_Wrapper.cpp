@@ -1,12 +1,13 @@
 
 #include "GLFW_Wrapper.h"
 
+#include "GLFW/glfw3.h"
 #include <iostream>
 
 namespace soft_render
 {
 
-	GLFWwindow* GLFW_Wrapper::create_window(int width, int height)
+	void GLFW_Wrapper::create_window(int width, int height)
 	{
 		auto status = glfwInit();
 		if (status == GLFW_TRUE)
@@ -36,18 +37,21 @@ namespace soft_render
 
 		m_window = window;
 		glfwSetWindowUserPointer(m_window, &m_dispatcher);
-
-		return window;
 	}
 
-	void GLFW_Wrapper::main_loop(std::function<void()> fn)
+	void GLFW_Wrapper::main_loop(std::function<void(int,int)> fn)
 	{
 
 		while (!glfwWindowShouldClose(m_window))
 		{
 			glfwPollEvents();
 
-			fn();
+			double cx;
+			double cy;
+
+			glfwGetCursorPos(m_window, &cx, &cy);
+
+			fn(int(cx), int(cy));
 
 			glfwMakeContextCurrent(m_window); //in case for docking gui
 

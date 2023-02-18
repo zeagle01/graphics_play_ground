@@ -2,7 +2,6 @@
 #include "Camara.h"
 #include <iostream>
 #include <algorithm>
-#include "event.h"
 
 namespace soft_render
 {
@@ -13,46 +12,40 @@ namespace soft_render
 	}
 
 
-	void Camara::on_press(int button)
+	void Camara::drag_begin()
 	{
-		if (button == CE_MOUSE_BUTTON_RIGHT)
-		{
-			pressed = true;
-		}
+		pressed = true;
 	}
 
-	void Camara::on_release(int button)
+	void Camara::drag_end()
 	{
 
-		if (button == CE_MOUSE_BUTTON_RIGHT)
-		{
-			pressed = false;
-			isCursorAssigned = false;
-		}
+		pressed = false;
+		isCursorAssigned = false;
 	}
 
-	void Camara::on_scroll(int dx, int dy)
+	void Camara::increase_fov(float delta)
 	{
 		auto& fov = m_configs.get_ref<config::fov>();
 		float max = 90.f;
 		float uniform_fov = fov / max;
 		float factor = 3.f * std::pow(uniform_fov, 1.001);
-		fov += dy * factor;
+		fov += delta * factor;
 		fov = std::clamp<float>(fov, 0.f, max);
 	}
 
-	void Camara::update(int x, int y)
+	void Camara::drag(int x, int y)
 	{
 		if (pressed)
 		{
 			if (isCursorAssigned)
 			{
-				int dx = x - this->x;
-				int dy = y - this->y;
+				int dx = x - m_theta_x;
+				int dy = y - m_theta_y;
 				rotate(dx, dy);
 			}
-			this->x = x;
-			this->y = y;
+			m_theta_x = x;
+			m_theta_y = y;
 			isCursorAssigned = true;
 		}
 	}
