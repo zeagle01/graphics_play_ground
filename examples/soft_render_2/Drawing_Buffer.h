@@ -4,6 +4,7 @@
 #include <vector>
 #include <functional>
 #include <memory>
+#include "event.h"
 
 struct GLFWwindow;
 
@@ -22,7 +23,7 @@ namespace soft_render
 
 		void set_color(int wi, int hi, float depth, float r, float g, float b);
 
-		void add_click_fn(std::function<void()> pressed_fn, std::function<void()> release_fn);
+		void add_click_fn(std::function<bool(const MousePress&)>  pressed_fn, std::function<bool(const MouseRelease&)> release_fn);
 
 		void clear();
 

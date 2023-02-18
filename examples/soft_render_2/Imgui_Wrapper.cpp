@@ -71,7 +71,7 @@ namespace soft_render
 		ImGui::NewFrame();
 
 		ImGui::Begin("Test from demo layer");
-		ImGui::Text("hello world from demo layer");
+		ImGui::Text("spinning cube options");
 		//ImGui::ShowDemoWindow();
 
 		for (auto it : m_ui_components)

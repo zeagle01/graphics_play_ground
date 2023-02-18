@@ -4,6 +4,7 @@
 #include "Spinning_Cube.h"
 #include "Drawing_Buffer.h"
 #include "Camara.h"
+#include "event.h"
 
 #include "member_extractor.h"
 
@@ -26,14 +27,16 @@ namespace soft_render
 
 		m_screen = sc;
 
-		auto press_fn = [this]()
+		auto press_fn = [this](const MousePress& e)
 		{
-			m_configs.get_ref<config::camara>().on_press();
+			m_configs.get_ref<config::camara>().on_press(e.button);
+			return true;
 		};
 
-		auto release_fn = [this]()
+		auto release_fn = [this](const MouseRelease& e)
 		{
-			m_configs.get_ref<config::camara>().on_release();
+			m_configs.get_ref<config::camara>().on_release(e.button);
+			return true;
 		};
 		m_screen->add_click_fn(press_fn, release_fn);
 

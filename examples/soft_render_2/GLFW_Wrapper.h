@@ -1,13 +1,20 @@
 
 #pragma once
 
+#include "dispatcher.h"
 #include "GLFW/glfw3.h"
+#include "event.h"
 #include <functional>
+
 
 struct GLFWwindow;
 
 namespace soft_render
 {
+
+
+
+
 
 	class GLFW_Wrapper
 	{
@@ -15,14 +22,19 @@ namespace soft_render
 		GLFWwindow* create_window(int width, int height);
 		void main_loop(std::function<void()>);
 
-		void add_click_fn(std::function<void()> pressed_fn, std::function<void()> release_fn);
+
+		template<typename E>
+		void add_event_handler(std::function<bool(const E&)> handler)
+		{
+			m_dispatcher.add<E>(handler);
+		}
+
+		void setup_input();
+
 	private:
 		GLFWwindow* m_window;
 
-		struct call_back
-		{
-			std::function<void()> press_fn;
-			std::function<void()> release_fn;
-		} m_call_back;
+
+		dispatcher <Event, bool> m_dispatcher;
 	};
 }

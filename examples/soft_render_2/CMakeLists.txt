@@ -26,6 +26,8 @@ add_executable(
 	Spinning_Cube_App.h
 	Spinning_Cube_App.cpp
 	serialization.h
+	dispatcher.h
+	event.h
 )
 
 target_compile_features(soft_render_2 PRIVATE cxx_std_20)

@@ -10,8 +10,8 @@ namespace soft_render
 	{
 	public:
 		Camara();
-		void on_press();
-		void on_release();
+		void on_press(int button);
+		void on_release(int button);
 		void update(int x, int y);
 
 	private:

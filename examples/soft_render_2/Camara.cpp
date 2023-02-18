@@ -11,12 +11,12 @@ namespace soft_render
 	}
 
 
-	void Camara::on_press()
+	void Camara::on_press(int button)
 	{
 		pressed = true;
 	}
 
-	void Camara::on_release()
+	void Camara::on_release(int button)
 	{
 		pressed = false;
 		isCursorAssigned = false;
