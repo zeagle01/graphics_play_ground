@@ -8,7 +8,6 @@
 namespace soft_render
 {
 
-
 	void OpenGL_Wrapper::init(int width, int height)
 	{
 		m_width = width;

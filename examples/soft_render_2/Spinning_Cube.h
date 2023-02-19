@@ -54,6 +54,7 @@ namespace soft_render
 
 		void draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix);
 		void draw_triangle(const std::array<vec3, 3>& x, const vec3& color, const mat4& model_matrix);
+		void draw_box(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix);
 
 	private:
 

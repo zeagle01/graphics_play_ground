@@ -311,6 +311,53 @@ namespace soft_render
 		m_screen->draw_triangle({ x0, x1, x2 }, color);
 	}
 
+	void Spinning_Cube::draw_box(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix)
+	{
+		std::vector<vec3> pos{ corner };
+		std::vector<int> tri{
+			0,1,2,
+			1,3,2,
+
+			4,5,6,
+			5,7,6,
+
+			0,2,4,
+			2,6,4,
+
+			1,3,5,
+			3,7,5,
+
+			0,1,4,
+			1,5,4,
+
+			2,3,6,
+			3,7,6,
+		};
+
+		std::vector<vec3> space_unit{
+			{1.f,0.f,0.f},
+			{0.f,1.f,0.f},
+			{0.f,0.f,1.f}
+		};
+
+		std::array<float, 2> factor;
+		for (int i = 0; i < 3; i++)
+		{
+			auto backup_pos = pos;
+			for (int j = 0; j < backup_pos.size(); j++)
+			{
+				pos.push_back(backup_pos[j] + side_length * space_unit[i]);
+			}
+		}
+
+		for (int i = 0; i < tri.size() / 3; i++)
+		{
+			draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, color, model_matrix);
+		}
+
+
+	}
+
 	void Spinning_Cube::update(int cx, int cy)
 	{
 
@@ -322,7 +369,9 @@ namespace soft_render
 		auto cube_unit = m_configs.get_ref<config::cube_unit>();
 
 		auto model = get_model_matrix({});
-		draw_cubic(model, cube_side, cube_unit);
+		//draw_cubic(model, cube_side, cube_unit);
+
+		draw_box({}, cube_side, { 0.5f,0.7f,0.2f }, model);
 		
 		if (m_configs.get_ref<config::draw_axis>())
 		{
