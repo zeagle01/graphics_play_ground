@@ -321,12 +321,10 @@ namespace soft_render
 		auto cube_side = m_configs.get_ref<config::cube_side>();
 		auto cube_unit = m_configs.get_ref<config::cube_unit>();
 
-
 		auto model = get_model_matrix({});
 		draw_cubic(model, cube_side, cube_unit);
 		
-		bool draw_axis = true;
-		if (draw_axis)
+		if (m_configs.get_ref<config::draw_axis>())
 		{
 			float litte_cube_side = cube_side / 30;
 			float litte_cube_unit = cube_unit / 6;

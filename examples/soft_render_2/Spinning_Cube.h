@@ -73,8 +73,8 @@ namespace soft_render
 			ADD_MEMBER_POINTER(camara, Camara);
 			ADD_MEMBER_POINTER(cube_side, float, 50.f);
 			ADD_MEMBER_POINTER(cube_unit, float, 1.f);
-
 			ADD_MEMBER_POINTER(perpective, bool, false);
+			ADD_MEMBER_POINTER(draw_axis, bool, true); 
 		};
 		type_map m_configs;
 	};
