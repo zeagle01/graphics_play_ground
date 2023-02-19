@@ -237,40 +237,77 @@ namespace soft_render
 		if (m_configs.get_ref<config::perpective>())
 		{
 			m_vp = view_port * projection * camara_matrix;
+			m_projection_matrix = view_port * projection;
 		}
 		else
 		{
 			m_vp = view_port *  camara_matrix;
+			m_projection_matrix = view_port;
 		}
+
+		m_view_matrix = camara_matrix;
 
 	}
 
-
-
-	vec3 Spinning_Cube::map_point_to_screen(const vec3& p, const mat4& model_matrix)
+	void Spinning_Cube::vertex_shader(vertex_shader_param param)
 	{
-		vec4 x{ p(0),p(1),p(2),1.f };
-		x = m_vp * model_matrix * x;
+		vec4 x{ param.in_pos(0),param.in_pos(1),param.in_pos(2),1.f };
+		x = param.projection_matrix * param.view_matrix * param.model_matrix * x;
+
+		vec4 n{ param.in_normal(0),param.in_normal(1),param.in_normal(2),0.f };
+		n = param.view_matrix * param.model_matrix * n;
 
 		x(0) = x(0) / x(3);
 		x(1) = x(1) / x(3);
 		x(2) = x(2) / x(3);
-		return { x(0),x(1),x(2) };
+
+		param.out_pos = { x(0),x(1),x(2) };
+		param.out_normal = { n(0),n(1),n(2) };
+
+	}
+
+	vec3 Spinning_Cube::fragment_shader(fragment_shader_param p)
+	{
+		return p.pos;
+		//return { p.pos(0),0.f,0.f };
 	}
 
 	void Spinning_Cube::draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix)
 	{
-		auto x0 = map_point_to_screen(x[0], model_matrix);
-		auto x1 = map_point_to_screen(x[1], model_matrix);
-		m_screen->draw_line({ x0, x1 }, color);
+		//auto x0 = vertex_shader(x[0], model_matrix);
+		//auto x1 = vertex_shader(x[1], model_matrix);
+
+		//auto line_fragment_shader = [color](int i, int j, float depth) 
+		//{
+		//	return color;
+		//};
+
+		//m_screen->draw_line({ x0, x1 }, line_fragment_shader);
 	}
 
-	void Spinning_Cube::draw_triangle(const std::array<vec3, 3>& x, const vec3& color, const mat4& model_matrix)
+	void Spinning_Cube::draw_triangle(const std::array<vec3, 3>& x, const std::array<vec3, 3> n, const mat4& model_matrix)
 	{
-		auto x0 = map_point_to_screen(x[0], model_matrix);
-		auto x1 = map_point_to_screen(x[1], model_matrix);
-		auto x2 = map_point_to_screen(x[2], model_matrix);
-		m_screen->draw_triangle({ x0, x1, x2 }, color);
+		std::array<vec3,3> out_x;
+		std::array<vec3, 3> out_normal;
+		vertex_shader_param v0{ out_x[0],out_normal[0],x[0],n[0],m_projection_matrix,m_view_matrix,model_matrix };
+		vertex_shader(v0);
+
+		vertex_shader_param v1{ out_x[1],out_normal[1],x[1],n[1],m_projection_matrix,m_view_matrix,model_matrix };
+		vertex_shader(v1);
+
+		vertex_shader_param v2{ out_x[2],out_normal[2],x[2],n[2],m_projection_matrix,m_view_matrix,model_matrix };
+		vertex_shader(v2);
+
+		auto fragment_shader_fn = [this, &v0, &v1, &v2](vec3 w)
+		{
+			auto x_frag = w(0) * v0.out_pos + w(1) * v1.out_pos + w(2) * v2.out_pos;
+			auto n_frag = w(0) * v0.out_normal + w(1) * v1.out_normal + w(2) * v2.out_normal;
+			//fragment_shader_param p{ x_frag,n_frag };
+			fragment_shader_param p{ w,n_frag };
+			return fragment_shader(p);
+		};
+
+		m_screen->draw_triangle({ v0.out_pos, v1.out_pos, v2.out_pos }, fragment_shader_fn);
 	}
 
 	void Spinning_Cube::draw_cubic(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix)
@@ -302,6 +339,29 @@ namespace soft_render
 			{0.f,0.f,1.f}
 		};
 
+		std::vector<vec3> normal
+		{
+			-space_unit[1],-space_unit[1],-space_unit[1],
+			-space_unit[1],-space_unit[1],-space_unit[1],
+
+			space_unit[1],space_unit[1],space_unit[1],
+			space_unit[1],space_unit[1],space_unit[1],
+
+			-space_unit[0],-space_unit[0],-space_unit[0],
+			-space_unit[0],-space_unit[0],-space_unit[0],
+
+			space_unit[0],space_unit[0],space_unit[0],
+			space_unit[0],space_unit[0],space_unit[0],
+
+			space_unit[2],space_unit[2],space_unit[2],
+			space_unit[2],space_unit[2],space_unit[2],
+
+			-space_unit[2],-space_unit[2],-space_unit[2],
+			-space_unit[2],-space_unit[2],-space_unit[2],
+
+		};
+
+
 		std::array<float, 2> factor;
 		for (int i = 0; i < 3; i++)
 		{
@@ -314,7 +374,7 @@ namespace soft_render
 
 		for (int i = 0; i < tri.size() / 3; i++)
 		{
-			draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, color, model_matrix);
+			draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, { normal[i * 3 + 0],normal[i * 3 + 1],normal[i * 3 + 2] }, model_matrix);
 		}
 
 
@@ -363,8 +423,10 @@ namespace soft_render
 
 			for (int i = 0; i < tri.size() / 3; i++)
 			{
-				draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, tri_color[i], get_identity<float, 4>());
+				//draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, tri_color[i], get_identity<float, 4>());
 			}
+
+			draw_triangle({ pos[tri[0 * 3 + 0]],pos[tri[0 * 3 + 1]],pos[tri[0 * 3 + 2]] }, { front_dir,front_dir,front_dir }, get_identity<float, 4>());
 
 			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_right }, { 1.f,0.f,0.f }, get_identity<float, 4>());
 			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_up }, { 0.f,1.0f,0.f }, get_identity<float, 4>());

@@ -110,7 +110,7 @@ namespace soft_render
 				-A(1,0),A(0,0)
 			};
 
-			auto w = invA * x / det;
+			auto w = invA * b / det;
 			return vec3{ w(0),w(1),1 - w(0) - w(1) };
 		}
 	};

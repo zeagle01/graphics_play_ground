@@ -46,15 +46,38 @@ namespace soft_render
 
 		void compute_view_projection_matrix();
 
-		vec3 map_point_to_screen(const vec3& p, const mat4& model_matrix);
+
+		struct vertex_shader_param
+		{
+			vec3& out_pos;
+			vec3& out_normal;
+
+			const vec3& in_pos;
+			const vec3& in_normal;
+			const mat4& projection_matrix;
+			const mat4& view_matrix;
+			const mat4& model_matrix;
+		};
+
+		struct fragment_shader_param
+		{
+			const vec3& pos;
+			const vec3& normal;
+		};
+
+
+		void vertex_shader(vertex_shader_param p);
+		vec3 fragment_shader(fragment_shader_param p);
 
 		void draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix);
-		void draw_triangle(const std::array<vec3, 3>& x, const vec3& color, const mat4& model_matrix);
+		void draw_triangle(const std::array<vec3, 3>& x, const std::array<vec3, 3> n, const mat4& model_matrix);
 		void draw_cubic(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix);
 
 	private:
 
 		mat4 m_vp;
+		mat4 m_view_matrix;
+		mat4 m_projection_matrix;
 
 		int m_width;
 		int m_height;
