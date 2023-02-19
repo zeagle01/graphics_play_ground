@@ -53,6 +53,7 @@ namespace soft_render
 		vec3 map_point_to_screen(const vec3& p, const mat4& model_matrix);
 
 		void draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix);
+		void draw_triangle(const std::array<vec3, 3>& x, const vec3& color, const mat4& model_matrix);
 
 	private:
 

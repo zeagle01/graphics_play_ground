@@ -14,6 +14,28 @@ namespace soft_render
 		//std::array< T, Row* Col> data;
 		T data[Row * Col];
 
+		//mat() = default;
+		//constexpr mat(std::initializer_list<T> v)
+		//{
+		//	for (int i = 0; i < Row * Col; i++)
+		//	{
+		//		operator()(i) = *(v.begin() + i);
+		//	}
+		//}
+		//constexpr mat(const  std::initializer_list<mat<T, Row, 1>>& columns)
+		//{
+		//	int ci = 0;
+		//	for (const auto it : columns)
+		//	{
+		//		auto& column = *it;
+		//		for (int ri = 0; ri < Row; ri++)
+		//		{
+		//			operator()(ri, ci) = column(ri);
+		//		}
+		//		ci++;
+		//	}
+		//}
+
 		T& operator()(int ri, int ci) { return data[ri * Col + ci]; }
 		const T& operator() (int ri, int ci) const { return data[ri * Col + ci]; }
 
@@ -23,6 +45,8 @@ namespace soft_render
 	};
 
 	using mat4 = mat<float, 4, 4>;
+	using mat3 = mat<float, 3, 3>;
+	using mat2 = mat<float, 2, 2>;
 	using vec3 = mat<float, 3, 1>;
 	using vec2 = mat<float, 2, 1>;
 	using vec4 = mat<float, 4, 1>;

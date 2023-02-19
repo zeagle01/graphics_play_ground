@@ -303,6 +303,14 @@ namespace soft_render
 		m_screen->draw_line({ x0, x1 }, color);
 	}
 
+	void Spinning_Cube::draw_triangle(const std::array<vec3, 3>& x, const vec3& color, const mat4& model_matrix)
+	{
+		auto x0 = map_point_to_screen(x[0], model_matrix);
+		auto x1 = map_point_to_screen(x[1], model_matrix);
+		auto x2 = map_point_to_screen(x[2], model_matrix);
+		m_screen->draw_triangle({ x0, x1, x2 }, color);
+	}
+
 	void Spinning_Cube::update(int cx, int cy)
 	{
 
@@ -332,6 +340,24 @@ namespace soft_render
 			float axis_length = litte_cube_side * 10;
 
 			auto cam_presentation_location = cam_location + 5 * axis_length * front_dir;
+			std::vector<vec3> pos
+			{
+				cam_presentation_location,
+				cam_presentation_location + axis_length * cam_right,
+				cam_presentation_location + axis_length * cam_up,
+				cam_presentation_location - axis_length * front_dir
+			};
+			std::vector<int> tri{ 0,1,2,0,1,3 };
+			std::vector<vec3> tri_color
+			{
+				{1.f,0.f,0.f} ,
+				{0.f,1.f,0.f} ,
+			};
+
+			for (int i = 0; i < tri.size() / 3; i++)
+			{
+				draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, tri_color[i], get_identity<float, 4>());
+			}
 
 			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_right }, { 1.f,0.f,0.f }, get_identity<float, 4>());
 			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_up }, { 0.f,1.0f,0.f }, get_identity<float, 4>());

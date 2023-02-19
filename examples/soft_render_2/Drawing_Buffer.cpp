@@ -62,11 +62,12 @@ namespace soft_render
 
 	void Drawing_Buffer::draw_line(const std::array<vec3, 2>& x, const vec3& color)
 	{
-		auto x0 = vec2i{ int(x[0](0)),int(x[0](1)) };
-		auto x1 = vec2i{ int(x[1](0)),int(x[1](1)) };
-		m_rasterizer->loop_line(x0, x[0](2), x1, x[1](2),
-			[this,color](int i, int j,float depth) 
+		std::array<vec2i, 2> xi = { x[0](0),x[0](1) ,  x[1](0),x[1](1) };
+
+		m_rasterizer->loop_line(xi,
+			[this,x,color](int i, int j,float ratio) 
 			{
+				float depth = x[0](2) + ratio * (x[1](2) - x[0](2));
 				set_color(i, j, depth, color(0), color(1), color(2));
 			}
 		);
@@ -75,6 +76,13 @@ namespace soft_render
 
 	void Drawing_Buffer::draw_triangle(const std::array<vec3, 3>& x, const vec3& color)
 	{
+		std::array<vec2i, 3> xi = { x[0](0),x[0](1) ,  x[1](0),x[1](1),  x[2](0),x[2](1)};
+		m_rasterizer->triangle_fragment_loop(xi,
+			[this, x, color](int i, int j, const vec3& w)
+			{
+				float depth = w(0) * x[0](2) + w(1) * x[1](2) + w(2) * x[2](2);
+				set_color(i, j, depth, color(0), color(1), color(2));
+			});
 
 	}
 }
