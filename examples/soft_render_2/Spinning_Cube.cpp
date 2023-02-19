@@ -221,7 +221,7 @@ namespace soft_render
 
 		};
 
-		return  get_scale_and_translate(object_space_box, screen_space_box);
+		return get_scale_and_translate(object_space_box, screen_space_box);
 	}
 
 
@@ -246,44 +246,6 @@ namespace soft_render
 	}
 
 
-	void Spinning_Cube::compute_pixel(const vec3& pos,const vec3& color, const mat4& model_matrix)
-	{
-
-		vec4 p{ pos(0), pos(1), pos(2), 1.f };
-
-		p = m_vp * model_matrix * p;
-
-		int xi = p(0) / p(3);
-		int yi = p(1) / p(3);
-		float depth = p(2) / p(3);
-
-		if (xi >= 0 && xi < m_width && yi >= 0 && yi < m_height)
-		{
-			m_screen->set_color(xi, yi, depth, color(0), color(1), color(2));
-		}
-
-	}
-
-	void Spinning_Cube::draw_cubic(const mat4& model_matrix, float cube_side, float cube_unit)
-	{
-		for (float xi = 0; xi <  cube_side; xi += cube_unit)
-		{
-			for (float yi = 0; yi < cube_side; yi += cube_unit)
-			{
-				float x = xi ;
-				float y = yi ;
-				float z0 = 0 ;
-				float z1 = cube_side ;
-				compute_pixel({ x, y, z0 }, { 0.2,0.5,0.8 }, model_matrix);
-				compute_pixel({ x, y, z1 }, { 0.2,0.5,0.8 }, model_matrix);
-				compute_pixel({ x, z0, y }, { 0.2,0.8,0.5 }, model_matrix);
-				compute_pixel({ x, z1, y }, { 0.2,0.8,0.5 }, model_matrix);
-				compute_pixel({ z0, x, y }, { 0.5,0.2,0.3 }, model_matrix);
-				compute_pixel({ z1, x, y }, { 0.5,0.2,0.3 }, model_matrix);
-			}
-		}
-
-	}
 
 	vec3 Spinning_Cube::map_point_to_screen(const vec3& p, const mat4& model_matrix)
 	{
@@ -311,7 +273,7 @@ namespace soft_render
 		m_screen->draw_triangle({ x0, x1, x2 }, color);
 	}
 
-	void Spinning_Cube::draw_box(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix)
+	void Spinning_Cube::draw_cubic(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix)
 	{
 		std::vector<vec3> pos{ corner };
 		std::vector<int> tri{
@@ -369,9 +331,7 @@ namespace soft_render
 		auto cube_unit = m_configs.get_ref<config::cube_unit>();
 
 		auto model = get_model_matrix({});
-		//draw_cubic(model, cube_side, cube_unit);
-
-		draw_box({}, cube_side, { 0.5f,0.7f,0.2f }, model);
+		draw_cubic({}, cube_side, { 0.5f,0.7f,0.2f }, model);
 		
 		if (m_configs.get_ref<config::draw_axis>())
 		{

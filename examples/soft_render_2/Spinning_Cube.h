@@ -46,15 +46,11 @@ namespace soft_render
 
 		void compute_view_projection_matrix();
 
-		void compute_pixel(const vec3& pos, const vec3& color, const mat4& model_matrix);
-
-		void draw_cubic(const mat4& model_matrix, float cube_side, float cube_unit);
-
 		vec3 map_point_to_screen(const vec3& p, const mat4& model_matrix);
 
 		void draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix);
 		void draw_triangle(const std::array<vec3, 3>& x, const vec3& color, const mat4& model_matrix);
-		void draw_box(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix);
+		void draw_cubic(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix);
 
 	private:
 
