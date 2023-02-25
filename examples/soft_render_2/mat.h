@@ -29,6 +29,8 @@ namespace soft_render
 	using vec4 = mat<float, 4, 1>;
 
 	using vec2i = mat<int,2, 1>;
+	using vec3i = mat<int,3, 1>;
+	using vec4i = mat<int,4, 1>;
 
 
 

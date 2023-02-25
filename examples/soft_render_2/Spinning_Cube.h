@@ -8,6 +8,7 @@
 
 namespace soft_render 
 {
+	class Shader;
 	class Drawing_Buffer;
 	class Camara;
 
@@ -46,35 +47,9 @@ namespace soft_render
 
 		void compute_view_projection_matrix();
 
-
-		struct vertex_shader_param
-		{
-			vec3& out_pos;
-			vec3& out_surf_pos;
-			vec3& out_surf_normal;
-
-			const vec3& in_pos;
-			const vec3& in_normal;
-			const mat4& projection_matrix;
-			const mat4& view_matrix;
-			const mat4& model_matrix;
-		};
-
-		struct fragment_shader_param
-		{
-			const vec3& pos;
-			const vec3& normal;
-			const vec3& light_pos;
-			const vec3& color;
-			const vec3& light_color;
-		};
-
-
-		void vertex_shader(vertex_shader_param p);
-		vec3 fragment_shader(fragment_shader_param p);
-
+	private:
 		void draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix);
-		void draw_triangle(const std::array<vec3, 3>& x, const std::array<vec3, 3> n, const vec3& color,const mat4& model_matrix);
+		void draw_triangles(const std::vector<vec3>& positions, const std::vector<vec3i>& indices, const std::vector<vec3>& normals, const vec3& color, const mat4& model_matrix);
 		void draw_cubic(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix);
 
 	private:
@@ -88,6 +63,7 @@ namespace soft_render
 		float m_aspect;
 
 		Drawing_Buffer* m_screen;
+		std::shared_ptr<Shader> m_shader;
 
 	public:
 		struct config

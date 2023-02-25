@@ -5,6 +5,7 @@
 #include "Drawing_Buffer.h"
 #include "Camara.h"
 #include "mat.h"
+#include "shader.h"
 
 #include "member_extractor.h"
 
@@ -29,6 +30,8 @@ namespace soft_render
 		m_aspect = float(m_width) / float(m_height);
 
 		m_screen = sc;
+		m_shader = std::make_shared<Shader>();
+		m_shader->init(sc);
 	}
 
 
@@ -252,50 +255,7 @@ namespace soft_render
 
 	}
 
-	void Spinning_Cube::vertex_shader(vertex_shader_param param)
-	{
-		vec4 x{ param.in_pos(0),param.in_pos(1),param.in_pos(2),1.f };
-		x = param.projection_matrix * param.view_matrix * param.model_matrix * x;
 
-		auto surf_x =  param.view_matrix * param.model_matrix * x;
-
-		vec4 n{ param.in_normal(0),param.in_normal(1),param.in_normal(2),0.f };
-		n = param.view_matrix * param.model_matrix * n;
-
-		x(0) = x(0) / x(3);
-		x(1) = x(1) / x(3);
-		x(2) = x(2) / x(3);
-
-		param.out_pos = { x(0),x(1),x(2) };
-		param.out_surf_normal = { n(0),n(1),n(2) };
-		param.out_surf_pos = { surf_x(0),surf_x(1),surf_x(2) };
-
-	}
-
-	vec3 Spinning_Cube::fragment_shader(fragment_shader_param fp)
-	{
-
-		auto l = fp.light_pos;
-		auto p = fp.pos;
-		auto n = fp.normal;
-		auto e = normalize(-p);
-
-		auto l_dir = normalize(l - p);
-		float diffuse = std::max(dot(n, l_dir), 0.f);
-
-		auto h = normalize((l_dir + e));
-
-		float specular = std::max(std::pow(dot(h, n), 3e2f), 0.f);
-
-		float density = std::clamp(0.5f * diffuse + 0.5f * specular, 0.00f, 0.99f);
-
-		float ambient = m_configs.get_ref<config::ambient>();
-		//float ambient = 0.3f;
-		auto out_color = ambient * fp.color + density * (1.f - ambient) * vec3 { fp.color(0)* fp.light_color(0), fp.color(1)* fp.light_color(1), fp.color(2)* fp.light_color(2) };
-
-		return out_color;
-		//return   0.5f + 0.5f * fp.normal;
-	}
 
 	void Spinning_Cube::draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix)
 	{
@@ -310,59 +270,30 @@ namespace soft_render
 		//m_screen->draw_line({ x0, x1 }, line_fragment_shader);
 	}
 
-	void Spinning_Cube::draw_triangle(const std::array<vec3, 3>& x, const std::array<vec3, 3> n, const vec3& color, const mat4& model_matrix)
+
+	void Spinning_Cube::draw_triangles(const std::vector<vec3>& positions, const std::vector<vec3i>& indices, const std::vector<vec3>& normals, const vec3& color, const mat4& model_matrix)
 	{
-		std::array<vec3,3> out_pos;
-		std::array<vec3, 3> out_surf_pos;
-		std::array<vec3, 3> out_surf_normal;
-		std::array<std::shared_ptr<vertex_shader_param>, 3> v;
-		for (int vi = 0; vi < 3; vi++)
-		{
-			// vertex_shader_param v{out_pos[vi],out_surf_pos[vi],out_surf_normal[vi],out_light_pos[vi],x[vi],n[vi],m_projection_matrix,m_view_matrix,model_matrix};
-			v[vi] = std::make_shared<vertex_shader_param>(out_pos[vi], out_surf_pos[vi], out_surf_normal[vi], x[vi], n[vi], m_projection_matrix, m_view_matrix, model_matrix);
-			vertex_shader(*v[vi]);
+		m_shader->set_vertex_attribute<Shader::config::pos>(positions);
+		m_shader->set_vertex_attribute<Shader::config::normal>(normals);
+		m_shader->set_vertex_attribute<Shader::config::indices>(indices);
 
-		}
+		m_shader->set_uniform<Shader::config::view_matrix>(m_view_matrix);
+		m_shader->set_uniform<Shader::config::projection_matrix>(m_projection_matrix);
+		m_shader->set_uniform<Shader::config::model_matrix>(model_matrix);
 
-		auto light_pos = m_configs.get_ref<config::light_pos>();
-		auto transformed_light_pos_4 = m_view_matrix * vec4{ light_pos(0),light_pos(0),light_pos(0),1.f };
-		auto transformed_light_pos = vec3{ transformed_light_pos_4(0),transformed_light_pos_4(1),transformed_light_pos_4(2) };
+		m_shader->set_uniform<Shader::config::light_pos>(m_configs.get_ref<config::light_pos>());
+		m_shader->set_uniform<Shader::config::light_color>(m_configs.get_ref<config::light_color>());
+		m_shader->set_uniform<Shader::config::ambient>(m_configs.get_ref<config::ambient>());
+		m_shader->set_uniform<Shader::config::obj_color>(color);
 
-		auto light_color = m_configs.get_ref<config::light_color>();
+		m_shader->commit_draw();
 
-		auto fragment_shader_fn = [this, v, transformed_light_pos, color, light_color](vec3 w)
-		{
-			auto x_frag = w(0) * v[0]->out_pos + w(1) * v[1]->out_pos + w(2) * v[2]->out_pos;
-			auto n_frag = w(0) * v[0]->out_surf_normal + w(1) * v[1]->out_surf_normal + w(2) * v[2]->out_surf_normal;
-			fragment_shader_param p{ x_frag,n_frag,transformed_light_pos ,color,light_color };
-			return fragment_shader(p);
-		};
-
-		m_screen->draw_triangle({ v[0]->out_pos, v[1]->out_pos, v[2]->out_pos }, fragment_shader_fn);
 	}
 
 	void Spinning_Cube::draw_cubic(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix)
 	{
-		std::vector<vec3> pos{ corner };
-		std::vector<int> tri{
-			0,1,2,
-			1,3,2,
 
-			4,5,6,
-			5,7,6,
-
-			0,2,4,
-			2,6,4,
-
-			1,3,5,
-			3,7,5,
-
-			0,1,4,
-			1,5,4,
-
-			2,3,6,
-			3,7,6,
-		};
+		std::vector<vec3> cubic_8_pos{ corner };
 
 		std::vector<vec3> space_unit{
 			{1.f,0.f,0.f},
@@ -370,46 +301,55 @@ namespace soft_render
 			{0.f,0.f,1.f}
 		};
 
-		std::vector<vec3> normal
-		{
-			-space_unit[1],-space_unit[1],-space_unit[1],
-			-space_unit[1],-space_unit[1],-space_unit[1],
-
-			space_unit[1],space_unit[1],space_unit[1],
-			space_unit[1],space_unit[1],space_unit[1],
-
-			-space_unit[0],-space_unit[0],-space_unit[0],
-			-space_unit[0],-space_unit[0],-space_unit[0],
-
-			space_unit[0],space_unit[0],space_unit[0],
-			space_unit[0],space_unit[0],space_unit[0],
-
-			space_unit[2],space_unit[2],space_unit[2],
-			space_unit[2],space_unit[2],space_unit[2],
-
-			-space_unit[2],-space_unit[2],-space_unit[2],
-			-space_unit[2],-space_unit[2],-space_unit[2],
-
-		};
-
-
-		std::array<float, 2> factor;
 		for (int i = 0; i < 3; i++)
 		{
-			auto backup_pos = pos;
+			auto backup_pos = cubic_8_pos;
 			for (int j = 0; j < backup_pos.size(); j++)
 			{
-				pos.push_back(backup_pos[j] + side_length * space_unit[i]);
+				cubic_8_pos.push_back(backup_pos[j] + side_length * space_unit[i]);
 			}
 		}
 
-		for (int i = 0; i < tri.size() / 3; i++)
+		std::vector<vec4i> cubic_6_side_indices
 		{
-			draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, { normal[i * 3 + 0],normal[i * 3 + 1],normal[i * 3 + 2] }, color, model_matrix);
+			{0,1,3,2}, //bottom
+			{4,5,7,6}, //up
+			{0,2,6,4}, //left
+			{1,3,7,5}, //right
+			{0,1,5,4}, //front
+			{2,3,7,6}, //back
+		};
+
+		std::vector<vec3> cubic_6_side_normal
+		{
+			-space_unit[1], //bottom
+			space_unit[1],	// up
+			-space_unit[0], //left
+			space_unit[0],  // right
+			space_unit[2],  //front
+			-space_unit[2]  //back
+		};
+
+
+		std::vector<vec3> final_pos(4 * 6);
+		std::vector<vec3> final_normal(4 * 6);
+		std::vector<vec3i> final_tri(2 * 6);
+
+		for (int si = 0; si < 6; si++)
+		{
+			for (int svi = 0; svi < 4; svi++)
+			{
+				final_pos[si * 4 + svi] = cubic_8_pos[cubic_6_side_indices[si](svi)];
+				final_normal[si * 4 + svi] = cubic_6_side_normal[si];
+			}
+			int v[]{ si * 4 + 0,si * 4 + 1,si * 4 + 2,si * 4 + 3 };
+			final_tri[si * 2 + 0] = vec3i{ v[0],v[1],v[2] };
+			final_tri[si * 2 + 1] = vec3i{ v[0],v[2],v[3] };
 		}
 
-
+		draw_triangles(final_pos, final_tri, final_normal, color, model_matrix);
 	}
+
 
 	void Spinning_Cube::update(int cx, int cy)
 	{
@@ -457,7 +397,7 @@ namespace soft_render
 				//draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, tri_color[i], get_identity<float, 4>());
 			}
 
-			draw_triangle({ pos[tri[0 * 3 + 0]],pos[tri[0 * 3 + 1]],pos[tri[0 * 3 + 2]] }, { front_dir,front_dir,front_dir }, { 1.f,0.f,0.f }, get_identity<float, 4>());
+			draw_triangles({ pos[tri[0 * 3 + 0]],pos[tri[0 * 3 + 1]],pos[tri[0 * 3 + 2]] }, { {0,1,2} }, { front_dir, front_dir, front_dir }, { 1.f,0.f,0.f }, get_identity<float, 4>());
 
 			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_right }, { 1.f,0.f,0.f }, get_identity<float, 4>());
 			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_up }, { 0.f,1.0f,0.f }, get_identity<float, 4>());

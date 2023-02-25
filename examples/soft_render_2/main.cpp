@@ -17,11 +17,11 @@ int main()
 	std::string project_file_name = "app.txt";
 	std::ifstream fin(project_file_name);
 
-//	if (!soft_render::serilizer::read<soft_render::Spinning_Cube_App>(app, fin))
-//	{
-//		printf(" read cache file failed !\n");
-//
-//	}
+	if (!soft_render::serilizer::read<soft_render::Spinning_Cube_App>(app, fin))
+	{
+		printf(" read cache file failed !\n");
+
+	}
 
 	app.run();
 

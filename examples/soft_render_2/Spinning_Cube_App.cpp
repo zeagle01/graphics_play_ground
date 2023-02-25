@@ -69,6 +69,7 @@ namespace soft_render
 				m_drawing_buffer->draw();
 
 				m_gui->update();
+
 			}
 		);
 

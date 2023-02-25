@@ -18,6 +18,7 @@ add_executable(
 	Camara.h
 	Camara.cpp
 	mat.h
+	graphic_math.h
 	type_list.h
 	type_map.h
 	macro_loop.h
@@ -29,6 +30,8 @@ add_executable(
 	dispatcher.h
 	event.h
 	rasterizer.h
+	shader.h
+	shader.cpp
 )
 
 target_compile_features(soft_render_2 PRIVATE cxx_std_20)
