@@ -8,6 +8,9 @@
 
 #include "member_extractor.h"
 
+#include <functional>
+#include <algorithm>
+
 
 namespace soft_render
 {
@@ -254,6 +257,8 @@ namespace soft_render
 		vec4 x{ param.in_pos(0),param.in_pos(1),param.in_pos(2),1.f };
 		x = param.projection_matrix * param.view_matrix * param.model_matrix * x;
 
+		auto surf_x =  param.view_matrix * param.model_matrix * x;
+
 		vec4 n{ param.in_normal(0),param.in_normal(1),param.in_normal(2),0.f };
 		n = param.view_matrix * param.model_matrix * n;
 
@@ -262,14 +267,34 @@ namespace soft_render
 		x(2) = x(2) / x(3);
 
 		param.out_pos = { x(0),x(1),x(2) };
-		param.out_normal = { n(0),n(1),n(2) };
+		param.out_surf_normal = { n(0),n(1),n(2) };
+		param.out_surf_pos = { surf_x(0),surf_x(1),surf_x(2) };
 
 	}
 
-	vec3 Spinning_Cube::fragment_shader(fragment_shader_param p)
+	vec3 Spinning_Cube::fragment_shader(fragment_shader_param fp)
 	{
-		return p.pos;
-		//return { p.pos(0),0.f,0.f };
+
+		auto l = fp.light_pos;
+		auto p = fp.pos;
+		auto n = fp.normal;
+		auto e = normalize(-p);
+
+		auto l_dir = normalize(l - p);
+		float diffuse = std::max(dot(n, l_dir), 0.f);
+
+		auto h = normalize((l_dir + e));
+
+		float specular = std::max(std::pow(dot(h, n), 3e2f), 0.f);
+
+		float density = std::clamp(0.5f * diffuse + 0.5f * specular, 0.00f, 0.99f);
+
+		float ambient = m_configs.get_ref<config::ambient>();
+		//float ambient = 0.3f;
+		auto out_color = ambient * fp.color + density * (1.f - ambient) * vec3 { fp.color(0)* fp.light_color(0), fp.color(1)* fp.light_color(1), fp.color(2)* fp.light_color(2) };
+
+		return out_color;
+		//return   0.5f + 0.5f * fp.normal;
 	}
 
 	void Spinning_Cube::draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix)
@@ -285,29 +310,35 @@ namespace soft_render
 		//m_screen->draw_line({ x0, x1 }, line_fragment_shader);
 	}
 
-	void Spinning_Cube::draw_triangle(const std::array<vec3, 3>& x, const std::array<vec3, 3> n, const mat4& model_matrix)
+	void Spinning_Cube::draw_triangle(const std::array<vec3, 3>& x, const std::array<vec3, 3> n, const vec3& color, const mat4& model_matrix)
 	{
-		std::array<vec3,3> out_x;
-		std::array<vec3, 3> out_normal;
-		vertex_shader_param v0{ out_x[0],out_normal[0],x[0],n[0],m_projection_matrix,m_view_matrix,model_matrix };
-		vertex_shader(v0);
-
-		vertex_shader_param v1{ out_x[1],out_normal[1],x[1],n[1],m_projection_matrix,m_view_matrix,model_matrix };
-		vertex_shader(v1);
-
-		vertex_shader_param v2{ out_x[2],out_normal[2],x[2],n[2],m_projection_matrix,m_view_matrix,model_matrix };
-		vertex_shader(v2);
-
-		auto fragment_shader_fn = [this, &v0, &v1, &v2](vec3 w)
+		std::array<vec3,3> out_pos;
+		std::array<vec3, 3> out_surf_pos;
+		std::array<vec3, 3> out_surf_normal;
+		std::array<std::shared_ptr<vertex_shader_param>, 3> v;
+		for (int vi = 0; vi < 3; vi++)
 		{
-			auto x_frag = w(0) * v0.out_pos + w(1) * v1.out_pos + w(2) * v2.out_pos;
-			auto n_frag = w(0) * v0.out_normal + w(1) * v1.out_normal + w(2) * v2.out_normal;
-			//fragment_shader_param p{ x_frag,n_frag };
-			fragment_shader_param p{ w,n_frag };
+			// vertex_shader_param v{out_pos[vi],out_surf_pos[vi],out_surf_normal[vi],out_light_pos[vi],x[vi],n[vi],m_projection_matrix,m_view_matrix,model_matrix};
+			v[vi] = std::make_shared<vertex_shader_param>(out_pos[vi], out_surf_pos[vi], out_surf_normal[vi], x[vi], n[vi], m_projection_matrix, m_view_matrix, model_matrix);
+			vertex_shader(*v[vi]);
+
+		}
+
+		auto light_pos = m_configs.get_ref<config::light_pos>();
+		auto transformed_light_pos_4 = m_view_matrix * vec4{ light_pos(0),light_pos(0),light_pos(0),1.f };
+		auto transformed_light_pos = vec3{ transformed_light_pos_4(0),transformed_light_pos_4(1),transformed_light_pos_4(2) };
+
+		auto light_color = m_configs.get_ref<config::light_color>();
+
+		auto fragment_shader_fn = [this, v, transformed_light_pos, color, light_color](vec3 w)
+		{
+			auto x_frag = w(0) * v[0]->out_pos + w(1) * v[1]->out_pos + w(2) * v[2]->out_pos;
+			auto n_frag = w(0) * v[0]->out_surf_normal + w(1) * v[1]->out_surf_normal + w(2) * v[2]->out_surf_normal;
+			fragment_shader_param p{ x_frag,n_frag,transformed_light_pos ,color,light_color };
 			return fragment_shader(p);
 		};
 
-		m_screen->draw_triangle({ v0.out_pos, v1.out_pos, v2.out_pos }, fragment_shader_fn);
+		m_screen->draw_triangle({ v[0]->out_pos, v[1]->out_pos, v[2]->out_pos }, fragment_shader_fn);
 	}
 
 	void Spinning_Cube::draw_cubic(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix)
@@ -374,7 +405,7 @@ namespace soft_render
 
 		for (int i = 0; i < tri.size() / 3; i++)
 		{
-			draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, { normal[i * 3 + 0],normal[i * 3 + 1],normal[i * 3 + 2] }, model_matrix);
+			draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, { normal[i * 3 + 0],normal[i * 3 + 1],normal[i * 3 + 2] }, color, model_matrix);
 		}
 
 
@@ -426,11 +457,16 @@ namespace soft_render
 				//draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, tri_color[i], get_identity<float, 4>());
 			}
 
-			draw_triangle({ pos[tri[0 * 3 + 0]],pos[tri[0 * 3 + 1]],pos[tri[0 * 3 + 2]] }, { front_dir,front_dir,front_dir }, get_identity<float, 4>());
+			draw_triangle({ pos[tri[0 * 3 + 0]],pos[tri[0 * 3 + 1]],pos[tri[0 * 3 + 2]] }, { front_dir,front_dir,front_dir }, { 1.f,0.f,0.f }, get_identity<float, 4>());
 
 			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_right }, { 1.f,0.f,0.f }, get_identity<float, 4>());
 			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_up }, { 0.f,1.0f,0.f }, get_identity<float, 4>());
 			draw_line({ cam_presentation_location,  cam_presentation_location - axis_length * front_dir }, { 0.0f,0.0f,1.0f }, get_identity<float, 4>());
+		}
+
+		if (m_configs.get_ref<config::draw_light>())
+		{
+			draw_cubic({}, 10.f, m_configs.get_ref<config::light_color>(), get_translate_matrix(m_configs.get_ref<config::light_pos>()));
 		}
 
 		const auto& angle_rate = get_config<config::angle_rate>();

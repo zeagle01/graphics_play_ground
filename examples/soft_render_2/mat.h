@@ -82,6 +82,17 @@ namespace soft_render
 		return ret;
 	}
 
+	template<typename T, int Row, int Col>
+	static mat<T, Row, Col> operator+(const T& s, const mat<T, Row, Col>& a)
+	{
+		mat<T,Row, Col> ret;
+		for (int i = 0; i < Row * Col; i++)
+		{
+			ret.data[i] = a.data[i] + s;
+		}
+		return ret;
+	}
+
 	template<typename T,int Row, int Col>
 	static mat<T, Row, Col> operator-(const mat<T, Row, Col>& a, const mat<T, Row, Col>& b)
 	{
@@ -99,7 +110,7 @@ namespace soft_render
 		mat<T,Row, Col> ret;
 		for (int i = 0; i < Row * Col; i++)
 		{
-			ret.data[i] = -ret.data[i];
+			ret.data[i] = -a.data[i];
 		}
 		return ret;
 	}

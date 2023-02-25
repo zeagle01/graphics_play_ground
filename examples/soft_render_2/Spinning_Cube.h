@@ -50,7 +50,8 @@ namespace soft_render
 		struct vertex_shader_param
 		{
 			vec3& out_pos;
-			vec3& out_normal;
+			vec3& out_surf_pos;
+			vec3& out_surf_normal;
 
 			const vec3& in_pos;
 			const vec3& in_normal;
@@ -63,6 +64,9 @@ namespace soft_render
 		{
 			const vec3& pos;
 			const vec3& normal;
+			const vec3& light_pos;
+			const vec3& color;
+			const vec3& light_color;
 		};
 
 
@@ -70,7 +74,7 @@ namespace soft_render
 		vec3 fragment_shader(fragment_shader_param p);
 
 		void draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix);
-		void draw_triangle(const std::array<vec3, 3>& x, const std::array<vec3, 3> n, const mat4& model_matrix);
+		void draw_triangle(const std::array<vec3, 3>& x, const std::array<vec3, 3> n, const vec3& color,const mat4& model_matrix);
 		void draw_cubic(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix);
 
 	private:
@@ -91,10 +95,14 @@ namespace soft_render
 			ADD_MEMBER_POINTER(angle_rate, vec3, vec3{ 0.1f,0.2f,0.03f });
 			ADD_MEMBER_POINTER(init_angle, vec3);
 			ADD_MEMBER_POINTER(camara, Camara);
+			ADD_MEMBER_POINTER(light_pos, vec3, vec3{ 0,0,100.f });
+			ADD_MEMBER_POINTER(light_color, vec3, vec3{ 1.f,1.f,1.f });
+			ADD_MEMBER_POINTER(ambient, float, 0.3f);
 			ADD_MEMBER_POINTER(cube_side, float, 50.f);
 			ADD_MEMBER_POINTER(cube_unit, float, 1.f);
 			ADD_MEMBER_POINTER(perpective, bool, false);
 			ADD_MEMBER_POINTER(draw_axis, bool, true); 
+			ADD_MEMBER_POINTER(draw_light, bool, true); 
 		};
 		type_map m_configs;
 	};
