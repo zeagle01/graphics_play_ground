@@ -82,8 +82,9 @@ namespace soft_render
 
 			ADD_MEMBER_POINTER(draw_mesh, bool, true); 
 			ADD_MEMBER_STR_POINTER(mesh_file, "../../resources/meshes/african_head.obj");
+			//ADD_MEMBER_STR_POINTER(mesh_file, "../../resources/meshes/bunny.obj");
 			ADD_MEMBER_POINTER(mesh_translate, vec3);
-			ADD_MEMBER_POINTER(mesh_scale, float, 1.f);
+			ADD_MEMBER_POINTER(mesh_scale, float, 50.f);
 		};
 		type_map m_configs;
 	};

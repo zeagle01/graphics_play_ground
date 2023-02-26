@@ -6,6 +6,7 @@
 #include <string>
 #include <functional>
 #include <fstream>
+#include <map>  
 
 namespace soft_render
 {
@@ -35,6 +36,15 @@ namespace soft_render
 			std::function<void(const obj_tri_t&)> tri_fn
 			);
 
+		struct VertexAttribute
+		{
+			std::vector<vec3>* attribute;
+			int obj_order;//in face
+		};
+
+		std::vector<VertexAttribute> sort_attribute_according_to_size();
+		std::vector<  std::map<int, int > > record_map_of_attribute_from_high_size_to_low_size(std::vector<VertexAttribute> size_sorted_vertex_attribute);
+		void permuate_attribute_according_to_map(std::vector<VertexAttribute> size_sorted_vertex_attribute, const std::vector<  std::map<int, int > >& map_greater_size_to_less_size_attribute);
 		void extend_to_gl_format();
 
 		std::ifstream fin;

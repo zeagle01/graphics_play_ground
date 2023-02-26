@@ -38,44 +38,58 @@ namespace soft_render
 		}
 	}
 
-	struct VertexAttribute
-	{
-		std::vector<vec3>* attribute;
-		int obj_order;//in face
-	} ;
 
-	void Mesh_Loader::extend_to_gl_format()
+
+	std::vector<Mesh_Loader::VertexAttribute> Mesh_Loader::sort_attribute_according_to_size()
 	{
 		auto& positions = m_configs.get_ref<config::positions>();
 		auto& textur_uv = m_configs.get_ref<config::texture_uv>();
 		auto& normals = m_configs.get_ref<config::normals>();
+
+		std::vector<vec3>* attributes[] = { &positions,&textur_uv,&normals };
+		std::vector<VertexAttribute> vertex_attributes;
+		for (int i = 0; i < 3; i++)
+		{
+			if (!attributes[i]->empty())
+			{
+				vertex_attributes.push_back({ attributes[i], i });
+			}
+		}
+
+		std::sort
+		(
+			std::begin(vertex_attributes), std::end(vertex_attributes),
+			[](const auto& a, const auto& b)
+			{
+				if (b.obj_order == 0 && a.attribute->size() == b.attribute->size())
+				{
+					return true;
+				}
+				else
+				{
+					return a.attribute->size() < b.attribute->size();
+				}
+			}
+		);
+		return vertex_attributes;
+	}
+
+	std::vector<  std::map<int, int > > Mesh_Loader::record_map_of_attribute_from_high_size_to_low_size(std::vector<VertexAttribute> size_sorted_vertex_attribute)
+	{
+
 		auto& indicies = m_configs.get_ref<config::indicies>();
-
-//		std::vector<vec3>* attributes[] = { &positions,&textur_uv,&normals };
-//		std::vector<VertexAttribute> vertex_attributes;
-//		for (int i = 0; i < 3; i++)
-//		{
-//			if (!attributes[i]->empty())
-//			{
-//				vertex_attributes.push_back({ attributes[i], i });
-//			}
-//		}
-
-		std::vector<vec2i> size_rank{ {int(positions.size()), 0}, { int(textur_uv.size()), 1 }, { int(normals.size()),2 } };
-		std::sort(std::begin(size_rank), std::end(size_rank), [](const auto& a, const auto& b) {return a(0) < b(0); });
-
-		std::array<std::map<int, int>,2> map_greater_size_to_less_size_attribute;
+		std::vector<  std::map<int, int > > map_greater_size_to_less_size_attribute(size_sorted_vertex_attribute.size() - 1);
 		for (int ti = 0; ti < m_obj_indices.size(); ti++)
 		{
-			int high_size_rank = size_rank[2](1);
+			int high_size_rank = size_sorted_vertex_attribute.back().obj_order;
 			vec3i high_rank_triangle;
 			for (int tvi = 0; tvi < 3; tvi++)
 			{
 				vec3i one_vertex_index = m_obj_indices[ti][tvi];
 				high_rank_triangle(tvi) = one_vertex_index(high_size_rank);
-				for (int ri = 0; ri < 2; ri++)
+				for (int ri = 0; ri < size_sorted_vertex_attribute.size() - 1; ri++)
 				{
-					int low_size_rank = size_rank[ri](1);
+					int low_size_rank = size_sorted_vertex_attribute[ri].obj_order;
 					auto  high_size_attribute = one_vertex_index(high_size_rank);
 					auto  low_size_attribute = one_vertex_index(low_size_rank);
 					map_greater_size_to_less_size_attribute[ri][high_size_attribute] = low_size_attribute;
@@ -84,21 +98,36 @@ namespace soft_render
 			indicies.push_back(high_rank_triangle);//base on hight rank attribute to form triangle
 		}
 
-		std::vector<vec3>* attributes[] = { &positions,&textur_uv,&normals };
+		return map_greater_size_to_less_size_attribute;
+	}
 
-		int max_size = size_rank[2](0);
-		for (int ri = 0; ri < 2; ri++)
+
+	void Mesh_Loader::permuate_attribute_according_to_map(std::vector<VertexAttribute> size_sorted_vertex_attribute, const std::vector<  std::map<int, int > >& map_greater_size_to_less_size_attribute)
+	{
+		int max_size = size_sorted_vertex_attribute.back().attribute->size();
+		for (int ri = 0; ri < size_sorted_vertex_attribute.size() - 1; ri++)
 		{
-			int low_size_rank = size_rank[ri](1);
-			auto low_size_attribute_backup = *(attributes[low_size_rank]);
-			auto& low_size_attribute = *(attributes[low_size_rank]);
+			int low_size_rank = size_sorted_vertex_attribute[ri].obj_order;
+			auto low_size_attribute_backup = *size_sorted_vertex_attribute[ri].attribute;
+			auto& low_size_attribute = *(size_sorted_vertex_attribute[ri].attribute);
 			low_size_attribute.resize(max_size);
 			for (int vi = 0; vi < max_size; vi++)
 			{
-				int maped_v = map_greater_size_to_less_size_attribute[ri][vi];
+				int maped_v = map_greater_size_to_less_size_attribute[ri].at(vi);
 				low_size_attribute[vi] = low_size_attribute_backup[maped_v];
 			}
 		}
+
+	}
+
+	void Mesh_Loader::extend_to_gl_format()
+	{
+		auto size_sorted_vertex_attribute = sort_attribute_according_to_size();
+
+		auto map_greater_size_to_less_size_attribute = record_map_of_attribute_from_high_size_to_low_size(size_sorted_vertex_attribute);
+
+		permuate_attribute_according_to_map(size_sorted_vertex_attribute, map_greater_size_to_less_size_attribute);
+
 
 	}
 
