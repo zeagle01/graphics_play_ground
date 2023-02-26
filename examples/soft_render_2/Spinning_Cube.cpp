@@ -6,6 +6,7 @@
 #include "Camara.h"
 #include "mat.h"
 #include "shader.h"
+#include "mesh_loader.h"
 
 #include "member_extractor.h"
 
@@ -16,14 +17,10 @@
 namespace soft_render
 {
 
-
-	void Spinning_Cube::set_spinning_cube_default_value()
-	{
-		type_map::fill_types<config>(m_configs);
-	}
-
 	void Spinning_Cube::init(int w, int h, Drawing_Buffer* sc)
 	{
+		type_map::fill_types<config>(m_configs);
+
 		m_width = w;
 		m_height = h;
 
@@ -32,6 +29,13 @@ namespace soft_render
 		m_screen = sc;
 		m_shader = std::make_shared<Shader>();
 		m_shader->init(sc);
+
+		m_mesh_loader = std::make_shared<Mesh_Loader>();
+
+		if (m_configs.get_ref<config::draw_mesh>())
+		{
+			m_mesh_loader->load(m_configs.get_ref<config::mesh_file>());
+		}
 	}
 
 
@@ -61,7 +65,6 @@ namespace soft_render
 
 	mat4 Spinning_Cube::get_translate_matrix(const vec3& translate)
 	{
-
 		mat4 ret
 		{
 				1,0,0,translate(0),
@@ -147,7 +150,6 @@ namespace soft_render
 				0,0,0,1.f
 			}
 		};
-
 
 		return frame * trans;
 	}
@@ -359,15 +361,13 @@ namespace soft_render
 		m_configs.get_ref<config::camara>().drag(cx, cy);
 
 		auto cube_side = m_configs.get_ref<config::cube_side>();
-		auto cube_unit = m_configs.get_ref<config::cube_unit>();
 
 		auto model = get_model_matrix({});
-		draw_cubic({}, cube_side, { 0.5f,0.7f,0.2f }, model);
+		//draw_cubic({}, cube_side, { 0.5f,0.7f,0.2f }, model);
 		
 		if (m_configs.get_ref<config::draw_axis>())
 		{
 			float litte_cube_side = cube_side / 30;
-			float litte_cube_unit = cube_unit / 6;
 
 			const auto& lookat = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::lookat>();
 			const auto& cam_location = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::location>();
@@ -407,6 +407,26 @@ namespace soft_render
 		if (m_configs.get_ref<config::draw_light>())
 		{
 			draw_cubic({}, 10.f, m_configs.get_ref<config::light_color>(), get_translate_matrix(m_configs.get_ref<config::light_pos>()));
+		}
+
+		if (m_configs.get_ref<config::draw_mesh>())
+		{
+			const auto& file_name = m_configs.get_ref<config::mesh_file>();
+			printf("draw %s \n", file_name.c_str());
+
+			auto translate = m_configs.get_ref<config::mesh_translate>();
+			auto scale = m_configs.get_ref<config::mesh_scale>();
+			mat4 model= get_translate_matrix(translate);
+			model(0, 0) *= scale;
+			model(1, 1) *= scale;
+			model(2, 2) *= scale;
+
+			draw_triangles(
+				m_mesh_loader->m_configs.get_ref<Mesh_Loader::config::positions>(),
+				m_mesh_loader->m_configs.get_ref<Mesh_Loader::config::indicies>(),
+				m_mesh_loader->m_configs.get_ref<Mesh_Loader::config::normals>(),
+				{ 1.f,0.f,0.f }, model
+			);
 		}
 
 		const auto& angle_rate = get_config<config::angle_rate>();

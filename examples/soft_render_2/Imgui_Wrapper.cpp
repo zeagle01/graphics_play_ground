@@ -32,6 +32,12 @@ namespace soft_render
 		ImGui::Checkbox(name.c_str(), value);
 	}
 
+	void text_line::operator()()
+	{
+		auto str = name + ": " + *value;
+		ImGui::Text(str.c_str());
+	}
+
 
 	void Imgui_Wrapper::init(GLFWwindow* window)
 	{

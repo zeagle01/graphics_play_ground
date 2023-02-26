@@ -24,10 +24,13 @@ namespace soft_render
 			ADD_UI_RECORD(light_color,			Spinning_Cube,			slider_bar_float3,			 range, 0.0f, 1.f);
 			ADD_UI_RECORD(ambient,				Spinning_Cube,			slider_bar_float,			 range, 0.f, 1.f);
 			ADD_UI_RECORD(cube_side,			Spinning_Cube,			slider_bar_float,			 range, 1e1f, 1e3f);
-			ADD_UI_RECORD(cube_unit,			Spinning_Cube,			slider_bar_float,			 range, 0.8f, 10.f);
 			ADD_UI_RECORD(perpective,			Spinning_Cube,			check_box,					 no_extra			);
 			ADD_UI_RECORD(draw_axis,			Spinning_Cube,			check_box,					 no_extra			);
 			ADD_UI_RECORD(draw_light,			Spinning_Cube,			check_box,					 no_extra			);
+			ADD_UI_RECORD(draw_mesh,			Spinning_Cube,			check_box,					 no_extra			);
+			ADD_UI_RECORD(mesh_file,			Spinning_Cube,			text_line,					 no_extra			);
+			ADD_UI_RECORD(mesh_translate,		Spinning_Cube,			slider_bar_float3,			 range,-1e2f,1e2f	);
+			ADD_UI_RECORD(mesh_scale,			Spinning_Cube,			slider_bar_float,			 range,1e-2f,1e2f	);
 			ADD_UI_RECORD(near,					Camara,					slider_bar_float,			 range, -1e3f, 1e2);
 			ADD_UI_RECORD(far,					Camara,					slider_bar_float,			 range, -1e4f, 1e2f);
 			ADD_UI_RECORD(fov,					Camara,					slider_bar_float,			 range, 1e-5f, 90.f);

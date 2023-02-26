@@ -1,10 +1,12 @@
 
 #pragma once
 
-#include <functional>
-#include <vector>
 #include "mat.h"
 #include "type_map.h"
+
+#include <functional>
+#include <string>
+#include <vector>
 
 
 struct GLFWwindow;
@@ -51,6 +53,11 @@ namespace soft_render
 	};
 
 	struct check_box :ui_component_base, value_and_extra_data<bool, no_extra>
+	{
+		void operator()()override;
+	};
+
+	struct text_line :ui_component_base, value_and_extra_data<std::string, no_extra>
 	{
 		void operator()()override;
 	};

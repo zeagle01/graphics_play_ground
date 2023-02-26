@@ -29,7 +29,6 @@ namespace soft_render
 		Spinning_Cube& sc = m_configs.get_ref<config::model>();
 
 		sc.init(screen_size(0), screen_size(1), m_drawing_buffer.get());
-		sc.set_spinning_cube_default_value();
 	}
 
 	void Spinning_Cube_App::connect_data_and_ui_component()

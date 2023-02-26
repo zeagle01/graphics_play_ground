@@ -5,6 +5,8 @@
 #include "mat.h"
 #include <memory>
 #include <iostream>
+#include <string>
+#include "tagged_type.h"
 
 namespace soft_render
 {

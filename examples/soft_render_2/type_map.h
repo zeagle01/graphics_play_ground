@@ -9,8 +9,10 @@
 
 #include "type_list.h"
 #include "member_extractor.h"
+#include "Tagged_Type.h"
 
 #define ADD_MEMBER_POINTER(name,type,...) struct name: type_map::variable<type,__VA_ARGS__> {}; name* name##_var;
+#define ADD_MEMBER_STR_POINTER(name,str) struct name: type_map::str_variable<str> {}; name* name##_var;
 #define ADD_RELATION_PAIR_RECORD(name,...) struct name: std::type_identity<soft_render::type_list<__VA_ARGS__>> {}; name* name##_var;
 #define ADD_RELATION_RECORD_KEY_FIRST( key0, ...) struct key0##key1: std::type_identity<soft_render::type_list<key0,__VA_ARGS__>> {}; key0* key0##_var;
 #define ADD_RELATION_RECORD_KEY_FIRST_TWO( key0, key1,...) struct key0##key1: std::type_identity<soft_render::type_list<key0,key1,__VA_ARGS__>> {}; key0##key1* key0##key1##_var;
@@ -42,6 +44,16 @@ namespace soft_render
 					static_assert(false, "shouldn't be more default values size greater than one !");
 					return {};
 				}
+			}
+		};
+
+		template<Literal_String s>
+		struct str_variable
+		{
+			using type = std::string;
+			constexpr  static std::string get_default_value()
+			{
+				return std::string(std::begin(s.data), std::end(s.data));
 			}
 		};
 

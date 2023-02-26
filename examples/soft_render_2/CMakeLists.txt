@@ -23,6 +23,7 @@ add_executable(
 	type_map.h
 	macro_loop.h
 	member_extractor.h
+	tagged_type.h
 	ui_data_mapper.h
 	Spinning_Cube_App.h
 	Spinning_Cube_App.cpp
@@ -32,6 +33,8 @@ add_executable(
 	rasterizer.h
 	shader.h
 	shader.cpp
+	mesh_loader.h
+	mesh_loader.cpp
 )
 
 target_compile_features(soft_render_2 PRIVATE cxx_std_20)
