@@ -28,9 +28,9 @@ target_link_libraries(vk_render PRIVATE glm::glm)
 ##target_include_directories(vk_render PRIVATE Vulkan::Vulkan)
 #target_link_libraries(vk_render Vulkan::Vulkan)
 
-set(vk_render_vulkan_dir "" CACHE PATH "vulkan install dir")
+set(vk_render_vulkan_dir "$ENV{VULKAN_SDK}" CACHE PATH "vulkan install dir")
 
-message("vk_render_vulkan_dir: {vk_render_vulkan_dir}")
+message("vk_render_vulkan_dir: ${vk_render_vulkan_dir}")
 
 target_include_directories(vk_render PRIVATE ${vk_render_vulkan_dir}/Include)
 target_link_libraries(vk_render PRIVATE ${vk_render_vulkan_dir}/Lib/vulkan-1.lib)
