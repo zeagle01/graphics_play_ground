@@ -25,7 +25,7 @@ namespace clumsy_engine
 		template<typename T>
 		static void apply(auto& morphisms)
 		{
-			auto m = morphisms.get_type<clumsy_lib::Morphism_Types<T::base_type>>();
+			auto m = morphisms.get_type<clumsy_lib::Morphism_Types<typename T::base_type>>();
 			m->add_types<T>();
 		}
 	};

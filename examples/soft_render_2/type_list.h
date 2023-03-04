@@ -84,7 +84,7 @@ namespace soft_render
 			static constexpr int value = sizeof...(Ts);
 		};
 	}
-	template<typename tl> constexpr int get_size_v = get_size_imp<tl>::value;
+	template<typename tl> constexpr int get_size_v = details::get_size_imp<tl>::value;
 
 	//get index 
 	namespace details
@@ -129,7 +129,7 @@ namespace soft_render
 			static constexpr bool value = true;
 		};
 	}
-	template<typename tl> constexpr bool is_empty_v = is_empty_imp<tl>::value;
+	template<typename tl> constexpr bool is_empty_v = details::is_empty_imp<tl>::value;
 
 	//is_in
 	namespace details
@@ -156,7 +156,7 @@ namespace soft_render
 			>::value;
 		};
 	}
-	template<typename T, typename tl> inline constexpr bool is_in = is_in_imp<T, tl>::value;
+	template<typename T, typename tl> inline constexpr bool is_in = details::is_in_imp<T, tl>::value;
 	template<typename T, typename tl> concept type_in_list = is_in<T, tl>;
 
 

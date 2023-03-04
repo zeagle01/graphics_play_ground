@@ -34,7 +34,7 @@ namespace clumsy_engine
 		template<typename Morphism_T>
 		auto& get_morphism()
 		{
-			return *(m_morphisms->get_type<clumsy_lib::Morphism_Types<Morphism_T::base_type>>());
+			return *(m_morphisms->get_type<clumsy_lib::Morphism_Types<typename Morphism_T::base_type>>());
 		}
 
 		clumsy_lib::Variable_Accecor<clumsy_lib::Type_Map<void>>* m_datas;

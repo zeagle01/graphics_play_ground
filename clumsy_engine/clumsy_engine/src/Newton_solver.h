@@ -34,13 +34,13 @@ namespace clumsy_engine
 		template<typename Morphism_T>
 		auto& get_morphism()
 		{
-			return *(m_morphisms->get_type<clumsy_lib::Morphism_Types<Morphism_T::base_type>>());
+			return *(m_morphisms->get_type<clumsy_lib::Morphism_Types<typename Morphism_T::base_type>>());
 		}
 
 		template<typename Morphism_T>
 		std::string get_morphism_type_name()
 		{
-			auto m = m_morphisms->get_type<clumsy_lib::Morphism_Types<Morphism_T::base_type>>();
+			auto m = m_morphisms->get_type<clumsy_lib::Morphism_Types<typename Morphism_T::base_type>>();
 			return m->get_current_type_name();
 		}
 

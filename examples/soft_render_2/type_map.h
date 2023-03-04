@@ -41,7 +41,7 @@ namespace soft_render
 				}
 				else
 				{
-					static_assert(false, "shouldn't be more default values size greater than one !");
+					static_assert(std::_Always_false, "shouldn't be more default values size greater than one !");
 					return {};
 				}
 			}
@@ -62,7 +62,7 @@ namespace soft_render
 		auto& get_ref()
 		{
 			auto key = typeid(Var).name();
-			return *(std::static_pointer_cast<Var::type>(m_datas[key]));
+			return *(std::static_pointer_cast<typename Var::type>(m_datas[key]));
 		}
 
 		template<typename Var,typename ...P>
@@ -70,16 +70,16 @@ namespace soft_render
 		{
 			auto key = typeid(Var).name();
 
-			std::shared_ptr<Var::type> obj;
-			if constexpr (std::is_aggregate_v<Var::type>)
+			std::shared_ptr<typename Var::type> obj;
+			if constexpr (std::is_aggregate_v<typename Var::type>)
 			{
-				obj = std::make_shared<Var::type>();
+				obj = std::make_shared<typename Var::type>();
 				typename Var::type& value = *obj;
 				value = typename Var::type { std::forward<P>(p)... };
 			}
 			else
 			{
-				obj = std::make_shared<Var::type>(std::forward<P>(p)...);
+				obj = std::make_shared<typename Var::type>(std::forward<P>(p)...);
 			}
 
 			m_datas[key] = obj;//override

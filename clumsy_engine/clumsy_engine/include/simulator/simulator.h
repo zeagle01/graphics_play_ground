@@ -54,7 +54,7 @@ namespace clumsy_engine
 		template<typename Morphism_T,typename Sub_T>
 		void set_morphism_type()
 		{
-			auto m = m_morphisms.get_type<clumsy_lib::Morphism_Types<Morphism_T::base_type>>();
+			auto m = m_morphisms.get_type<clumsy_lib::Morphism_Types<typename Morphism_T::base_type>>();
 			m->set_current_type<Sub_T>();
 		}
 
@@ -83,7 +83,7 @@ namespace clumsy_engine
 		template<typename Morphism_T>
 		auto& get_morphism() 
 		{
-			return *(m_morphisms.get_type<clumsy_lib::Morphism_Types<Morphism_T::base_type>>());
+			return *(m_morphisms.get_type<clumsy_lib::Morphism_Types<typename Morphism_T::base_type>>());
 		}
 
 

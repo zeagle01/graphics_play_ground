@@ -41,7 +41,7 @@ namespace soft_render
 
 					os << "{\n";
 
-					for_each_obj_with_type< extract_member_type_list_t<obj_t::config> >:: template apply<write>(obj.m_configs, os, indent_depth + 1);
+					for_each_obj_with_type< extract_member_type_list_t<typename obj_t::config> >:: template apply<write>(obj.m_configs, os, indent_depth + 1);
 
 					indent(os, indent_depth);
 

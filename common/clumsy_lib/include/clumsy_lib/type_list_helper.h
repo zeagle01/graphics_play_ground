@@ -17,7 +17,7 @@ namespace clumsy_lib
 	template<typename tl0, typename tl1, typename F, typename ctl0 = tl0, typename ctl1 = tl1, typename ...P>
 	static void double_for_each_type(P&&... p)
 	{
-		if constexpr (!is_empty<ctl0> && !is_empty<ctl1>)
+		if constexpr (!is_empty_v<ctl0> && !is_empty_v<ctl1>)
 		{
 			using current_t0 = front_t<ctl0>;
 
@@ -30,7 +30,7 @@ namespace clumsy_lib
 
 			double_for_each_type<tl0, tl1, F, poped_list0, poped_list1 >(std::forward<P>(p)...);
 		}
-		else if constexpr (is_empty<tl0> && !is_empty<tl1>)
+		else if constexpr (is_empty_v<tl0> && !is_empty_v<tl1>)
 		{
 			using current_t0 = front_t<tl0>;
 

@@ -75,7 +75,7 @@ namespace clumsy_engine
 			}
 			else
 			{
-				CE_CORE_ERROR("can't open {output_file}", output_file);
+				CE_CORE_ERROR("can't open {}", output_file);
 			}
 		}
 
