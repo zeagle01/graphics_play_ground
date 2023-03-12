@@ -321,9 +321,17 @@ namespace soft_render
 			
 			auto model = get_translate_matrix(p) * get_scale_matrix({ axis_length,axis_length,axis_length });
 
-			draw_lines({ {0,0,0},  {1,0,0},{0,1,0} ,{0,0,-1} },
-				{ {0,1},{0,2},{0,3} },
+			draw_lines({ {0,0,0},  {1,0,0} },
+				{ {0,1} },
 				{ 1.f,0.f,0.f }, model);
+
+			draw_lines({ {0,0,0},  {0,1,0}  },
+				{ {0,1} },
+				{ 0.f,1.f,0.f }, model);
+
+			draw_lines({ {0,0,0},  {0,0,1} },
+				{ {0,1} },
+				{ 0.f,0.f,1.f }, model);
 		}
 
 		if (m_configs.get_ref<config::draw_camara>())
