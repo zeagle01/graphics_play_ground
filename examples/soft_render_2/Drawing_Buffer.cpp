@@ -61,7 +61,7 @@ namespace soft_render
 		}
 	}
 
-	void Drawing_Buffer::draw_line(const std::array<vec3, 2>& x, std::function<vec3(int, int, float)> fragment_shader)
+	void Drawing_Buffer::draw_line(const std::array<vec3, 2>& x, std::function<vec3(float)> fragment_shader)
 	{
 		std::array<vec2i, 2> xi = { x[0](0),x[0](1) ,  x[1](0),x[1](1) };
 
@@ -69,7 +69,7 @@ namespace soft_render
 			[this,x,fragment_shader](int i, int j,float ratio) 
 			{
 				float depth = x[0](2) + ratio * (x[1](2) - x[0](2));
-				auto color = fragment_shader(i, j, depth);
+				auto color = fragment_shader( depth);
 				set_color(i, j, depth, color(0), color(1), color(2));
 			}
 		);

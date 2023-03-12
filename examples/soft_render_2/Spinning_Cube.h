@@ -33,22 +33,16 @@ namespace soft_render
 
 	private:
 
-		mat4 get_translate_matrix(const vec3& translate);
-
 		mat4 get_model_matrix(const vec3& translate);
 
 		mat4 get_camara_matrix();
-
-		mat4 get_scale_and_translate(const std::array<vec3, 2>& box_from, const std::array<vec3, 2>& box_dst);
-
-		mat4 get_projection_matrix();
 
 		mat4 view_port_matrix();
 
 		void compute_view_projection_matrix();
 
 	private:
-		void draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix);
+		void draw_lines(const std::vector<vec3>& positions, const std::vector<vec2i>& indices, const vec3& color, const mat4& model_matrix);
 		void draw_triangles(const std::vector<vec3>& positions, const std::vector<vec3i>& indices, const std::vector<vec3>& normals, const vec3& color, const mat4& model_matrix);
 		void draw_cubic(const vec3& corner, float side_length, const vec3& color, const mat4& model_matrix);
 
@@ -81,8 +75,8 @@ namespace soft_render
 			ADD_MEMBER_POINTER(draw_light, bool, true); 
 
 			ADD_MEMBER_POINTER(draw_mesh, bool, true); 
-			ADD_MEMBER_STR_POINTER(mesh_file, "../../resources/meshes/african_head.obj");
-			//ADD_MEMBER_STR_POINTER(mesh_file, "../../resources/meshes/bunny.obj");
+			//ADD_MEMBER_STR_POINTER(mesh_file, "../../resources/meshes/african_head.obj");
+			ADD_MEMBER_STR_POINTER(mesh_file, "../../resources/meshes/bunny.obj");
 			ADD_MEMBER_POINTER(mesh_translate, vec3);
 			ADD_MEMBER_POINTER(mesh_scale, float, 50.f);
 		};

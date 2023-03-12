@@ -17,12 +17,9 @@ namespace soft_render
 
 		void init(int width, int height);
 
-		void main_loop(std::function<void(int, int)> fn);
-
 		void set_color(int wi, int hi, float depth, float r, float g, float b);
-		
 
-		void draw_line(const std::array<vec3, 2>& x, std::function<vec3(int, int, float)> fragment_shader);
+		void draw_line(const std::array<vec3, 2>& x, std::function<vec3(float)> fragment_shader);
 		void draw_triangle(const std::array<vec3, 3>& x, std::function<vec3(vec3)> fragment_shader);
 
 		void clear();

@@ -7,6 +7,7 @@
 #include "mat.h"
 #include "shader.h"
 #include "mesh_loader.h"
+#include "graphic_math.h"
 
 #include "member_extractor.h"
 
@@ -63,62 +64,11 @@ namespace soft_render
 		return true;
 	}
 
-	mat4 Spinning_Cube::get_translate_matrix(const vec3& translate)
-	{
-		mat4 ret
-		{
-				1,0,0,translate(0),
-				0,1,0,translate(1),
-				0,0,1,translate(2),
-				0,0,0,1
-		};
-		return  ret;
-	}
-
 	mat4 Spinning_Cube::get_model_matrix(const vec3& translate)
 	{
 		auto init_angle = m_configs.get_ref<config::init_angle>();
-		float m_angle_x = init_angle(0);
-		float m_angle_y = init_angle(1);
-		float m_angle_z = init_angle(2);
 
-		float cx = std::cos(m_angle_x);
-		float sx = std::sin(m_angle_x);
-		mat4 rotx
-		{
-			{
-				1,0,0,0,
-				0,cx,-sx,0,
-				0,sx,cx,0,
-				0,0,0,1
-			}
-		};
-
-		float cy = std::cos(m_angle_y);
-		float sy = std::sin(m_angle_y);
-		mat4 roty
-		{
-			{
-				cy,0,-sy,0,
-				0,1,0,0,
-				sy,0,cy,0,
-				0,0,0,1
-			}
-		};
-
-		float cz = std::cos(m_angle_z);
-		float sz = std::sin(m_angle_z);
-		mat4 rotz
-		{
-			{
-				cz,-sz,0,0,
-				sz,cz,0,0,
-				0,0,1,0,
-				0,0,0,1
-			}
-		};
-
-		return rotz * roty * rotx * get_translate_matrix(translate);
+		return get_rotation_matrix(init_angle) * get_translate_matrix(translate);
 	}
 
 	mat4 Spinning_Cube::get_camara_matrix()
@@ -154,48 +104,6 @@ namespace soft_render
 		return frame * trans;
 	}
 
-	mat4 Spinning_Cube::get_scale_and_translate(const std::array<vec3, 2>& box_from, const std::array<vec3, 2>& box_dst)
-	{
-		mat4 translate_back_to_origin = get_identity<float,4>();
-
-		translate_back_to_origin(0, 3) = -box_from[0](0);
-		translate_back_to_origin(1, 3) = -box_from[0](1);
-		translate_back_to_origin(2, 3) = -box_from[0](2);
-
-		auto dx_from = box_from[1] - box_from[0];
-
-
-		mat4 translate_to_dst = get_identity<float,4>();
-
-		translate_to_dst(0, 3) = box_dst[0](0);
-		translate_to_dst(1, 3) = box_dst[0](1);
-		translate_to_dst(2, 3) = box_dst[0](2);
-
-		mat4 scale_to_dst = get_identity<float,4>();
-		auto dx_dst = box_dst[1] - box_dst[0];
-
-		scale_to_dst(0, 0) = dx_dst(0) / dx_from(0);
-		scale_to_dst(1, 1) = dx_dst(1) / dx_from(1);
-		scale_to_dst(2, 2) = dx_dst(2) / dx_from(2);
-
-		return  translate_to_dst * scale_to_dst * translate_back_to_origin;
-	}
-
-	mat4 Spinning_Cube::get_projection_matrix()
-	{
-		auto m_near = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::near>();
-		auto m_far = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::far>();
-		mat4 ret
-		{
-			m_near,0,0,0,
-			0,m_near,0,0,
-			0,0,m_near + m_far,-m_near * m_far,
-			0,0,1,0
-		};
-
-		return ret;
-	}
-
 	float degree_2_radian(float d)
 	{
 		const float pi = 3.1415926f;
@@ -229,7 +137,7 @@ namespace soft_render
 
 		};
 
-		return get_scale_and_translate(object_space_box, screen_space_box);
+		return get_box_transform_matrix(object_space_box, screen_space_box);
 	}
 
 
@@ -238,7 +146,11 @@ namespace soft_render
 
 		auto camara_matrix = get_camara_matrix();
 
-		auto projection = get_projection_matrix();
+
+		auto m_near = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::near>();
+		auto m_far = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::far>();
+
+		auto projection = get_projection_matrix(m_near, m_far);
 
 		auto view_port = view_port_matrix();
 
@@ -259,17 +171,22 @@ namespace soft_render
 
 
 
-	void Spinning_Cube::draw_line(const std::array<vec3, 2>& x, const vec3& color, const mat4& model_matrix)
+	void Spinning_Cube::draw_lines(const std::vector<vec3>& positions, const std::vector<vec2i>& indices, const vec3& color, const mat4& model_matrix)
 	{
-		//auto x0 = vertex_shader(x[0], model_matrix);
-		//auto x1 = vertex_shader(x[1], model_matrix);
+		m_shader->set_vertex_attribute<Shader::config::pos>(positions);
+		//m_shader->set_vertex_attribute<Shader::config::normal>(normals);
+		m_shader->set_vertex_attribute<Shader::config::edge_indices>(indices);
 
-		//auto line_fragment_shader = [color](int i, int j, float depth) 
-		//{
-		//	return color;
-		//};
+		m_shader->set_uniform<Shader::config::view_matrix>(m_view_matrix);
+		m_shader->set_uniform<Shader::config::projection_matrix>(m_projection_matrix);
+		m_shader->set_uniform<Shader::config::model_matrix>(model_matrix);
 
-		//m_screen->draw_line({ x0, x1 }, line_fragment_shader);
+		m_shader->set_uniform<Shader::config::light_pos>(m_configs.get_ref<config::light_pos>());
+		m_shader->set_uniform<Shader::config::light_color>(m_configs.get_ref<config::light_color>());
+		m_shader->set_uniform<Shader::config::ambient>(m_configs.get_ref<config::ambient>());
+		m_shader->set_uniform<Shader::config::obj_color>(color);
+
+		m_shader->draw_lines();
 	}
 
 
@@ -288,7 +205,7 @@ namespace soft_render
 		m_shader->set_uniform<Shader::config::ambient>(m_configs.get_ref<config::ambient>());
 		m_shader->set_uniform<Shader::config::obj_color>(color);
 
-		m_shader->commit_draw();
+		m_shader->draw_triangles();
 
 	}
 
@@ -363,7 +280,7 @@ namespace soft_render
 		auto cube_side = m_configs.get_ref<config::cube_side>();
 
 		auto model = get_model_matrix({});
-		//draw_cubic({}, cube_side, { 0.5f,0.7f,0.2f }, model);
+		draw_cubic({}, cube_side, { 0.5f,0.7f,0.2f }, model);
 		
 		if (m_configs.get_ref<config::draw_axis>())
 		{
@@ -397,11 +314,11 @@ namespace soft_render
 				//draw_triangle({ pos[tri[i * 3 + 0]],pos[tri[i * 3 + 1]],pos[tri[i * 3 + 2]] }, tri_color[i], get_identity<float, 4>());
 			}
 
-			draw_triangles({ pos[tri[0 * 3 + 0]],pos[tri[0 * 3 + 1]],pos[tri[0 * 3 + 2]] }, { {0,1,2} }, { front_dir, front_dir, front_dir }, { 1.f,0.f,0.f }, get_identity<float, 4>());
+			//draw_triangles({ pos[tri[0 * 3 + 0]],pos[tri[0 * 3 + 1]],pos[tri[0 * 3 + 2]] }, { {0,1,2} }, { front_dir, front_dir, front_dir }, { 1.f,0.f,0.f }, get_identity<float, 4>());
 
-			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_right }, { 1.f,0.f,0.f }, get_identity<float, 4>());
-			draw_line({ cam_presentation_location,  cam_presentation_location + axis_length * cam_up }, { 0.f,1.0f,0.f }, get_identity<float, 4>());
-			draw_line({ cam_presentation_location,  cam_presentation_location - axis_length * front_dir }, { 0.0f,0.0f,1.0f }, get_identity<float, 4>());
+			draw_lines({ cam_presentation_location,  cam_presentation_location + axis_length * cam_right,cam_presentation_location + axis_length * cam_up ,cam_presentation_location - axis_length * front_dir },
+				{ {0,1},{0,2},{0,3} },
+				{ 1.f,0.f,0.f }, get_identity<float, 4>());
 		}
 
 		if (m_configs.get_ref<config::draw_light>())
@@ -412,7 +329,6 @@ namespace soft_render
 		if (m_configs.get_ref<config::draw_mesh>())
 		{
 			const auto& file_name = m_configs.get_ref<config::mesh_file>();
-			printf("draw %s \n", file_name.c_str());
 
 			auto translate = m_configs.get_ref<config::mesh_translate>();
 			auto scale = m_configs.get_ref<config::mesh_scale>();

@@ -16,7 +16,42 @@ namespace soft_render
 		type_map::fill_types<fragment_in>(m_fragment_in);
 	}
 
-	void Shader::commit_draw()
+	void Shader::draw_lines()
+	{
+		const auto& positions = m_configs.get_ref<config::pos>();
+
+		auto& out_positions = m_configs.get_ref<config::out_pos>();
+		auto& out_normal = m_configs.get_ref<config::out_normal>();
+		auto& out_uv = m_configs.get_ref<config::out_uv>();
+		out_positions.resize(positions.size());
+		out_normal.resize(positions.size());
+		out_uv.resize(positions.size());
+
+		for (int vi = 0; vi < positions.size(); vi++)
+		{
+			compute_vertex_shader(vi);
+		}
+
+		transform_uniform();
+
+		const auto& edge_indices = m_configs.get_ref<config::edge_indices>();
+		for (int ei = 0; ei < edge_indices.size(); ei++)
+		{
+			std::array<vec3, 2> p{ out_positions[edge_indices[ei](0)],out_positions[edge_indices[ei](1)] };
+
+			auto fragment_shader_fn = [this, p](float w)
+			{
+				auto& fragment_p = m_fragment_in.get_ref<fragment_in::pos >();
+				fragment_p = (1 - w) * p[0] + w * p[1];
+
+				return compute_fragmen_shader();
+			};
+			m_screen->draw_line({ p[0], p[1] }, fragment_shader_fn);
+		}
+
+	}
+
+	void Shader::draw_triangles()
 	{
 		const auto& positions = m_configs.get_ref<config::pos>();
 
