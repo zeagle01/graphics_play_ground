@@ -35,16 +35,17 @@ namespace soft_render
 		transform_uniform();
 
 		const auto& edge_indices = m_configs.get_ref<config::edge_indices>();
+		const auto& obj_color = m_configs.get_ref<config::obj_color>();
 		for (int ei = 0; ei < edge_indices.size(); ei++)
 		{
 			std::array<vec3, 2> p{ out_positions[edge_indices[ei](0)],out_positions[edge_indices[ei](1)] };
 
-			auto fragment_shader_fn = [this, p](float w)
+			auto fragment_shader_fn = [this, obj_color, p](float w)
 			{
 				auto& fragment_p = m_fragment_in.get_ref<fragment_in::pos >();
 				fragment_p = (1 - w) * p[0] + w * p[1];
 
-				return compute_fragmen_shader();
+				return obj_color;
 			};
 			m_screen->draw_line({ p[0], p[1] }, fragment_shader_fn);
 		}

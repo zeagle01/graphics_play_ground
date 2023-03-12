@@ -85,7 +85,7 @@ namespace soft_render
 					std::string open_curl;
 					is >> open_curl;
 
-					for_each_obj_with_type< extract_member_type_list_t<obj_t::config> >:: template apply<read>(obj.m_configs, is, indent_depth + 1);
+					for_each_obj_with_type< extract_member_type_list_t<typename obj_t::config> >:: template apply<read>(obj.m_configs, is, indent_depth + 1);
 
 					std::string close_curl;
 					is >> close_curl;
