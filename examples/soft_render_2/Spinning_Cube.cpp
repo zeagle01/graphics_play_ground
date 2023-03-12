@@ -279,10 +279,54 @@ namespace soft_render
 
 		auto cube_side = m_configs.get_ref<config::cube_side>();
 
-		auto model = get_model_matrix({});
-		draw_cubic({}, cube_side, { 0.5f,0.7f,0.2f }, model);
+
+		if (m_configs.get_ref<config::draw_mesh>())
+		{
+			const auto& file_name = m_configs.get_ref<config::mesh_file>();
+
+			auto translate = m_configs.get_ref<config::mesh_translate>();
+			auto scale = m_configs.get_ref<config::mesh_scale>();
+			mat4 model= get_translate_matrix(translate);
+			model(0, 0) *= scale;
+			model(1, 1) *= scale;
+			model(2, 2) *= scale;
+
+			model = model * get_rotation_matrix(m_configs.get_ref<config::init_angle>());
+
+			draw_triangles(
+				m_mesh_loader->m_configs.get_ref<Mesh_Loader::config::positions>(),
+				m_mesh_loader->m_configs.get_ref<Mesh_Loader::config::indicies>(),
+				m_mesh_loader->m_configs.get_ref<Mesh_Loader::config::normals>(),
+				{ 1.f,0.f,0.f }, model
+			);
+
+			//auto model = get_model_matrix({});
+			//draw_cubic({}, cube_side, { 0.5f,0.7f,0.2f }, model);
+		}
 		
 		if (m_configs.get_ref<config::draw_axis>())
+		{
+			float axis_length = cube_side / 3;
+
+			auto m_near = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::near>();
+			auto m_far = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::far>();
+			auto m_fov = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::fov>();
+			float tangent = std::tan(degree_2_radian(m_fov));
+			float half_height = std::abs(m_near) * tangent;
+			float half_width = half_height * m_aspect;
+
+			auto toPos = vec3{20,20,m_near};
+			auto pv = m_projection_matrix * m_view_matrix;
+			auto p = from_homogeneous_point(GS_solve(pv, get_homogeneous_point(toPos)));
+			
+			auto model = get_translate_matrix(p) * get_scale_matrix({ axis_length,axis_length,axis_length });
+
+			draw_lines({ {0,0,0},  {1,0,0},{0,1,0} ,{0,0,-1} },
+				{ {0,1},{0,2},{0,3} },
+				{ 1.f,0.f,0.f }, model);
+		}
+
+		if (m_configs.get_ref<config::draw_camara>())
 		{
 			float litte_cube_side = cube_side / 30;
 
@@ -316,9 +360,10 @@ namespace soft_render
 
 			//draw_triangles({ pos[tri[0 * 3 + 0]],pos[tri[0 * 3 + 1]],pos[tri[0 * 3 + 2]] }, { {0,1,2} }, { front_dir, front_dir, front_dir }, { 1.f,0.f,0.f }, get_identity<float, 4>());
 
-			draw_lines({ cam_presentation_location,  cam_presentation_location + axis_length * cam_right,cam_presentation_location + axis_length * cam_up ,cam_presentation_location - axis_length * front_dir },
-				{ {0,1},{0,2},{0,3} },
-				{ 1.f,0.f,0.f }, get_identity<float, 4>());
+			//draw_lines({ cam_presentation_location,  cam_presentation_location + axis_length * cam_right,cam_presentation_location + axis_length * cam_up ,cam_presentation_location - axis_length * front_dir },
+			//	{ {0,1},{0,2},{0,3} },
+			//	{ 1.f,0.f,0.f }, get_identity<float, 4>());
+
 		}
 
 		if (m_configs.get_ref<config::draw_light>())
@@ -326,24 +371,6 @@ namespace soft_render
 			draw_cubic({}, 10.f, m_configs.get_ref<config::light_color>(), get_translate_matrix(m_configs.get_ref<config::light_pos>()));
 		}
 
-		if (m_configs.get_ref<config::draw_mesh>())
-		{
-			const auto& file_name = m_configs.get_ref<config::mesh_file>();
-
-			auto translate = m_configs.get_ref<config::mesh_translate>();
-			auto scale = m_configs.get_ref<config::mesh_scale>();
-			mat4 model= get_translate_matrix(translate);
-			model(0, 0) *= scale;
-			model(1, 1) *= scale;
-			model(2, 2) *= scale;
-
-			draw_triangles(
-				m_mesh_loader->m_configs.get_ref<Mesh_Loader::config::positions>(),
-				m_mesh_loader->m_configs.get_ref<Mesh_Loader::config::indicies>(),
-				m_mesh_loader->m_configs.get_ref<Mesh_Loader::config::normals>(),
-				{ 1.f,0.f,0.f }, model
-			);
-		}
 
 		const auto& angle_rate = get_config<config::angle_rate>();
 		auto& init_angle = get_config<config::init_angle>();

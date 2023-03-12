@@ -72,6 +72,7 @@ namespace soft_render
 			ADD_MEMBER_POINTER(cube_side, float, 50.f);
 			ADD_MEMBER_POINTER(perpective, bool, false);
 			ADD_MEMBER_POINTER(draw_axis, bool, true); 
+			ADD_MEMBER_POINTER(draw_camara, bool, false); 
 			ADD_MEMBER_POINTER(draw_light, bool, true); 
 
 			ADD_MEMBER_POINTER(draw_mesh, bool, true); 

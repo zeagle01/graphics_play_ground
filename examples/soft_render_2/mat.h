@@ -192,6 +192,37 @@ namespace soft_render
 		return ret;
 	}
 
+	template<typename T, int N>
+	static mat<T, N, 1> GS_solve(const mat<T, N, N>& A, const mat<T, N, 1>& b)
+	{
+		auto temp_b = b;
+		auto U = A;
+		for (int round = 0; round < N; round++)
+		{
+			for (int row = round + 1; row < N; row++)
+			{
+				float c = -U(row, round) / U(round, round);
+				for (int col = round ; col < N; col++)
+				{
+					U(row, col) += c * U(round, col);
+				}
+				temp_b(row) += c * temp_b(round);
+			}
+		}
+
+		mat<T, N, 1> ret;
+		for (int row = N - 1; row >= 0; row--)
+		{
+			ret(row) = temp_b(row);
+			for (int col = row + 1; col < N; col++)
+			{
+				ret(row) -= U(row, col) * ret(col);
+			}
+			ret(row) /= U(row, row);
+		}
+
+		return ret;
+	}
 
 }
 
