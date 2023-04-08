@@ -60,7 +60,7 @@ struct LiteralValue
 struct Var_With_Defualt_Value
 {
 	ADDD_FIELD_WITH(A, int, ADD_FIELD(Get_Default, EVAL(LiteralValue<int,2>)))
-	ADDD_FIELD_WITH(B, int, ADD_FIELD(Get_Default, EVAL(LiteralValue<float,3.f>)))
+	ADDD_FIELD_WITH(B, float, ADD_FIELD(Get_Default, EVAL(LiteralValue<float,3.f>)))
 
 };
 

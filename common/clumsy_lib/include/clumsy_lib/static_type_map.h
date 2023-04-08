@@ -20,7 +20,7 @@ namespace clumsy_lib
 		}
 
 		template<typename var_name>
-		auto& get_ref()
+		auto& get_ref() requires is_in<var_name,tl>
 		{
 			int i = get_index_v< tl, var_name>;
 			auto ptr = std::static_pointer_cast<var_name::type>(m_datas[i]);
@@ -28,7 +28,7 @@ namespace clumsy_lib
 		}
 
 		template<typename var_name>
-		const auto& get_ref() const
+		const auto& get_ref() const requires is_in<var_name,tl>
 		{
 			int i = get_index_v< tl, var_name>;
 			auto ptr = std::static_pointer_cast<var_name::type>(m_datas[i]);
