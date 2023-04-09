@@ -16,6 +16,7 @@ include/clumsy_lib/variable_accecor.h
 include/clumsy_lib/static_loop.h
 include/clumsy_lib/raw_pointer.h
 include/clumsy_lib/static_type_map.h
+include/clumsy_lib/dynamic_type_map.h
 include/clumsy_lib/field_defines.h
 clumsy_lib.cpp
 )
