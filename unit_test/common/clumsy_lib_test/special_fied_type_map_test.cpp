@@ -35,17 +35,26 @@ namespace special_type_map_test
 	};
 
 
+	struct Check_Box
+	{
+		ADD_FIELD(A, bool);
+		ADD_FIELD(B, bool);
+		ADD_FIELD(C, bool);
+	};
+	using check_boxes = extract_member_type_list_t<Check_Box>;
+
 	struct My_Var_List
 	{
 		ADD_FIELD(A, int);
 		ADD_FIELD(M, Morphysm<Base>);
+		ADD_FIELD(Options, Static_Type_Map<check_boxes>);
 	};
 
 
 
+	using tl = extract_member_type_list_t<My_Var_List>;
 	TEST(Special_Type_Map_Test, a_type_map_has_morphysm)
 	{
-		using tl = extract_member_type_list_t<My_Var_List>;
 		Static_Type_Map<tl> m;
 		
 		auto& obj = m.get_ref<My_Var_List::M>();
@@ -65,6 +74,18 @@ namespace special_type_map_test
 			std::string exp = "B";
 			EXPECT_THAT(act, Eq(exp));
 		}
+	}
+
+	TEST(Special_Type_Map_Test, nest_type_map)
+	{
+		Static_Type_Map<tl> m;
+		
+		auto& obj = m.get_ref<My_Var_List::Options>();
+		bool exp = false;
+		obj.get_ref<Check_Box::A>() = exp;
+		bool act = obj.get_ref<Check_Box::A>();
+
+		EXPECT_THAT(act, Eq(exp));
 	}
 
 }
