@@ -6,8 +6,11 @@
 #include <string>
 #include <memory>
 
+#include "clumsy_lib/type_getter.h"
+
 namespace clumsy_lib
 {
+	template<template<typename> typename Get_Type = Get_Its_Own_Type>
 	class Dynamic_Type_Map
 	{
 	public:
@@ -16,7 +19,7 @@ namespace clumsy_lib
 		void add_or_replace()
 		{
 			std::string key = typeid(Var_Name).name();
-			m_datas[key] = std::make_shared<typename Var_Name::type>();
+			m_datas[key] = std::make_shared<typename Get_Type<Var_Name>::type>();
 		}
 
 		template<typename Var_Name>
@@ -31,12 +34,7 @@ namespace clumsy_lib
 		auto& get_ref()
 		{
 			std::string key = typeid(Var_Name).name();
-
-			if (!m_datas.count(key))
-			{
-				printf("%s not exsit\n", key.c_str());
-			}
-			return *std::static_pointer_cast<typename Var_Name::type>(m_datas[key]);
+			return *std::static_pointer_cast<typename Get_Type<Var_Name>::type>(m_datas.at(key));
 
 		}
 
@@ -44,7 +42,7 @@ namespace clumsy_lib
 		const auto& get_ref() const
 		{
 			std::string key = typeid(Var_Name).name();
-			return *std::static_pointer_cast<typename Var_Name::type>(m_datas.at(key));
+			return *std::static_pointer_cast<typename Get_Type<Var_Name>::type>(m_datas.at(key));
 		}
 
 

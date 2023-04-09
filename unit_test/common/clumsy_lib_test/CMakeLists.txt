@@ -15,6 +15,8 @@ class_reflection_test.cpp
 static_loop_test.cpp
 static_type_map_test.cpp
 dynamic_type_map_test.cpp
+morphysm_test.cpp
+special_fied_type_map_test.cpp
 )
 
 
