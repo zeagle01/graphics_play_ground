@@ -20,6 +20,7 @@ include/clumsy_lib/dynamic_type_map.h
 include/clumsy_lib/field_defines.h
 include/clumsy_lib/morphysm.h
 include/clumsy_lib/type_getter.h
+include/clumsy_lib/weak_ptr.h
 clumsy_lib.cpp
 )
 

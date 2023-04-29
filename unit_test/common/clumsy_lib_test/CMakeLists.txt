@@ -17,6 +17,7 @@ static_type_map_test.cpp
 dynamic_type_map_test.cpp
 morphysm_test.cpp
 special_fied_type_map_test.cpp
+weak_ptr_test.cpp
 )
 
 
