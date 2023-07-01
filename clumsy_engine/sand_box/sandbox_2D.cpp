@@ -18,12 +18,20 @@ void Sandbox_2D::on_update(clumsy_engine::Time_Step dt)
 	clumsy_engine::Render_Command::clear();
 
 	clumsy_engine::Renderer_2D::begin_scene(m_camara_controller->get_camara());
+
 	for (int i = 0; i < 3; i++)
 	{
-		clumsy_engine::Renderer_2D::draw_quad({ 0.f,-i * 0.6f }, { 0.5f,0.5f }, m_plane_color);
+		if (i == 0)
+		{
+			clumsy_engine::Renderer_2D::draw_rotated_quad({ 0.f,-i * 0.6f }, { 0.5f,0.5f }, glm::radians(45.f), m_plane_color);
+		}
+		else
+		{
+			clumsy_engine::Renderer_2D::draw_quad({ 0.f,-i * 0.6f }, { 0.5f,0.5f }, m_plane_color);
+		}
 	}
 
-	clumsy_engine::Renderer_2D::draw_quad({ 0.5f, 0.1f }, { 0.5f,0.5f }, m_texture);
+	clumsy_engine::Renderer_2D::draw_rotated_quad({ 0.5f, 0.1f }, { 0.5f,0.5f }, glm::radians(45.f), m_texture, 10.f, glm::vec4(0.9f, 0.8f, 0.9f, 1.0));
 
 	clumsy_engine::Renderer_2D::end_scene();
 
