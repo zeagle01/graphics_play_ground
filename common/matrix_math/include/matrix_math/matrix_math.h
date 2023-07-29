@@ -362,6 +362,24 @@ COMPONENTWISE_SELF_BINARY(operator-=,Substract)
 		return relative_diff <= threshold;
 	}
 
+
+	template< int Row, int Col, typename T  >
+	static DEVICE_CALLABLE  bool operator==(const mat<Row, Col, T>& m0, const mat<Row, Col, T>& m1)
+	{
+		for (int ri = 0; ri < Row ; ri++)
+		{
+			for (int ci = 0; ci < Col; ci++)
+			{
+				if (m0(ri, ci) != m1(ri, ci))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+
 }
 
 

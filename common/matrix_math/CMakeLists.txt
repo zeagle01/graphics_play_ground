@@ -6,8 +6,9 @@ project(matrix_math  )
 
 
 add_library(matrix_math STATIC 
-include/matrix_math/matrix_math.h
-matrix_math.cpp
+	include/matrix_math/matrix_math.h
+	matrix_math.cpp
+	include/matrix_math/linear_system_solver.h
 )
 
 target_include_directories(matrix_math

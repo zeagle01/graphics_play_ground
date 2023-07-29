@@ -139,4 +139,15 @@ namespace matrix_math
 
 		EXPECT_FALSE(is_near<2>(v0, v1));
 	}
+
+	TEST(Matrix_Math_Test, is_equal)
+	{
+		vec3f v0{ 1,0,0 };
+		vec3f v1{ 1,0,0 };
+
+
+		EXPECT_THAT(v0,Eq(v1));
+		v1(1) += 0.01;
+		EXPECT_THAT(v0,Ne(v1));
+	}
 }

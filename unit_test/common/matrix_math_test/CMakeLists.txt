@@ -7,8 +7,9 @@ project(matrix_math_test)
 
 
 add_executable(matrix_math_test  
-main.cpp
-matrix_math_test.cpp
+	main.cpp
+	matrix_math_test.cpp
+	linear_system_solver_test.cpp
 )
 
 
@@ -20,6 +21,5 @@ set_target_properties(matrix_math_test PROPERTIES FOLDER unit_test/common)
 find_package(GTest CONFIG REQUIRED)
 target_link_libraries(matrix_math_test PRIVATE GTest::gmock_main)
 
-#include(${CMAKE_SOURCE_DIR}/cmake/gtest.cmake)
-#link_to_gtest(matrix_math_test ${CMAKE_SOURCE_DIR}/external/gtest)
+target_compile_features(matrix_math_test PRIVATE cxx_std_20)
 
