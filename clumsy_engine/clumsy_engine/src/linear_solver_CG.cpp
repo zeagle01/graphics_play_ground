@@ -45,7 +45,7 @@ namespace clumsy_engine
 		auto r = b - A * ret;
 		auto p = r;
 
-		int iter_name = 5;
+		int iter_name = 50;
 		for (int i = 0; i < iter_name; i++)
 		{
 			float rr_old = dot(r, r);

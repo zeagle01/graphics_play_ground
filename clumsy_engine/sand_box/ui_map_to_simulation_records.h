@@ -78,6 +78,7 @@ struct UI_Simulation_Mapper
 	ADD_SIM_DATA_MAPPER(Time_Step, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), DEFAULT_FLOAT(0.1f));
 	ADD_SIM_DATA_MAPPER(Mass_Density, Set_Value, CE_WRAP(Imgui_SlideFloat<0.001f, 10.0f>), DEFAULT_FLOAT(1.0f));
 	ADD_SIM_DATA_MAPPER(Stretch_Stiff, Set_Value_Exponential, CE_WRAP(Imgui_SlideFloat<-3.f, 7.f>), DEFAULT_FLOAT(3.f));
+	ADD_SIM_DATA_MAPPER(Bending_Stiff, Set_Value_Exponential, CE_WRAP(Imgui_SlideFloat<-3.f, 7.f>), DEFAULT_FLOAT(3.f));
 	ADD_SIM_DATA_MAPPER(Gravity_Acceleration, Set_Value, CE_WRAP(Imgui_SlideFloat3<-10.f, 10.0f>), DEFAULT_FLOAT3(0.f, -10.f, 0.f));
 
 	ADD_SIM_INTERACTION_MAPPER(Spring_Stretch, Add_Remove, Imgui_Checkbox, DEFAULT_BOOL(true));

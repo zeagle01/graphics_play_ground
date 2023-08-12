@@ -37,6 +37,8 @@ namespace clumsy_engine
 		DEF_MEM(Position,					v_v3f,				Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
 		DEF_MEM(Triangle_Indice,			vi,					Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
 
+		DEF_MEM(Bending_Stiff,				float,				Plain_Computer,										DEPENDENT_TYPE_LIST()																		);
+
 		DEF_MEM(Vertex_Num,					int,				CE_WRAP(Get_List_Size<Position, 1>),							DEPENDENT_TYPE_LIST(Position)																);
 		DEF_MEM(Velocity,					v_v3f,				CE_WRAP(Allocate_With_Size<v_v3f, Vertex_Num, 1>),				DEPENDENT_TYPE_LIST(Vertex_Num)																);
 		DEF_MEM(Last_Frame_Position,		v_v3f,				CE_WRAP(Allocate_With_Size<v_v3f, Vertex_Num, 1>),				DEPENDENT_TYPE_LIST(Vertex_Num)																);

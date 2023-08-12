@@ -49,7 +49,7 @@ namespace clumsy_engine
 
 		float w[] = { 1,1,-1,-1 };
 
-		float stiff = 1e3f;
+		float stiff = get_value<data::Bending_Stiff>();
 
 		for (int i = 0; i < vertex_of_stencel_num; i++)
 		{

@@ -10,7 +10,7 @@
 namespace clumsy_engine
 {
 
-	class Quadratic_Bending :public clumsy_lib::Variable_Acc_Constraint<clumsy_lib::type_list<data::Position, data::Triangle_Indice, data::Edge_Indice, data::Edge_Adjacent_Triangle>>
+	class Quadratic_Bending :public clumsy_lib::Variable_Acc_Constraint<clumsy_lib::type_list<data::Position, data::Triangle_Indice, data::Bending_Stiff, data::Edge_Indice, data::Edge_Adjacent_Triangle>>
 	{
 	public:
 		std::vector<stencil> compute_stencils();
