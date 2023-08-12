@@ -32,6 +32,7 @@ namespace clumsy_engine
 		CE_CORE_INFO("gl rednerer: {0}", (const char*)glGetString(GL_RENDERER));
 		CE_CORE_INFO("gl verdor: {0}", (const char*)glGetString(GL_VENDOR));
 		CE_CORE_INFO("gl version: {0}", (const char*)glGetString(GL_VERSION));
+
 	}
 
 

@@ -37,8 +37,8 @@ add_executable(shellet_test
 	test/FEM_Simulator_Test.cpp
     )
 
-set_property(TARGET shellet_test PROPERTY FOLDER shellet)
-set_property(TARGET shellet PROPERTY FOLDER shellet)
+set_property(TARGET shellet_test PROPERTY FOLDER examples/shellet)
+set_property(TARGET shellet PROPERTY FOLDER examples/shellet)
 
 set_property(TARGET shellet_test PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:shellet_test>)
 set_property(TARGET shellet PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:shellet>)

@@ -148,7 +148,7 @@ ${source_files}
 )
 
 
-set_target_properties(clumsy_engine PROPERTIES FOLDER clumsy_engine)
+set_target_properties(clumsy_engine PROPERTIES FOLDER examples/clumsy_engine)
 
 
 
@@ -245,4 +245,3 @@ set_target_properties( sand_box clumsy_engine
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin
 )
 
-set_target_properties(clumsy_engine PROPERTIES FOLDER "clumsy_engine")

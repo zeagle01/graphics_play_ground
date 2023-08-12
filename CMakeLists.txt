@@ -11,16 +11,13 @@ include(GNUInstallDirs)
 #set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/shellet_install)
 #set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
 
-add_subdirectory(shellet)
 add_subdirectory(examples)
-add_subdirectory(glad)
-add_subdirectory(clumsy_engine)
 
-add_subdirectory(external_wrappers/imgui)
-add_subdirectory(external_wrappers/stb)
+add_subdirectory(external_wrappers)
 
 add_subdirectory(common/matrix_math)
 add_subdirectory(common/clumsy_lib)
+
 add_subdirectory(unit_test/common/matrix_math_test)
 add_subdirectory(unit_test/common/clumsy_lib_test)
 

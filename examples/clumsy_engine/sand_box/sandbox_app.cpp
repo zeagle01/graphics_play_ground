@@ -97,6 +97,9 @@ public:
 			auto opend_file = clumsy_engine::File_Dialogs::open_file("mesh file (*.obj)\0*.obj\0 project (*.pro)\0*.pro\0");
 			CE_INFO("opened {0}", opend_file);
 		}
+
+		
+
 		if (ImGui::Button("save.."))
 		{
 			auto saved_file = clumsy_engine::File_Dialogs::save_file("project (*.pro)\0*.pro\0");
@@ -283,8 +286,8 @@ class SanBox_App:public clumsy_engine::Application
 	public:
 		SanBox_App() 
 		{
-			//push_layer(std::make_shared<Layer_Demo>());
 			push_layer(std::make_shared<Sandbox_2D>());
+			//push_layer(std::make_shared<Layer_Demo>());
 		}
 
 };
@@ -298,8 +301,8 @@ std::unique_ptr<clumsy_engine::Application> clumsy_engine::create_application()
 
 	clumsy_engine::Log::get_core_logger()->trace("create app");
 
-	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
-	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
+	//std::unique_ptr<clumsy_engine::Application> app = std::make_unique<SanBox_App>(); 
+	std::unique_ptr<clumsy_engine::Application> app = std::make_unique<Sim_App>(); 
 
 	return app;
 }

@@ -10,7 +10,7 @@ add_executable(show_obj main.cpp)
 
 target_compile_features(show_obj PRIVATE cxx_std_17)
 
-set_property(TARGET show_obj PROPERTY FOLDER shellet)
+set_property(TARGET show_obj PROPERTY FOLDER examples/shellet)
 set_property(TARGET show_obj PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:show_obj>)
 
 target_link_libraries(show_obj PRIVATE shellet)

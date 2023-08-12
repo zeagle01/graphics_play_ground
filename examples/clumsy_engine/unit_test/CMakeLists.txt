@@ -26,7 +26,7 @@ target_sources(clumsy_engine_test PRIVATE ${test_files})
 
 target_compile_features(clumsy_engine_test PRIVATE cxx_std_20)
 
-set_target_properties(clumsy_engine_test PROPERTIES FOLDER clumsy_engine)
+set_target_properties(clumsy_engine_test PROPERTIES FOLDER examples/clumsy_engine)
 
 set_target_properties(clumsy_engine_test 
     PROPERTIES
