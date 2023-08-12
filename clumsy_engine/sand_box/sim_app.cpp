@@ -146,7 +146,21 @@ using namespace clumsy_engine;
 		//render
 		clumsy_engine::Renderer::begin_scene(m_camara);
 
-		clumsy_engine::Renderer::submit(m_shader, m_vertex_array,glm::mat4(1.f));
+		if (m_enable_fill)
+		{
+			clumsy_engine::Render_Command::set_polygon_mode(false);
+			clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::mat4(1.f));
+		}
+
+		if (m_enable_wireframe)
+		{
+			auto ogl_shader = std::dynamic_pointer_cast<OpenGL_Shader>(m_shader);
+			ogl_shader->upload_uniform_vec3("u_obj_color", { 0.,1.f,0.f });
+			clumsy_engine::Render_Command::set_polygon_mode(true);
+			clumsy_engine::Renderer::submit(m_shader, m_vertex_array, glm::mat4(1.f));
+
+			ogl_shader->upload_uniform_vec3("u_obj_color", m_obj_color);
+		}
 
 		clumsy_engine::Renderer::end_scene();
 
@@ -269,6 +283,9 @@ using namespace clumsy_engine;
 		{
 			ogl_shader->upload_uniform_float("u_specular_steep", specular_steep);
 		}
+
+		ImGui::Checkbox("fill", &m_enable_fill);
+		ImGui::Checkbox("wireframe", &m_enable_wireframe);
 
 		ImGui::End();
 

@@ -17,6 +17,8 @@ namespace clumsy_engine
 
 		inline static void set_clear_color(const glm::vec4& color) { s_renderer_API->set_clear_color(color); }
 
+		inline static void set_polygon_mode(bool v) { s_renderer_API->set_polygon_mode(v); }
+
 		inline static void set_viewport(int x, int y, int  width, int height)
 		{
 			s_renderer_API->set_viewport(x, y, width, height);

@@ -11,6 +11,9 @@ namespace clumsy_engine
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+
 	}
 
 	void OpenGL_Renderer_API::clear()
@@ -23,6 +26,18 @@ namespace clumsy_engine
 	{
 		glClearColor(color[0], color[1], color[2], color[3]);
 
+	}
+
+	void OpenGL_Renderer_API::set_polygon_mode(bool isLine)
+	{
+		if (isLine)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+		else
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
 	}
 
 	void OpenGL_Renderer_API::draw_indexed(Ref<Vertex_Array> vertex_array)

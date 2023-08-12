@@ -49,8 +49,11 @@ private:
 
 	clumsy_engine::Simulator m_sim;
 
-
 	clumsy_lib::Type_Map<UI_Simulation_Mapper::base_type> m_simulation_mappers;
+
+	bool m_enable_wireframe = true;
+	bool m_enable_fill = true;
+	glm::vec3 m_obj_color = { 1.f, 0.f, 0.f };
 
 };
 

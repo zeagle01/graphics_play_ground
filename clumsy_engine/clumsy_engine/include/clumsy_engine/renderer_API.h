@@ -26,6 +26,7 @@ namespace clumsy_engine
 		virtual void init() = 0;
 		virtual void clear() = 0;
 		virtual void set_clear_color(const glm::vec4& color ) = 0;
+		virtual void set_polygon_mode(bool isLine) = 0;
 
 		virtual void draw_indexed(Ref<Vertex_Array> vertex_array) = 0;
 		virtual void set_viewport(int x, int y, int  width, int height) = 0;

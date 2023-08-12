@@ -13,6 +13,7 @@ namespace clumsy_engine
 
 		void init() override;
 		void clear() override;
+		void set_polygon_mode(bool isLine) override;
 		void set_clear_color(const glm::vec4& color) override;
 		void set_viewport(int x, int y, int  width, int height) override;
 
