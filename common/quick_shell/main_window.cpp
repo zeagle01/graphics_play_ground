@@ -1,6 +1,7 @@
 module;
 
 #include <iostream>
+#include "ce_log.h"
 
 module main_window;
 
@@ -19,7 +20,7 @@ namespace quick_shell
 		m_glfwWrapper->main_loop(
 			[](int x, int y)
 			{
-				printf("%d %d \n",x,y);
+				CE_LOG_INFO("{} {} ",x,y);
 			}
 		);
 	}

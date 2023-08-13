@@ -44,7 +44,11 @@ set_source_files_properties(${partion_files} PROPERTIES COMPILE_FLAGS "/internal
 
 target_compile_features(quick_shell PRIVATE cxx_std_20)
 
+##########ce_log
+target_link_libraries(quick_shell PRIVATE ce_log)
+
 
 ##########glfw3
 find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(quick_shell PRIVATE glfw)
+

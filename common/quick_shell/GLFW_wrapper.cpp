@@ -5,7 +5,10 @@ module;
 #include <iostream>
 #include "GLFW/glfw3.h"
 
+#include "ce_log.h";
+
 module main_window:GLFW_wrapper;
+
 
 
 namespace quick_shell
@@ -18,11 +21,11 @@ namespace quick_shell
 			auto status = glfwInit();
 			if (status == GLFW_TRUE)
 			{
-				printf("glfw init succeed! \n");
+				CE_LOG_INFO("glfw init succeed! ");
 			}
 			else
 			{
-				printf("glfw init error! \n");
+				CE_LOG_INFO("glfw init error! ");
 			}
 
 			GLFWwindow* window;
@@ -30,11 +33,11 @@ namespace quick_shell
 
 			if (window)
 			{
-				printf(" window %p is created\n", window);
+				CE_LOG_INFO(" window {} is created", (void*)window);
 			}
 			else
 			{
-				printf(" window can't be created\n");
+				CE_LOG_ERROR(" window can't be created");
 			}
 
 			glfwMakeContextCurrent(window);
