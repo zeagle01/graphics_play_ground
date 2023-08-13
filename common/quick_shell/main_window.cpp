@@ -11,7 +11,7 @@ namespace quick_shell
 	void main_window::init()
 	{
 		m_glfwWrapper = std::make_shared<GLFW_wrapper>();
-		m_glfwWrapper->create_window(0, 1);
+		m_glfwWrapper->create_window(800, 600);
 	}
 
 	void main_window::run_event_loop()

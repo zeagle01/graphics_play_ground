@@ -44,7 +44,7 @@ target_link_libraries(soft_render_2 PRIVATE my_imgui)
 
 ##########glfw3
 find_package(glfw3 CONFIG REQUIRED)
-target_link_libraries(soft_render_2 PUBLIC glfw)
+target_link_libraries(soft_render_2 PRIVATE glfw)
 
 ##########glad
 target_link_libraries(soft_render_2 PRIVATE glad)
