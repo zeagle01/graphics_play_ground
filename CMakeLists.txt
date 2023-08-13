@@ -15,8 +15,7 @@ add_subdirectory(examples)
 
 add_subdirectory(external_wrappers)
 
-add_subdirectory(common/matrix_math)
-add_subdirectory(common/clumsy_lib)
+add_subdirectory(common)
 
 add_subdirectory(unit_test/common/matrix_math_test)
 add_subdirectory(unit_test/common/clumsy_lib_test)
