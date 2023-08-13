@@ -3,19 +3,15 @@ module;
 
 #include <memory> 
 
-export module Main_Window;
+export module main_window;
 
-
-//import GLFW_Wrapper;
-
-import :par;
+import : UI_wrapper;
+import : GLFW_wrapper;
 
 
 namespace quick_shell
 {
-	class GLFW_Wrapper;
-
-	export class  Main_Window
+	export class  main_window
 	{
 	public: 
 		void init();
@@ -28,7 +24,7 @@ namespace quick_shell
 		}
 
 	private:
-		std::shared_ptr<GLFW_Wrapper > m_glfwWrapper;
+		std::shared_ptr<GLFW_wrapper > m_glfwWrapper;
 	};
 
 }

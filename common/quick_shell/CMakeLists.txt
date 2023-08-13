@@ -4,14 +4,13 @@ cmake_minimum_required(VERSION 3.26)
 project(quick_shell)
 
 set(partion_files
-	main_window_par.cpp
-	glfw_wrapper_par.cpp
+	GLFW_wrapper.cpp
+	UI_wrapper.cpp
 )
 
 add_library(quick_shell  
 	${partion_files}
-	main_window_imp.cpp
-	glfw_wrapper_imp.cpp
+	main_window.cpp
 )
 
 set_target_properties(quick_shell PROPERTIES FOLDER common)
@@ -37,7 +36,6 @@ target_sources(quick_shell PUBLIC
 	TYPE CXX_MODULES
 	FILES 
 	main_window.ixx 
-	glfw_wrapper.ixx
 )
 
 set_source_files_properties(${partion_files} PROPERTIES COMPILE_FLAGS "/internalPartition")

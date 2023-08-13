@@ -1,6 +1,6 @@
 
 
-module Main_Window : par;
+module main_window : UI_wrapper;
 
 
 
