@@ -10,13 +10,11 @@ module;
 
 module main_window : render;
 
-import :GLFW_wrapper;
 import :shader;
 import :vartex_array;
 
 namespace quick_shell
 {
-
 	class renderer_imp
 	{
 	public:
@@ -25,8 +23,6 @@ namespace quick_shell
 		{
 			if (!m_shader)
 			{
-				load_glad();
-
 				//glEnable(GL_BLEND);
 				//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -65,6 +61,19 @@ namespace quick_shell
 			m_shader->upload_uniform_mat4("u_model_matrix", identity.data());
 
 			draw_iendxes();
+		}
+
+		template<typename proc>
+		void load_glad(proc* proc_addr)
+		{
+			if (!gladLoadGLLoader((GLADloadproc)proc_addr)) {
+				CE_LOG_INFO("glad load failed\n");
+			}
+			else {
+
+				CE_LOG_INFO("glad load succend\n");
+			}
+			printf("gl version %s\n", glGetString(GL_VERSION));
 
 		}
 
@@ -79,18 +88,6 @@ namespace quick_shell
 			glDrawElements(GL_TRIANGLES, m_vertex_array->get_index_count(), GL_UNSIGNED_INT, nullptr);
 		}
 
-		void load_glad()
-		{
-			if (!gladLoadGLLoader((GLADloadproc)GLFW_wrapper::get_proc_address())) {
-				CE_LOG_INFO("glad load failed\n");
-			}
-			else {
-
-				CE_LOG_INFO("glad load succend\n");
-			}
-			printf("gl version %s\n", glGetString(GL_VERSION));
-
-		}
 
 
 		std::unique_ptr<shader> m_shader;

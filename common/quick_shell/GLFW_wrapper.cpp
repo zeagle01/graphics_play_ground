@@ -88,6 +88,8 @@ namespace quick_shell
 			return &glfwGetProcAddress;
 		}
 
+		GLFWwindow* get_window_ptr() { return m_window; }
+
 	private:
 		GLFWwindow* m_window;
 		std::vector<std::function<void(int, int)>> m_frame_update_fns;

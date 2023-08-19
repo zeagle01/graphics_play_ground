@@ -12,10 +12,15 @@ namespace quick_shell
 	void main_window::init(int width,int height)
 	{
 		m_glfwWrapper.create_window(width, height);
+		m_ui_panel.init(m_glfwWrapper.get_window_ptr());
+		m_renderer.load_glad(GLFW_wrapper::get_proc_address());
+
+		m_ui_fn = [this]() { m_ui_panel.upate_ui_data(); };
 	}
 
 	void main_window::run_event_loop()
 	{
+		m_glfwWrapper.register_frame_update_fn(m_ui_fn);
 		m_glfwWrapper.run_event_loop();
 	}
 

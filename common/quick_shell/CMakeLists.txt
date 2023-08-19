@@ -44,22 +44,25 @@ target_sources(quick_shell PUBLIC
 
 set_source_files_properties(${partion_files} PROPERTIES COMPILE_FLAGS "/internalPartition")
 
-###moduel support end
+### moduel support end
 
 target_compile_features(quick_shell PRIVATE cxx_std_20)
 
-##########ce_log
+########## ce_log
 target_link_libraries(quick_shell PRIVATE ce_log)
 
 ########## clumsy_lib
 target_link_libraries(quick_shell PRIVATE clumsy_lib)
 
 
-##########glfw3
+########## glfw3
 find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(quick_shell PRIVATE glfw)
 
 
-##########glad
+########## glad
 target_link_libraries(quick_shell PRIVATE glad)
 
+
+########## imgui
+target_link_libraries(quick_shell PRIVATE my_imgui)

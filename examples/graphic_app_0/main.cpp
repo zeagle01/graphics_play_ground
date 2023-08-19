@@ -28,7 +28,8 @@ int main()
 		};
 
 	float t = 0.f;
-	float step = 0.01f;
+	float step0 = 0.01f;
+	float step = step0;
 	auto animation_fn = [&]()
 		{
 			std::ranges::for_each(pos, [&](auto& x) {x += 0.001f * (std::sin(t) - 0.5f); });
@@ -40,7 +41,7 @@ int main()
 
 	m.register_frame_update_fn(animation_fn);
 
-	m.add_ui_component<ui_component::check_box>([&](const auto& v) {step = float(v) * step; });
+	m.add_ui_component<ui_component::check_box>([&](const auto& v) {step = float(v) * step0; });
 
 	m.run_event_loop();
 

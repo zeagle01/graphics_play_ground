@@ -19,6 +19,12 @@ namespace quick_shell
 	export class renderer
 	{
 	public:
+		template<typename proc>
+		void load_glad(proc* proc_addr)
+		{
+			m_render_imp.load_glad(proc_addr);
+		}
+
 		void draw_triangles(int* indices, float* pos, int tNum, int vNum);
 	private:
 		renderer_imp  m_render_imp;
@@ -54,6 +60,7 @@ namespace quick_shell
 		GLFW_wrapper m_glfwWrapper;
 		renderer m_renderer;
 		ui_panel m_ui_panel;
+		std::function<void()> m_ui_fn;
 	};
 
 }
