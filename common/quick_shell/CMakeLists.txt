@@ -7,6 +7,8 @@ set(partion_files
 	GLFW_wrapper.cpp
 	UI_wrapper.cpp
 	render.cpp
+	shader.cpp
+	vertex_array.cpp
 )
 
 add_library(quick_shell  
@@ -55,5 +57,5 @@ target_link_libraries(quick_shell PRIVATE glfw)
 
 
 ##########glad
-target_link_libraries(clumsy_engine PRIVATE glad)
+target_link_libraries(quick_shell PRIVATE glad)
 

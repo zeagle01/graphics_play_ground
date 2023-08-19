@@ -15,6 +15,8 @@ module main_window:GLFW_wrapper;
 
 namespace quick_shell
 {
+	using proc_address_t = decltype(glfwGetProcAddress);
+
 	class GLFW_wrapper
 	{
 	public:
@@ -78,6 +80,12 @@ namespace quick_shell
 
 				glfwSwapBuffers(m_window);
 			}
+		}
+
+
+		static proc_address_t* get_proc_address() 
+		{
+			return &glfwGetProcAddress;
 		}
 
 	private:

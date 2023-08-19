@@ -3,6 +3,7 @@ module;
 
 #include <memory> 
 #include <functional>
+#include <memory>
 
 export module main_window;
 
@@ -44,7 +45,7 @@ namespace quick_shell
 		}
 
 	private:
-		GLFW_wrapper  m_glfwWrapper;
+		GLFW_wrapper m_glfwWrapper;
 		renderer m_renderer;
 	};
 

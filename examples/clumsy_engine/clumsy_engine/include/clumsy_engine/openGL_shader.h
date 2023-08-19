@@ -20,7 +20,6 @@ namespace clumsy_engine
 		OpenGL_Shader(const std::string& shader_file);
 
 		void bind() const override;
-
 		void unbind() const override;
 
 		const std::string& get_name() const override { return m_name;}
