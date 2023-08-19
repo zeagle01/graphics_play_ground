@@ -6,6 +6,7 @@ project(quick_shell)
 set(partion_files
 	GLFW_wrapper.cpp
 	UI_wrapper.cpp
+	render.cpp
 )
 
 add_library(quick_shell  
@@ -51,4 +52,8 @@ target_link_libraries(quick_shell PRIVATE ce_log)
 ##########glfw3
 find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(quick_shell PRIVATE glfw)
+
+
+##########glad
+target_link_libraries(clumsy_engine PRIVATE glad)
 

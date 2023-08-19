@@ -30,4 +30,9 @@ namespace quick_shell
 	{
 		m_glfwWrapper.register_frame_update_fn(frame_update_fn);
 	}
+
+	void renderer::draw_triangles(int* indices, float* pos, int tNum, int vNum)
+	{
+		m_render_imp.draw_triangles(indices, pos, tNum, vNum);
+	}
 }
