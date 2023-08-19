@@ -37,17 +37,17 @@ namespace special_type_map_test
 
 	struct Check_Box
 	{
-		ADD_FIELD(A, bool);
-		ADD_FIELD(B, bool);
-		ADD_FIELD(C, bool);
+		CE_ADD_FIELD(A, bool);
+		CE_ADD_FIELD(B, bool);
+		CE_ADD_FIELD(C, bool);
 	};
 	using check_boxes = extract_member_type_list_t<Check_Box>;
 
 	struct My_Var_List
 	{
-		ADD_FIELD(A, int);
-		ADD_FIELD(M, Morphysm<Base>);
-		ADD_FIELD(Options, Static_Type_Map<check_boxes>);
+		CE_ADD_FIELD(A, int);
+		CE_ADD_FIELD(M, Morphysm<Base>);
+		CE_ADD_FIELD(Options, Static_Type_Map<check_boxes>);
 	};
 
 

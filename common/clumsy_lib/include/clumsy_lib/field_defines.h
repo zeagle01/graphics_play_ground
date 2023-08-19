@@ -2,7 +2,14 @@
 
 #pragma once
 
-#define ADD_TAG(name) struct name{}; name*  name##_var;
-#define ADD_FIELD(name,t) struct name{ using type=t;}; name*  name##_var;
-#define ADDD_FIELD_WITH(name,t,...) struct name{ using type=t; __VA_ARGS__}; name*  name##_var;
 
+#define CE_ADD_NODE(name,...) struct name{__VA_ARGS__}; name*  name##_var;
+#define CE_ADD_LEAF(name,...) struct name{__VA_ARGS__}; 
+
+#define CE_ADD_TAG(name) struct name{}; 
+#define CE_FIELD(name,t) using name=t;
+#define CE_TYPE(t) CE_FIELD(type,t)
+
+
+
+#define CE_ADD_FIELD(name,t) CE_ADD_NODE(name,CE_TYPE(t) )

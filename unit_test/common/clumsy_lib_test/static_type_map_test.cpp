@@ -12,8 +12,8 @@ using namespace clumsy_lib;
 
 struct My_List
 {
-	ADD_FIELD(A, int);
-	ADD_FIELD(B, float);
+	CE_ADD_FIELD(A, int);
+	CE_ADD_FIELD(B, float);
 };
 
 using tl = extract_member_type_list_t<My_List>;
@@ -59,8 +59,8 @@ struct LiteralValue
 
 struct Var_With_Defualt_Value
 {
-	ADDD_FIELD_WITH(A, int, ADD_FIELD(Get_Default, EVAL(LiteralValue<int,2>)))
-	ADDD_FIELD_WITH(B, float, ADD_FIELD(Get_Default, EVAL(LiteralValue<float,3.f>)))
+	CE_ADD_NODE(A, CE_TYPE(int) CE_ADD_LEAF(Get_Default, CE_TYPE(EVAL(LiteralValue<int, 2>))));
+	CE_ADD_NODE(B, CE_TYPE(int) CE_ADD_LEAF(Get_Default, CE_TYPE(EVAL(LiteralValue<float, 3.f>))));
 
 };
 

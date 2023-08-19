@@ -9,14 +9,14 @@ using namespace clumsy_lib;
 
 struct List_A
 {
-	ADD_FIELD(A, int);
-	ADD_FIELD(B, float);
+	CE_ADD_FIELD(A, int);
+	CE_ADD_FIELD(B, float);
 };
 
 struct List_B
 {
-	ADD_FIELD(A, int);
-	ADD_FIELD(B, float);
+	CE_ADD_FIELD(A, int);
+	CE_ADD_FIELD(B, float);
 };
 
 TEST(Dynamic_Type_Map_Test, add_varialbe_to_type_map)

@@ -16,8 +16,7 @@ namespace quick_shell
 
 	void main_window::run_event_loop()
 	{
-		m_glfwWrapper.run_event_loop(
-		);
+		m_glfwWrapper.run_event_loop();
 	}
 
 	void main_window::register_frame_update_fn(std::function<void()> frame_update_fn)
