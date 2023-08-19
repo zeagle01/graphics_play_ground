@@ -2,6 +2,7 @@
 module;
 
 #include <memory> 
+#include <functional>
 
 export module main_window;
 
@@ -14,8 +15,11 @@ namespace quick_shell
 	export class  main_window
 	{
 	public: 
-		void init();
+		void init(int width,int height);
 		void run_event_loop();
+
+		void register_frame_update_fn(std::function<void()> frame_update_fn);
+		void register_frame_update_fn(std::function<void(int, int)> frame_update_fn);
 
 		template<typename Ui>
 		void add_ui()
@@ -24,7 +28,7 @@ namespace quick_shell
 		}
 
 	private:
-		std::shared_ptr<GLFW_wrapper > m_glfwWrapper;
+		GLFW_wrapper  m_glfwWrapper;
 	};
 
 }

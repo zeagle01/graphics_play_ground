@@ -4,6 +4,8 @@ module;
 #include <functional>
 #include <iostream>
 #include "GLFW/glfw3.h"
+#include <ranges>
+#include <algorithm>
 
 #include "ce_log.h";
 
@@ -47,7 +49,19 @@ namespace quick_shell
 			m_window = window;
 		}
 
-		void main_loop(std::function<void(int cursor_x, int cursor_y)> fn)
+		void register_frame_update_fn(std::function<void()> frame_update_fn)
+		{
+			m_frame_update_fns.push_back(
+				[=](int, int) {frame_update_fn(); }
+			);
+		}
+
+		void register_frame_update_fn(std::function<void(int,int)> frame_update_fn)
+		{
+			m_frame_update_fns.push_back(frame_update_fn);
+		}
+
+		void run_event_loop()
 		{
 			while (!glfwWindowShouldClose(m_window))
 			{
@@ -58,7 +72,7 @@ namespace quick_shell
 
 				glfwGetCursorPos(m_window, &cx, &cy);
 
-				fn(int(cx), int(cy));
+				std::ranges::for_each(m_frame_update_fns, [&](auto& fn) { fn(int(cx), int(cy)); });
 
 				glfwMakeContextCurrent(m_window); //in case for docking gui
 
@@ -68,5 +82,6 @@ namespace quick_shell
 
 	private:
 		GLFWwindow* m_window;
+		std::vector<std::function<void(int, int)>> m_frame_update_fns;
 	};
 }
