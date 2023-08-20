@@ -25,13 +25,12 @@ namespace quick_shell
 		template<typename  ui_com>
 		void add_ui_component(const std::string& name, typename ui_com::type& value, const typename ui_com::extra_data& extra_d)
 		{
-			auto ui_com_obj = std::make_shared<ui_component_imp<ui_com>>();
-			ui_com_obj->name = name;
-			ui_com_obj->value = &value;
-			ui_com_obj->extra = extra_d;
+			ui_component_imp<ui_com> ui_com_obj;
+			ui_com_obj.name = name;
+			ui_com_obj.value = &value;
+			ui_com_obj.extra = extra_d;
 
-			std::vector<std::function<void()>> slots{*ui_com_obj};
-			m_connects.insert({ ui_com_obj,slots });
+			m_connects.push_back(ui_com_obj);
 		}
 
 
@@ -86,17 +85,12 @@ namespace quick_shell
 	private:
 		void invoke_slots()
 		{
-			std::ranges::for_each(m_connects,
-				[](auto& it)
-				{
-					std::ranges::for_each(it.second, [](auto slot) { slot(); });
-				}
-			);
+			std::ranges::for_each(m_connects, [](auto& slot) { slot(); });
 		}
 
 	private:
 
-		std::unordered_map<std::shared_ptr<void>, std::vector<std::function<void()>>> m_connects;
+		 std::vector<std::function<void()>> m_connects;
 
 	};
 

@@ -40,6 +40,14 @@ DEF_UI_COMPONENT_IMP (ui_component::slider_bar,
 	return ImGui::SliderFloat(name.c_str(), value, extra.min, extra.max);
 )
 
+DEF_UI_COMPONENT_IMP (ui_component::slider_bar2,
+	return ImGui::SliderFloat2(name.c_str(), value->data(), extra.min, extra.max);
+)
+
+DEF_UI_COMPONENT_IMP (ui_component::slider_bar3,
+	return ImGui::SliderFloat3(name.c_str(), value->data(), extra.min, extra.max);
+)
+
 
 DEF_UI_COMPONENT_IMP(ui_component::check_box,
 	return ImGui::Checkbox(name.c_str(), value);

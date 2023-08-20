@@ -39,12 +39,20 @@ int main()
 			}
 		};
 
+	// update fn
 	m.register_frame_update_fn(render_fn);
 
 	m.register_frame_update_fn(animation_fn);
 
+	//ui panel
 	m.add_ui_component<ui_component::check_box>("enable animation", move );
 	m.add_ui_component<ui_component::slider_bar>("time step", step, { 0.f,0.1f });
+
+	std::array<float, 2> vec2;
+	std::array<float, 3> vec3;
+
+	m.add_ui_component<ui_component::slider_bar2>("vec2 ", vec2, { 0.f,1.f });
+	m.add_ui_component<ui_component::slider_bar3>("vec3", vec3, { 0.f,1.f });
 
 	std::string name = "adfasdf";
 	m.add_ui_component<ui_component::text_line>("fps", name);
