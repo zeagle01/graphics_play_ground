@@ -9,7 +9,7 @@ module;
 
 #include "ce_log.h";
 
-module main_window:GLFW_wrapper;
+module quick_shell:GLFW_wrapper;
 
 
 

@@ -11,7 +11,7 @@ module;
 #include <algorithm>
 
 
-module main_window : UI_wrapper;
+module quick_shell : UI_wrapper;
 
 import : ui_components;
 import : ui_component_imp;

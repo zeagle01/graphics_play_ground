@@ -7,7 +7,7 @@ module;
 
 #include <string>
 
-module main_window:ui_component_imp;
+module quick_shell:ui_component_imp;
 
 import : ui_components;
 

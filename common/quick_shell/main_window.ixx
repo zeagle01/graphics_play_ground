@@ -6,7 +6,7 @@ module;
 #include <ranges>
 #include <algorithm>
 
-export module main_window;
+export module quick_shell;
 
 import : UI_wrapper;
 import : GLFW_wrapper;

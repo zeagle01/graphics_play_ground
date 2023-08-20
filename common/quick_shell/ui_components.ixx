@@ -5,7 +5,7 @@ module;
 #include <string>
 #include <array>
 
-export module main_window: ui_components;
+export module quick_shell: ui_components;
 
 
 namespace quick_shell

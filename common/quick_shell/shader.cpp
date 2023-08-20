@@ -13,7 +13,7 @@ module;
 #include <fstream>
 
 
-module main_window:shader;
+module quick_shell:shader;
 
 namespace quick_shell
 {

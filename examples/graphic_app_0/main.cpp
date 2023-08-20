@@ -1,5 +1,5 @@
 
-import main_window;
+import quick_shell;
 import sim_lib;
 
 #include <iostream>

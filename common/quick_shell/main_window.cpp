@@ -3,7 +3,7 @@ module;
 #include <iostream>
 #include "ce_log.h"
 
-module main_window;
+module quick_shell;
 
 
 

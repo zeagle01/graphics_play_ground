@@ -8,7 +8,7 @@ module;
 #include <array>
 #include <memory>
 
-module main_window : render;
+module quick_shell : render;
 
 import :shader;
 import :vartex_array;

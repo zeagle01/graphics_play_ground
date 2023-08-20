@@ -7,7 +7,7 @@ module;
 #include <string>
 #include <map>
 
-module main_window:vartex_array;
+module quick_shell:vartex_array;
 
 
 namespace quick_shell
