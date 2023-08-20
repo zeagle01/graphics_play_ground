@@ -14,49 +14,23 @@ module;
 module main_window : UI_wrapper;
 
 import : ui_components;
+import : ui_component_imp;
 
 namespace quick_shell
 {
-	class ui_component_base
-	{
-	public:
-		~ui_component_base() {};
-	};
-
-
-	template<typename ui_com>
-	class ui_component_imp;
-
-	template<>
-	class ui_component_imp<ui_component::check_box> :public ui_component_base
-	{
-	public:
-		bool is_changed() 
-		{
-			return ImGui::Checkbox("check_box_aaa", &m_value);
-		}
-		const bool& get_value() { return m_value; }
-	private:
-		bool m_value;
-	};
 
 	class ui_panel
 	{
 	public:
 		template<typename  ui_com>
-		void add_ui_component(std::function<void( const typename ui_com::type&)> slot)
+		void add_ui_component(const std::string& name, typename ui_com::type& value, const typename ui_com::extra_data& extra_d)
 		{
 			auto ui_com_obj = std::make_shared<ui_component_imp<ui_com>>();
+			ui_com_obj->name = name;
+			ui_com_obj->value = &value;
+			ui_com_obj->extra = extra_d;
 
-			ui_component_imp<ui_component::check_box>& ui_com_obj_tmp = *ui_com_obj;
-			auto wraped_slot = [&,slot]() 
-			{
-				if (ui_com_obj_tmp.is_changed())
-				{
-					slot(ui_com_obj_tmp.get_value());
-				}
-			};
-			std::vector<std::function<void()>> slots{wraped_slot};
+			std::vector<std::function<void()>> slots{*ui_com_obj};
 			m_connects.insert({ ui_com_obj,slots });
 		}
 
@@ -122,7 +96,7 @@ namespace quick_shell
 
 	private:
 
-		std::unordered_map<std::shared_ptr<ui_component_base>, std::vector<std::function<void()>>> m_connects;
+		std::unordered_map<std::shared_ptr<void>, std::vector<std::function<void()>>> m_connects;
 
 	};
 

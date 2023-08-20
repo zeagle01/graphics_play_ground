@@ -40,21 +40,21 @@ namespace quick_shell
 		void register_frame_update_fn(std::function<void()> frame_update_fn);
 		void register_frame_update_fn(std::function<void(int, int)> frame_update_fn);
 
-		//
+		// expose render api obj
 		renderer& get_renderer() { return m_renderer; }
 
+		//ui
 		template<typename  ui_com>
-		void add_ui_component(std::function<void( const typename ui_com::type&)> slot)
+		void add_ui_component(const std::string& name,  typename ui_com::type& value, const typename ui_com::extra_data& extra_d)
 		{
-			m_ui_panel.add_ui_component<ui_com>(slot);
+			m_ui_panel.add_ui_component<ui_com>(name, value, extra_d);
 		}
 
 		template<typename  ui_com>
-		void add_ui_component(std::initializer_list<std::function<void( const typename ui_com::type&)>> slots)
+		void add_ui_component(const std::string& name, typename ui_com::type& value)
 		{
-			std::ranges::for_each(slots, [](auto& slot) {add_ui_component<ui_com>(slot); });
+			m_ui_panel.add_ui_component<ui_com>(name, value, no_extra{});
 		}
-
 
 	private:
 		GLFW_wrapper m_glfwWrapper;

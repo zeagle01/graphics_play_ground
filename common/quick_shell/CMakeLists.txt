@@ -9,6 +9,7 @@ set(partion_files
 	render.cpp
 	shader.cpp
 	vertex_array.cpp
+	ui_component_imp.cpp
 )
 
 add_library(quick_shell  

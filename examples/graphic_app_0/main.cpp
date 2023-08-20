@@ -28,20 +28,26 @@ int main()
 		};
 
 	float t = 0.f;
-	float step0 = 0.01f;
-	float step = step0;
+	float step = 0.01f;
+	bool move = true;
 	auto animation_fn = [&]()
 		{
-			std::ranges::for_each(pos, [&](auto& x) {x += 0.001f * (std::sin(t) - 0.5f); });
-			t += step;
-			printf(" %f \n", t);
+			if (move)
+			{
+				std::ranges::for_each(pos, [&](auto& x) {x += 0.001f * (std::sin(t) - 0.5f); });
+				t += step;
+			}
 		};
 
 	m.register_frame_update_fn(render_fn);
 
 	m.register_frame_update_fn(animation_fn);
 
-	m.add_ui_component<ui_component::check_box>([&](const auto& v) {step = float(v) * step0; });
+	m.add_ui_component<ui_component::check_box>("enable animation", move );
+	m.add_ui_component<ui_component::slider_bar>("time step", step, { 0.f,0.1f });
+
+	std::string name = "adfasdf";
+	m.add_ui_component<ui_component::text_line>("fps", name);
 
 	m.run_event_loop();
 
