@@ -10,17 +10,17 @@ export module main_window: ui_components;
 
 namespace quick_shell
 {
+	using arr2 = std::array<float, 2>;
+	using arr3 = std::array<float, 3>;
 
 	struct no_extra {};
 
-	struct range
+
+	export struct range
 	{
 		float min;
 		float max;
 	};
-
-	using arr2 = std::array<float, 2>;
-	using arr3 = std::array<float, 3>;
 
 	export struct ui_component
 	{
