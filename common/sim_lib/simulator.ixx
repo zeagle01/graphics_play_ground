@@ -15,14 +15,17 @@ namespace sim_lib
 	export class simulator
 	{
 	public:
-		template<typename T>
-		void set_data()
+		template<typename var>
+		void set(typename const var::type& data)
 		{
-			m_imp.set_data<T>();
+			m_imp.set<var>(data);
 		}
 
-		void start();
-		void end();
+		template<typename var>
+		const typename var::type& get()
+		{
+			return m_imp.get<var>();
+		}
 
 		void step();
 

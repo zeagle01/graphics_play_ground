@@ -5,6 +5,7 @@ import sim_lib;
 #include <iostream>
 #include <ranges>
 #include <algorithm>
+#include <vector>
 
 using namespace quick_shell;
 
@@ -17,7 +18,7 @@ int main()
 	auto& renderer = m.get_renderer();
 
 	int indices[] = { 0,1,2 };
-	float pos[] = {
+	std::vector<float> pos = {
 		0.f,0.f,0.f,
 		1.f,0.f,0.f,
 		1.f,1.f,0.f
@@ -25,43 +26,25 @@ int main()
 	
 	auto render_fn = [&]
 		{
-			renderer.draw_triangles(indices, pos, 1, 3);
+			renderer.draw_triangles(indices, pos.data(), 1, 3);
 		};
-
 
 
 	sim_lib::simulator sim;
-	sim.start();
 
-	float t = 0.f;
-	float step = 0.01f;
-	bool move = true;
+	sim.set<sim_lib::sim_data::positions>(pos);
+
 	auto animation_fn = [&]()
 		{
-			if (move)
-			{
-				std::ranges::for_each(pos, [&](auto& x) {x += 0.001f * (std::sin(t) - 0.5f); });
-				t += step;
-			}
+			sim.step();
+			pos = sim.get<sim_lib::sim_data::positions>();
 		};
+
+
 
 	// update fn
 	m.register_frame_update_fn(render_fn);
-
 	m.register_frame_update_fn(animation_fn);
-
-	//ui panel
-	m.add_ui_component<ui_component::check_box>("enable animation", move );
-	m.add_ui_component<ui_component::slider_bar>("time step", step, { 0.f,0.1f });
-
-	std::array<float, 2> vec2;
-	std::array<float, 3> vec3;
-
-	m.add_ui_component<ui_component::slider_bar2>("vec2 ", vec2, { 0.f,1.f });
-	m.add_ui_component<ui_component::slider_bar3>("vec3", vec3, { 0.f,1.f });
-
-	std::string name = "adfasdf";
-	m.add_ui_component<ui_component::text_line>("fps", name);
 
 	m.run_event_loop();
 

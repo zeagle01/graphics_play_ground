@@ -85,3 +85,4 @@ TEST(Dynamic_Type_Map_Test, copy_type_map_and_const_ref)
 	EXPECT_THAT(act_bb, Eq(exp_bb));
 
 }
+
