@@ -1,5 +1,6 @@
 
 import main_window;
+import sim_lib;
 
 #include <iostream>
 #include <ranges>
@@ -26,6 +27,11 @@ int main()
 		{
 			renderer.draw_triangles(indices, pos, 1, 3);
 		};
+
+
+
+	sim_lib::simulator sim;
+	sim.start();
 
 	float t = 0.f;
 	float step = 0.01f;
