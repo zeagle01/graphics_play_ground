@@ -66,7 +66,11 @@ namespace sim_lib
 		void step()
 		{
 			m_solver->update_data(m_datas, m_propagator.get_all_change_status());
+
+			m_propagator.clear_all_changes();
+
 			m_solver->solve();
+
 			convert(m_datas.get_ref<sim_data::positions>(), m_solver->get_result());
 		}
 

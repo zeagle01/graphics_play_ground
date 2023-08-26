@@ -22,19 +22,28 @@ namespace sim_lib
 	using vec3 = matrix_math::mat<3, 1, float>;
 	using mat3 = matrix_math::mat<3, 3, float>;
 
-	template<typename T, int N>
-	static void convert(std::vector<matrix_math::mat<N, 1, T>>& out, const std::vector<std::array<T, N>>& in)
+	namespace solver_data_update
 	{
-		out.resize(in.size());
-		for (int i = 0; i < in.size(); i++)
+		struct convert
 		{
-			for (int j = 0; j < N; j++)
+			template<typename T, int N>
+			static void apply(std::vector<matrix_math::mat<N, 1, T>>& out, const std::vector<std::array<T, N>>& in)
 			{
-				out[i](j) = in[i][j];
+				out.resize(in.size());
+				for (int i = 0; i < in.size(); i++)
+				{
+					for (int j = 0; j < N; j++)
+					{
+						out[i](j) = in[i][j];
+					}
+				}
+
 			}
-		}
+		};
 
 	}
+
+
 
 
 	class solver
@@ -47,7 +56,7 @@ namespace sim_lib
 			clumsy_lib::Down_Stream_Datas<var_list> down_stream(change_status);
 			if (down_stream.is_changed<var::positions>())
 			{
-				convert(m_datas.get_ref<var::positions>(), data.get_ref<sim_data::positions>());
+				solver_data_update::convert::apply(m_datas.get_ref<var::positions>(), data.get_ref<sim_data::positions>());
 			}
 		}
 
@@ -83,7 +92,7 @@ namespace sim_lib
 
 		struct var
 		{
-			CE_ADD_FIELD(positions, std::vector<vec3>);
+			CE_ADD_NODE(positions, CE_TYPE(std::vector<vec3>) CE_FIELD(update_fn,solver_data_update::convert) CE_FIELD(deps,clumsy_lib::type_list<sim_data::positions>));
 
 		};
 
