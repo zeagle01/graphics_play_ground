@@ -65,6 +65,12 @@ namespace sim_lib
 
 		void step()
 		{
+			clumsy_lib::Down_Stream_Datas<var_list> change_checker(m_propagator.get_all_change_status());
+			if (change_checker.is_changed<sim_data::solver>())
+			{
+
+			}
+
 			m_solver->update_data(m_datas, m_propagator.get_all_change_status());
 
 			m_propagator.clear_all_changes();
