@@ -8,6 +8,7 @@
 #include <typeindex>
 #include <unordered_map>
 #include <set>
+#include <memory>
 
 namespace clumsy_lib
 {
@@ -190,5 +191,103 @@ namespace clumsy_lib
 	};
 
 
+	struct empty {};
+
+	template<typename T>
+	struct default_get_dep_update_fn
+	{
+		
+		template<typename U>
+		static auto apply()
+		{
+			if constexpr (requires{typename U::dep_update_fn; })
+			{
+				return typename U::dep_update_fn{};
+			}
+			else
+			{
+				return empty{};
+			}
+		}
+		using type = decltype(apply<T>());
+
+	};
+	
+
+	template<typename var_list, 
+		template<typename> typename get_deps = default_get_deps,
+		template<typename> typename get_dep_update_fn = default_get_dep_update_fn
+	>
+	class dependent_updater
+	{
+	public:
+		template<typename obj_t,typename upstream_obj_t>
+		void apply(obj_t& obj, const upstream_obj_t& upstream_obj, const change_status_t& changes)
+		{
+			m_change_status = std::make_unique<Down_Stream_Datas<var_list>>(changes);
+
+			For_Each_Type<var_list>::apply<update>(obj, upstream_obj);
+
+		}
+	private:
+
+		struct update
+		{
+			template<typename Var_Name, typename obj_t, typename upstream_obj_t>
+			static void apply(obj_t& obj, const upstream_obj_t& upstream_obj)
+			{
+				recurse_update_upstream<Var_Name, typename get_deps<Var_Name>::type>::apply(obj, upstream_obj);
+			}
+
+
+			template<typename var,typename dep_list>
+			struct recurse_update_upstream;
+
+			template<typename var, typename ...dep>
+			struct recurse_update_upstream <var, type_list< dep...>>
+			{
+
+				template<typename obj_t, typename upstream_obj_t>
+				static void apply(obj_t& obj, const upstream_obj_t& upstream_obj)
+				{
+					bool any_changed = false;
+					any_changed = (m_change_status->is_changed<dep>() || ...);
+					if (any_changed)
+					{
+						(recurse_update_upstream<dep, typename get_deps<dep>::type>::apply(obj, upstream_obj), ...);
+					}
+					else
+					{
+						using update_fn = get_dep_update_fn<var>::type;
+						if constexpr (!std::is_same_v<update_fn, empty>)
+						{
+							update_fn::apply(get_data<var>(obj, upstream_obj), get_data<dep>(obj, upstream_obj)...);
+						}
+					}
+
+				}
+
+				template<typename var, typename obj_t, typename upstream_obj_t>
+				static auto& get_data(obj_t& obj, const upstream_obj_t& upstream_obj)
+				{
+					if constexpr (Type_In_List<var, var_list>)
+					{
+						return obj.template get_ref<var>();
+					}
+					else
+					{
+						return upstream_obj.template get_ref<var>();
+					}
+				}
+
+			};
+
+
+		};
+
+		using change_status_ptr = std::unique_ptr<Down_Stream_Datas<var_list>>;
+		change_status_ptr m_change_status;
+
+	};
 
 }
