@@ -13,4 +13,9 @@ namespace sim_lib
 		m_imp.step();
 	}
 
+	void simulator::init()
+	{
+		m_imp.init();
+	}
+
 }

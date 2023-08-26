@@ -2,8 +2,11 @@
 module;
 
 #include "clumsy_lib/static_type_map.h"
-#include "clumsy_lib/field_defines.h"
 #include "clumsy_lib/class_reflection.h"
+#include "clumsy_lib/dependent_propagator.h"
+
+#include "clumsy_lib/field_defines.h"
+
 #include "matrix_math/matrix_math.h"
 
 #include <cmath>
@@ -38,9 +41,14 @@ namespace sim_lib
 	{
 	public:
 		template<typename data_holder>
-		void update_data(const data_holder& data)
+		void update_data(const data_holder& data, const clumsy_lib::change_status_t& change_status)
 		{
-			convert(m_datas.get_ref<var::positions>(), data.get_ref<sim_data::positions>());
+
+			clumsy_lib::Down_Stream_Datas<var_list> down_stream(change_status);
+			if (down_stream.is_changed<var::positions>())
+			{
+				convert(m_datas.get_ref<var::positions>(), data.get_ref<sim_data::positions>());
+			}
 		}
 
 		void solve()
@@ -65,6 +73,12 @@ namespace sim_lib
 			return m_datas.get_ref<var::positions>();
 		}
 
+
+		clumsy_lib::adj_list_t compute_dep_graph()
+		{
+			return clumsy_lib::Dependent_Graph::build<var_list>();
+		}
+
 	private:
 
 		struct var
@@ -72,6 +86,7 @@ namespace sim_lib
 			CE_ADD_FIELD(positions, std::vector<vec3>);
 
 		};
+
 		using var_list = clumsy_lib::extract_member_type_list_t<var>;
 		clumsy_lib::Static_Type_Map<var_list> m_datas;
 

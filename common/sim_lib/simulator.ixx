@@ -27,7 +27,9 @@ namespace sim_lib
 			return m_imp.get<var>();
 		}
 
+		void init();
 		void step();
+
 
 	private:
 		simulator_imp m_imp;

@@ -69,6 +69,7 @@ int main()
 	std::vector<sim_lib::int3> sim_tris;
 	convert_to_sim_data(sim_tris, indices);
 
+	sim.init();
 	sim.set<sim_lib::sim_data::positions>(sim_pos);
 	sim.set<sim_lib::sim_data::triangles>(sim_tris);
 

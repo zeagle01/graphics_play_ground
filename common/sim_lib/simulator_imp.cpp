@@ -3,6 +3,7 @@ module;
 
 #include "clumsy_lib/static_type_map.h"
 #include "clumsy_lib/class_reflection.h"
+#include "clumsy_lib/dependent_propagator.h"
 
 #include "matrix_math/matrix_math.h"
 
@@ -34,10 +35,25 @@ namespace sim_lib
 	{
 	public:
 
+		void init()
+		{
+			if (!m_solver)
+			{
+				//TODO: get_instace<enum,base_class>(enum_value);
+				m_solver = std::make_unique<solver>();
+
+				auto solver_deps = m_solver->compute_dep_graph();
+				auto sim_deps = clumsy_lib::Dependent_Graph::build<var_list>();
+				auto all_deps = clumsy_lib::Dependent_Graph::merge(sim_deps, solver_deps);
+				m_propagator.set_dependent_graph(all_deps);
+			}
+		}
+
 		template<typename var>
 		void set(typename const var::type& data)
 		{
 			m_datas.get_ref<var>() = data;
+			m_propagator.touch<var>();
 		}
 
 		template<typename var>
@@ -49,13 +65,7 @@ namespace sim_lib
 
 		void step()
 		{
-			//TODO: get_instace<enum,base_class>(enum_value);
-			if (!m_solver)
-			{
-				m_solver = std::make_unique<solver>();
-			}
-
-			m_solver->update_data(m_datas);
+			m_solver->update_data(m_datas, m_propagator.get_all_change_status());
 			m_solver->solve();
 			convert(m_datas.get_ref<sim_data::positions>(), m_solver->get_result());
 		}
@@ -63,6 +73,9 @@ namespace sim_lib
 	private:
 		using var_list = clumsy_lib::extract_member_type_list_t<sim_data>;
 		clumsy_lib::Static_Type_Map<var_list> m_datas;
+
+		clumsy_lib::Dependent_Propagator<var_list> m_propagator;
+		clumsy_lib::adj_list_t m_dep_graph;
 
 		std::unique_ptr<solver> m_solver;
 
