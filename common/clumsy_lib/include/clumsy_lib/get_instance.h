@@ -13,6 +13,9 @@ namespace clumsy_lib															\
 	{																			\
 		return std::make_unique<derived_t>();									\
 	}																			\
+																				\
+	template<>																	\
+	template<> constexpr bool creator<base_t>::check<enum_v>() { return true; }					\
 }																				\
 
 namespace clumsy_lib
@@ -23,6 +26,9 @@ namespace clumsy_lib
 	{
 		template<auto enum_v>
 		static std::unique_ptr<base_t> apply();
+
+		template<auto enum_v>
+		static constexpr bool check() { return false; }
 	};
 
 	struct get_instance
@@ -44,7 +50,11 @@ namespace clumsy_lib
 			{
 				if (static_cast<int>(v) == I)
 				{
-					ret = creator<base_t>::template apply< static_cast<enum_t>(I) >();
+					constexpr enum_t enum_v = static_cast<enum_t>(I);
+					if constexpr (creator<base_t>::template check<enum_v>())
+					{
+						ret = creator<base_t>::template apply<enum_v>();
+					}
 				}
 			}
 		};
