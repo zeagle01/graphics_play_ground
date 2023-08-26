@@ -3,12 +3,13 @@ cmake_minimum_required(VERSION 3.26)
 
 project(sim_lib)
 
-set(partion_files
+set(partition_files
 	simulator_imp.cpp
+	solver.cpp
 )
 
 add_library(sim_lib  
-	${partion_files}
+	${partition_files}
 	simulator.cpp
 )
 
@@ -38,7 +39,7 @@ target_sources(sim_lib PUBLIC
 	sim_data.ixx 
 )
 
-set_source_files_properties(${partion_files} PROPERTIES COMPILE_FLAGS "/internalPartition")
+set_source_files_properties(${partition_files} PROPERTIES COMPILE_FLAGS "/internalPartition")
 
 ### moduel support end
 
@@ -49,4 +50,7 @@ target_link_libraries(sim_lib PRIVATE ce_log)
 
 ########## clumsy_lib
 target_link_libraries(sim_lib PRIVATE clumsy_lib)
+
+########## matrix_math
+target_link_libraries(sim_lib PRIVATE matrix_math)
 
