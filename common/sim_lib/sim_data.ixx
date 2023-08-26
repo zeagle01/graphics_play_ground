@@ -42,8 +42,16 @@ namespace sim_lib
 		float3 velocity;
 	};
 
+	export enum class solver_type
+	{
+		Newton,
+		Explicit,
+	};
+
 	export struct sim_data
 	{
+		CE_ADD_NODE(solver, CE_TYPE(solver_type));
+
 		CE_ADD_NODE(positions, CE_TYPE(std::vector<float3>));
 		CE_ADD_NODE(triangles, CE_TYPE(std::vector<int3>));
 

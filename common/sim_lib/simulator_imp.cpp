@@ -49,16 +49,22 @@ namespace sim_lib
 
 		void step()
 		{
-			m_solver.update_data(m_datas);
-			m_solver.solve();
-			convert(m_datas.get_ref<sim_data::positions>(), m_solver.get_result());
+			//TODO: get_instace<enum,base_class>(enum_value);
+			if (!m_solver)
+			{
+				m_solver = std::make_unique<solver>();
+			}
+
+			m_solver->update_data(m_datas);
+			m_solver->solve();
+			convert(m_datas.get_ref<sim_data::positions>(), m_solver->get_result());
 		}
 
 	private:
 		using var_list = clumsy_lib::extract_member_type_list_t<sim_data>;
 		clumsy_lib::Static_Type_Map<var_list> m_datas;
 
-		solver m_solver;
+		std::unique_ptr<solver> m_solver;
 
 	};
 }

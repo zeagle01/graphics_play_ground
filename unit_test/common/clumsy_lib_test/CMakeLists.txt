@@ -6,17 +6,18 @@ project(clumsy_lib_test)
 
 
 add_executable(clumsy_lib_test  
-main.cpp
-type_list_test.cpp
-macro_loop_test.cpp
-type_map_test.cpp
-class_reflection_test.cpp
-static_loop_test.cpp
-static_type_map_test.cpp
-dynamic_type_map_test.cpp
-morphysm_test.cpp
-special_fied_type_map_test.cpp
-weak_ptr_test.cpp
+	main.cpp
+	type_list_test.cpp
+	macro_loop_test.cpp
+	type_map_test.cpp
+	class_reflection_test.cpp
+	static_loop_test.cpp
+	static_type_map_test.cpp
+	dynamic_type_map_test.cpp
+	morphysm_test.cpp
+	special_fied_type_map_test.cpp
+	weak_ptr_test.cpp
+	dependent_propagator_test.cpp
 )
 
 

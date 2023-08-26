@@ -9,7 +9,7 @@ namespace clumsy_lib
 {
 
 	template<typename ...P>
-	struct type_list;
+	struct type_list {};
 
 
 	//front
