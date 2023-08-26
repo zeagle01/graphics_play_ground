@@ -1,11 +1,12 @@
 
 module;
 
-#include "clumsy_lib/dynamic_type_map.h" 
-#include "clumsy_lib/type_map.h" 
+#include "clumsy_lib/static_type_map.h"
+#include "clumsy_lib/class_reflection.h"
 
 #include <algorithm>
 #include <cmath>
+#include <array>
 
 
 module sim_lib : simulator_imp;
@@ -18,10 +19,6 @@ namespace sim_lib
 	class simulator_imp
 	{
 	public:
-		simulator_imp()
-		{
-			m_datas.add_or_replace<sim_data::positions>();
-		}
 
 		template<typename var>
 		void set(typename const var::type& data)
@@ -44,18 +41,20 @@ namespace sim_lib
 			float freq = 1.0f;
 			float step = 0.01f;
 
-			int vNum = pos.size() / 3;
+			int vNum = pos.size();
 			for (int i = 0; i < vNum; i++)
 			{
-				pos[i * 3 + 0] += amp * std::sin(t * freq);
+				pos[i][0] += amp * std::sin(t * freq);
 			}
 
 			t += step;
 		}
 
 	private:
-		clumsy_lib::dynamic_type_map m_datas;
+		using var_list = clumsy_lib::extract_member_type_list_t<sim_data>;
+		clumsy_lib::Static_Type_Map<var_list> m_datas;
 
 		float t = 0.f;
+
 	};
 }
