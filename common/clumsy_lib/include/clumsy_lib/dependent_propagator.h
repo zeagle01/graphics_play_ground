@@ -132,6 +132,12 @@ namespace clumsy_lib
 
 	};
 
+	template<typename name>
+	static bool check_is_changed(const change_status_t& is_changed)
+	{
+		return is_changed.at(std::type_index(typeid(name)));
+	}
+
 	template<typename list >
 	class Dependent_Propagator
 	{
@@ -222,72 +228,71 @@ namespace clumsy_lib
 	{
 	public:
 		template<typename obj_t,typename upstream_obj_t>
-		void apply(obj_t& obj, const upstream_obj_t& upstream_obj, const change_status_t& changes)
+		static void apply(obj_t& obj, const upstream_obj_t& upstream_obj, const change_status_t& changes)
 		{
-			m_change_status = std::make_unique<Down_Stream_Datas<var_list>>(changes);
-
-			For_Each_Type<var_list>::apply<update>(obj, upstream_obj);
+			s_changes = changes;
+			For_Each_Type<var_list>::apply<update_each>(obj, upstream_obj);
 
 		}
 	private:
 
-		struct update
+		struct update_each
 		{
 			template<typename Var_Name, typename obj_t, typename upstream_obj_t>
 			static void apply(obj_t& obj, const upstream_obj_t& upstream_obj)
 			{
-				recurse_update_upstream<Var_Name, typename get_deps<Var_Name>::type>::apply(obj, upstream_obj);
+				recurse_update_upstream<Var_Name, typename get_deps<Var_Name>::type>::apply(obj, upstream_obj );
 			}
-
-
-			template<typename var,typename dep_list>
-			struct recurse_update_upstream;
-
-			template<typename var, typename ...dep>
-			struct recurse_update_upstream <var, type_list< dep...>>
-			{
-
-				template<typename obj_t, typename upstream_obj_t>
-				static void apply(obj_t& obj, const upstream_obj_t& upstream_obj)
-				{
-					bool any_changed = false;
-					any_changed = (m_change_status->is_changed<dep>() || ...);
-					if (any_changed)
-					{
-						(recurse_update_upstream<dep, typename get_deps<dep>::type>::apply(obj, upstream_obj), ...);
-					}
-					else
-					{
-						using update_fn = get_dep_update_fn<var>::type;
-						if constexpr (!std::is_same_v<update_fn, empty>)
-						{
-							update_fn::apply(get_data<var>(obj, upstream_obj), get_data<dep>(obj, upstream_obj)...);
-						}
-					}
-
-				}
-
-				template<typename var, typename obj_t, typename upstream_obj_t>
-				static auto& get_data(obj_t& obj, const upstream_obj_t& upstream_obj)
-				{
-					if constexpr (Type_In_List<var, var_list>)
-					{
-						return obj.template get_ref<var>();
-					}
-					else
-					{
-						return upstream_obj.template get_ref<var>();
-					}
-				}
-
-			};
-
 
 		};
 
-		using change_status_ptr = std::unique_ptr<Down_Stream_Datas<var_list>>;
-		change_status_ptr m_change_status;
+		template<typename var, typename dep_list>
+		struct recurse_update_upstream;
 
+		template<typename var, typename ...dep>
+		struct recurse_update_upstream <var, type_list< dep...>>
+		{
+
+			template<typename obj_t, typename upstream_obj_t>
+			static void apply(obj_t& obj, const upstream_obj_t& upstream_obj )
+			{
+				bool any_changed = false;
+				any_changed = (check_is_changed<dep>(s_changes) || ...);
+
+				if (any_changed)
+				{
+					(recurse_update_upstream<dep, typename get_deps<dep>::type>::apply(obj, upstream_obj ), ...);
+				}
+
+				if (check_is_changed<var>(s_changes))
+				{
+					using update_fn = get_dep_update_fn<var>::type;
+
+					if constexpr (!std::is_same_v<update_fn, empty>)
+					{
+						update_fn::apply(get_data<var>(obj, upstream_obj), get_data<dep>(obj, upstream_obj)...);
+					}
+					s_changes[std::type_index(typeid(var))] = false;
+				}
+
+			}
+
+			template<typename var, typename obj_t, typename upstream_obj_t>
+			static auto& get_data(obj_t& obj, const upstream_obj_t& upstream_obj)
+			{
+				if constexpr (Type_In_List<var, var_list>)
+				{
+					return obj.template get_ref<var>();
+				}
+				else
+				{
+					return upstream_obj.template get_ref<var>();
+				}
+			}
+
+		};
+
+		static inline change_status_t s_changes = {};
 	};
 
 }

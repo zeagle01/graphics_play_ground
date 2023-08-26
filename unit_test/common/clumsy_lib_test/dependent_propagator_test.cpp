@@ -110,10 +110,7 @@ namespace dependent_propagator_test
 		using  down_stream_list = extract_member_type_list_t<down_stream_datas>;
 		Down_Stream_Datas<down_stream_list> down_stream(m_up_stream.get_all_change_status());
 
-		dependent_updater<down_stream_list> updater;
-
-
-		updater.apply(obj, upstream_obj, m_up_stream.get_all_change_status());
+		dependent_updater<down_stream_list>::apply(obj, upstream_obj, m_up_stream.get_all_change_status());
 
 		EXPECT_THAT(obj.get_ref<down_stream_datas::C>(),Eq(exp));
 	}

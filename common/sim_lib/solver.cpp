@@ -52,12 +52,7 @@ namespace sim_lib
 		template<typename data_holder>
 		void update_data(const data_holder& data, const clumsy_lib::change_status_t& change_status)
 		{
-
-			clumsy_lib::Down_Stream_Datas<var_list> down_stream(change_status);
-			if (down_stream.is_changed<var::positions>())
-			{
-				solver_data_update::convert::apply(m_datas.get_ref<var::positions>(), data.get_ref<sim_data::positions>());
-			}
+			clumsy_lib::dependent_updater<var_list>::apply(m_datas, data, change_status);
 		}
 
 		void solve()
@@ -90,9 +85,13 @@ namespace sim_lib
 
 	private:
 
+#define CE_SOLVER_DATA(name,type,update_fn,dep_list,tag_list) CE_ADD_NODE(name, CE_TYPE(type) CE_FIELD(dep_update_fn,update_fn) CE_FIELD(deps,dep_list) CE_FIELD(tags,tag_list))
+
+		template<typename ...T>
+		using tl = clumsy_lib::type_list<T...>;
 		struct var
 		{
-			CE_ADD_NODE(positions, CE_TYPE(std::vector<vec3>) CE_FIELD(update_fn,solver_data_update::convert) CE_FIELD(deps,clumsy_lib::type_list<sim_data::positions>));
+			CE_SOLVER_DATA(positions,		std::vector<vec3>,		solver_data_update::convert, tl<sim_data::positions>,	tl<>)
 
 		};
 
