@@ -4,6 +4,8 @@ module;
 #include "clumsy_lib/static_type_map.h"
 #include "clumsy_lib/class_reflection.h"
 #include "clumsy_lib/dependent_propagator.h"
+#include "clumsy_lib/get_instance.h"
+#include "clumsy_lib/morphysm.h"
 
 #include "matrix_math/matrix_math.h"
 
@@ -12,6 +14,10 @@ module sim_lib : simulator_imp;
 
 import :sim_data;
 import :solver;
+
+
+using namespace sim_lib;
+REGISTER_INSTANCE_FACTORY(solver_base, dummy, solver_type::Dummy);
 
 namespace sim_lib
 {
@@ -35,18 +41,12 @@ namespace sim_lib
 	{
 	public:
 
-		void init()
-		{
-			if (!m_solver)
-			{
-				//TODO: get_instace<enum,base_class>(enum_value);
-				m_solver = std::make_unique<solver>();
+		void init() 
+		{ 
+			m_sim_deps = clumsy_lib::Dependent_Graph::build<var_list>();
+			m_propagator.set_dependent_graph(m_sim_deps);
 
-				auto solver_deps = m_solver->compute_dep_graph();
-				auto sim_deps = clumsy_lib::Dependent_Graph::build<var_list>();
-				auto all_deps = clumsy_lib::Dependent_Graph::merge(sim_deps, solver_deps);
-				m_propagator.set_dependent_graph(all_deps);
-			}
+			m_solver.register_sub_type<dummy>(solver_type::Dummy);
 		}
 
 		template<typename var>
@@ -66,9 +66,15 @@ namespace sim_lib
 		void step()
 		{
 			clumsy_lib::Down_Stream_Datas<var_list> change_checker(m_propagator.get_all_change_status());
+
 			if (change_checker.is_changed<sim_data::solver>())
 			{
+				m_solver.shift(m_datas.get_ref<sim_data::solver>());
 
+				auto solver_deps = m_solver->compute_dep_graph();
+				auto all_deps = clumsy_lib::Dependent_Graph::merge(m_sim_deps, solver_deps);
+				m_propagator.set_dependent_graph(all_deps);
+				m_propagator.set_all_changes();
 			}
 
 			m_solver->update_data(m_datas, m_propagator.get_all_change_status());
@@ -85,9 +91,10 @@ namespace sim_lib
 		clumsy_lib::Static_Type_Map<var_list> m_datas;
 
 		clumsy_lib::Dependent_Propagator<var_list> m_propagator;
-		clumsy_lib::adj_list_t m_dep_graph;
+		clumsy_lib::adj_list_t m_sim_deps;
 
-		std::unique_ptr<solver> m_solver;
+		clumsy_lib::Morphysm<solver_base,solver_type> m_solver;
 
 	};
 }
+

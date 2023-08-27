@@ -23,8 +23,10 @@ namespace get_instance_test
 
 	};
 
+
 }
 using namespace get_instance_test;
 
-REGISTER_INSTANCE_FACTORY(my_interface,imp_A,data_type::A)
-REGISTER_INSTANCE_FACTORY(my_interface,imp_B,data_type::B)
+REGISTER_INSTANCE_FACTORY(my_interface, imp_A, data_type::A)
+REGISTER_INSTANCE_FACTORY(my_interface, imp_B, data_type::B)
+

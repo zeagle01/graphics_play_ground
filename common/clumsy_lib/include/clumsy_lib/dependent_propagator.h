@@ -177,6 +177,14 @@ namespace clumsy_lib
 			}
 		}
 
+		void set_all_changes()
+		{
+			for (auto& c : m_is_changed)
+			{
+				c.second = true;
+			}
+		}
+
 	private:
 		change_status_t m_is_changed;
 		adj_list_t m_down_streams;

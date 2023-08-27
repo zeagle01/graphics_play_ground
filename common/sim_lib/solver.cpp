@@ -6,6 +6,7 @@ module;
 #include "clumsy_lib/dependent_propagator.h"
 
 #include "clumsy_lib/field_defines.h"
+#include "clumsy_lib/get_instance.h"
 
 #include "matrix_math/matrix_math.h"
 
@@ -44,18 +45,37 @@ namespace sim_lib
 	}
 
 
+	using var_list = clumsy_lib::extract_member_type_list_t<sim_data>;
+	using simulator_datas_t = clumsy_lib::Static_Type_Map<var_list>;
 
-
-	class solver
+	class solver_base
 	{
+
 	public:
-		template<typename data_holder>
-		void update_data(const data_holder& data, const clumsy_lib::change_status_t& change_status)
+
+		virtual void update_data(const simulator_datas_t& sim_datas, const clumsy_lib::change_status_t& change_status) = 0;
+
+		virtual void solve() = 0;
+
+		virtual const std::vector<vec3>& get_result() const = 0;
+
+		virtual clumsy_lib::adj_list_t compute_dep_graph()
 		{
-			clumsy_lib::dependent_updater<var_list>::apply(m_datas, data, change_status);
+			return {};
 		}
 
-		void solve()
+	};
+
+
+	class dummy :public solver_base
+	{
+	public:
+		void update_data(const simulator_datas_t& sim_datas, const clumsy_lib::change_status_t& change_status) override
+		{
+			clumsy_lib::dependent_updater<var_list>::apply(m_datas, sim_datas, change_status);
+		}
+
+		void solve() override
 		{
 			float amp = 0.01f;
 			float freq = 1.0f;
@@ -72,13 +92,13 @@ namespace sim_lib
 
 		}
 
-		const std::vector<vec3>& get_result() const
+		const std::vector<vec3>& get_result() const override
 		{
 			return m_datas.get_ref<var::positions>();
 		}
 
 
-		clumsy_lib::adj_list_t compute_dep_graph()
+		clumsy_lib::adj_list_t compute_dep_graph() override
 		{
 			return clumsy_lib::Dependent_Graph::build<var_list>();
 		}
@@ -101,4 +121,8 @@ namespace sim_lib
 		float t = 0.f;
 	};
 
+
+
+
 }
+

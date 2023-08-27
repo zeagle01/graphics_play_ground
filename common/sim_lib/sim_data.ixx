@@ -44,6 +44,7 @@ namespace sim_lib
 
 	export enum class solver_type
 	{
+		Dummy,
 		Newton,
 		Explicit,
 	};

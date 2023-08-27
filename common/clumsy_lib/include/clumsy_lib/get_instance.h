@@ -8,27 +8,21 @@
 #define REGISTER_INSTANCE_FACTORY( base_t,derived_t,enum_v)						\
 namespace clumsy_lib															\
 {																				\
-	template<>																	\
-	template<> std::unique_ptr<base_t> creator<base_t>::apply<enum_v>()			\
-	{																			\
-		return std::make_unique<derived_t>();									\
-	}																			\
-																				\
-	template<>																	\
-	template<> constexpr bool creator<base_t>::check<enum_v>() { return true; }					\
+		template<> std::unique_ptr<base_t> creator::apply<base_t, enum_v>()			\
+		{																			\
+			return std::make_unique<derived_t>();									\
+		}																			\
+\
+		template std::unique_ptr<base_t> creator::apply<base_t, enum_v>();			\
 }																				\
 
 namespace clumsy_lib
 {
 
-
-	template<typename base_t> struct creator
+	struct creator
 	{
-		template<auto enum_v>
+		template<typename base_t, auto enum_v>
 		static std::unique_ptr<base_t> apply();
-
-		template<auto enum_v>
-		static constexpr bool check() { return false; }
 	};
 
 	struct get_instance
@@ -51,9 +45,9 @@ namespace clumsy_lib
 				if (static_cast<int>(v) == I)
 				{
 					constexpr enum_t enum_v = static_cast<enum_t>(I);
-					if constexpr (creator<base_t>::template check<enum_v>())
+					//if constexpr (creator::template check<base_t, enum_v>())
 					{
-						ret = creator<base_t>::template apply<enum_v>();
+						ret = creator::template apply<base_t, enum_v>();
 					}
 				}
 			}
