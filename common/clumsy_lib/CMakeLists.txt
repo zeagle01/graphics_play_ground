@@ -21,7 +21,6 @@ include/clumsy_lib/field_defines.h
 include/clumsy_lib/morphysm.h
 include/clumsy_lib/type_getter.h
 include/clumsy_lib/weak_ptr.h
-include/clumsy_lib/get_instance.h
 clumsy_lib.cpp
 )
 

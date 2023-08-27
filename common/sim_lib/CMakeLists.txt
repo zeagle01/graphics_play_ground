@@ -6,6 +6,8 @@ project(sim_lib)
 set(partition_files
 	simulator_imp.cpp
 	solver.cpp
+	solver_data_update.cpp
+	solver_dummy.cpp
 )
 
 add_library(sim_lib  

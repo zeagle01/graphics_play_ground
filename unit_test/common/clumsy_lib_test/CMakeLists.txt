@@ -18,9 +18,6 @@ add_executable(clumsy_lib_test
 	special_fied_type_map_test.cpp
 	weak_ptr_test.cpp
 	dependent_propagator_test.cpp
-	get_instance_test.cpp
-		classes_for_get_instance.h
-		classes_for_get_instance.cpp
 )
 
 

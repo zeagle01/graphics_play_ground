@@ -4,7 +4,6 @@ module;
 #include "clumsy_lib/static_type_map.h"
 #include "clumsy_lib/class_reflection.h"
 #include "clumsy_lib/dependent_propagator.h"
-#include "clumsy_lib/get_instance.h"
 #include "clumsy_lib/morphysm.h"
 
 #include "matrix_math/matrix_math.h"
@@ -14,14 +13,11 @@ module sim_lib : simulator_imp;
 
 import :sim_data;
 import :solver;
+import :solver_dummy;
 
-
-using namespace sim_lib;
-REGISTER_INSTANCE_FACTORY(solver_base, dummy, solver_type::Dummy);
 
 namespace sim_lib
 {
-
 
 	template<typename T, int N>
 	static void convert(std::vector<std::array<T, N>>& out, const std::vector<matrix_math::mat<N, 1, T>>& in)
