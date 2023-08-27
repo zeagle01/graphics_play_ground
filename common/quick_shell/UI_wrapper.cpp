@@ -23,12 +23,14 @@ namespace quick_shell
 	{
 	public:
 		template<typename  ui_com>
-		void add_ui_component(const std::string& name, typename ui_com::type& value, const typename ui_com::extra_data& extra_d)
+		void add_ui_component(const std::string& name, typename ui_com::type& value, const typename ui_com::extra_data& extra_d,
+			std::function<void(const typename ui_com::type&)> call_back)
 		{
 			ui_component_imp<ui_com> ui_com_obj;
 			ui_com_obj.name = name;
 			ui_com_obj.value = &value;
 			ui_com_obj.extra = extra_d;
+			ui_com_obj.call_back = call_back;
 
 			m_connects.push_back(ui_com_obj);
 		}

@@ -6,6 +6,7 @@ module;
 #include "imgui_impl_opengl3.h"
 
 #include <string>
+#include <functional>
 
 module quick_shell:ui_component_imp;
 
@@ -22,15 +23,23 @@ namespace quick_shell
 		std::string name;
 		typename ui_com::type* value;
 		typename ui_com::extra_data extra;
+		std::function<void(const typename ui_com::type&)> call_back;
 	};
 
 
 #define DEF_UI_COMPONENT_IMP(ui_com,...)									\
 template<> struct ui_component_imp<ui_com> : value_and_extra_data<ui_com>	\
 {																			\
-	bool operator()()														\
+	bool update_value()														\
 	{																		\
-		__VA_ARGS__															\
+		__VA_ARGS__;														\
+	}																		\
+	void operator()()														\
+	{																		\
+		if(update_value()&&call_back)										\
+		{																	\
+			call_back(*value);												\
+		}																	\
 	}																		\
 };																			\
 

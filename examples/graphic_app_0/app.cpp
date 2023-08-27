@@ -45,6 +45,14 @@ void App::run()
 
 	init_sim();
 
+	auto animation_fn = [&]()
+		{
+			sim.step();
+			convert_from_sim_data(pos, sim.get<sim_lib::sim_data::positions>());
+		};
+
+	m.register_frame_update_fn(animation_fn);
+
 	auto render_fn = [&]
 		{
 			renderer.draw_triangles(indices.data(), pos.data(), indices.size() / 3, pos.size() / 3);
@@ -53,7 +61,14 @@ void App::run()
 	// update fn
 	m.register_frame_update_fn(render_fn);
 
-	m.add_ui_component<ui_component::slider_bar2>("plane_size", m_plane_size, { 0.1,1.5 });
+	m.add_ui_component<ui_component::slider_bar2>("plane_size", m_plane_size, { 0.1,1.5 },
+		[this](const auto& new_v)
+		{
+			make_plane(new_v[0], new_v[1], m_nx, m_ny);
+			init_sim();
+		}
+
+	);
 
 	m.run_event_loop();
 
@@ -63,7 +78,7 @@ void App::make_plane(float lx, float ly, int nx, int ny)
 {
 
 	float dx = lx / nx;
-	float dy = lx / nx;
+	float dy = ly / ny;
 
 	pos.clear();
 	pos.reserve(nx * ny);
@@ -113,7 +128,7 @@ void App::prepare_mesh()
 		1.f,1.f,0.f
 	};
 
-	 make_plane(m_plane_size[0], m_plane_size[1], 50, 50);
+	 make_plane(m_plane_size[0], m_plane_size[1], m_nx, m_ny);
 
 }
 
@@ -133,12 +148,5 @@ void App::init_sim()
 	sim.set<sim_lib::sim_data::triangles>(sim_tris);
 	sim.set<sim_lib::sim_data::obstacle_vert_index>({0});
 
-	auto animation_fn = [&]()
-		{
-			sim.step();
-			convert_from_sim_data(pos, sim.get<sim_lib::sim_data::positions>());
-		};
-
-	m.register_frame_update_fn(animation_fn);
 
 }

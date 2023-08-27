@@ -28,6 +28,8 @@ private:
 	std::vector<float> pos;
 private:
 	std::array<float, 2> m_plane_size{ 0.5f,0.5f };
+	int m_nx = 50;
+	int m_ny = 50;
 
 	quick_shell::main_window m;
 	sim_lib::simulator sim;

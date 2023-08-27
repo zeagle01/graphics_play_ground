@@ -45,15 +45,16 @@ namespace quick_shell
 
 		//ui
 		template<typename  ui_com>
-		void add_ui_component(const std::string& name,  typename ui_com::type& value, const typename ui_com::extra_data& extra_d)
+		void add_ui_component(const std::string& name, typename ui_com::type& value, const typename ui_com::extra_data& extra_d,
+			std::function<void(const typename ui_com::type&)> call_back = nullptr)
 		{
-			m_ui_panel.add_ui_component<ui_com>(name, value, extra_d);
+			m_ui_panel.add_ui_component<ui_com>(name, value, extra_d, call_back);
 		}
 
 		template<typename  ui_com>
 		void add_ui_component(const std::string& name, typename ui_com::type& value)
 		{
-			m_ui_panel.add_ui_component<ui_com>(name, value, no_extra{});
+			m_ui_panel.add_ui_component<ui_com>(name, value, no_extra{}, nullptr);
 		}
 
 	private:
