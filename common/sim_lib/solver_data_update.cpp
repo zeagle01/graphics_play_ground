@@ -11,7 +11,7 @@ namespace sim_lib
 {
 	namespace solver_data_update
 	{
-		struct convert
+		struct assign
 		{
 			template<typename T, int N>
 			static void apply(std::vector<matrix_math::mat<N, 1, T>>& out, const std::vector<std::array<T, N>>& in)
@@ -25,6 +25,12 @@ namespace sim_lib
 					}
 				}
 
+			}
+
+			template<typename T>
+			static void apply(T& out, const T& in)
+			{
+				out = in;
 			}
 		};
 

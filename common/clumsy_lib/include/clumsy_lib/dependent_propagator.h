@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <set>
 #include <memory>
+//#include <iostream>
 
 namespace clumsy_lib
 {
@@ -169,6 +170,11 @@ namespace clumsy_lib
 			return m_is_changed;
 		}
 
+		void propagate()
+		{
+			For_Each_Type<list>::template apply<Touch_If_Changed>(*this);
+		}
+
 		void clear_all_changes()
 		{
 			for (auto& c : m_is_changed)
@@ -189,6 +195,18 @@ namespace clumsy_lib
 		change_status_t m_is_changed;
 		adj_list_t m_down_streams;
 	private:
+		struct Touch_If_Changed
+		{
+			template<typename name,typename Host_Type>
+			static void apply(Host_Type& host)
+			{
+				if (host.is_changed<name>())
+				{
+					host.touch<name>();
+				}
+			}
+
+		};
 
 		void touch_imp(const std::type_index& t)
 		{
@@ -264,23 +282,27 @@ namespace clumsy_lib
 			template<typename obj_t, typename upstream_obj_t>
 			static void apply(obj_t& obj, const upstream_obj_t& upstream_obj )
 			{
-				bool any_changed = false;
-				any_changed = (check_is_changed<dep>(s_changes) || ...);
-
-				if (any_changed)
+				if constexpr (Type_In_List<var, var_list>)
 				{
-					(recurse_update_upstream<dep, typename get_deps<dep>::type>::apply(obj, upstream_obj ), ...);
-				}
+					bool any_changed = false;
+					any_changed = (check_is_changed<dep>(s_changes) || ...);
 
-				if (check_is_changed<var>(s_changes))
-				{
-					using update_fn = get_dep_update_fn<var>::type;
-
-					if constexpr (!std::is_same_v<update_fn, empty>)
+					if (any_changed)
 					{
-						update_fn::apply(get_data<var>(obj, upstream_obj), get_data<dep>(obj, upstream_obj)...);
+						(recurse_update_upstream<dep, typename get_deps<dep>::type>::apply(obj, upstream_obj), ...);
 					}
-					s_changes[std::type_index(typeid(var))] = false;
+
+					if (check_is_changed<var>(s_changes))
+					{
+						using update_fn = get_dep_update_fn<var>::type;
+
+						if constexpr (!std::is_same_v<update_fn, empty>)
+						{
+							update_fn::apply(get_data<var>(obj, upstream_obj), get_data<dep>(obj, upstream_obj)...);
+							//printf("exe %s \n", typeid(update_fn).name());
+						}
+						s_changes[std::type_index(typeid(var))] = false;
+					}
 				}
 
 			}

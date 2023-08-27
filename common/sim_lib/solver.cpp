@@ -7,26 +7,21 @@ module;
 
 #include "clumsy_lib/field_defines.h"
 
-#include "matrix_math/matrix_math.h"
 
 #include <cmath>
 
 module sim_lib:solver;
 
-import :sim_data;
+import :simulator_datas;
 
 import :solver_data_update;
+import :small_mat;
 
 
 namespace sim_lib
 {
-	//
-	using vec3 = matrix_math::mat<3, 1, float>;
-	using mat3 = matrix_math::mat<3, 3, float>;
 
-
-
-	using var_list = clumsy_lib::extract_member_type_list_t<sim_data>;
+	using var_list = clumsy_lib::extract_member_type_list_t<simulator_datas>;
 	using simulator_datas_t = clumsy_lib::Static_Type_Map<var_list>;
 
 	class solver_base

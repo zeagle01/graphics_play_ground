@@ -14,6 +14,7 @@ module;
 module sim_lib : solver_dummy;
 
 import :solver;
+import :simulator_datas;
 
 namespace sim_lib
 {
@@ -62,9 +63,7 @@ namespace sim_lib
 		using tl = clumsy_lib::type_list<T...>;
 		struct var
 		{
-
-			CE_SOLVER_DATA(positions, std::vector<vec3>, solver_data_update::convert, tl<sim_data::positions>, tl<>)
-
+			CE_SOLVER_DATA(positions, std::vector<vec3>, solver_data_update::assign, tl<simulator_datas::positions>, tl<>)
 		};
 
 		using var_list = clumsy_lib::extract_member_type_list_t<var>;

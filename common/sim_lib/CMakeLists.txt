@@ -6,8 +6,12 @@ project(sim_lib)
 set(partition_files
 	simulator_imp.cpp
 	solver.cpp
+	simulator_datas.cpp
 	solver_data_update.cpp
 	solver_dummy.cpp
+	simulator_data_update.cpp
+	struct_functors.cpp
+	small_mat.cpp
 )
 
 add_library(sim_lib  

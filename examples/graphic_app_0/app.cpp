@@ -53,6 +53,8 @@ void App::run()
 	// update fn
 	m.register_frame_update_fn(render_fn);
 
+	m.add_ui_component<ui_component::slider_bar2>("plane_size", m_plane_size, { 0.1,1.5 });
+
 	m.run_event_loop();
 
 }
@@ -111,7 +113,7 @@ void App::prepare_mesh()
 		1.f,1.f,0.f
 	};
 
-	 make_plane(1.f, 1.f, 50, 50);
+	 make_plane(m_plane_size[0], m_plane_size[1], 50, 50);
 
 }
 
