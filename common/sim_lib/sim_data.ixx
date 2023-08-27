@@ -36,7 +36,6 @@ namespace sim_lib
 
 	export struct obstacle_data
 	{
-		int vertex_index;
 		float stiff;
 		float thickness;
 		float3 velocity;
@@ -56,7 +55,7 @@ namespace sim_lib
 		CE_ADD_NODE(positions, CE_TYPE(std::vector<float3>));
 		CE_ADD_NODE(triangles, CE_TYPE(std::vector<int3>));
 
-		CE_ADD_NODE(obstacle, CE_TYPE(std::vector<self_collision_data>));
+		CE_ADD_NODE(obstacle_vert_index, CE_TYPE(std::vector<int>));
 
 		CE_ADD_NODE(stretch, CE_TYPE(std::vector<stretch_data>));
 

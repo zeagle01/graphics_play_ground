@@ -6,6 +6,8 @@ project(graphic_app_0)
 
 add_executable(graphic_app_0  
 	main.cpp
+	app.h
+	app.cpp
 )
 
 set_target_properties(graphic_app_0 PROPERTIES FOLDER examples)
