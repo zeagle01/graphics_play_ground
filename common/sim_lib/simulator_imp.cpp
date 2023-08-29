@@ -48,8 +48,6 @@ namespace sim_lib
 		{
 			get<var>() = data;
 			mark_changed<var>();
-
-			m_interface_data_propagator.touch<var>();
 		}
 
 		template<typename var>

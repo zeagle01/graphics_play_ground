@@ -53,6 +53,10 @@ DEF_UI_COMPONENT_IMP (ui_component::slider_bar2,
 	return ImGui::SliderFloat2(name.c_str(), value->data(), extra.min, extra.max);
 )
 
+DEF_UI_COMPONENT_IMP (ui_component::slider_bar2i,
+	return ImGui::SliderInt2(name.c_str(), value->data(), extra.min, extra.max);
+)
+
 DEF_UI_COMPONENT_IMP (ui_component::slider_bar3,
 	return ImGui::SliderFloat3(name.c_str(), value->data(), extra.min, extra.max);
 )

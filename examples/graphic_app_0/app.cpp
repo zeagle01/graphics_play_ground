@@ -2,6 +2,8 @@
 #include "app.h"
 
 
+
+
 using namespace quick_shell;
 
 template<typename T,int N>
@@ -127,7 +129,7 @@ void App::prepare_mesh()
 		1.f,1.f,0.f
 	};
 
-	 make_plane(m_plane_size[0], m_plane_size[1], m_nx, m_ny);
+	 make_plane(m_plane_size[0], m_plane_size[1], m_plane_resolution[0], m_plane_resolution[1]);
 
 }
 
@@ -166,8 +168,18 @@ void App::update_sim_data()
 	m.add_ui_component<ui_component::slider_bar2>("plane_size", m_plane_size, { 0.1,1.5 },
 		[this](const auto& new_v)
 		{
-			make_plane(new_v[0], new_v[1], m_nx, m_ny);
+			make_plane(new_v[0], new_v[1], m_plane_resolution[0], m_plane_resolution[1]);
 			init_sim_data();
+			m_sim_data_is_valid = sim.commit_all_changes();
+		}
+	);
+
+	m.add_ui_component<ui_component::slider_bar2i>("plane_resolution", m_plane_resolution, { 2,50 },
+		[this](const auto& new_v)
+		{
+			make_plane(m_plane_size[0], m_plane_size[1], new_v[0], new_v[1]);
+			init_sim_data();
+			m_sim_data_is_valid = sim.commit_all_changes();
 		}
 
 	);
