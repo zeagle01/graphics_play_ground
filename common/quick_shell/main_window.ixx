@@ -51,11 +51,21 @@ namespace quick_shell
 			m_ui_panel.add_ui_component<ui_com>(name, value, extra_d, call_back);
 		}
 
+
 		template<typename  ui_com>
 		void add_ui_component(const std::string& name, typename ui_com::type& value)
 		{
 			m_ui_panel.add_ui_component<ui_com>(name, value, no_extra{}, nullptr);
 		}
+
+		template<typename  ui_com>
+		void add_ui_component(const std::string& name)
+		{
+			typename ui_com::type value{};
+			m_ui_panel.add_ui_component<ui_com>(name, value, no_extra{}, nullptr);
+		}
+
+
 
 	private:
 		GLFW_wrapper m_glfwWrapper;
@@ -63,5 +73,6 @@ namespace quick_shell
 		ui_panel m_ui_panel;
 		std::function<void()> m_ui_fn;
 	};
+
 
 }

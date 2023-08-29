@@ -61,6 +61,8 @@ void App::run()
 	// update fn
 	m.register_frame_update_fn(render_fn);
 
+	m.add_ui_component<ui_component::text_line>("draping plane");
+
 	m.add_ui_component<ui_component::slider_bar2>("plane_size", m_plane_size, { 0.1,1.5 },
 		[this](const auto& new_v)
 		{

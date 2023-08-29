@@ -43,7 +43,7 @@ namespace quick_shell
 			ImGui::NewFrame();
 
 			ImGui::Begin("my gui");
-			ImGui::Text("ui components ");
+			//ImGui::Text("ui components ");
 			//ImGui::ShowDemoWindow();
 
 			invoke_slots();
