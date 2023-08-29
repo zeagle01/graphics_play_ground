@@ -18,7 +18,7 @@ import :simulator_datas;
 
 namespace sim_lib
 {
-	class dummy :public solver_base
+	class dummy_solver :public solver_base
 	{
 	public:
 		void update_data(const simulator_datas_t& sim_datas, const clumsy_lib::change_status_t& change_status) override

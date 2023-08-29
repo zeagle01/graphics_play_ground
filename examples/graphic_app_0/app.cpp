@@ -96,7 +96,6 @@ void App::run()
 
 	// update fn
 	m.register_frame_update_fn(fps_fn(update_fn,m_fps));
-	//m.register_frame_update_fn(update_fn);
 
 	update_sim_data();
 

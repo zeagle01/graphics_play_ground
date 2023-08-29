@@ -35,7 +35,7 @@ namespace sim_lib
 
 		void init() 
 		{ 
-			m_solver.register_sub_type<dummy>(solver_type::Dummy);
+			m_solver.register_sub_type<dummy_solver>(solver_type::Dummy);
 
 			auto interface_dep_graph = clumsy_lib::Dependent_Graph::build<interface_var_list>();
 			auto simulator_dep_graph = clumsy_lib::Dependent_Graph::build<simulator_var_list>();
@@ -68,45 +68,6 @@ namespace sim_lib
 			m_interface_data_propagator.touch<var>();
 		}
 
-		struct validator
-		{
-			template<typename T,typename ...U>
-			static void apply(T& me,const U& ...deps)
-			{
-				bool deps_is_all_valid = true;
-				deps_is_all_valid = (deps.is_valid&&...);
-				if (deps_is_all_valid)
-				{
-					me.is_valid = T::validator::apply(me.data, deps.data...);
-
-					//printf(" %s exe validator \n", typeid(T::type).name());
-				}
-				else
-				{
-					me.is_valid = false;
-				}
-			}
-
-		};
-
-		template<typename T>
-		struct get_validator
-		{
-			using type = validator;
-		};
-
-		struct check_interface_data_valid
-		{
-			template<typename var,typename Obj>
-			static void apply(bool& all_data_valid, Obj& obj)
-			{
-				all_data_valid = all_data_valid && obj.get_ref<var>().is_valid;
-				if (!obj.get_ref<var>().is_valid)
-				{
-					printf("invalid %s  \n", typeid(var).name());
-				}
-			}
-		};
 
 		bool commit_all_changes()
 		{
@@ -174,15 +135,57 @@ namespace sim_lib
 
 		}
 
-	struct get_sim_data_ref
-	{
-		template<typename var,typename Obj>
-		static auto& apply(Obj& obj)
+	private:
+		struct validator
 		{
-			return obj.template get_ref<var>().data;
-		}
+			template<typename T,typename ...U>
+			static void apply(T& me,const U& ...deps)
+			{
+				bool deps_is_all_valid = true;
+				deps_is_all_valid = (deps.is_valid&&...);
+				if (deps_is_all_valid)
+				{
+					me.is_valid = T::validator::apply(me.data, deps.data...);
 
-	};
+					//printf(" %s exe validator \n", typeid(T::type).name());
+				}
+				else
+				{
+					me.is_valid = false;
+				}
+			}
+
+		};
+
+		template<typename T>
+		struct get_validator
+		{
+			using type = validator;
+		};
+
+		struct check_interface_data_valid
+		{
+			template<typename var,typename Obj>
+			static void apply(bool& all_data_valid, Obj& obj)
+			{
+				all_data_valid = all_data_valid && obj.get_ref<var>().is_valid;
+				if (!obj.get_ref<var>().is_valid)
+				{
+					printf("invalid %s  \n", typeid(var).name());
+				}
+			}
+		};
+
+	private:
+		struct get_sim_data_ref
+		{
+			template<typename var, typename Obj>
+			static auto& apply(Obj& obj)
+			{
+				return obj.template get_ref<var>().data;
+			}
+
+		};
 
 		void update_data()
 		{
