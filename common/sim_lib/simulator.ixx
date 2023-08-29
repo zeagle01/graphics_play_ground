@@ -16,15 +16,32 @@ namespace sim_lib
 	{
 	public:
 		template<typename var>
-		void set(typename const var::type& data)
+		void set(const auto& data)
 		{
 			m_imp.set<var>(data);
 		}
 
 		template<typename var>
-		const typename var::type& get()
+		const typename auto& get() const
 		{
 			return m_imp.get<var>();
+		}
+
+		template<typename var>
+		typename auto& get()
+		{
+			return m_imp.get<var>();
+		}
+
+		template<typename var>
+		void mark_changed()
+		{
+			return m_imp.mark_changed<var>();
+		}
+
+		[[nodiscard]] bool commit_all_changes()
+		{
+			return m_imp.commit_all_changes();
 		}
 
 		void init();

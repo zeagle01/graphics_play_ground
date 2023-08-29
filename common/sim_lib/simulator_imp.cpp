@@ -1,6 +1,7 @@
 
 module;
 
+
 #include "clumsy_lib/static_type_map.h"
 #include "clumsy_lib/class_reflection.h"
 #include "clumsy_lib/dependent_propagator.h"
@@ -43,16 +44,87 @@ namespace sim_lib
 		}
 
 		template<typename var>
-		void set(typename const var::type& data)
+		void set(const auto& data)
 		{
-			m_interface_datas.get_ref<var>() = data;
+			get<var>() = data;
+			mark_changed<var>();
+
 			m_interface_data_propagator.touch<var>();
 		}
 
 		template<typename var>
-		const typename var::type& get()
+		const typename auto& get() const
 		{
-			return m_interface_datas.get_ref<var>();
+			return m_interface_datas.get_ref<var>().data;
+		}
+
+		template<typename var>
+		typename auto& get()
+		{
+			return m_interface_datas.get_ref<var>().data;
+		}
+
+		template<typename var>
+		void mark_changed()
+		{
+			m_interface_data_propagator.touch<var>();
+		}
+
+		struct validator
+		{
+			template<typename T,typename ...U>
+			static void apply(T& me,const U& ...deps)
+			{
+				bool deps_is_all_valid = true;
+				deps_is_all_valid = (deps.is_valid&&...);
+				if (deps_is_all_valid)
+				{
+					me.is_valid = T::validator::apply(me.data, deps.data...);
+
+					//printf(" %s exe validator \n", typeid(T::type).name());
+				}
+				else
+				{
+					me.is_valid = false;
+				}
+			}
+
+		};
+
+		template<typename T>
+		struct get_validator
+		{
+			using type = validator;
+		};
+
+		struct check_interface_data_valid
+		{
+			template<typename var,typename Obj>
+			static void apply(bool& all_data_valid, Obj& obj)
+			{
+				all_data_valid = all_data_valid && obj.get_ref<var>().is_valid;
+				if (!obj.get_ref<var>().is_valid)
+				{
+					printf("invalid %s  \n", typeid(var).name());
+				}
+			}
+		};
+
+		bool commit_all_changes()
+		{
+			using updater = clumsy_lib::dependent_updater<
+				interface_var_list,
+				clumsy_lib::default_get_deps,
+				get_validator
+			>;
+
+			updater::apply (m_interface_datas, m_interface_datas, m_interface_data_propagator.get_all_change_status());
+
+			bool all_data_valid = true;
+
+			clumsy_lib::For_Each_Type<interface_var_list>::apply<check_interface_data_valid>(all_data_valid, m_interface_datas);
+
+			return all_data_valid;
 		}
 
 
@@ -75,7 +147,7 @@ namespace sim_lib
 			m_solver->solve();
 
 			map_dynamic_positions_back_to_interface_positions::apply(
-				m_interface_datas.get_ref<sim_data::positions>(), m_solver->get_result(),
+				get<sim_data::positions>(), m_solver->get_result(),
 				m_simulator_datas.get_ref<simulator_datas::dynamic_vert_index>()
 			);
 		}
@@ -86,7 +158,7 @@ namespace sim_lib
 			clumsy_lib::Down_Stream_Datas<interface_var_list> change_checker(m_interface_data_propagator.get_all_change_status());
 			if (change_checker.is_changed<sim_data::solver>())
 			{
-				m_solver.shift(m_interface_datas.get_ref<sim_data::solver>());
+				m_solver.shift(get<sim_data::solver>());
 			}
 		}
 
@@ -104,9 +176,26 @@ namespace sim_lib
 
 		}
 
+	struct get_sim_data_ref
+	{
+		template<typename var,typename Obj>
+		static auto& apply(Obj& obj)
+		{
+			return obj.template get_ref<var>().data;
+		}
+
+	};
+
 		void update_data()
 		{
-			clumsy_lib::dependent_updater<simulator_var_list>::apply(m_simulator_datas, m_interface_datas, m_interface_data_propagator.get_all_change_status());
+			clumsy_lib::dependent_updater<simulator_var_list>
+				::apply<
+				clumsy_lib::Static_Type_Map<simulator_var_list>,
+				clumsy_lib::Static_Type_Map<interface_var_list>,
+				clumsy_lib::default_get_data_ref,
+				get_sim_data_ref
+				>
+				(m_simulator_datas, m_interface_datas, m_interface_data_propagator.get_all_change_status());
 		}
 	private:
 

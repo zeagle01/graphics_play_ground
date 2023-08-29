@@ -244,6 +244,16 @@ namespace clumsy_lib
 		using type = decltype(apply<T>());
 
 	};
+
+	struct default_get_data_ref
+	{
+		template<typename var,typename Obj>
+		static auto& apply(Obj& obj)
+		{
+			return obj.template get_ref<var>();
+		}
+
+	};
 	
 
 	template<typename var_list, 
@@ -253,30 +263,31 @@ namespace clumsy_lib
 	class dependent_updater
 	{
 	public:
-		template<typename obj_t,typename upstream_obj_t>
+		template<typename obj_t, typename upstream_obj_t, typename obj_get_data_ref = default_get_data_ref, typename upstream_get_data_ref = default_get_data_ref>
 		static void apply(obj_t& obj, const upstream_obj_t& upstream_obj, const change_status_t& changes)
 		{
 			s_changes = changes;
-			For_Each_Type<var_list>::apply<update_each>(obj, upstream_obj);
+			For_Each_Type<var_list>::apply< update_each<obj_get_data_ref, upstream_get_data_ref> >(obj, upstream_obj);
 
 		}
-	private:
 
+	private:
+		template<typename obj_get_data_ref, typename upstream_get_data_ref >
 		struct update_each
 		{
 			template<typename Var_Name, typename obj_t, typename upstream_obj_t>
 			static void apply(obj_t& obj, const upstream_obj_t& upstream_obj)
 			{
-				recurse_update_upstream<Var_Name, typename get_deps<Var_Name>::type>::apply(obj, upstream_obj );
+				recurse_update_upstream<obj_get_data_ref, upstream_get_data_ref, Var_Name, typename get_deps<Var_Name>::type>::apply(obj, upstream_obj);
 			}
 
 		};
 
-		template<typename var, typename dep_list>
+		template<typename obj_get_data_ref, typename upstream_get_data_ref, typename var, typename dep_list>
 		struct recurse_update_upstream;
 
-		template<typename var, typename ...dep>
-		struct recurse_update_upstream <var, type_list< dep...>>
+		template<typename obj_get_data_ref, typename upstream_get_data_ref, typename var, typename ...dep>
+		struct recurse_update_upstream <obj_get_data_ref, upstream_get_data_ref, var, type_list< dep...>>
 		{
 
 			template<typename obj_t, typename upstream_obj_t>
@@ -289,7 +300,7 @@ namespace clumsy_lib
 
 					if (any_changed)
 					{
-						(recurse_update_upstream<dep, typename get_deps<dep>::type>::apply(obj, upstream_obj), ...);
+						(recurse_update_upstream<obj_get_data_ref, upstream_get_data_ref, dep, typename get_deps<dep>::type>::apply(obj, upstream_obj), ...);
 					}
 
 					if (check_is_changed<var>(s_changes))
@@ -312,11 +323,11 @@ namespace clumsy_lib
 			{
 				if constexpr (Type_In_List<var, var_list>)
 				{
-					return obj.template get_ref<var>();
+					return obj_get_data_ref::apply<var>(obj);
 				}
 				else
 				{
-					return upstream_obj.template get_ref<var>();
+					return upstream_get_data_ref::apply<var>(upstream_obj);
 				}
 			}
 

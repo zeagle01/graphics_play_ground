@@ -61,7 +61,7 @@ namespace quick_shell
 		template<typename  ui_com>
 		void add_ui_component(const std::string& name)
 		{
-			typename ui_com::type value{};
+			static typename ui_com::type value{};
 			m_ui_panel.add_ui_component<ui_com>(name, value, no_extra{}, nullptr);
 		}
 

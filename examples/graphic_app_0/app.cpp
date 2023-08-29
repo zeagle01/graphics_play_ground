@@ -43,12 +43,18 @@ void App::run()
 
 	prepare_mesh();
 
+	m_sim_data_is_str = m_sim_data_is_valid ? "yes" : "no";
+	m.add_ui_component<ui_component::text_line>("sim_data_is_ready", m_sim_data_is_str);
+
 	init_sim();
 
 	auto animation_fn = [&]()
 		{
-			sim.step();
-			convert_from_sim_data(pos, sim.get<sim_lib::sim_data::positions>());
+			if (m_sim_data_is_valid)
+			{
+				sim.step();
+				convert_from_sim_data(pos, sim.get<sim_lib::sim_data::positions>());
+			}
 		};
 
 	m.register_frame_update_fn(animation_fn);
@@ -61,16 +67,7 @@ void App::run()
 	// update fn
 	m.register_frame_update_fn(render_fn);
 
-	m.add_ui_component<ui_component::text_line>("draping plane");
-
-	m.add_ui_component<ui_component::slider_bar2>("plane_size", m_plane_size, { 0.1,1.5 },
-		[this](const auto& new_v)
-		{
-			make_plane(new_v[0], new_v[1], m_nx, m_ny);
-			init_sim();
-		}
-
-	);
+	update_sim_data();
 
 	m.run_event_loop();
 
@@ -134,8 +131,7 @@ void App::prepare_mesh()
 
 }
 
-
-void App::init_sim()
+void App::init_sim_data()
 {
 
 	std::vector<sim_lib::float3> sim_pos;
@@ -144,11 +140,44 @@ void App::init_sim()
 	std::vector<sim_lib::int3> sim_tris;
 	convert_to_sim_data(sim_tris, indices);
 
-	sim.init();
 	sim.set<sim_lib::sim_data::solver>(sim_lib::solver_type::Dummy);
+	sim.set<sim_lib::sim_data::vertex_num>(sim_pos.size());
+	sim.set<sim_lib::sim_data::positions>(sim_pos);
 	sim.set<sim_lib::sim_data::positions>(sim_pos);
 	sim.set<sim_lib::sim_data::triangles>(sim_tris);
-	sim.set<sim_lib::sim_data::obstacle_vert_index>({0});
+	sim.set<sim_lib::sim_data::obstacle_vert_index>(fix_points);
 
+}
+
+void App::init_sim()
+{
+	sim.init();
+
+	init_sim_data();
+
+	m_sim_data_is_valid = sim.commit_all_changes();
+}
+
+void App::update_sim_data()
+{
+
+	m.add_ui_component<ui_component::text_line>("draping plane");
+
+	m.add_ui_component<ui_component::slider_bar2>("plane_size", m_plane_size, { 0.1,1.5 },
+		[this](const auto& new_v)
+		{
+			make_plane(new_v[0], new_v[1], m_nx, m_ny);
+			init_sim_data();
+		}
+
+	);
+
+	m.add_ui_component<ui_component::slider_bar3>("gravity", sim.get<sim_lib::sim_data::gravity>(), {0.0,10.f},
+		[this](const auto& new_v)
+		{
+			sim.mark_changed<sim_lib::sim_data::gravity>();
+			m_sim_data_is_valid = sim.commit_all_changes();
+		}
+	);
 
 }
