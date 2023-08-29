@@ -1,6 +1,8 @@
 
 #include "app.h"
 
+#include <chrono>
+#include <sstream>
 
 
 
@@ -47,8 +49,28 @@ void App::run()
 
 	m_sim_data_is_str = m_sim_data_is_valid ? "yes" : "no";
 	m.add_ui_component<ui_component::text_line>("sim_data_is_ready", m_sim_data_is_str);
+	m.add_ui_component<ui_component::text_line>("fps", m_fps);
+	m.add_ui_component<ui_component::text_line>("sim_fps", m_sim_fps);
+	m.add_ui_component<ui_component::text_line>("render_fps", m_render_fps);
+
 
 	init_sim();
+
+	auto fps_fn = [&](auto fn, std::string& fps)
+		{
+			return [&,fn] {
+				auto b = std::chrono::high_resolution_clock::now();
+
+				fn();
+
+				auto e = std::chrono::high_resolution_clock::now();
+				std::stringstream ss;
+
+				ss << 1e9 / (e - b).count();
+
+				fps = ss.str();
+			};
+		};
 
 	auto animation_fn = [&]()
 		{
@@ -59,15 +81,22 @@ void App::run()
 			}
 		};
 
-	m.register_frame_update_fn(animation_fn);
+	//m.register_frame_update_fn(animation_fn);
 
 	auto render_fn = [&]
 		{
 			renderer.draw_triangles(indices.data(), pos.data(), indices.size() / 3, pos.size() / 3);
 		};
 
+	auto update_fn = [&]
+		{
+			fps_fn(animation_fn,m_sim_fps)();
+			fps_fn(render_fn,m_render_fps)();
+		};
+
 	// update fn
-	m.register_frame_update_fn(render_fn);
+	m.register_frame_update_fn(fps_fn(update_fn,m_fps));
+	//m.register_frame_update_fn(update_fn);
 
 	update_sim_data();
 
@@ -174,7 +203,7 @@ void App::update_sim_data()
 		}
 	);
 
-	m.add_ui_component<ui_component::slider_bar2i>("plane_resolution", m_plane_resolution, { 2,50 },
+	m.add_ui_component<ui_component::slider_bar2i>("plane_resolution", m_plane_resolution, { 2,200 },
 		[this](const auto& new_v)
 		{
 			make_plane(m_plane_size[0], m_plane_size[1], new_v[0], new_v[1]);

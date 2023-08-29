@@ -47,6 +47,7 @@ namespace quick_shell
 			}
 
 			m_vertex_array->bind();
+			m_vertex_array->set_index_buffer(indices, tNum * 3);
 			m_vertex_array->set_vertex_attribute_data(m_attribute_name_position, pos, vNum);
 
 			std::array<float, 16> identity

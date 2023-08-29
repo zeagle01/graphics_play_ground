@@ -37,9 +37,9 @@ private:
 	std::array<int, 2> m_plane_resolution{ 50,50 };
 
 private:
-	std::string fps;
-	std::string sim_fps;
-	std::string render_fps;
+	std::string m_fps = "0";
+	std::string m_sim_fps = "0";
+	std::string m_render_fps = "0";
 	quick_shell::main_window m;
 	sim_lib::simulator sim;
 };
