@@ -3,7 +3,7 @@
 
 #include <chrono>
 #include <sstream>
-
+#include <numeric>
 
 
 using namespace quick_shell;
@@ -175,6 +175,9 @@ void App::init_sim_data()
 	sim.set<sim_lib::sim_data::positions>(sim_pos);
 	sim.set<sim_lib::sim_data::positions>(sim_pos);
 	sim.set<sim_lib::sim_data::triangles>(sim_tris);
+	std::vector<int> stretch_t(sim_tris.size());
+	std::iota(stretch_t.begin(), stretch_t.end(),0);
+	sim.set<sim_lib::sim_data::stretch_triangles>(stretch_t);
 	sim.set<sim_lib::sim_data::obstacle_vert_index>(fix_points);
 
 }
@@ -232,6 +235,14 @@ void App::update_sim_data()
 		[this](const auto& new_v)
 		{
 			sim.mark_changed<sim_lib::sim_data::density>();
+			m_sim_data_is_valid = sim.commit_all_changes();
+		}
+	);
+
+	m.add_ui_component<ui_component::slider_bar>("stretch stiff", sim.get<sim_lib::sim_data::stretch_stiff>(), {0.0001,1.f},
+		[this](const auto& new_v)
+		{
+			sim.mark_changed<sim_lib::sim_data::stretch_stiff>();
 			m_sim_data_is_valid = sim.commit_all_changes();
 		}
 	);

@@ -17,18 +17,6 @@ namespace sim_lib
 	export using float3 = std::array<float, 3>;
 	export using int3 = std::array<int, 3>;
 
-	export struct stretch_data
-	{
-		int triangle_index;
-		float stiff;
-	};
-
-	export struct bending_data
-	{
-		int v0,v1;
-		float stiff;
-		float rest_angle;
-	};
 
 	export struct self_collision_data
 	{
@@ -86,6 +74,20 @@ namespace sim_lib
 			return true;
 		}
 
+		template<typename sizable>
+		static bool apply(const std::vector<int>& in, const sizable& ref_container) 
+		{
+			int ref_size = ref_container.size();
+			for (int i = 0; i < in.size(); i++)
+			{
+				if (in[i] >= ref_size)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
 	};
 
 	template<typename name_t, typename T, typename validator_t = no_validator, optional defaulv_valid = optional::no>
@@ -116,7 +118,8 @@ namespace sim_lib
 
 		CE_SIM_INTERFACE_DATA(obstacle_vert_index,	std::vector<int>,no_validator, tl<>,	optional::yes);
 
-		//CE_ADD_NODE(stretch, CE_TYPE(std::vector<stretch_data>));
+		CE_SIM_INTERFACE_DATA(stretch_triangles, std::vector<int>,	within_range, tl<triangles>, optional::yes);
+		CE_SIM_INTERFACE_DATA(stretch_stiff,	float,				no_validator, tl<>, optional::yes);
 
 		//CE_ADD_NODE(bending, CE_TYPE(std::vector<bending_data>));
 

@@ -27,7 +27,9 @@ namespace sim_lib
 	struct simulator_datas
 	{
 		CE_SIMULATOR_DATA(vert_size, int, get_size, EVAL(tl<sim_data::positions>), tl<>);
-		CE_SIMULATOR_DATA(dynamic_vert_index, std::vector<int>, compute_dynamic_vert_index_map, EVAL(tl<vert_size, sim_data::obstacle_vert_index>), tl<>);
+		CE_SIMULATOR_DATA(vert_adj_verts, std::vector<std::vector<int>>, compute_vert_adj_verts, EVAL(tl< sim_data::triangles>), tl<>);
+		CE_SIMULATOR_DATA(interface_verts, std::vector<int>, compute_interface_vert_index_map, EVAL(tl< vert_adj_verts,sim_data::obstacle_vert_index>), tl<>);
+		CE_SIMULATOR_DATA(dynamic_vert_index, std::vector<int>, compute_dynamic_vert_index_map, EVAL(tl<vert_size,interface_verts, sim_data::obstacle_vert_index>), tl<>);
 		//dynamic positions
 		CE_SIMULATOR_DATA(positions, std::vector<vec3>, compute_dynamic_positions, EVAL(tl<sim_data::positions, dynamic_vert_index>), tl<>);
 		CE_SIMULATOR_DATA(gravity, vec3, assign, EVAL(tl<sim_data::gravity >), tl<>);

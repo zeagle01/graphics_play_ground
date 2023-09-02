@@ -32,6 +32,9 @@ namespace sim_lib
 		{
 
 			auto& pos = m_datas.get_ref<var::positions>();
+			auto& vel = m_datas.get_ref<var::velocity>();
+			auto last_pos = pos;
+
 
 			m_linear_system.reserve_space( pos.size(),
 				[](int vi)
@@ -40,26 +43,40 @@ namespace sim_lib
 				}
 			);
 
-			auto writer_loop = m_linear_system.get_write_loop(pos.size(), [&](int i) { return std::vector<int>{ i }; });
+			//inertial
+			auto diag_loop = m_linear_system.get_write_loop(pos.size(), [&](int i) { return std::vector<int>{ i }; });
 
-			// TODO:
 			float mass = m_datas.get_ref<var::density>();
 			float dt = m_datas.get_ref < var::time_step>();
 			vec3 g = m_datas.get_ref<var::gravity>();
-			printf(" %f %f %f \n", g(0), g(1), g(2));
+
 			std::vector<vec3> forces(pos.size());
 			std::vector<vec3> dx(pos.size());
 			std::vector<vec3> Ax(pos.size());
-			std::vector<float> inv_diag(pos.size());
+			std::vector<float> diag(pos.size());
 
 			auto get_inertial = [&](auto get_nz, int si)
 				{
 					forces[si] = mass * g;
-					inv_diag[si] = dt * dt / mass;
-					get_nz(si, 0, 0) = mass / dt / dt;
+					float inertial_h = mass / dt / dt;
+					forces[si] += inertial_h * (vel[si] * dt);
+					diag[si] = inertial_h;
+					get_nz(si, 0, 0) = diag[si];
 				};
 
-			writer_loop(get_inertial);
+			diag_loop(get_inertial);
+
+			//interface vert
+			const auto& interface_verts = m_datas.get_ref<var::interface_verts>();
+			auto interface_vert_loop = m_linear_system.get_write_loop(interface_verts.size(), [&](int i) { return std::vector<int>{ interface_verts[i] }; });
+			auto add_interface_vert_constraint = [&](auto get_nz, int vi)
+				{
+					float fix_stiff = 1e12f;
+					forces[vi] += fix_stiff * (last_pos[vi] - pos[vi]);
+					diag[vi] += fix_stiff;
+					get_nz(vi, 0, 0) += fix_stiff;
+				};
+			interface_vert_loop(add_interface_vert_constraint);
 
 			//jacobi
 			for (int it = 0; it < 50; it++)
@@ -74,13 +91,14 @@ namespace sim_lib
 
 				for (int i = 0; i < dx.size(); i++)
 				{
-					dx[i] += inv_diag[i] * (forces[i] - Ax[i]);
+					dx[i] += (forces[i] - Ax[i]) / diag[i];
 				}
 			}
 
 			for (int i = 0; i < dx.size(); i++)
 			{
 				pos[i] = pos[i] + dx[i];
+				vel[i] += dx[i] / dt;
 			}
 
 		}
@@ -106,6 +124,8 @@ namespace sim_lib
 		struct var
 		{
 			CE_SOLVER_DATA(positions, std::vector<vec3>, solver_data_update::assign, tl<simulator_datas::positions>, tl<>)
+			CE_SOLVER_DATA(velocity, std::vector<vec3>, simulator_data_update::resize, tl<simulator_datas::positions>, tl<>)
+			CE_SOLVER_DATA(interface_verts, std::vector<int>, solver_data_update::assign, tl<simulator_datas::interface_verts>, tl<>)
 			CE_SOLVER_DATA(gravity, vec3, simulator_data_update::assign, tl<simulator_datas::gravity>, tl<>)
 			CE_SOLVER_DATA(time_step, float, simulator_data_update::assign, tl<simulator_datas::time_step>, tl<>)
 			CE_SOLVER_DATA(density, float, simulator_data_update::assign, tl<simulator_datas::density>, tl<>)
