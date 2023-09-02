@@ -10,6 +10,7 @@ add_executable(matrix_math_test
 	main.cpp
 	matrix_math_test.cpp
 	linear_system_solver_test.cpp
+	sparse_matrix_test.cpp
 )
 
 
