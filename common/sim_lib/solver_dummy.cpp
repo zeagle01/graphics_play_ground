@@ -10,11 +10,13 @@ module;
 #include "matrix_math/matrix_math.h"
 
 #include <cmath>
+#include <ranges>
 
 module sim_lib : solver_dummy;
 
 import :solver;
 import :simulator_datas;
+import matrix_math;
 
 namespace sim_lib
 {
@@ -28,18 +30,57 @@ namespace sim_lib
 
 		void solve() override
 		{
-			float amp = 0.01f;
-			float freq = 1.0f;
-			float step = 0.01f;
 
 			auto& pos = m_datas.get_ref<var::positions>();
-			int vNum = pos.size();
-			for (int i = 0; i < vNum; i++)
+
+			m_linear_system.reserve_space( pos.size(),
+				[](int vi)
+				{
+					return spm_t::r_c{vi, vi};
+				}
+			);
+
+			auto writer_loop = m_linear_system.get_write_loop(pos.size(), [&](int i) { return std::vector<int>{ i }; });
+
+			// TODO:
+			float mass = 1.f;
+			float dt = 1e-2f;
+			float g = -9.8f;
+			std::vector<vec3> forces(pos.size());
+			std::vector<vec3> dx(pos.size());
+			std::vector<vec3> Ax(pos.size());
+			std::vector<float> inv_diag(pos.size());
+
+			auto get_inertial = [&](auto get_nz, int si)
+				{
+					forces[si](1) = g;
+					inv_diag[si] = dt * dt / mass;
+					get_nz(si, 0, 0) = mass / dt / dt;
+				};
+
+			writer_loop(get_inertial);
+
+			//jacobi
+			for (int it = 0; it < 50; it++)
 			{
-				pos[i](0) += amp * std::sin(t * freq);
+
+				m_linear_system.for_each_nz(
+					[&](int row, int col, const float& v)
+					{
+						Ax[row] += v * dx[col];
+					}
+				);
+
+				for (int i = 0; i < dx.size(); i++)
+				{
+					dx[i] += inv_diag[i] * (forces[i] - Ax[i]);
+				}
 			}
 
-			t += step;
+			for (int i = 0; i < dx.size(); i++)
+			{
+				pos[i] = pos[i] + dx[i];
+			}
 
 		}
 
@@ -69,7 +110,8 @@ namespace sim_lib
 		using var_list = clumsy_lib::extract_member_type_list_t<var>;
 		clumsy_lib::Static_Type_Map<var_list> m_datas;
 
-		float t = 0.f;
+		using spm_t=matrix_math::sparse_matrix<float>;
+		spm_t m_linear_system;
 	};
 
 }

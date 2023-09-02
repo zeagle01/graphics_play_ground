@@ -8,6 +8,7 @@ import matrix_math;
 
 
 using namespace testing;
+using namespace matrix_math;
 
 namespace sparse_matrix_test
 {
@@ -59,9 +60,9 @@ namespace sparse_matrix_test
 
 
 		float v = 1.f;
-		auto get_vert_m = [&](int si)
+		auto get_vert_m = [&]( auto get_nz, int si)
 			{
-				return [&](int i, int j) {return v; };
+				get_nz(si, 0, 0) = v;
 			};
 
 		write_vert(get_vert_m);
@@ -79,10 +80,12 @@ namespace sparse_matrix_test
 		);
 
 
-		float sub_m[] = { 2.f,1.f,1.f,2.f };
-		auto get_stencil_m = [&](int si)
+		auto get_stencil_m = [&](auto get_nz, int si)
 			{
-				return [&](int i, int j) {return sub_m[i * 2 + j]; };
+				get_nz(si, 0, 0) += 2.f;
+				get_nz(si, 0, 1) += 1.f;
+				get_nz(si, 1, 0) += 1.f;
+				get_nz(si, 1, 1) += 2.f;
 			};
 
 		write_stencils(get_stencil_m);

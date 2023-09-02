@@ -34,7 +34,7 @@ private:
 	std::string m_sim_data_is_str = "no";
 private:
 	std::array<float, 2> m_plane_size{ 0.5f,0.5f };
-	std::array<int, 2> m_plane_resolution{ 50,50 };
+	std::array<int, 2> m_plane_resolution{ 2,2 };
 
 private:
 	std::string m_fps = "0";
