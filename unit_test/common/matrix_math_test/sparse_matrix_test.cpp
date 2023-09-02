@@ -98,4 +98,42 @@ namespace sparse_matrix_test
 		EXPECT_THAT(sum, Eq(10.f));
 	}
 
+	TEST_F(sparse_matrix_test, build)
+	{
+		m_sparse_m.reserve_space(m_row.size(),
+				[&](int i)
+				{
+					return sparse_matrix<float>::r_c{ m_row[i],m_col[i] };
+				}
+			);
+
+		int stencil_num = 3;
+
+
+		auto looper = m_sparse_m.get_write_loop(stencil_num, [](int i)
+			{
+				return std::vector<int>{ i };
+			}
+		);
+
+
+		float v = 1.f;
+		auto writer = [&](int i)
+			{
+				return [&](int i, int j) {return v; };
+			};
+
+		looper(writer);
+
+		float sum = 0;
+		auto sum_a_row = [&](int row, int col, const float& v)
+			{
+				sum += v;
+			};
+		m_sparse_m.for_each_nz(sum_a_row);
+
+		EXPECT_THAT(sum, Eq(3.f));
+
+	}
+
 }

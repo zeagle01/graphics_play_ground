@@ -14,6 +14,13 @@ class sparse_matrix
 {
 
 public:
+
+	struct r_c
+	{
+		int row;
+		int col;
+	};
+
 	struct r_c_v
 	{
 		const T& value;
@@ -28,6 +35,38 @@ public:
 	};
 
 public:
+
+	void reserve_space(int num_nz, std::function<r_c(int)> get_row_col)
+	{
+
+	}
+
+	using sub_mat = std::function<const T& (int, int)>;
+	using sub_mats = std::function<sub_mat(int)>;
+
+	std::function<void(sub_mats)> get_write_loop(int stencil_num, std::function<std::vector<int>(int)> get_stencil)
+	{
+		auto ret = [&, get_stencil](sub_mats get_stencil_m)
+			{
+				for (int si = 0; si < stencil_num; si++)
+				{
+					auto stencil_m = get_stencil_m(si);
+					std::vector<int> stencil = get_stencil(si);
+					for (int i = 0; i < stencil.size(); i++)
+					{
+						int vi = stencil[i];
+						for (int j = 0; j < stencil.size(); j++)
+						{
+							int vj = stencil[j];
+							m_mat[vi][vj] = stencil_m(i,j);
+						}
+					}
+				}
+
+			};
+		return ret;
+	}
+
 	void set_values(std::function<r_c_v( int)> get_value, int num_nz)
 	{
 		for (int i = 0; i < num_nz; i++)
