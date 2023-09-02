@@ -124,7 +124,8 @@ namespace sim_lib
 
 
 		CE_SIM_INTERFACE_DATA(gravity,	float3,	no_validator, tl<>,	optional::yes);
-
+		CE_SIM_INTERFACE_DATA(time_step,float,	no_validator, tl<>,	optional::yes);
+		CE_SIM_INTERFACE_DATA(density,	float,	no_validator, tl<>,	optional::yes);
 
 
 	};

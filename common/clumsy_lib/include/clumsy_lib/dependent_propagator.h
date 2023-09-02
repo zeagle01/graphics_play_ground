@@ -170,10 +170,6 @@ namespace clumsy_lib
 			return m_is_changed;
 		}
 
-		void propagate()
-		{
-			For_Each_Type<list>::template apply<Touch_If_Changed>(*this);
-		}
 
 		void clear_all_changes()
 		{
@@ -195,18 +191,6 @@ namespace clumsy_lib
 		change_status_t m_is_changed;
 		adj_list_t m_down_streams;
 	private:
-		struct Touch_If_Changed
-		{
-			template<typename name,typename Host_Type>
-			static void apply(Host_Type& host)
-			{
-				if (host.is_changed<name>())
-				{
-					host.touch<name>();
-				}
-			}
-
-		};
 
 		void touch_imp(const std::type_index& t)
 		{

@@ -95,7 +95,7 @@ namespace sim_lib
 
 			update_data();
 
-			m_simulator_data_propagator.propagate();
+			propagate_simulator_changes();
 
 			m_solver->update_data(m_simulator_datas, m_simulator_data_propagator.get_all_change_status());
 
@@ -110,6 +110,23 @@ namespace sim_lib
 				m_simulator_datas.get_ref<simulator_datas::dynamic_vert_index>()
 			);
 		}
+	private:
+		void propagate_simulator_changes()
+		{
+			clumsy_lib::For_Each_Type<simulator_var_list>::apply<touch_simulator_var>(m_simulator_data_propagator);
+		}
+
+		struct touch_simulator_var
+		{
+			template<typename var, typename propagator_t>
+			static void apply(propagator_t& propagator)
+			{
+				if (propagator.is_changed<var>())
+				{
+					propagator.touch<var>();
+				}
+			}
+		};
 
 	private:
 		void switch_solver()

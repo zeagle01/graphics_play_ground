@@ -43,9 +43,10 @@ namespace sim_lib
 			auto writer_loop = m_linear_system.get_write_loop(pos.size(), [&](int i) { return std::vector<int>{ i }; });
 
 			// TODO:
-			float mass = 1.f;
-			float dt = 1e-2f;
-			float g = -9.8f;
+			float mass = m_datas.get_ref<var::density>();
+			float dt = m_datas.get_ref < var::time_step>();
+			vec3 g = m_datas.get_ref<var::gravity>();
+			printf(" %f %f %f \n", g(0), g(1), g(2));
 			std::vector<vec3> forces(pos.size());
 			std::vector<vec3> dx(pos.size());
 			std::vector<vec3> Ax(pos.size());
@@ -53,7 +54,7 @@ namespace sim_lib
 
 			auto get_inertial = [&](auto get_nz, int si)
 				{
-					forces[si](1) = g;
+					forces[si] = mass * g;
 					inv_diag[si] = dt * dt / mass;
 					get_nz(si, 0, 0) = mass / dt / dt;
 				};
@@ -105,6 +106,9 @@ namespace sim_lib
 		struct var
 		{
 			CE_SOLVER_DATA(positions, std::vector<vec3>, solver_data_update::assign, tl<simulator_datas::positions>, tl<>)
+			CE_SOLVER_DATA(gravity, vec3, simulator_data_update::assign, tl<simulator_datas::gravity>, tl<>)
+			CE_SOLVER_DATA(time_step, float, simulator_data_update::assign, tl<simulator_datas::time_step>, tl<>)
+			CE_SOLVER_DATA(density, float, simulator_data_update::assign, tl<simulator_datas::density>, tl<>)
 		};
 
 		using var_list = clumsy_lib::extract_member_type_list_t<var>;

@@ -30,6 +30,9 @@ namespace sim_lib
 		CE_SIMULATOR_DATA(dynamic_vert_index, std::vector<int>, compute_dynamic_vert_index_map, EVAL(tl<vert_size, sim_data::obstacle_vert_index>), tl<>);
 		//dynamic positions
 		CE_SIMULATOR_DATA(positions, std::vector<vec3>, compute_dynamic_positions, EVAL(tl<sim_data::positions, dynamic_vert_index>), tl<>);
+		CE_SIMULATOR_DATA(gravity, vec3, assign, EVAL(tl<sim_data::gravity >), tl<>);
+		CE_SIMULATOR_DATA(time_step, float, assign, EVAL(tl<sim_data::time_step >), tl<>);
+		CE_SIMULATOR_DATA(density, float, assign, EVAL(tl<sim_data::density >), tl<>);
 	};
 
 }

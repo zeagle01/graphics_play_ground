@@ -220,4 +220,20 @@ void App::update_sim_data()
 		}
 	);
 
+	m.add_ui_component<ui_component::slider_bar>("time_step", sim.get<sim_lib::sim_data::time_step>(), {0.0001,1.f},
+		[this](const auto& new_v)
+		{
+			sim.mark_changed<sim_lib::sim_data::time_step>();
+			m_sim_data_is_valid = sim.commit_all_changes();
+		}
+	);
+
+	m.add_ui_component<ui_component::slider_bar>("density", sim.get<sim_lib::sim_data::density>(), {0.0001,1.f},
+		[this](const auto& new_v)
+		{
+			sim.mark_changed<sim_lib::sim_data::density>();
+			m_sim_data_is_valid = sim.commit_all_changes();
+		}
+	);
+
 }

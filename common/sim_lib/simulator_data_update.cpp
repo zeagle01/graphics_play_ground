@@ -19,6 +19,13 @@ namespace sim_lib
 
 		struct assign
 		{
+
+			template<typename T >
+			static void apply(T& out, const T& in)
+			{
+				out = in;
+			}
+
 			template<typename T, int N>
 			static void apply(std::vector<std::array<T, N>>& out, const std::vector<matrix_math::mat<N, 1, T>>& in)
 			{
@@ -29,6 +36,24 @@ namespace sim_lib
 					{
 						out[i][j] = in[i](j);
 					}
+				}
+			}
+
+			template<typename T, int N>
+			static void apply(std::array<T, N>& out, const matrix_math::mat<N, 1, T>& in)
+			{
+				for (int j = 0; j < N; j++)
+				{
+					out[j] = in(j);
+				}
+			}
+
+			template<typename T, int N>
+			static void apply(matrix_math::mat<N, 1, T>& out,const std::array<T, N>& in)
+			{
+				for (int j = 0; j < N; j++)
+				{
+					out(j) = in[j];
 				}
 			}
 		};
