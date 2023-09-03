@@ -16,6 +16,7 @@ namespace sim_lib
 
 	export using float3 = std::array<float, 3>;
 	export using int3 = std::array<int, 3>;
+	export using int2 = std::array<int, 2>;
 
 
 	export struct self_collision_data
@@ -120,6 +121,8 @@ namespace sim_lib
 
 		CE_SIM_INTERFACE_DATA(stretch_triangles, std::vector<int>,	within_range, tl<triangles>, optional::yes);
 		CE_SIM_INTERFACE_DATA(stretch_stiff,	float,				no_validator, tl<>, optional::yes);
+
+		CE_SIM_INTERFACE_DATA(stretch_edges,	std::vector<int2>,	within_range, tl<vertex_num>, optional::yes);
 
 		//CE_ADD_NODE(bending, CE_TYPE(std::vector<bending_data>));
 

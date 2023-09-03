@@ -7,6 +7,7 @@ module;
 #include <ranges>
 #include <algorithm>
 #include <set>
+#include <unordered_map>
 
 module sim_lib : simulator_data_update;
 
@@ -76,6 +77,21 @@ namespace sim_lib
 
 		};
 
+		struct compute_edge_lengths
+		{
+			template<typename vec>
+			static void apply(std::vector<float>& out, const std::vector<int2>& edges, const std::vector<vec>& pos)
+			{
+				out.resize(edges.size());
+				for (int i = 0; i < edges.size(); i++)
+				{
+					auto dx = pos[edges[i][0]] - pos[edges[i][1]];
+					out[i] = matrix_math::norm<2>::apply(dx);
+				}
+			}
+
+		};
+
 		struct compute_vert_adj_verts
 		{
 			static void apply(std::vector<std::vector<int>>& out, const std::vector<int3>& triangles)
@@ -114,7 +130,7 @@ namespace sim_lib
 			}
 		};
 
-		struct compute_interface_vert_index_map
+		struct compute_interface_verts
 		{
 			static void apply(std::vector<int>& out, const std::vector<std::vector<int>>& vv, const std::vector<int>& obstacles_vertex_indices)
 			{
@@ -141,12 +157,11 @@ namespace sim_lib
 			}
 		};
 
-
-		struct compute_dynamic_vert_index_map
+		struct compute_internal_dynamic_verts
 		{
-			static void apply(std::vector<int>& out, const int& vert_size, const std::vector<int>& interface_verts, const std::vector<int>& obstacles_vertex_indices)
+			static void apply(std::vector<int>& out, const int& vert_size, const std::vector<int>& obstacles_vertex_indices)
 			{
-				out = interface_verts;
+				out.clear();
 
 				std::set<int> obstacles_vertex_indices_set(obstacles_vertex_indices.begin(), obstacles_vertex_indices.end());
 
@@ -158,6 +173,17 @@ namespace sim_lib
 					}
 				}
 
+			}
+
+		};
+
+
+		struct compute_dynamic_verts
+		{
+			static void apply(std::vector<int>& out, const std::vector<int>& internal_dynamic_verts, const std::vector<int>& interface_verts)
+			{
+				out = internal_dynamic_verts;
+				out.insert(out.end(), interface_verts.begin(), interface_verts.end());
 			}
 
 		};
@@ -176,6 +202,61 @@ namespace sim_lib
 					out.push_back({ in[v][0] ,in[v][1] ,in[v][2] });
 				}
 				out.shrink_to_fit();
+			}
+		};
+
+		struct compute_dynamic_stencils
+		{
+			template<typename T,int N>
+			static void apply(std::vector<std::array<T, N>>& out, const std::vector<std::array<T, N>>& in, const std::vector<int>& dynamic_verts)
+			{
+				out.clear();
+
+				std::unordered_map<int, int> orig_to_dynmaic;
+				for (int i = 0; i < dynamic_verts.size(); i++)
+				{
+					orig_to_dynmaic[dynamic_verts[i]] = i;
+				}
+
+				for (int i = 0; i < in.size(); i++)
+				{
+					bool is_dynamic_0 = orig_to_dynmaic.contains(in[i][0]);
+					for (int j = 1; j < N; j++)
+					{
+						bool is_dynamic_j = orig_to_dynmaic.contains(in[i][j]);
+						if (is_dynamic_j != is_dynamic_0)
+						{
+							printf(" %d is %d, %d is %d\n", in[i][0], int(is_dynamic_0), in[i][j], int(is_dynamic_j));
+							break;
+
+						}
+					}
+
+					if (is_dynamic_0)
+					{
+						std::array<T, N> dynamic_stencil;
+						for (int j = 0; j < N; j++)
+						{
+							dynamic_stencil[j] = orig_to_dynmaic[in[i][j]];
+						}
+						out.push_back(dynamic_stencil);
+					}
+				}
+			}
+		};
+
+		struct get_range
+		{
+			static void apply(int2& out, const std::vector<int>& in)
+			{
+				out[0] = 0;
+				out[1] = in.size();
+			}
+
+			static void apply(int2& out, const std::vector<int>& in,int offset)
+			{
+				out[0] = offset;
+				out[1] = in.size() + offset;
 			}
 		};
 

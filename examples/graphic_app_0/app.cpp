@@ -142,6 +142,22 @@ void App::make_plane(float lx, float ly, int nx, int ny)
 			indices.push_back(v2);
 			indices.push_back(v1);
 			indices.push_back(v3);
+
+			//edges
+			m_edges.push_back(v0);
+			m_edges.push_back(v1);
+
+			m_edges.push_back(v0);
+			m_edges.push_back(v2);
+
+			m_edges.push_back(v1);
+			m_edges.push_back(v2);
+
+			m_edges.push_back(v2);
+			m_edges.push_back(v3);
+
+			m_edges.push_back(v1);
+			m_edges.push_back(v3);
 		}
 	}
 	indices.shrink_to_fit();
@@ -179,6 +195,10 @@ void App::init_sim_data()
 	std::iota(stretch_t.begin(), stretch_t.end(),0);
 	sim.set<sim_lib::sim_data::stretch_triangles>(stretch_t);
 	sim.set<sim_lib::sim_data::obstacle_vert_index>(fix_points);
+
+	std::vector<sim_lib::int2> sim_edges;
+	convert_to_sim_data(sim_edges, m_edges);
+	sim.set<sim_lib::sim_data::stretch_edges>(sim_edges);
 
 }
 

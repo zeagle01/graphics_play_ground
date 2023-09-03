@@ -107,7 +107,7 @@ namespace sim_lib
 
 			map_dynamic_positions_back_to_interface_positions::apply(
 				get<sim_data::positions>(), m_solver->get_result(),
-				m_simulator_datas.get_ref<simulator_datas::dynamic_vert_index>()
+				m_simulator_datas.get_ref<simulator_datas::dynamic_verts>()
 			);
 		}
 	private:

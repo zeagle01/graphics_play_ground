@@ -27,15 +27,16 @@ private:
 
 private:
 	std::vector< int> indices;
+	std::vector< int> m_edges;
 	std::vector<float> pos;
 
 	bool m_sim_data_is_valid = false;
 	std::string m_sim_data_is_str = "no";
 private:
 	std::array<float, 2> m_plane_size{ 0.5f,0.5f };
-	std::array<int, 2> m_plane_resolution{ 2,2 };
+	std::array<int, 2> m_plane_resolution{ 10,10 };
 
-	std::vector<int> fix_points = { 0,m_plane_resolution[0] };
+	std::vector<int> fix_points = { 0, (m_plane_resolution[0] - 1) * 2  };
 
 private:
 	std::string m_fps = "0";
