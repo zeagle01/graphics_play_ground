@@ -19,7 +19,8 @@ private:
 	void prepare_mesh();
 	void init_sim();
 	void init_sim_data();
-	void update_sim_data();
+	void connect_sim_ui();
+	void connect_render_ui();
 
 private:
 
@@ -38,6 +39,10 @@ private:
 
 	std::vector<int> fix_points = { 0, (m_plane_resolution[0] - 1) * 2  };
 	//std::vector<int> fix_points = { 0  };
+
+private:
+	bool m_enable_fill = true;
+	bool m_enable_wirefram = true;
 
 private:
 	std::string m_fps = "0";

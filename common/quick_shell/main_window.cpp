@@ -39,4 +39,14 @@ namespace quick_shell
 	{
 		m_render_imp.draw_triangles(indices, pos, tNum, vNum);
 	}
+
+	void renderer::enable_fill(bool isLine)
+	{
+		m_render_imp.enable_fill(isLine);
+	}
+
+	void renderer::enable_wireframe(bool isLine)
+	{
+		m_render_imp.enable_wireframe(isLine);
+	}
 }

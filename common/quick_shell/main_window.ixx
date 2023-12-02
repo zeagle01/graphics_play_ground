@@ -25,6 +25,8 @@ namespace quick_shell
 			m_render_imp.load_glad(proc_addr);
 		}
 
+		void enable_fill(bool isLine);
+		void enable_wireframe(bool isLine);
 		void draw_triangles(int* indices, float* pos, int tNum, int vNum);
 	private:
 		renderer_imp  m_render_imp;

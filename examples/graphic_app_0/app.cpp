@@ -97,7 +97,8 @@ void App::run()
 	// update fn
 	m.register_frame_update_fn(fps_fn(update_fn,m_fps));
 
-	update_sim_data();
+	connect_sim_ui();
+	connect_render_ui();
 
 	m.run_event_loop();
 
@@ -214,7 +215,7 @@ void App::init_sim()
 	m_sim_data_is_valid = sim.commit_all_changes();
 }
 
-void App::update_sim_data()
+void App::connect_sim_ui()
 {
 
 	m.add_ui_component<ui_component::text_line>("draping plane");
@@ -269,5 +270,29 @@ void App::update_sim_data()
 			m_sim_data_is_valid = sim.commit_all_changes();
 		}
 	);
+
+}
+
+void App::connect_render_ui()
+{
+
+	m.add_ui_component<ui_component::text_line>("render configs ");
+
+	auto& renderer = m.get_renderer();
+
+	m.add_ui_component<ui_component::check_box>("enable_fill", m_enable_fill, {},
+		[&,this](const auto& new_v)
+		{
+			renderer.enable_fill(new_v);
+		}
+	);
+
+	m.add_ui_component<ui_component::check_box>("enable_wireframe", m_enable_wirefram, {},
+		[&,this](const auto& new_v)
+		{
+			renderer.enable_wireframe(new_v);
+		}
+	);
+
 
 }
