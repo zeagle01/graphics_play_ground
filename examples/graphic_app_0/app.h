@@ -19,11 +19,15 @@ private:
 	void prepare_mesh();
 	void init_sim();
 	void init_sim_data();
+
+private:
 	void connect_sim_ui();
 	void connect_render_ui();
 
 private:
+	void on_mouse_move(int x, int y);
 
+private:
 	void make_plane(float lx, float ly, int nx, int ny);
 
 private:

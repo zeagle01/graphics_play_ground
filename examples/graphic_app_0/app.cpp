@@ -5,6 +5,7 @@
 #include <sstream>
 #include <numeric>
 
+import geometry_lib;
 
 using namespace quick_shell;
 
@@ -97,10 +98,22 @@ void App::run()
 	// update fn
 	m.register_frame_update_fn(fps_fn(update_fn,m_fps));
 
+	m.register_frame_update_fn([&](int x, int y) 
+		{
+			on_mouse_move(x, y);
+		});
+
 	connect_sim_ui();
 	connect_render_ui();
 
 	m.run_event_loop();
+
+}
+
+void App::on_mouse_move(int x, int y)
+{
+
+	geometry::bvh bvh;
 
 }
 

@@ -1,23 +1,17 @@
 
 cmake_minimum_required(VERSION 3.26)
 
-project(quick_shell)
+project(geometry_lib)
 
 set(partion_files
-	GLFW_wrapper.cpp
-	UI_wrapper.cpp
-	render.cpp
-	shader.cpp
-	vertex_array.cpp
-	ui_component_imp.cpp
+	bvh.cpp
 )
 
-add_library(quick_shell  
+add_library(geometry_lib  
 	${partion_files}
-	main_window.cpp ## imp
 )
 
-set_target_properties(quick_shell PROPERTIES FOLDER common)
+set_target_properties(geometry_lib PROPERTIES FOLDER common)
 
 
 ###moduel support
@@ -35,35 +29,19 @@ elseif(CMAKE_VERSION VERSION_LESS 3.29)
   set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "a816ed09-43d1-40e5-bc8c-1a2824ee194e")
 endif()
 
-target_sources(quick_shell PUBLIC
+target_sources(geometry_lib PUBLIC
 	FILE_SET cxx_modules
 	TYPE CXX_MODULES
 	FILES 
-	main_window.ixx  ## main module definition 
-	ui_components.ixx  
+	geometry_lib.ixx  ## main module definition
+	bvh.ixx  
 )
 
 set_source_files_properties(${partion_files} PROPERTIES COMPILE_FLAGS "/internalPartition")
 
 ### moduel support end
+target_compile_features(geometry_lib PRIVATE cxx_std_20)
 
-target_compile_features(quick_shell PRIVATE cxx_std_20)
-
-########## ce_log
-target_link_libraries(quick_shell PRIVATE ce_log)
-
-########## clumsy_lib
-target_link_libraries(quick_shell PRIVATE clumsy_lib)
+target_link_libraries(geometry_lib PRIVATE matrix_math)
 
 
-########## glfw3
-find_package(glfw3 CONFIG REQUIRED)
-target_link_libraries(quick_shell PRIVATE glfw)
-
-
-########## glad
-target_link_libraries(quick_shell PRIVATE glad)
-
-
-########## imgui
-target_link_libraries(quick_shell PRIVATE my_imgui)

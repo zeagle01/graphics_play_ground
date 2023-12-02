@@ -18,3 +18,5 @@ target_compile_features(graphic_app_0 PRIVATE cxx_std_20)
 target_link_libraries(graphic_app_0 PRIVATE quick_shell)
 
 target_link_libraries(graphic_app_0 PRIVATE sim_lib)
+
+target_link_libraries(graphic_app_0 PRIVATE geometry_lib)

@@ -41,7 +41,7 @@ namespace sim_lib
 		CE_SIMULATOR_DATA(density,			float,					assign, EVAL(tl<sim_data::density >), tl<>);
 
 		//dynamic derived
-		CE_SIMULATOR_DATA(edge_lengths, std::vector<float>, compute_edge_lengths, EVAL(tl<stretch_edges,positions >), tl<>);
+		CE_SIMULATOR_DATA(edge_lengths,		std::vector<float>,		compute_edge_lengths, EVAL(tl<stretch_edges,positions >), tl<>);
 
 	};
 
