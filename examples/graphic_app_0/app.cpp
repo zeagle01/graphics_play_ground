@@ -125,6 +125,8 @@ void App::make_plane(float lx, float ly, int nx, int ny)
 
 	indices.clear();
 	indices.reserve((nx - 1) * (ny - 1) * 2);
+	m_edges.clear();
+	m_edges.reserve(nx * ny * 3);
 
 	for (int xi = 0; xi < nx - 1; xi++)
 	{
@@ -161,6 +163,7 @@ void App::make_plane(float lx, float ly, int nx, int ny)
 		}
 	}
 	indices.shrink_to_fit();
+	m_edges.shrink_to_fit();
 }
 
 void App::prepare_mesh()

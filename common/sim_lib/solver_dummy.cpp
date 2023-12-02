@@ -35,11 +35,8 @@ namespace sim_lib
 			auto& vel = m_datas.get_ref<var::velocity>();
 			auto& last_pos = m_datas.get_ref<var::last_positions>();
 
-			const auto& internal_dynamic_verts_range = m_datas.get_ref<var::internal_dynamic_verts_range>();
-			for (int i = internal_dynamic_verts_range[0]; i < internal_dynamic_verts_range[1]; i++)
-			{
-				last_pos[i] = pos[i];
-			}
+			//backup last pos
+			last_pos = pos;
 
 			for (int it = 0; it < 1; it++)
 			{
@@ -81,8 +78,13 @@ namespace sim_lib
 				}
 			);
 
+			m_linear_system.set_var_num(pos.size());
+
+			m_linear_system.set_fixed_variables(m_datas.get_ref<var::fixed_verts>());
+
 			//inertial
-			auto diag_loop = m_linear_system.get_write_loop(pos.size(), [&](int i) { return std::vector<int>{ i }; });
+			const auto& dynamic_verts = m_datas.get_ref<var::dynamic_verts>();
+			auto diag_loop = m_linear_system.get_write_loop(dynamic_verts.size(), [&](int i) { return std::vector<int>{ dynamic_verts[i] }; });
 
 			//float mass = m_datas.get_ref<var::density>();
 			//float dt = m_datas.get_ref < var::time_step>();
@@ -99,45 +101,34 @@ namespace sim_lib
 
 			auto get_inertial = [&](auto get_nz, int si)
 				{
-					forces[si] = mass * g;
+					int v = dynamic_verts[si];
+					forces[v] = mass * g;
 					float inertial_h = mass / dt / dt;
-					forces[si] += inertial_h * (vel[si] * dt);
-					diag[si] = inertial_h;
+					forces[v] += inertial_h * (vel[si] * dt);
+					diag[v] = inertial_h;
 					get_nz(si, 0, 0) = diag[si];
 				};
 
 			diag_loop(get_inertial);
 
-			//interface vert
-			const auto& interface_verts_range = m_datas.get_ref<var::interface_verts_range>();
-			int interface_verts_size = interface_verts_range[1] - interface_verts_range[0];
-			auto interface_vert_loop = m_linear_system.get_write_loop(interface_verts_size, [&](int i) { return std::vector<int>{ interface_verts_range[0] + i }; });
-			auto add_interface_vert_constraint = [&](auto get_nz, int fix_vi)
-				{
-					int v = interface_verts_range[0] + fix_vi;
-					float fix_stiff = 1e10f;
-					forces[v] += fix_stiff * (last_pos[v] - pos[v]);
-					diag[v] += fix_stiff;
-					get_nz(fix_vi, 0, 0) += fix_stiff;
-				};
-			interface_vert_loop(add_interface_vert_constraint);
-
 			//edge stretch
 			const auto& edges = m_datas.get_ref<var::stretch_edges>();
 			const auto& edge_lengths = m_datas.get_ref<var::edge_lengths>();
-			float stretch_stiff = 1e1f;
+			float stretch_stiff = 1e-1f;
 			auto edge_loop = m_linear_system.get_write_loop(edges.size(), [&](int ei) { return std::vector<int>{ edges[ei][0], edges[ei][1] }; });
 
 			auto add_stretch_edge_constraint = [&](auto get_nz, int ei)
 				{
 					int v0 = edges[ei][0];
 					int v1 = edges[ei][1];
+					std::array<vec3, 2> X{ pos[v0],pos[v1] };
 
-					auto dx = pos[v1] - pos[v0];
-					float l = matrix_math::norm<2>::apply(dx);
-					auto n = (pos[v0] - pos[v1]) / (l + 1e-6f);
-					auto stretch_f = -stretch_stiff * (l - edge_lengths[ei]) * n;
 					float w[]{ 1,-1 };
+					auto dx = w[0] * X[0] + w[1] * X[1];
+					float l = matrix_math::norm<2>::apply(dx);
+					auto n = dx / l ;
+
+					auto stretch_f = -stretch_stiff * (l - edge_lengths[ei]) * n;
 
 					forces[v0] += w[0] * stretch_f;
 					forces[v1] += w[1] * stretch_f;
@@ -147,14 +138,14 @@ namespace sim_lib
 					diag[v1] += w[1] * w[1] * stretch_stiff;
 					get_nz(ei, 1, 1) += w[1] * w[1] * stretch_stiff;
 
-					//get_nz(ei, 0, 1) += w[0] * w[1] * stretch_stiff;
-					//get_nz(ei, 1, 0) += w[1] * w[0] * stretch_stiff;
+					get_nz(ei, 0, 1) += w[0] * w[1] * stretch_stiff;
+					get_nz(ei, 1, 0) += w[1] * w[0] * stretch_stiff;
 				};
 
 			edge_loop(add_stretch_edge_constraint);
 
 			//jacobi
-			for (int it = 0; it < 50; it++)
+			for (int it = 0; it < 10; it++)
 			{
 
 				m_linear_system.for_each_nz(
@@ -164,9 +155,10 @@ namespace sim_lib
 					}
 				);
 
-				for (int i = 0; i < dx.size(); i++)
+				for (int i = 0; i < dynamic_verts.size(); i++)
 				{
-					dx[i] += (forces[i] - Ax[i]) / diag[i];
+					int v = dynamic_verts[i];
+					dx[v] += (forces[v] - Ax[v]) / diag[v];
 				}
 			}
 
@@ -186,19 +178,19 @@ namespace sim_lib
 		using tl = clumsy_lib::type_list<T...>;
 		struct var
 		{
-			CE_SOLVER_DATA(positions, std::vector<vec3>, solver_data_update::assign, tl<simulator_datas::positions>, tl<>)
-			CE_SOLVER_DATA(velocity, std::vector<vec3>, simulator_data_update::resize, tl<simulator_datas::positions>, tl<>)
-			CE_SOLVER_DATA(last_positions, std::vector<vec3>, simulator_data_update::assign, tl<simulator_datas::positions>, tl<>)
+			CE_SOLVER_DATA(positions,			std::vector<vec3>,	solver_data_update::assign, tl<simulator_datas::positions>, tl<>)
+			CE_SOLVER_DATA(velocity,			std::vector<vec3>,	simulator_data_update::resize, tl<simulator_datas::vert_size>, tl<>)
+			CE_SOLVER_DATA(last_positions,		std::vector<vec3>,	simulator_data_update::resize, tl<simulator_datas::vert_size>, tl<>)
 
-			CE_SOLVER_DATA(interface_verts_range, int2, solver_data_update::assign, tl<simulator_datas::interface_verts_range>, tl<>)
-			CE_SOLVER_DATA(internal_dynamic_verts_range, int2, simulator_data_update::assign, tl<simulator_datas::internal_dynamic_verts_range>, tl<>)
+			CE_SOLVER_DATA(dynamic_verts,		std::vector<int>,	simulator_data_update::assign, tl<simulator_datas::dynamic_verts>, tl<>)
+			CE_SOLVER_DATA(fixed_verts,			std::vector<int>,	simulator_data_update::assign, tl<simulator_datas::fixed_verts>, tl<>)
 
-			CE_SOLVER_DATA(stretch_edges, std::vector<int2>, simulator_data_update::assign, tl<simulator_datas::stretch_edges>, tl<>)
-			CE_SOLVER_DATA(edge_lengths, std::vector<float>, simulator_data_update::assign, tl<simulator_datas::edge_lengths>, tl<>)
+			CE_SOLVER_DATA(stretch_edges,		std::vector<int2>,	simulator_data_update::assign, tl<simulator_datas::stretch_edges>, tl<>)
+			CE_SOLVER_DATA(edge_lengths,		std::vector<float>, simulator_data_update::assign, tl<simulator_datas::edge_lengths>, tl<>)
 
-			CE_SOLVER_DATA(gravity, vec3, simulator_data_update::assign, tl<simulator_datas::gravity>, tl<>)
-			CE_SOLVER_DATA(time_step, float, simulator_data_update::assign, tl<simulator_datas::time_step>, tl<>)
-			CE_SOLVER_DATA(density, float, simulator_data_update::assign, tl<simulator_datas::density>, tl<>)
+			CE_SOLVER_DATA(gravity,				vec3,				simulator_data_update::assign, tl<simulator_datas::gravity>, tl<>)
+			CE_SOLVER_DATA(time_step,			float,				simulator_data_update::assign, tl<simulator_datas::time_step>, tl<>)
+			CE_SOLVER_DATA(density,				float,				simulator_data_update::assign, tl<simulator_datas::density>, tl<>)
 		};
 
 		using var_list = clumsy_lib::extract_member_type_list_t<var>;

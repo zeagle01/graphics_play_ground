@@ -68,13 +68,6 @@ namespace sim_lib
 			{
 				out.resize(n);
 			}
-
-			template<typename T,typename U>
-			static void apply(std::vector<T>& out, const std::vector<U>& in)
-			{
-				out.resize(in.size());
-			}
-
 		};
 
 		struct compute_edge_lengths
@@ -192,58 +185,19 @@ namespace sim_lib
 
 		struct compute_dynamic_positions
 		{
-			static void apply(std::vector<vec3>& out, const std::vector<float3>& in, const std::vector<int>& index_map)
+			static void apply(std::vector<vec3>& out, const std::vector<float3>& in )
 			{
 				out.clear();
-				out.reserve(index_map.size());
-				for (int i = 0; i < index_map.size(); i++)
+				out.reserve(in.size());
+				for (int i = 0; i < in.size(); i++)
 				{
-					int v = index_map[i];
+					int v = i;
 					out.push_back({ in[v][0] ,in[v][1] ,in[v][2] });
 				}
 				out.shrink_to_fit();
 			}
 		};
 
-		struct compute_dynamic_stencils
-		{
-			template<typename T,int N>
-			static void apply(std::vector<std::array<T, N>>& out, const std::vector<std::array<T, N>>& in, const std::vector<int>& dynamic_verts)
-			{
-				out.clear();
-
-				std::unordered_map<int, int> orig_to_dynmaic;
-				for (int i = 0; i < dynamic_verts.size(); i++)
-				{
-					orig_to_dynmaic[dynamic_verts[i]] = i;
-				}
-
-				for (int i = 0; i < in.size(); i++)
-				{
-					bool is_dynamic_0 = orig_to_dynmaic.contains(in[i][0]);
-					for (int j = 1; j < N; j++)
-					{
-						bool is_dynamic_j = orig_to_dynmaic.contains(in[i][j]);
-						if (is_dynamic_j != is_dynamic_0)
-						{
-							printf(" %d is %d, %d is %d\n", in[i][0], int(is_dynamic_0), in[i][j], int(is_dynamic_j));
-							break;
-
-						}
-					}
-
-					if (is_dynamic_0)
-					{
-						std::array<T, N> dynamic_stencil;
-						for (int j = 0; j < N; j++)
-						{
-							dynamic_stencil[j] = orig_to_dynmaic[in[i][j]];
-						}
-						out.push_back(dynamic_stencil);
-					}
-				}
-			}
-		};
 
 		struct get_range
 		{
@@ -260,20 +214,6 @@ namespace sim_lib
 			}
 		};
 
-		struct map_dynamic_positions_back_to_interface_positions
-		{
-			static void apply(std::vector<float3>& out, const std::vector<vec3>& in, const std::vector<int>& index_map)
-			{
-				for (int i = 0; i < index_map.size(); i++)
-				{
-					int v = index_map[i];
-					out[v][0] = in[i](0); 
-					out[v][1] = in[i](1); 
-					out[v][2] = in[i](2); 
-				}
-			}
-
-		};
 
 	}
 

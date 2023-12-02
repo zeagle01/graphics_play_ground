@@ -4,6 +4,7 @@ module;
 #include <vector>
 #include <functional>
 #include <map>
+#include <set>
 
 export module matrix_math;
 
@@ -29,31 +30,68 @@ namespace matrix_math
 
 		}
 
-		using get_nz_t = std::function<T& (int si, int i, int j)>;
+		void set_var_num(int vNum)
+		{
+			m_mat.clear();
+		}
+
+		void set_fixed_variables(const std::vector<int>& fixed_vars)
+		{
+			m_fixed_vars = std::set<int>(fixed_vars.begin(), fixed_vars.end());
+		}
+
+		struct writter
+		{
+			std::map<int, std::map<int, T>>& mat;
+			int ri;
+			int ci;
+			std::set<int>& fixed_vars;
+
+			writter& operator+=(const T& v) 
+			{
+				if (!fixed_vars.contains(ri))
+				{
+					mat[ri][ci] += v;
+				}
+				return *this; 
+			}
+
+			writter& operator=(const T& v) 
+			{
+				if (!fixed_vars.contains(ri))
+				{
+					mat[ri][ci] = v;
+				}
+				return *this; 
+			}
+		};
+
+		using get_nz_t = std::function<writter (int si, int i, int j)>;
 		using get_stencil_nz_t = std::function<void(get_nz_t, int)>;
+
 
 		std::function<void(get_stencil_nz_t)> get_write_loop(int stencil_num, std::function<std::vector<int>(int)> get_stencil)
 		{
 
-			get_nz_t get_nz_fn = [&,get_stencil](int si, int i, int j)->T&
+			get_nz_t get_nz_fn = [&,get_stencil](int si, int i, int j)->writter
 				{
 					std::vector<int> stencil = get_stencil(si);
 					int vi = stencil[i];
 					int vj = stencil[j];
-					return m_mat[vi][vj];
+					return  writter{ m_mat, vi, vj, m_fixed_vars };
 				};
 
 
-			auto ret = [&,get_nz_fn, stencil_num, get_stencil](std::function<void(get_nz_t, int)> fn)
+			auto ret = [&,get_nz_fn, stencil_num, get_stencil](get_stencil_nz_t fn)
 				{
 					for (int si = 0; si < stencil_num; si++)
 					{
 						fn(get_nz_fn, si);
 					}
-
 				};
 			return ret;
 		}
+
 
 
 		void for_each_nz(std::function<void(int row, int col, const T& v)> fn)
@@ -71,7 +109,10 @@ namespace matrix_math
 		}
 
 	private:
+
+
 		std::map<int, std::map<int, T>> m_mat;
+		std::set<int> m_fixed_vars;
 	};
 
 }
