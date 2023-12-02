@@ -123,118 +123,46 @@ namespace sim_lib
 			}
 		};
 
-		struct compute_interface_verts
+
+		struct compute_complete_set
 		{
-			static void apply(std::vector<int>& out, const std::vector<std::vector<int>>& vv, const std::vector<int>& obstacles_vertex_indices)
+			static void apply(std::vector<int>& out, int totalNum, const std::vector<int>& filter)
 			{
-				out.clear();
-				out.reserve(vv.size());
-
-				std::set<int> obstacles_vertex_indices_set(obstacles_vertex_indices.begin(), obstacles_vertex_indices.end());
-				for (int i = 0; i < obstacles_vertex_indices.size(); i++)
-				{
-					int obstacle_v = obstacles_vertex_indices[i];
-					for (int j = 0; j < vv[obstacle_v].size(); j++)
-					{
-						int adj_v = vv[obstacle_v][j];
-						bool adj_v_is_dynamic = !obstacles_vertex_indices_set.contains(adj_v);
-						if (adj_v_is_dynamic)
-						{
-							out.push_back(obstacle_v);
-							break;
-						}
-
-					}
-				}
-
-			}
-		};
-
-		struct compute_internal_dynamic_verts
-		{
-			static void apply(std::vector<int>& out, const int& vert_size, const std::vector<int>& obstacles_vertex_indices)
-			{
+				std::set<int> filterHelper(filter.begin(), filter.end());
 				out.clear();
 
-				std::set<int> obstacles_vertex_indices_set(obstacles_vertex_indices.begin(), obstacles_vertex_indices.end());
-
-				for (int i = 0; i < vert_size; i++)
+				for (int i = 0; i < totalNum; i++)
 				{
-					if (!obstacles_vertex_indices_set.contains(i))
+					if (!filterHelper.contains(i))
 					{
 						out.push_back(i);
 					}
 				}
 
-			}
-
-		};
-
-
-		struct compute_dynamic_verts
-		{
-			static void apply(std::vector<int>& out, const std::vector<int>& internal_dynamic_verts, const std::vector<int>& interface_verts)
-			{
-				out = internal_dynamic_verts;
-				out.insert(out.end(), interface_verts.begin(), interface_verts.end());
-			}
-
-		};
-
-
-
-		struct compute_dynamic_positions
-		{
-			static void apply(std::vector<vec3>& out, const std::vector<float3>& in )
-			{
-				out.clear();
-				out.reserve(in.size());
-				for (int i = 0; i < in.size(); i++)
-				{
-					int v = i;
-					out.push_back({ in[v][0] ,in[v][1] ,in[v][2] });
-				}
 				out.shrink_to_fit();
 			}
 		};
 
-
-		struct get_range
+		struct convert_pos
 		{
-			static void apply(int2& out, const std::vector<int>& in)
+			static void apply(std::vector<vec3>& out, const std::vector<float3>& in)
 			{
-				out[0] = 0;
-				out[1] = in.size();
+				out.resize(in.size());
+				for (int i = 0; i < in.size(); i++)
+				{
+					for (int j = 0; j < 3; j++)
+					{
+						out[i](j) = in[i][j];
+					}
+				}
+				out.shrink_to_fit();
 			}
 
-			static void apply(int2& out, const std::vector<int>& in,int offset)
-			{
-				out[0] = offset;
-				out[1] = in.size() + offset;
-			}
 		};
 
 
 	}
 
 
-	struct compute_complete_set
-	{
-		static void apply(std::vector<int>& out, int totalNum, const std::vector<int>& filter)
-		{
-			std::set<int> filterHelper(filter.begin(), filter.end());
-			out.clear();
-
-			for (int i = 0; i < totalNum; i++)
-			{
-				if (!filterHelper.contains(i))
-				{
-					out.push_back(i);
-				}
-			}
-
-			out.shrink_to_fit();
-		}
-	};
 }
 

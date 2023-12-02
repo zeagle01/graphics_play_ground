@@ -28,7 +28,7 @@ namespace sim_lib
 	{
 		//geometry
 		CE_SIMULATOR_DATA(vert_size,		int,					assign, EVAL(tl<sim_data::vertex_num>), tl<>);
-		CE_SIMULATOR_DATA(positions,		std::vector<vec3>,		compute_dynamic_positions, EVAL(tl<sim_data::positions >), tl<>);
+		CE_SIMULATOR_DATA(positions,		std::vector<vec3>,		convert_pos, EVAL(tl<sim_data::positions >), tl<>);
 
 		CE_SIMULATOR_DATA(dynamic_verts,	std::vector<int>,		compute_complete_set, EVAL(tl<sim_data::vertex_num,sim_data::obstacle_vert_index>), tl<>);
 		CE_SIMULATOR_DATA(fixed_verts,		std::vector<int>,		assign, EVAL(tl<sim_data::obstacle_vert_index>), tl<>);
