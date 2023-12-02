@@ -276,5 +276,25 @@ namespace sim_lib
 		};
 
 	}
+
+
+	struct compute_complete_set
+	{
+		static void apply(std::vector<int>& out, int totalNum, const std::vector<int>& filter)
+		{
+			std::set<int> filterHelper(filter.begin(), filter.end());
+			out.clear();
+
+			for (int i = 0; i < totalNum; i++)
+			{
+				if (!filterHelper.contains(i))
+				{
+					out.push_back(i);
+				}
+			}
+
+			out.shrink_to_fit();
+		}
+	};
 }
 

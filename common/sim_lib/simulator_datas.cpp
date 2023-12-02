@@ -49,6 +49,11 @@ namespace sim_lib
 		//dynamic derived
 		CE_SIMULATOR_DATA(edge_lengths, std::vector<float>, compute_edge_lengths, EVAL(tl<stretch_edges,positions >), tl<>);
 
+
+		//new
+		CE_SIMULATOR_DATA(dynamic_verts_new, std::vector<int>, compute_complete_set, EVAL(tl<sim_data::vertex_num,sim_data::obstacle_vert_index>), tl<>);
+
+
 	};
 
 }

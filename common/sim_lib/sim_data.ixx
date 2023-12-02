@@ -91,7 +91,7 @@ namespace sim_lib
 
 	};
 
-	template<typename name_t, typename T, typename validator_t = no_validator, optional defaulv_valid = optional::no>
+	template<typename name_t, typename T, typename validator_t = no_validator, optional defaulv_valid = optional::no  >
 	struct valid_wrapper
 	{
 		using type = name_t;
@@ -117,10 +117,10 @@ namespace sim_lib
 
 		CE_SIM_INTERFACE_DATA(triangles,	std::vector<int3>,		within_range, tl<vertex_num>,	optional::yes);
 
-		CE_SIM_INTERFACE_DATA(obstacle_vert_index,	std::vector<int>,no_validator, tl<>,	optional::yes);
+		CE_SIM_INTERFACE_DATA(obstacle_vert_index,	std::vector<int>, no_validator, tl<>,	optional::yes);
 
 		CE_SIM_INTERFACE_DATA(stretch_triangles, std::vector<int>,	within_range, tl<triangles>, optional::yes);
-		CE_SIM_INTERFACE_DATA(stretch_stiff,	float,				no_validator, tl<>, optional::yes);
+		CE_SIM_INTERFACE_DATA(stretch_stiff,	float,				no_validator, tl<>, optional::yes);// refine to per triangles
 
 		CE_SIM_INTERFACE_DATA(stretch_edges,	std::vector<int2>,	within_range, tl<vertex_num>, optional::yes);
 
