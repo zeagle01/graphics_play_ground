@@ -9,6 +9,7 @@ module quick_shell;
 
 namespace quick_shell
 {
+	//main window
 	void main_window::init(int width,int height)
 	{
 		m_glfwWrapper.create_window(width, height);
@@ -35,6 +36,9 @@ namespace quick_shell
 		m_glfwWrapper.register_frame_update_fn(frame_update_fn);
 	}
 
+
+
+	//renderer
 	void renderer::draw_triangles(int* indices, float* pos, int tNum, int vNum)
 	{
 		m_render_imp.draw_triangles(indices, pos, tNum, vNum);
@@ -48,5 +52,10 @@ namespace quick_shell
 	void renderer::enable_wireframe(bool isLine)
 	{
 		m_render_imp.enable_wireframe(isLine);
+	}
+
+	void renderer::draw_points(float* pos, int vNum)
+	{
+		m_render_imp.draw_points(pos, vNum);
 	}
 }

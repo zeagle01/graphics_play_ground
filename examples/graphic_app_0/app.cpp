@@ -85,6 +85,7 @@ void App::run()
 	auto render_fn = [&]
 		{
 			renderer.draw_triangles(indices.data(), pos.data(), indices.size() / 3, pos.size() / 3);
+			renderer.draw_points( pos.data(), pos.size() / 3);
 		};
 
 	auto update_fn = [&]
