@@ -32,8 +32,11 @@ private:
 	void make_plane(float lx, float ly, int nx, int ny);
 
 private:
-
 	mouse_picker m_mouse_picker;
+
+	picked_info m_picked { -1,{} };
+	struct mouse_ray { std::array<float, 3> p, dir; };
+	mouse_ray m_mouse_ray;
 
 private:
 	std::vector< int> indices;

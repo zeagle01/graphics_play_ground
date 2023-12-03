@@ -85,7 +85,21 @@ void App::run()
 	auto render_fn = [&]
 		{
 			renderer.draw_triangles(indices.data(), pos.data(), indices.size() / 3, pos.size() / 3);
-			renderer.draw_points( pos.data(), pos.size() / 3);
+
+			if (m_picked.t_index != -1)
+			{
+				int t = m_picked.t_index;
+				std::array<int, 3> t_indices{ indices[t * 3 + 0] ,indices[t * 3 + 1],indices[t * 3 + 2] };
+				std::array<float, 9> t_points
+				{
+					pos[t_indices[0] * 3 + 0], pos[t_indices[0] * 3 + 1], pos[t_indices[0] * 3 + 2],
+					pos[t_indices[1] * 3 + 0], pos[t_indices[1] * 3 + 1], pos[t_indices[1] * 3 + 2],
+					pos[t_indices[2] * 3 + 0], pos[t_indices[2] * 3 + 1], pos[t_indices[2] * 3 + 2]
+				};
+				renderer.draw_points(t_points.data(), 3);
+			}
+
+			renderer.draw_points(m_mouse_ray.p.data(), 1);
 		};
 
 	auto update_fn = [&]
@@ -95,12 +109,12 @@ void App::run()
 		};
 
 	// update fn
-	m.register_frame_update_fn(fps_fn(update_fn,m_fps));
-
 	m.register_frame_update_fn([&](int x, int y) 
 		{
 			on_mouse_move(x, y);
 		});
+	m.register_frame_update_fn(fps_fn(update_fn,m_fps));
+
 
 	connect_sim_ui();
 	connect_render_ui();
@@ -111,7 +125,32 @@ void App::run()
 
 void App::on_mouse_move(int x, int y)
 {
-	m_mouse_picker.pick(x, y);
+	m_mouse_ray = {
+		{ x / 400.f-1.0f ,1.0f - y / 300.f ,-1.f },
+		{ 0 , 0, 1.f }
+	};
+
+
+	m_picked = m_mouse_picker.pick(
+		m_mouse_ray.p,
+		m_mouse_ray.dir,
+		pos.data(), indices.data(), pos.size() / 3, indices.size() / 3 
+	);
+
+	if (m_picked.t_index != -1)
+	{
+		int t = m_picked.t_index;
+		std::array<int, 3> t_indices{ indices[t * 3 + 0] ,indices[t * 3 + 1],indices[t * 3 + 2] };
+
+		std::vector<int> new_fixed = fix_points;
+		new_fixed.push_back(t_indices[0]);
+		new_fixed.push_back(t_indices[1]);
+		new_fixed.push_back(t_indices[2]);
+
+		sim.set<sim_lib::sim_data::obstacle_vert_index>(new_fixed);
+		m_sim_data_is_valid = sim.commit_all_changes();
+	}
+
 }
 
 void App::make_plane(float lx, float ly, int nx, int ny)
