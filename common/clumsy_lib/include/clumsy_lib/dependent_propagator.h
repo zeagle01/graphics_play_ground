@@ -146,11 +146,11 @@ namespace clumsy_lib
 		void set_dependent_graph(const adj_list_t& deps)
 		{
 			m_down_streams = deps;
-			for (const auto& it : m_down_streams)
-			{
-				const auto& up = it.first;
-				m_is_changed[up] = false;
-			}
+		}
+
+		void set_change_status(change_status_t* change_status)
+		{
+			m_is_changed = change_status;
 		}
 
 		template<typename name> void touch()
@@ -162,33 +162,34 @@ namespace clumsy_lib
 		template<typename name> bool is_changed() const
 		{
 			static_assert(Type_In_List<name, list>, "type should be in list!");
-			return m_is_changed.at(std::type_index(typeid(name)));
+			return m_is_changed->at(std::type_index(typeid(name)));
 		}
+
 
 		const change_status_t& get_all_change_status() const
 		{
-			return m_is_changed;
+			return *m_is_changed;
 		}
 
 
 		void clear_all_changes()
 		{
-			for (auto& c : m_is_changed)
+			for (auto& c : *m_is_changed)
 			{
-				c.second = false;
+				(c.second) = false;
 			}
 		}
 
 		void set_all_changes()
 		{
-			for (auto& c : m_is_changed)
+			for (auto& c : *m_is_changed)
 			{
-				c.second = true;
+				(c.second) = true;
 			}
 		}
 
 	private:
-		change_status_t m_is_changed;
+		change_status_t* m_is_changed;
 		adj_list_t m_down_streams;
 	private:
 
@@ -196,7 +197,7 @@ namespace clumsy_lib
 		{
 			if (m_down_streams.contains(t))
 			{
-				m_is_changed[t] = true;
+				(*m_is_changed)[t] = true;
 				for (const auto& d : m_down_streams.at(t))
 				{
 					touch_imp(d);

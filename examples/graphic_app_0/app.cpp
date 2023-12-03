@@ -137,19 +137,21 @@ void App::on_mouse_move(int x, int y)
 		pos.data(), indices.data(), pos.size() / 3, indices.size() / 3 
 	);
 
+	std::vector<int> new_fixed = fix_points;
+
 	if (m_picked.t_index != -1)
 	{
 		int t = m_picked.t_index;
 		std::array<int, 3> t_indices{ indices[t * 3 + 0] ,indices[t * 3 + 1],indices[t * 3 + 2] };
 
-		std::vector<int> new_fixed = fix_points;
 		new_fixed.push_back(t_indices[0]);
 		new_fixed.push_back(t_indices[1]);
 		new_fixed.push_back(t_indices[2]);
 
-		sim.set<sim_lib::sim_data::obstacle_vert_index>(new_fixed);
-		m_sim_data_is_valid = sim.commit_all_changes();
 	}
+
+	sim.set<sim_lib::sim_data::obstacle_vert_index>(new_fixed);
+	m_sim_data_is_valid = sim.commit_all_changes();
 
 }
 

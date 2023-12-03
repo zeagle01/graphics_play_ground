@@ -166,7 +166,7 @@ namespace sim_lib
 
 			for (int i = 0; i < pos.size(); i++)
 			{
-				//pos[i] = pos[i] + dx[i];
+				pos[i] = pos[i] + dx[i];
 			}
 
 		}

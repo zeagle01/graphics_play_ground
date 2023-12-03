@@ -41,6 +41,13 @@ namespace sim_lib
 			auto simulator_dep_graph = clumsy_lib::Dependent_Graph::build<simulator_var_list>();
 			auto merged = clumsy_lib::Dependent_Graph::merge(interface_dep_graph, simulator_dep_graph);
 			m_interface_data_propagator.set_dependent_graph(merged);
+
+			for (const auto& it : merged)
+			{
+				m_change_status[it.first] = true;
+			}
+
+			m_interface_data_propagator.set_change_status(&m_change_status);
 		}
 
 		template<typename var>
@@ -145,7 +152,13 @@ namespace sim_lib
 				auto solver_dep_graph = m_solver->compute_dep_graph();
 				auto merged = clumsy_lib::Dependent_Graph::merge(simulator_dep_graph, solver_dep_graph);
 				m_simulator_data_propagator.set_dependent_graph(merged);
-				m_simulator_data_propagator.set_all_changes();
+
+				for (const auto& it : merged)
+				{
+					m_change_status[it.first] = true;
+				}
+
+				m_simulator_data_propagator.set_change_status(&m_change_status);
 			}
 
 		}
@@ -226,6 +239,8 @@ namespace sim_lib
 		clumsy_lib::Dependent_Propagator<simulator_var_list> m_simulator_data_propagator;
 
 		clumsy_lib::Morphysm<solver_base,solver_type> m_solver;
+
+		clumsy_lib::change_status_t  m_change_status;
 
 	};
 }
