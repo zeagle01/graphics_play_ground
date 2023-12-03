@@ -84,7 +84,6 @@ namespace sim_lib
 
 			//inertial
 			const auto& dynamic_verts = m_datas.get_ref<var::dynamic_verts>();
-			printf("dynamic size %d \n", int(dynamic_verts.size()));
 			auto diag_loop = m_linear_system.get_write_loop(dynamic_verts.size(), [&](int i) { return std::vector<int>{ dynamic_verts[i] }; });
 
 			//float mass = m_datas.get_ref<var::density>();

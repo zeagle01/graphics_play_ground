@@ -106,6 +106,8 @@ namespace sim_lib
 
 			m_solver->update_data(m_simulator_datas, m_simulator_data_propagator.get_all_change_status());
 
+			print_change_status();
+
 			m_simulator_data_propagator.clear_all_changes();
 
 			m_interface_data_propagator.clear_all_changes();
@@ -132,6 +134,18 @@ namespace sim_lib
 				}
 			}
 		};
+
+		void print_change_status()
+		{
+			for (const auto& it : m_change_status)
+			{
+				if (it.second)
+				{
+					printf(" %s \n", it.first.name());
+				}
+			}
+
+		}
 
 	private:
 		void switch_solver()

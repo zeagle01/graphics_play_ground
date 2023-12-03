@@ -49,7 +49,8 @@ private:
 	std::array<float, 2> m_plane_size{ 0.5f,0.5f };
 	std::array<int, 2> m_plane_resolution{ 3,3 };
 
-	std::vector<int> fix_points = { 0, (m_plane_resolution[0] - 1) * 2  };
+	std::vector<int> fix_points;
+	std::vector<int> last_fix_points;
 	//std::vector<int> fix_points = { 0  };
 
 private:

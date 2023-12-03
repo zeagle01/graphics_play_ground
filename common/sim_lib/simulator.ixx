@@ -36,7 +36,6 @@ namespace sim_lib
 		template<typename var>
 		void mark_changed()
 		{
-			printf(" %s changed\n", typeid(var).name());
 			return m_imp.mark_changed<var>();
 		}
 
