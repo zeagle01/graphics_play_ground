@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <vector>
 #include <array>
+#include "mouse_picker.h"
 
 import quick_shell;
 import sim_lib;
@@ -31,6 +32,10 @@ private:
 	void make_plane(float lx, float ly, int nx, int ny);
 
 private:
+
+	mouse_picker m_mouse_picker;
+
+private:
 	std::vector< int> indices;
 	std::vector< int> m_edges;
 	std::vector<float> pos;
@@ -54,4 +59,7 @@ private:
 	std::string m_render_fps = "0";
 	quick_shell::main_window m;
 	sim_lib::simulator sim;
+
+
+
 };

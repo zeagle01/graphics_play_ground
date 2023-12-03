@@ -8,6 +8,8 @@ add_executable(graphic_app_0
 	main.cpp
 	app.h
 	app.cpp
+	mouse_picker.h
+	mouse_picker.cpp
 )
 
 set_target_properties(graphic_app_0 PROPERTIES FOLDER examples)
@@ -20,3 +22,5 @@ target_link_libraries(graphic_app_0 PRIVATE quick_shell)
 target_link_libraries(graphic_app_0 PRIVATE sim_lib)
 
 target_link_libraries(graphic_app_0 PRIVATE geometry_lib)
+
+target_link_libraries(graphic_app_0 PRIVATE matrix_math)

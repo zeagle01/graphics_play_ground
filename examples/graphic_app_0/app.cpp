@@ -5,8 +5,6 @@
 #include <sstream>
 #include <numeric>
 
-import geometry_lib;
-
 using namespace quick_shell;
 
 template<typename T,int N>
@@ -112,9 +110,7 @@ void App::run()
 
 void App::on_mouse_move(int x, int y)
 {
-
-	geometry::bvh bvh;
-
+	m_mouse_picker.pick(x, y);
 }
 
 void App::make_plane(float lx, float ly, int nx, int ny)
