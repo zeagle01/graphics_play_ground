@@ -10,6 +10,7 @@ module;
 
 export module sim_lib: sim_data;
 
+import clumsy_lib;
 
 namespace sim_lib
 {
@@ -136,4 +137,41 @@ namespace sim_lib
 
 	};
 
+
+	export struct sim_data_new
+	{
+
+#define CE_SIM_INTERFACE_DATA_NEW(name,def_type,def_default_value,def_validator,def_tags)	\
+		struct name																			\
+		{																					\
+			def_type;																		\
+			def_default_value;																\
+			def_validator;																	\
+			def_tags;																		\
+		};
+
+#define CE_SIM_TYPE(t) using type=t
+#define CE_SIM_DEFAULT(v) using default_value_fn=v
+#define CE_SIM_VALIDATORS(...) using validator_fn=validators<__VA_ARGS__>
+#define CE_SIM_TAGS(...) using tags=clumsy_lib::type_list<__VA_ARGS__>
+
+
+		template<typename ...valid_fn>
+		struct validators
+		{
+			static bool apply();
+		};
+
+
+		template<typename Fn,typename... P>
+		struct validator
+		{
+			using fn = Fn;
+			using params = clumsy_lib::type_list<P...>;
+		};
+
+		CE_SIM_INTERFACE_DATA_NEW(solver,		CE_SIM_TYPE(solver_type),			CE_SIM_DEFAULT(EVAL(clumsy_lib::literal_value<solver_type::Dummy>)),		CE_SIM_VALIDATORS(),										CE_SIM_TAGS());
+		CE_SIM_INTERFACE_DATA_NEW(vertex_num,	CE_SIM_TYPE(uint32_t),				CE_SIM_DEFAULT(EVAL(clumsy_lib::literal_value<2>)),							CE_SIM_VALIDATORS(),										CE_SIM_TAGS());
+		CE_SIM_INTERFACE_DATA_NEW(positions,	CE_SIM_TYPE(std::vector<float3>),	CE_SIM_DEFAULT(EVAL(nullptr_t)),											CE_SIM_VALIDATORS(EVAL(validator<size_with,vertex_num>)),	CE_SIM_TAGS());
+	};
 }
