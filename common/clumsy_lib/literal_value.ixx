@@ -9,37 +9,38 @@ export module clumsy_lib : literal_value;
 
 namespace clumsy_lib
 {
-	
-	export 
-	template<auto v>
-	struct literal_value
-	{
-		static constexpr decltype(v) value = v;
 
+	export 
+	template<typename T, int = 0 >
+	struct literal
+	{
+		constexpr literal(T v) : data(v) {}
+		T data;
+		constexpr T get() const { return data; }
 	};
 
+	export 
 	template<int N>
-	struct literal_string_storage
+	struct literal<char,N>
 	{
-		constexpr literal_string_storage(const char (&data_ref)[N]) { std::copy_n(data_ref, N, data.data()); }
+		constexpr literal( const char (&v)[N] )  
+		{
+			std::copy_n(v, N, data.data()); 
+		}
 		std::array<char,N> data;
+
+		constexpr std::string_view get() const 
+		{ 
+			return std::string_view(std::begin(data), std::end(data)); 
+		}
 	};
 
 	export 
-	template<literal_string_storage str>
-	struct literal_string 
+	template<literal v>
+	struct literal_t 
 	{
-		static constexpr std::string_view value = str.data.data();
+		static constexpr auto value = v.get();
 	};
-
-
-	export 
-	template<typename T, T v >
-	struct literal_custom
-	{
-		static constexpr decltype(v) value = v;
-	};
-
 
 }
 

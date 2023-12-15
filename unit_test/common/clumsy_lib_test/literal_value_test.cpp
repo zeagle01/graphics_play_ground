@@ -21,31 +21,70 @@ namespace literal_value_test
 		C
 	};
 
-	TEST(Literal_Value_Test, assign_int)
+	namespace _1
 	{
-		int value = literal_value<3> ::value;
-		EXPECT_THAT(value, Eq(3));
+
+		TEST(Literal_Value_Test, assign_int)
+		{
+			constexpr auto value = literal_t< 3 >::value;
+			EXPECT_THAT(value, Eq(3));
+		}
+
+		TEST(Literal_Value_Test, assign_int_2)
+		{
+			using int2 = std::array<int, 2>;
+			constexpr auto value = literal_t< int2{1,2} >::value;
+			EXPECT_THAT(value, Eq(int2{1,2}));
+		}
+
+		TEST(Literal_Value_Test, assign_enum)
+		{
+			constexpr auto value = literal_t<my_enum::A>::value;
+			EXPECT_THAT(value, Eq(my_enum::A));
+		}
+
+
+
+		TEST(Literal_Value_Test, assign_string)
+		{
+			constexpr auto value = literal_t<"ABC">::value;
+			std::string s = value;
+			EXPECT_THAT(s, Eq("ABC"));
+
+		}
+
 	}
 
-	TEST(Literal_Value_Test, assign_int_2)
+	namespace _2
 	{
-		using int2 = std::array<int, 2>;
-		auto value = literal_custom < int2, int2{ 1,2 } > ::value;
-		EXPECT_THAT(value, Eq(int2{ 1,2 }));
-	}
+		TEST(Literal_Value_Test, assign_int)
+		{
+			constexpr auto value = literal{ 3 };
+			EXPECT_THAT(value.get(), Eq(3));
+		}
 
-	TEST(Literal_Value_Test, assign_enum)
-	{
-		my_enum value = literal_value<my_enum::A> ::value;
-		EXPECT_THAT(value, Eq(my_enum::A));
-	}
+		TEST(Literal_Value_Test, assign_int_2)
+		{
+			using int2 = std::array<int, 2>;
+			constexpr auto value = literal{ int2{ 1,2 } };
+			EXPECT_THAT(value.get(), Eq(int2{1,2}));
+		}
+
+		TEST(Literal_Value_Test, assign_enum)
+		{
+			constexpr auto value = literal{my_enum::A};
+			EXPECT_THAT(value.get(), Eq(my_enum::A));
+		}
 
 
 
-	TEST(Literal_Value_Test, assign_string)
-	{
-		std::string value = literal_string<"ABC"> ::value.data();
-		EXPECT_THAT(value, Eq("ABC"));
+		TEST(Literal_Value_Test, assign_string)
+		{
+			constexpr auto value = literal{"ABC"};
+			std::string s = value.get();
+			EXPECT_THAT(s, Eq("ABC"));
+
+		}
 
 	}
 
