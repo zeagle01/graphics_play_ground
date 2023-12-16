@@ -176,6 +176,35 @@ namespace dependent_propagator_test
 
 		}
 
+		TEST(static_dep_graph_test, walk)
+		{
+
+			using config_table = dep_table;
+			using  adj_list = extract_member_type_list_t<config_table>;
+			static_dep_graph dep_graph;
+
+			dep_graph.build<adj_list >();// build default getter
+
+			dynamic_walker walker(dep_graph);
+
+			std::map<std::type_index, int> count;
+
+			auto key_A = std::type_index(typeid(dep_table::A));
+			auto key_B = std::type_index(typeid(dep_table::B));
+			count.insert({ key_A,0 });
+			count.insert({ key_B,0 });
+
+			walker.walk(key_A, [&](auto type_key)
+				{
+					count[type_key]++;
+				}
+			);
+
+			EXPECT_THAT(count[key_A], Eq(1));
+			EXPECT_THAT(count[key_B], Eq(1));
+
+		}
+
 	}
 
 }

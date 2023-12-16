@@ -8,6 +8,7 @@ module;
 #include <unordered_map>
 #include <typeindex>
 #include <set>
+#include <functional> 
 
 export module clumsy_lib : static_dep_graph;
 
@@ -22,7 +23,7 @@ namespace clumsy_lib
 	};
 
 	export
-		class static_dep_graph
+	class static_dep_graph
 	{
 	public:
 
@@ -31,6 +32,9 @@ namespace clumsy_lib
 
 		template<typename from, typename to>
 		bool has_edge();
+
+		const std::set<std::type_index>& get_outlets(std::type_index t) const;
+		bool contains(std::type_index t) const;
 
 		static static_dep_graph merge(const static_dep_graph& dep0, const static_dep_graph& dep1);
 
@@ -43,6 +47,25 @@ namespace clumsy_lib
 		adj_list_t m_data;
 
 	};
+
+
+	export
+	class dynamic_walker
+	{
+	public:
+		dynamic_walker(const static_dep_graph& _graph) :graph(_graph) {}
+
+		template<typename T> 
+		void walk(std::function<void(std::type_index)> fn);
+
+		void walk(std::type_index type, std::function<void(std::type_index)> fn);
+
+	private:
+		const static_dep_graph& graph;
+		std::set<std::type_index> visited;
+	};
+
+
 
 	template<typename list, template<typename> typename get_deps >
 	void static_dep_graph::build()
@@ -119,6 +142,35 @@ namespace clumsy_lib
 		auto k_from = std::type_index(typeid(from));
 		auto k_to = std::type_index(typeid(to));
 		return m_data[k_from].contains(k_to);
+	}
+
+	const std::set<std::type_index>& static_dep_graph::get_outlets(std::type_index t) const
+	{
+		return m_data.at(t);
+	}
+
+	bool static_dep_graph::contains(std::type_index t) const
+	{
+		return m_data.contains(t);
+
+	}
+
+
+
+	void dynamic_walker::walk(std::type_index type, std::function<void(std::type_index)> fn)
+	{
+
+		if (graph.contains(type))
+		{
+			visited.insert(type);
+
+			fn(type);
+
+			for (const auto& d : graph.get_outlets(type))
+			{
+				walk(d,fn);
+			}
+		}
 	}
 
 }
