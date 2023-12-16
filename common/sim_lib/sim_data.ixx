@@ -108,7 +108,7 @@ namespace sim_lib
 	template<typename ...T>
 	using tl = clumsy_lib::type_list<T...>;
 
-	export struct sim_data
+	export struct sim_data_new
 	{
 		CE_SIM_INTERFACE_DATA(solver,		solver_type,			no_validator, tl<>,			optional::no);
 
@@ -138,22 +138,23 @@ namespace sim_lib
 	};
 
 
-	export struct sim_data_new
+	export struct sim_data
 	{
 
 #define CE_SIM_INTERFACE_DATA_NEW(name,def_type,def_default_value,def_validator,def_tags)	\
 		struct name																			\
 		{																					\
-			def_type;																		\
-			def_default_value;																\
-			def_validator;																	\
-			def_tags;																		\
-		};
+			using type =def_type;															\
+			using default_value_fn=def_default_value;										\
+			using validator_fn=validators<def_validator>;									\
+			using tags=clumsy_lib::type_list<def_tags>;										\
+		}; name* name##_var
 
-#define CE_SIM_TYPE(t) using type=t
-#define CE_SIM_DEFAULT(v) using default_value_fn=v
-#define CE_SIM_VALIDATORS(...) using validator_fn=validators<__VA_ARGS__>
-#define CE_SIM_TAGS(...) using tags=clumsy_lib::type_list<__VA_ARGS__>
+#define CE_SIM_TYPE(...) __VA_ARGS__ 
+#define CE_SIM_DEFAULT(...) EVAL(clumsy_lib::literal_t<__VA_ARGS__>)
+#define CE_SIM_NO_DEFAULT() nullptr_t
+#define CE_SIM_VALIDATORS(...) __VA_ARGS__
+#define CE_SIM_TAGS(...) __VA_ARGS__
 
 
 		template<typename ...valid_fn>
@@ -170,8 +171,15 @@ namespace sim_lib
 			using params = clumsy_lib::type_list<P...>;
 		};
 
-		CE_SIM_INTERFACE_DATA_NEW(solver,		CE_SIM_TYPE(solver_type),			CE_SIM_DEFAULT(EVAL(clumsy_lib::literal_value<solver_type::Dummy>)),		CE_SIM_VALIDATORS(),										CE_SIM_TAGS());
-		CE_SIM_INTERFACE_DATA_NEW(vertex_num,	CE_SIM_TYPE(uint32_t),				CE_SIM_DEFAULT(EVAL(clumsy_lib::literal_value<2>)),							CE_SIM_VALIDATORS(),										CE_SIM_TAGS());
-		CE_SIM_INTERFACE_DATA_NEW(positions,	CE_SIM_TYPE(std::vector<float3>),	CE_SIM_DEFAULT(EVAL(nullptr_t)),											CE_SIM_VALIDATORS(EVAL(validator<size_with,vertex_num>)),	CE_SIM_TAGS());
+		CE_SIM_INTERFACE_DATA_NEW(solver,					CE_SIM_TYPE(solver_type),			CE_SIM_DEFAULT(solver_type::Dummy),		CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_INTERFACE_DATA_NEW(vertex_num,				CE_SIM_TYPE(int),					CE_SIM_DEFAULT(-1),						CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_INTERFACE_DATA_NEW(positions,				CE_SIM_TYPE(std::vector<float3>),	CE_SIM_NO_DEFAULT(),					CE_SIM_VALIDATORS(validator<size_with, vertex_num>),										CE_SIM_TAGS());
+		CE_SIM_INTERFACE_DATA_NEW(triangles,				CE_SIM_TYPE(std::vector<int3>),		CE_SIM_NO_DEFAULT(),					CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
+		CE_SIM_INTERFACE_DATA_NEW(obstacle_vert_index,		CE_SIM_TYPE(std::vector<int>),		CE_SIM_NO_DEFAULT(),					CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
+		CE_SIM_INTERFACE_DATA_NEW(stretch_edges,			CE_SIM_TYPE(std::vector<int2>),		CE_SIM_NO_DEFAULT(),					CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
+		CE_SIM_INTERFACE_DATA_NEW(gravity,					CE_SIM_TYPE(float3),				CE_SIM_DEFAULT(float3{0,-9.8,0}),		CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_INTERFACE_DATA_NEW(time_step,				CE_SIM_TYPE(float),					CE_SIM_DEFAULT(0.01f),					CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_INTERFACE_DATA_NEW(density,					CE_SIM_TYPE(float),					CE_SIM_DEFAULT(1.f),					CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+
 	};
 }

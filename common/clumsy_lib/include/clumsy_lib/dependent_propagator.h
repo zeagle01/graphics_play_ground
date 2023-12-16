@@ -252,6 +252,7 @@ namespace clumsy_lib
 		static void apply(obj_t& obj, const upstream_obj_t& upstream_obj, const change_status_t& changes)
 		{
 			s_changes = changes;
+
 			For_Each_Type<var_list>::apply< update_each<obj_get_data_ref, upstream_get_data_ref> >(obj, upstream_obj);
 
 		}
@@ -292,7 +293,7 @@ namespace clumsy_lib
 					{
 						using update_fn = get_dep_update_fn<var>::type;
 
-						if constexpr (!std::is_same_v<update_fn, empty>)
+						if constexpr (!(std::is_same_v<update_fn, empty> || std::is_same_v<update_fn, std::nullptr_t>))
 						{
 							update_fn::apply(get_data<var>(obj, upstream_obj), get_data<dep>(obj, upstream_obj)...);
 							//printf("exe %s \n", typeid(update_fn).name());

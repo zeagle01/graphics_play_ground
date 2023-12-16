@@ -86,13 +86,13 @@ namespace sim_lib
 			const auto& dynamic_verts = m_datas.get_ref<var::dynamic_verts>();
 			auto diag_loop = m_linear_system.get_write_loop(dynamic_verts.size(), [&](int i) { return std::vector<int>{ dynamic_verts[i] }; });
 
-			float mass = m_datas.get_ref<var::density>();
-			float dt = m_datas.get_ref < var::time_step>();
-			vec3 g = m_datas.get_ref<var::gravity>();
+			//float mass = m_datas.get_ref<var::density>();
+			//float dt = m_datas.get_ref < var::time_step>();
+			//vec3 g = m_datas.get_ref<var::gravity>();
 
-			//float mass = 1e-2f;
-			//float dt = 1e-3f;
-			//vec3 g = { 0,-10.f,0 };
+			float mass = 1e-2f;
+			float dt = 1e-3f;
+			vec3 g = { 0,-10.f,0 };
 
 			std::vector<vec3> forces(pos.size());
 			std::vector<vec3> dx(pos.size());

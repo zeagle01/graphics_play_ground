@@ -60,13 +60,13 @@ namespace sim_lib
 		template<typename var>
 		const typename auto& get() const
 		{
-			return m_interface_datas.get_ref<var>().data;
+			return m_interface_datas.get_ref<var>();
 		}
 
 		template<typename var>
 		typename auto& get()
 		{
-			return m_interface_datas.get_ref<var>().data;
+			return m_interface_datas.get_ref<var>();
 		}
 
 		template<typename var>
@@ -88,7 +88,7 @@ namespace sim_lib
 
 			bool all_data_valid = true;
 
-			clumsy_lib::For_Each_Type<interface_var_list>::apply<check_interface_data_valid>(all_data_valid, m_interface_datas);
+			//clumsy_lib::For_Each_Type<interface_var_list>::apply<check_interface_data_valid>(all_data_valid, m_interface_datas);
 
 			return all_data_valid;
 		}
@@ -187,13 +187,13 @@ namespace sim_lib
 				deps_is_all_valid = (deps.is_valid&&...);
 				if (deps_is_all_valid)
 				{
-					me.is_valid = T::validator::apply(me.data, deps.data...);
+					//me.is_valid = T::validator::apply(me.data, deps.data...);
 
 					//printf(" %s exe validator \n", typeid(T::type).name());
 				}
 				else
 				{
-					me.is_valid = false;
+					//me.is_valid = false;
 				}
 			}
 
@@ -224,7 +224,7 @@ namespace sim_lib
 			template<typename var, typename Obj>
 			static auto& apply(Obj& obj)
 			{
-				return obj.template get_ref<var>().data;
+				return obj.template get_ref<var>();
 			}
 
 		};
