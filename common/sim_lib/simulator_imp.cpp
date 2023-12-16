@@ -38,7 +38,6 @@ namespace sim_lib
 		}
 
 
-
 		void init() 
 		{ 
 			m_solver.register_sub_type<dummy_solver>(solver_type::Dummy);
@@ -81,7 +80,6 @@ namespace sim_lib
 			m_interface_data_propagator.touch<var>();
 		}
 
-
 		bool commit_all_changes()
 		{
 			using updater = clumsy_lib::dependent_updater<
@@ -98,7 +96,6 @@ namespace sim_lib
 
 			return all_data_valid;
 		}
-
 
 		void step()
 		{

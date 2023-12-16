@@ -88,3 +88,41 @@ TEST(Type_List_Test, get_type_index)
 	EXPECT_THAT(bb, Eq(0));
 	EXPECT_THAT(cc, Eq(1));
 }
+
+TEST(Type_List_Test, merge_list_zero)
+{
+	using merged = merge_list_t<>;
+
+	EXPECT_TRUE((std::is_same_v<empty_type_list, merged>));
+}
+
+TEST(Type_List_Test, merge_list_one)
+{
+	using l0 = type_list<int>;
+	using merged = merge_list_t<l0>;
+
+	EXPECT_TRUE((std::is_same_v<l0, merged>));
+}
+
+TEST(Type_List_Test, merge_list_two)
+{
+	using l0 = type_list<int>;
+	using l1 = type_list<float>;
+	using exp = type_list<int, float>;
+	using merged = merge_list_t<l0, l1>;
+
+	EXPECT_TRUE((std::is_same_v<exp, merged>));
+
+}
+
+
+TEST(Type_List_Test, merge_list_more)
+{
+	using l0 = type_list<int>;
+	using l1 = type_list<float>;
+	using l2 = type_list<double>;
+	using exp = type_list<int,float,double>;
+	using merged = merge_list_t<l0,l1,l2>;
+
+	EXPECT_TRUE((std::is_same_v<exp, merged>));
+}

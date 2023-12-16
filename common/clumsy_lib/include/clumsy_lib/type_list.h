@@ -156,6 +156,19 @@ namespace clumsy_lib
 	template<typename T, typename tl>
 	concept Type_In_List = is_in<T, tl>;
 
+	//merge_list
+	template<typename ...P,typename ...Q>
+	static type_list<P..., Q...> operator+(type_list<P...> l0, type_list<Q...> l1);
+
+	template<typename ...tl>
+	struct merge_list_imp
+	{
+		using type = decltype((type_list<>{} + ... + tl{}));
+	};
+
+	template<typename ...tl>
+	using merge_list_t = merge_list_imp<tl...>::type;
+
 
 	//////////////////////
 	using empty_type_list = type_list<>;
