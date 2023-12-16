@@ -32,6 +32,12 @@ namespace sim_lib
 	class simulator_imp
 	{
 	public:
+		simulator_imp()
+		{
+			clumsy_lib::For_Each_Type<interface_var_list>::apply<set_interface_init_value>(m_interface_datas);
+		}
+
+
 
 		void init() 
 		{ 
@@ -255,6 +261,20 @@ namespace sim_lib
 		clumsy_lib::Morphysm<solver_base,solver_type> m_solver;
 
 		clumsy_lib::change_status_t  m_change_status;
+
+	private:
+		struct set_interface_init_value
+		{
+			template<typename T>
+			static void apply(clumsy_lib::Static_Type_Map<simulator_imp::interface_var_list>& interface_datas)
+			{
+				if constexpr (!std::is_same_v<typename T::default_value_fn, std::nullptr_t>)
+				{
+					interface_datas.get_ref<T>() = T::default_value_fn::value;
+				}
+			}
+
+		};
 
 	};
 }

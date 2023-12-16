@@ -110,9 +110,9 @@ namespace sim_lib
 		CE_SIM_DATA(triangles,					CE_SIM_TYPE(std::vector<int3>),			CE_SIM_DEFAULT_NONE(),						CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
 		CE_SIM_DATA(obstacle_vert_index,		CE_SIM_TYPE(std::vector<int>),			CE_SIM_DEFAULT_NONE(),						CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
 		CE_SIM_DATA(stretch_edges,				CE_SIM_TYPE(std::vector<int2>),			CE_SIM_DEFAULT_NONE(),						CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
-		CE_SIM_DATA(gravity,					CE_SIM_TYPE(float3),					CE_SIM_DEFAULT(float3{0,-9.8,0}),			CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
-		CE_SIM_DATA(time_step,					CE_SIM_TYPE(float),						CE_SIM_DEFAULT(0.01f),						CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
-		CE_SIM_DATA(density,					CE_SIM_TYPE(float),						CE_SIM_DEFAULT(1.f),						CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_DATA(gravity,					CE_SIM_TYPE(float3),					CE_SIM_DEFAULT(float3{0,-10.f,0}),			CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_DATA(time_step,					CE_SIM_TYPE(float),						CE_SIM_DEFAULT(0.001f),						CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_DATA(density,					CE_SIM_TYPE(float),						CE_SIM_DEFAULT(1e-2f),						CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
 
 
 
