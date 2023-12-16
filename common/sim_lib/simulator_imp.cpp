@@ -265,9 +265,9 @@ namespace sim_lib
 			template<typename T>
 			static void apply(clumsy_lib::Static_Type_Map<simulator_imp::interface_var_list>& interface_datas)
 			{
-				if constexpr (!std::is_same_v<typename T::default_value_fn, std::nullptr_t>)
+				if constexpr (!std::is_same_v<typename T::init_val, std::nullptr_t>)
 				{
-					interface_datas.get_ref<T>() = T::default_value_fn::value;
+					interface_datas.get_ref<T>() = T::init_val::value;
 				}
 			}
 

@@ -68,60 +68,26 @@ namespace sim_lib
 			}
 			return true;
 		}
+	};
 
+	template<typename Fn, typename... P>
+	struct validator_fn
+	{
+		using fn = Fn;
+		using params = clumsy_lib::type_list<P...>;
 	};
 
 	export struct sim_data
 	{
-
-#define CE_SIM_DATA(name,def_type,def_default_value,def_validator,def_tags)	\
-		struct name																			\
-		{																					\
-			using type =def_type;															\
-			using default_value_fn=def_default_value;										\
-			using validator_fn=validators<def_validator>;									\
-			using tags=clumsy_lib::type_list<def_tags>;										\
-		}; name* name##_var
-
-#define CE_SIM_TYPE(...) __VA_ARGS__ 
-#define CE_SIM_DEFAULT(...) EVAL(clumsy_lib::literal_t<__VA_ARGS__>)
-#define CE_SIM_DEFAULT_NONE() nullptr_t
-#define CE_SIM_VALIDATORS(...) __VA_ARGS__
-#define CE_SIM_TAGS(...) __VA_ARGS__
-
-
-		template<typename ...valid_fn>
-		struct validators
-		{
-			static bool apply();
-		};
-
-
-		template<typename Fn,typename... P>
-		struct validator
-		{
-			using fn = Fn;
-			using params = clumsy_lib::type_list<P...>;
-		};
-
-		CE_SIM_DATA(solver,						CE_SIM_TYPE(solver_type),				CE_SIM_DEFAULT(solver_type::Dummy),			CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
-		CE_SIM_DATA(vertex_num,					CE_SIM_TYPE(int),						CE_SIM_DEFAULT(-1),							CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
-		CE_SIM_DATA(positions,					CE_SIM_TYPE(std::vector<float3>),		CE_SIM_DEFAULT_NONE(),						CE_SIM_VALIDATORS(validator<size_with, vertex_num>),										CE_SIM_TAGS());
-		CE_SIM_DATA(triangles,					CE_SIM_TYPE(std::vector<int3>),			CE_SIM_DEFAULT_NONE(),						CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
-		CE_SIM_DATA(obstacle_vert_index,		CE_SIM_TYPE(std::vector<int>),			CE_SIM_DEFAULT_NONE(),						CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
-		CE_SIM_DATA(stretch_edges,				CE_SIM_TYPE(std::vector<int2>),			CE_SIM_DEFAULT_NONE(),						CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
-		CE_SIM_DATA(gravity,					CE_SIM_TYPE(float3),					CE_SIM_DEFAULT(float3{0,-10.f,0}),			CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
-		CE_SIM_DATA(time_step,					CE_SIM_TYPE(float),						CE_SIM_DEFAULT(0.001f),						CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
-		CE_SIM_DATA(density,					CE_SIM_TYPE(float),						CE_SIM_DEFAULT(1e-2f),						CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
-
-
-
-#undef CE_SIM_DATA	
-#undef CE_SIM_TYPE 
-#undef CE_SIM_DEFAULT
-#undef CE_SIM_DEFAULT_NONE
-#undef CE_SIM_VALIDATORS
-#undef CE_SIM_TAGS
+		CE_ENTRY(solver,						CE_USE(type,	solver_type);				CE_VAL(init_val,	solver_type::Dummy);			CE_LIST(validator);																			CE_LIST(tags));
+		CE_ENTRY(vertex_num,					CE_USE(type,	int);						CE_VAL(init_val,	-1);							CE_LIST(validator);																			CE_LIST(tags));
+		CE_ENTRY(positions,						CE_USE(type,	std::vector<float3>);		CE_NIL(init_val);									CE_LIST(validator,	validator_fn<size_with, vertex_num>);									CE_LIST(tags));
+		CE_ENTRY(triangles,						CE_USE(type,	std::vector<int3>);			CE_NIL(init_val);									CE_LIST(validator,	validator_fn<within_range, vertex_num>);								CE_LIST(tags));
+		CE_ENTRY(obstacle_vert_index,			CE_USE(type,	std::vector<int>);			CE_NIL(init_val);									CE_LIST(validator,	validator_fn<within_range, vertex_num>);								CE_LIST(tags));
+		CE_ENTRY(stretch_edges,					CE_USE(type,	std::vector<int2>);			CE_NIL(init_val);									CE_LIST(validator,	validator_fn<within_range, vertex_num>);								CE_LIST(tags));
+		CE_ENTRY(gravity,						CE_USE(type,	float3);					CE_VAL(init_val,	float3{0,-10.f,0});				CE_LIST(validator);																			CE_LIST(tags));
+		CE_ENTRY(time_step,						CE_USE(type,	float);						CE_VAL(init_val,	0.001f);						CE_LIST(validator);																			CE_LIST(tags));
+		CE_ENTRY(density,						CE_USE(type,	float);						CE_VAL(init_val,	1e-2f);							CE_LIST(validator);																			CE_LIST(tags));
 
 	};
 }
