@@ -19,32 +19,11 @@ namespace sim_lib
 	export using int3 = std::array<int, 3>;
 	export using int2 = std::array<int, 2>;
 
-
-	export struct self_collision_data
-	{
-		int triangle_index;
-		float stiff;
-		float thickness;
-	};
-
-	export struct obstacle_data
-	{
-		float stiff;
-		float thickness;
-		float3 velocity;
-	};
-
 	export enum class solver_type
 	{
 		Dummy,
 		Newton,
 		Explicit,
-	};
-
-	enum class optional
-	{
-		no,
-		yes
 	};
 
 	struct no_validator
@@ -92,56 +71,10 @@ namespace sim_lib
 
 	};
 
-	template<typename name_t, typename T, typename validator_t = no_validator, optional defaulv_valid = optional::no  >
-	struct valid_wrapper
-	{
-		using type = name_t;
-		T data;
-		bool is_valid = bool(defaulv_valid);
-		using validator = validator_t;
-	};
-
-
-#define SIM_TYPE(t) CE_TYPE(EVAL(t))
-#define CE_SIM_INTERFACE_DATA(name,t,validator,deplist,optional) CE_ADD_NODE(name, SIM_TYPE(valid_wrapper<EVAL(name,t, validator, optional)>) CE_FIELD(deps, deplist))
-
-	template<typename ...T>
-	using tl = clumsy_lib::type_list<T...>;
-
-	export struct sim_data_new
-	{
-		CE_SIM_INTERFACE_DATA(solver,		solver_type,			no_validator, tl<>,			optional::no);
-
-		CE_SIM_INTERFACE_DATA(vertex_num,	int,					no_validator, tl<>,			optional::no);
-
-		CE_SIM_INTERFACE_DATA(positions,	std::vector<float3>,	size_with, tl<vertex_num>,	optional::no);
-
-		CE_SIM_INTERFACE_DATA(triangles,	std::vector<int3>,		within_range, tl<vertex_num>,	optional::yes);
-
-		CE_SIM_INTERFACE_DATA(obstacle_vert_index,	std::vector<int>, no_validator, tl<>,	optional::yes);
-
-		CE_SIM_INTERFACE_DATA(stretch_triangles, std::vector<int>,	within_range, tl<triangles>, optional::yes);
-		CE_SIM_INTERFACE_DATA(stretch_stiff,	float,				no_validator, tl<>, optional::yes);// refine to per triangles
-
-		CE_SIM_INTERFACE_DATA(stretch_edges,	std::vector<int2>,	within_range, tl<vertex_num>, optional::yes);
-
-		//CE_ADD_NODE(bending, CE_TYPE(std::vector<bending_data>));
-
-		//CE_ADD_NODE(self_collision, CE_TYPE(std::vector<self_collision_data>));
-
-
-		CE_SIM_INTERFACE_DATA(gravity,	float3,	no_validator, tl<>,	optional::yes);
-		CE_SIM_INTERFACE_DATA(time_step,float,	no_validator, tl<>,	optional::yes);
-		CE_SIM_INTERFACE_DATA(density,	float,	no_validator, tl<>,	optional::yes);
-
-
-	};
-
-
 	export struct sim_data
 	{
 
-#define CE_SIM_INTERFACE_DATA_NEW(name,def_type,def_default_value,def_validator,def_tags)	\
+#define CE_SIM_DATA(name,def_type,def_default_value,def_validator,def_tags)	\
 		struct name																			\
 		{																					\
 			using type =def_type;															\
@@ -152,7 +85,7 @@ namespace sim_lib
 
 #define CE_SIM_TYPE(...) __VA_ARGS__ 
 #define CE_SIM_DEFAULT(...) EVAL(clumsy_lib::literal_t<__VA_ARGS__>)
-#define CE_SIM_NO_DEFAULT() nullptr_t
+#define CE_SIM_DEFAULT_NONE() nullptr_t
 #define CE_SIM_VALIDATORS(...) __VA_ARGS__
 #define CE_SIM_TAGS(...) __VA_ARGS__
 
@@ -171,15 +104,24 @@ namespace sim_lib
 			using params = clumsy_lib::type_list<P...>;
 		};
 
-		CE_SIM_INTERFACE_DATA_NEW(solver,					CE_SIM_TYPE(solver_type),			CE_SIM_DEFAULT(solver_type::Dummy),		CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
-		CE_SIM_INTERFACE_DATA_NEW(vertex_num,				CE_SIM_TYPE(int),					CE_SIM_DEFAULT(-1),						CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
-		CE_SIM_INTERFACE_DATA_NEW(positions,				CE_SIM_TYPE(std::vector<float3>),	CE_SIM_NO_DEFAULT(),					CE_SIM_VALIDATORS(validator<size_with, vertex_num>),										CE_SIM_TAGS());
-		CE_SIM_INTERFACE_DATA_NEW(triangles,				CE_SIM_TYPE(std::vector<int3>),		CE_SIM_NO_DEFAULT(),					CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
-		CE_SIM_INTERFACE_DATA_NEW(obstacle_vert_index,		CE_SIM_TYPE(std::vector<int>),		CE_SIM_NO_DEFAULT(),					CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
-		CE_SIM_INTERFACE_DATA_NEW(stretch_edges,			CE_SIM_TYPE(std::vector<int2>),		CE_SIM_NO_DEFAULT(),					CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
-		CE_SIM_INTERFACE_DATA_NEW(gravity,					CE_SIM_TYPE(float3),				CE_SIM_DEFAULT(float3{0,-9.8,0}),		CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
-		CE_SIM_INTERFACE_DATA_NEW(time_step,				CE_SIM_TYPE(float),					CE_SIM_DEFAULT(0.01f),					CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
-		CE_SIM_INTERFACE_DATA_NEW(density,					CE_SIM_TYPE(float),					CE_SIM_DEFAULT(1.f),					CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_DATA(solver,						CE_SIM_TYPE(solver_type),				CE_SIM_DEFAULT(solver_type::Dummy),			CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_DATA(vertex_num,					CE_SIM_TYPE(int),						CE_SIM_DEFAULT(-1),							CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_DATA(positions,					CE_SIM_TYPE(std::vector<float3>),		CE_SIM_DEFAULT_NONE(),						CE_SIM_VALIDATORS(validator<size_with, vertex_num>),										CE_SIM_TAGS());
+		CE_SIM_DATA(triangles,					CE_SIM_TYPE(std::vector<int3>),			CE_SIM_DEFAULT_NONE(),						CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
+		CE_SIM_DATA(obstacle_vert_index,		CE_SIM_TYPE(std::vector<int>),			CE_SIM_DEFAULT_NONE(),						CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
+		CE_SIM_DATA(stretch_edges,				CE_SIM_TYPE(std::vector<int2>),			CE_SIM_DEFAULT_NONE(),						CE_SIM_VALIDATORS(validator<within_range, vertex_num>),										CE_SIM_TAGS());
+		CE_SIM_DATA(gravity,					CE_SIM_TYPE(float3),					CE_SIM_DEFAULT(float3{0,-9.8,0}),			CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_DATA(time_step,					CE_SIM_TYPE(float),						CE_SIM_DEFAULT(0.01f),						CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+		CE_SIM_DATA(density,					CE_SIM_TYPE(float),						CE_SIM_DEFAULT(1.f),						CE_SIM_VALIDATORS(),																		CE_SIM_TAGS());
+
+
+
+#undef CE_SIM_DATA	
+#undef CE_SIM_TYPE 
+#undef CE_SIM_DEFAULT
+#undef CE_SIM_DEFAULT_NONE
+#undef CE_SIM_VALIDATORS
+#undef CE_SIM_TAGS
 
 	};
 }
