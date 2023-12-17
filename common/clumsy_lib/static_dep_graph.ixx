@@ -66,14 +66,85 @@ namespace clumsy_lib
 	};
 
 	export
+	template<typename list, template<typename> typename get_deps>
 	class static_walker
 	{
 	public:
-		template<template<typename> typename get_fn, typename list, template<typename> typename get_deps, typename ...P>
+		template<
+				template<typename> typename get_fn, 
+				template<typename> typename need_update_checker,
+				typename ...P
+		>
 		void walk(P&& ...p);
 
 	private:
-		std::set<std::type_index> visited;
+
+		template<template<typename> typename get_fn, template<typename> typename need_update_checker>
+		struct update_each
+		{
+			template<typename var_name, typename ...P>
+			static void apply(static_walker& walker, P&& ...p)
+			{
+				recurse_update_upstream<var_name, get_fn, need_update_checker, typename get_deps<var_name>::type>::apply(walker, std::forward<P>(p)...);
+			}
+		};
+
+		template<typename var, template<typename> typename get_fn, template<typename> typename need_update_checker, typename dep_list>
+		struct recurse_update_upstream;
+
+		template<typename var, template<typename> typename get_fn, template<typename> typename need_update_checker, typename ...dep>
+		struct recurse_update_upstream <var, get_fn, need_update_checker, type_list< dep...>>
+		{
+
+			template<typename ... P>
+			static void apply(static_walker& walker, P&& ...p)
+			{
+				if constexpr (Type_In_List<var, list>)
+				{
+
+					bool need_update = (check_need_update<dep, need_update_checker>(walker, std::forward<P>(p)...) || ...);
+
+					if (need_update)
+					{
+						(apply_each<dep >::apply(walker, std::forward<P>(p)...), ...);
+					}
+
+					if (check_need_update<var, need_update_checker>(walker, std::forward<P>(p)...))
+					{
+						//if constexpr (requires { typename get_fn<var>::type; }) //TODO: make it optional
+						{
+							using update_fn = get_fn<var>::type;
+							if constexpr (!(std::is_same_v<update_fn, std::nullptr_t>))
+							{
+								update_fn::template apply<var, dep...>(std::forward<P>(p)...);
+								//printf("exe %s \n", typeid(update_fn).name());
+							}
+						}
+
+						walker.m_visited.insert(std::type_index(typeid(var)));
+					}
+				}
+
+			}
+
+			template<typename var, typename ... P>
+			static void apply_each(static_walker& walker, P&& ...p)
+			{
+				//if constexpr (Type_In_List<var, list>)
+				{
+					recurse_update_upstream<var, get_fn, need_update_checker, typename get_deps<var>::type>::apply(walker, std::forward<P>(p)...);
+				}
+			}
+
+			template<typename var, template<typename> typename need_update_checker, typename ...P >
+			static bool check_need_update(const static_walker& walker, P&& ...p)
+			{
+				return (!walker.m_visited.contains(std::type_index(typeid(var))))
+					&& need_update_checker<var>::apply(std::forward<P>(p)...);
+			}
+		};
+	private:
+		std::set<std::type_index>  m_visited;
 	};
 
 
@@ -184,6 +255,20 @@ namespace clumsy_lib
 				walk(d,fn);
 			}
 		}
+	}
+
+
+	template<typename list, template<typename> typename get_deps>
+	template< template<typename> typename get_fn, template<typename> typename need_update_checker, typename ...P >
+	void static_walker<list, get_deps>::walk(P&& ...p)
+	{
+		For_Each_Type<list>::template
+			apply< 
+			update_each< get_fn, need_update_checker >
+			>( 
+				*this, std::forward<P>(p)...
+			);
+
 	}
 
 }
