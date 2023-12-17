@@ -65,6 +65,17 @@ namespace clumsy_lib
 		std::set<std::type_index> visited;
 	};
 
+	export
+	class static_walker
+	{
+	public:
+		template<template<typename> typename get_fn, typename list, template<typename> typename get_deps, typename ...P>
+		void walk(P&& ...p);
+
+	private:
+		std::set<std::type_index> visited;
+	};
+
 
 
 	template<typename list, template<typename> typename get_deps >
@@ -140,7 +151,9 @@ namespace clumsy_lib
 	bool static_dep_graph::has_edge()
 	{
 		auto k_from = std::type_index(typeid(from));
+
 		auto k_to = std::type_index(typeid(to));
+
 		return m_data[k_from].contains(k_to);
 	}
 
