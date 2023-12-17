@@ -138,25 +138,19 @@ namespace sim_lib
 			m_interface_data_status.touch<var>();
 		}
 
-		bool commit_all_changes()
+		void commit_all_changes()
 		{
-			using updater = clumsy_lib::dependent_updater<
-				interface_var_list,
-				clumsy_lib::default_get_deps,
-				get_validator
-			>;
-
-			updater::apply (m_interface_datas, m_interface_datas, m_interface_data_status.get_all_change_status());
-
-			bool all_data_valid = true;
-
-			//clumsy_lib::For_Each_Type<interface_var_list>::apply<check_interface_data_valid>(all_data_valid, m_interface_datas);
-
-			return all_data_valid;
+			m_changes_has_commited = true;
 		}
 
-		void step()
+		bool step()
 		{
+			bool data_is_valid = validate_interface_data();
+			if (!data_is_valid)
+			{
+				return false;
+			}
+
 			switch_solver();
 
 			config_simulator_propagatro();
@@ -177,8 +171,28 @@ namespace sim_lib
 
 			//output positions
 			simulator_data_update::assign::apply(get<sim_data::positions>(), m_solver->get_result());
+
+			return true;
 		}
+
 	private:
+
+		bool validate_interface_data()
+		{
+			if (m_changes_has_commited)
+			{
+				m_changes_has_commited = false;
+
+				m_all_data_is_valid = true;
+
+				clumsy_lib::static_walker<interface_var_list, get_validator_params> walker;
+
+				walker.walk<get_validator_fn, update_when_dirty>(m_all_data_is_valid, m_interface_datas, m_interface_data_status);
+
+			}
+			return m_all_data_is_valid;
+		}
+
 		void propagate_simulator_changes()
 		{
 			clumsy_lib::For_Each_Type<simulator_var_list>::apply<touch_simulator_var>(m_simulator_data_status);
@@ -202,7 +216,7 @@ namespace sim_lib
 			{
 				if (it.second)
 				{
-					printf(" %s \n", it.first.name());
+					printf("data changed: %s \n", it.first.name());
 				}
 			}
 
@@ -241,47 +255,6 @@ namespace sim_lib
 		}
 
 	private:
-		struct validator
-		{
-			template<typename T,typename ...U>
-			static void apply(T& me,const U& ...deps)
-			{
-				bool deps_is_all_valid = true;
-				deps_is_all_valid = (deps.is_valid&&...);
-				if (deps_is_all_valid)
-				{
-					//me.is_valid = T::validator::apply(me.data, deps.data...);
-
-					//printf(" %s exe validator \n", typeid(T::type).name());
-				}
-				else
-				{
-					//me.is_valid = false;
-				}
-			}
-
-		};
-
-		template<typename T>
-		struct get_validator
-		{
-			using type = validator;
-		};
-
-		struct check_interface_data_valid
-		{
-			template<typename var,typename Obj>
-			static void apply(bool& all_data_valid, Obj& obj)
-			{
-				all_data_valid = all_data_valid && obj.get_ref<var>().is_valid;
-				if (!obj.get_ref<var>().is_valid)
-				{
-					printf("invalid %s  \n", typeid(var).name());
-				}
-			}
-		};
-
-	private:
 		struct get_sim_data_ref
 		{
 			template<typename var, typename Obj>
@@ -315,6 +288,8 @@ namespace sim_lib
 		change_status m_simulator_data_status;
 
 		clumsy_lib::Morphysm<solver_base,solver_type> m_solver;
+		bool m_changes_has_commited = false;
+		bool m_all_data_is_valid = false;
 
 	private:
 		struct set_interface_init_value
@@ -326,6 +301,66 @@ namespace sim_lib
 				{
 					interface_datas.get_ref<T>() = T::init_val::value;
 				}
+			}
+		};
+
+	private:
+
+		struct validator_dispatchor
+		{
+			template<typename var, typename ...param>
+			static void apply(bool& all_data_valid, const clumsy_lib::Static_Type_Map<interface_var_list>& interface_datas, const change_status& interface_data_status)
+			{
+				bool valid = true;
+				if constexpr (!std::is_same_v<typename var::validator, std::nullptr_t>)
+				{
+					valid = var::validator::fn::apply(interface_datas.get_ref<var>(), interface_datas.get_ref<param>()...);
+
+					all_data_valid &= valid;
+				}
+
+				if (valid)
+				{
+					printf(" valid check ok: %s \n", typeid(var).name());
+				}
+				else
+				{
+					printf(" invalid data: %s \n", typeid(var).name());
+				}
+			}
+		};
+
+		template<typename var>
+		struct get_validator_fn
+		{
+			using type = validator_dispatchor;
+		};
+
+		template<typename var>
+		struct get_validator_params
+		{
+			template<typename U>
+			static auto  choosor()
+			{
+				if constexpr (requires {typename U::validator::params; })
+				{
+					return typename U::validator::params{};
+				}
+				else
+				{
+					return clumsy_lib::type_list<>{};
+				}
+			}
+
+			using type = decltype(choosor<var>());
+		};
+
+		template<typename var>
+		struct update_when_dirty
+		{
+			static bool apply(bool& all_data_valid, const clumsy_lib::Static_Type_Map<interface_var_list>& interface_datas, const change_status& interface_data_status)
+			{
+				return all_data_valid && interface_data_status.is_changed<var>();
 			}
 		};
 

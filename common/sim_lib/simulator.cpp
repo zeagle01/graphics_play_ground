@@ -8,9 +8,9 @@ module sim_lib;
 namespace sim_lib
 {
 
-	void simulator::step()
+	bool simulator::step()
 	{
-		m_imp.step();
+		return m_imp.step();
 	}
 
 	void simulator::init()

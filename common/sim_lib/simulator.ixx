@@ -39,13 +39,14 @@ namespace sim_lib
 			return m_imp.mark_changed<var>();
 		}
 
-		[[nodiscard]] bool commit_all_changes()
+		void commit_all_changes()
 		{
 			return m_imp.commit_all_changes();
 		}
 
 		void init();
-		void step();
+
+		[[nodiscard]] bool step();
 
 
 	private:

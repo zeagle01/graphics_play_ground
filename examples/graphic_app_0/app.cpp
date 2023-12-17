@@ -73,9 +73,10 @@ void App::run()
 
 	auto animation_fn = [&]()
 		{
+			m_sim_data_is_valid = sim.step();
+
 			if (m_sim_data_is_valid)
 			{
-				sim.step();
 				convert_from_sim_data(pos, sim.get<sim_lib::sim_data::positions>());
 			}
 		};
@@ -154,7 +155,7 @@ void App::on_mouse_move(int x, int y)
 	if (fix_points != last_fix_points)
 	{
 		sim.set<sim_lib::sim_data::obstacle_vert_index>(fix_points);
-		m_sim_data_is_valid = sim.commit_all_changes();
+		sim.commit_all_changes();
 	}
 
 	last_fix_points = fix_points;
@@ -269,7 +270,7 @@ void App::init_sim()
 
 	init_sim_data();
 
-	m_sim_data_is_valid = sim.commit_all_changes();
+	sim.commit_all_changes();
 }
 
 void App::connect_sim_ui()
@@ -282,7 +283,7 @@ void App::connect_sim_ui()
 		{
 			make_plane(new_v[0], new_v[1], m_plane_resolution[0], m_plane_resolution[1]);
 			init_sim_data();
-			m_sim_data_is_valid = sim.commit_all_changes();
+			sim.commit_all_changes();
 		}
 	);
 
@@ -291,7 +292,7 @@ void App::connect_sim_ui()
 		{
 			make_plane(m_plane_size[0], m_plane_size[1], new_v[0], new_v[1]);
 			init_sim_data();
-			m_sim_data_is_valid = sim.commit_all_changes();
+			sim.commit_all_changes();
 		}
 
 	);
@@ -300,7 +301,7 @@ void App::connect_sim_ui()
 		[this](const auto& new_v)
 		{
 			sim.mark_changed<sim_lib::sim_data::gravity>();
-			m_sim_data_is_valid = sim.commit_all_changes();
+			sim.commit_all_changes();
 		}
 	);
 
@@ -308,7 +309,7 @@ void App::connect_sim_ui()
 		[this](const auto& new_v)
 		{
 			sim.mark_changed<sim_lib::sim_data::time_step>();
-			m_sim_data_is_valid = sim.commit_all_changes();
+			sim.commit_all_changes();
 		}
 	);
 
@@ -316,7 +317,7 @@ void App::connect_sim_ui()
 		[this](const auto& new_v)
 		{
 			sim.mark_changed<sim_lib::sim_data::density>();
-			m_sim_data_is_valid = sim.commit_all_changes();
+			sim.commit_all_changes();
 		}
 	);
 
