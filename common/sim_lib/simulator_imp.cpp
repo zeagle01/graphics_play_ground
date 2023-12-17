@@ -187,7 +187,7 @@ namespace sim_lib
 
 				clumsy_lib::static_walker<interface_var_list, get_validator_params> walker;
 
-				walker.walk<get_validator_fn, update_when_dirty>(m_all_data_is_valid, m_interface_datas, m_interface_data_status);
+				walker.walk<validator_dispatchor, update_when_dirty>(m_all_data_is_valid, m_interface_datas, m_interface_data_status);
 
 			}
 			return m_all_data_is_valid;
@@ -330,11 +330,6 @@ namespace sim_lib
 			}
 		};
 
-		template<typename var>
-		struct get_validator_fn
-		{
-			using type = validator_dispatchor;
-		};
 
 		template<typename var>
 		struct get_validator_params

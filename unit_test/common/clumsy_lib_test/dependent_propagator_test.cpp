@@ -26,7 +26,7 @@ namespace dependent_propagator_test
 		template<typename T, typename ...dep>
 		static void apply(std::vector<std::string >& out)
 		{
-			out.push_back(get_name<T>());
+			out.push_back(get_name<T>()+":");
 			(out.push_back(get_name<dep>()), ...);
 		}
 
@@ -37,6 +37,16 @@ namespace dependent_propagator_test
 			auto it = ret.find_last_of(':');
 			ret = ret.substr(it + 1);
 			return ret;
+		}
+	};
+
+
+	struct assign
+	{
+		template<typename T>
+		static void apply(T& out, const T& in)
+		{
+			out = in;
 		}
 	};
 
@@ -58,8 +68,8 @@ namespace dependent_propagator_test
 
 	struct vars2
 	{
-		CE_ENTRY(A, CE_USE(fn, print_name)		CE_LIST(adjs))
-		CE_ENTRY(B, CE_USE(fn, print_name)		CE_LIST(adjs, A))
+		CE_ENTRY(A,   	CE_LIST(adjs))
+		CE_ENTRY(B, 	CE_LIST(adjs, A))
 	};
 
 
@@ -79,13 +89,6 @@ namespace dependent_propagator_test
 	protected:
 		template<typename T>
 		struct get_adjs { using type = typename T::adjs; };
-
-		template<typename T>
-		struct get_fn { using type = typename T::fn; };
-
-		template<typename T>
-		struct always_update { static bool apply(...) { return true; } };
-
 
 		static_dep_graph m_dep_graph0;
 		static_dep_graph m_dep_graph1;
@@ -138,9 +141,9 @@ namespace dependent_propagator_test
 
 		static_walker<list, get_adjs> walker;
 		std::vector<std::string > act;
-		walker.walk<get_fn, always_update>(act);
+		walker.walk<print_name >(act);
 
-		std::vector<std::string > exp{ "A","B","A" };
+		std::vector<std::string > exp{ "A:","B:","A" };
 		EXPECT_THAT(act, Eq(exp));
 	}
 
@@ -167,9 +170,9 @@ namespace dependent_propagator_test
 
 		static_walker<list, get_adjs> walker;
 		std::vector<std::string > act;
-		walker.walk<get_fn, update_var2_B_only>(act);
+		walker.walk<print_name, update_var2_B_only>(act);
 
-		std::vector<std::string > exp{ "B","A" };
+		std::vector<std::string > exp{ "B:","A" };
 		EXPECT_THAT(act, Eq(exp));
 	}
 
