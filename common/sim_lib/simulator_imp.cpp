@@ -11,6 +11,7 @@ module;
 
 #include "matrix_math/matrix_math.h"
 
+#include <memory>
 
 module sim_lib : simulator_imp;
 
@@ -26,8 +27,66 @@ import :solver_dummy;
 
 namespace sim_lib
 {
-
 	using namespace simulator_data_update;
+
+	class change_status
+	{
+	public:
+		void set_dependent_graph(const clumsy_lib::static_dep_graph& graph)
+		{
+			m_graph = graph;
+
+			m_walker = std::make_unique<clumsy_lib::dynamic_walker>(m_graph);
+
+			init_all_changes(false);
+		}
+
+		template<typename var>
+		void touch()
+		{
+			auto k = std::type_index(typeid(var));
+
+			m_walker->walk(k, [this](auto node_key) 
+				{
+					m_status[node_key] = true;
+				});
+		}
+
+		template<typename var>
+		bool is_changed() const
+		{
+			auto k = std::type_index(typeid(var));
+			return m_status.at(k);
+		}
+
+		void set_all_changes(bool v)
+		{
+			for (auto& it : m_status)
+			{
+				it.second = v;
+			}
+		}
+
+		const std::unordered_map<std::type_index, bool>& get_all_change_status() const
+		{
+			return m_status;
+		}
+
+	private:
+		void init_all_changes(bool v)
+		{
+			m_walker->walk([this,v](auto node_key)
+				{
+					m_status[node_key] = v;
+				}
+			);
+		}
+
+		std::unique_ptr<clumsy_lib::dynamic_walker> m_walker;
+		std::unordered_map<std::type_index, bool> m_status;
+		clumsy_lib::static_dep_graph m_graph;
+
+	};
 
 	class simulator_imp
 	{
@@ -39,20 +98,19 @@ namespace sim_lib
 
 
 		void init() 
-		{ 
+		{
 			m_solver.register_sub_type<dummy_solver>(solver_type::Dummy);
 
-			auto interface_dep_graph = clumsy_lib::Dependent_Graph::build<interface_var_list>();
-			auto simulator_dep_graph = clumsy_lib::Dependent_Graph::build<simulator_var_list>();
-			auto merged = clumsy_lib::Dependent_Graph::merge(interface_dep_graph, simulator_dep_graph);
-			m_interface_data_propagator.set_dependent_graph(merged);
+			clumsy_lib::static_dep_graph interface_dep_graph;
+			clumsy_lib::static_dep_graph simulator_dep_graph;
 
-			for (const auto& it : merged)
-			{
-				m_change_status[it.first] = true;
-			}
+			interface_dep_graph.build<interface_var_list>();
+			simulator_dep_graph.build<simulator_var_list>();
 
-			m_interface_data_propagator.set_change_status(&m_change_status);
+			auto merged = clumsy_lib::static_dep_graph::merge(interface_dep_graph, simulator_dep_graph);
+
+			m_interface_data_status.set_dependent_graph(merged);
+			m_interface_data_status.set_all_changes(true);
 		}
 
 		template<typename var>
@@ -77,7 +135,7 @@ namespace sim_lib
 		template<typename var>
 		void mark_changed()
 		{
-			m_interface_data_propagator.touch<var>();
+			m_interface_data_status.touch<var>();
 		}
 
 		bool commit_all_changes()
@@ -88,7 +146,7 @@ namespace sim_lib
 				get_validator
 			>;
 
-			updater::apply (m_interface_datas, m_interface_datas, m_interface_data_propagator.get_all_change_status());
+			updater::apply (m_interface_datas, m_interface_datas, m_interface_data_status.get_all_change_status());
 
 			bool all_data_valid = true;
 
@@ -107,13 +165,13 @@ namespace sim_lib
 
 			propagate_simulator_changes();
 
-			m_solver->update_data(m_simulator_datas, m_simulator_data_propagator.get_all_change_status());
+			m_solver->update_data(m_simulator_datas, m_simulator_data_status.get_all_change_status());
 
 			print_change_status();
 
-			m_simulator_data_propagator.clear_all_changes();
+			m_simulator_data_status.set_all_changes(false);
 
-			m_interface_data_propagator.clear_all_changes();
+			m_interface_data_status.set_all_changes(false);
 
 			m_solver->solve();
 
@@ -123,13 +181,13 @@ namespace sim_lib
 	private:
 		void propagate_simulator_changes()
 		{
-			clumsy_lib::For_Each_Type<simulator_var_list>::apply<touch_simulator_var>(m_simulator_data_propagator);
+			clumsy_lib::For_Each_Type<simulator_var_list>::apply<touch_simulator_var>(m_simulator_data_status);
 		}
 
 		struct touch_simulator_var
 		{
-			template<typename var, typename propagator_t>
-			static void apply(propagator_t& propagator)
+			template<typename var >
+			static void apply(change_status& propagator)
 			{
 				if (propagator.is_changed<var>())
 				{
@@ -140,7 +198,7 @@ namespace sim_lib
 
 		void print_change_status()
 		{
-			for (const auto& it : m_change_status)
+			for (const auto& it : m_interface_data_status.get_all_change_status())
 			{
 				if (it.second)
 				{
@@ -153,7 +211,7 @@ namespace sim_lib
 	private:
 		void switch_solver()
 		{
-			clumsy_lib::Down_Stream_Datas<interface_var_list> change_checker(m_interface_data_propagator.get_all_change_status());
+			clumsy_lib::Down_Stream_Datas<interface_var_list> change_checker(m_interface_data_status.get_all_change_status());
 			if (change_checker.is_changed<sim_data::solver>())
 			{
 				m_solver.shift(get<sim_data::solver>());
@@ -162,20 +220,22 @@ namespace sim_lib
 
 		void config_simulator_propagatro()
 		{
-			clumsy_lib::Down_Stream_Datas<interface_var_list> change_checker(m_interface_data_propagator.get_all_change_status());
+			clumsy_lib::Down_Stream_Datas<interface_var_list> change_checker(m_interface_data_status.get_all_change_status());
 			if (change_checker.is_changed<sim_data::solver>())
 			{
-				auto simulator_dep_graph = clumsy_lib::Dependent_Graph::build<simulator_var_list>();
-				auto solver_dep_graph = m_solver->compute_dep_graph();
-				auto merged = clumsy_lib::Dependent_Graph::merge(simulator_dep_graph, solver_dep_graph);
-				m_simulator_data_propagator.set_dependent_graph(merged);
+				clumsy_lib::static_dep_graph simulator_dep_graph;
+				simulator_dep_graph.build<interface_var_list>();
 
-				for (const auto& it : merged)
-				{
-					m_change_status[it.first] = true;
-				}
+				clumsy_lib::static_dep_graph solver_dep_graph = m_solver->get_dep_graph();
 
-				m_simulator_data_propagator.set_change_status(&m_change_status);
+				auto merged = clumsy_lib::static_dep_graph::merge(simulator_dep_graph, solver_dep_graph);
+
+				m_simulator_data_status.set_dependent_graph(merged);
+
+				m_simulator_data_status.set_all_changes(true);
+
+				m_interface_data_status.set_all_changes(true);
+
 			}
 
 		}
@@ -241,7 +301,7 @@ namespace sim_lib
 				clumsy_lib::default_get_data_ref,
 				get_sim_data_ref
 				>
-				(m_simulator_datas, m_interface_datas, m_interface_data_propagator.get_all_change_status());
+				(m_simulator_datas, m_interface_datas, m_interface_data_status.get_all_change_status());
 		}
 	private:
 
@@ -251,13 +311,10 @@ namespace sim_lib
 		using simulator_var_list = clumsy_lib::extract_member_type_list_t<simulator_datas>;
 		clumsy_lib::Static_Type_Map<simulator_var_list> m_simulator_datas;
 
-		clumsy_lib::Dependent_Propagator<interface_var_list> m_interface_data_propagator;
-
-		clumsy_lib::Dependent_Propagator<simulator_var_list> m_simulator_data_propagator;
+		change_status m_interface_data_status;
+		change_status m_simulator_data_status;
 
 		clumsy_lib::Morphysm<solver_base,solver_type> m_solver;
-
-		clumsy_lib::change_status_t  m_change_status;
 
 	private:
 		struct set_interface_init_value
@@ -270,9 +327,11 @@ namespace sim_lib
 					interface_datas.get_ref<T>() = T::init_val::value;
 				}
 			}
-
 		};
 
 	};
+
+
+
 }
 

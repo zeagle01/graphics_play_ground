@@ -35,7 +35,8 @@ namespace sim_lib
 
 		virtual const std::vector<vec3>& get_result() const = 0;
 
-		virtual clumsy_lib::adj_list_t compute_dep_graph()
+
+		virtual const clumsy_lib::static_dep_graph& get_dep_graph() const
 		{
 			return {};
 		}

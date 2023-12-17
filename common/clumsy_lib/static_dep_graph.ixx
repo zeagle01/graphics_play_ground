@@ -19,7 +19,20 @@ namespace clumsy_lib
 	template<typename T>
 	struct default_get_deps_new
 	{
-		using type = typename T::deps;
+		template<typename U>
+		static auto  choosor()
+		{
+			if constexpr (requires {typename U::deps; })
+			{
+				return typename U::deps {};
+			}
+			else
+			{
+				return type_list<>{};
+			}
+		}
+
+		using type = decltype(choosor<T>());
 	};
 
 	export
@@ -36,6 +49,14 @@ namespace clumsy_lib
 		const std::set<std::type_index>& get_outlets(std::type_index t) const;
 		bool contains(std::type_index t) const;
 
+		using adj_list_t = std::unordered_map<std::type_index, std::set<std::type_index>>;
+
+		const adj_list_t& get() const
+		{
+			return m_data;
+		}
+
+
 		static static_dep_graph merge(const static_dep_graph& dep0, const static_dep_graph& dep1);
 
 	private:
@@ -43,7 +64,6 @@ namespace clumsy_lib
 		template< template<typename> typename get_deps >
 		struct collect_deps;
 
-		using adj_list_t = std::unordered_map<std::type_index, std::set<std::type_index>>;
 		adj_list_t m_data;
 
 	};
@@ -55,12 +75,13 @@ namespace clumsy_lib
 	public:
 		dynamic_walker(const static_dep_graph& _graph) :graph(_graph) {}
 
-		template<typename T> 
+		void walk(std::type_index type, std::function<void(std::type_index)> fn);
 		void walk(std::function<void(std::type_index)> fn);
 
-		void walk(std::type_index type, std::function<void(std::type_index)> fn);
-
 	private:
+		void walk_imp(std::type_index type, std::function<void(std::type_index)> fn);
+		void walk_imp(std::function<void(std::type_index)> fn);
+
 		const static_dep_graph& graph;
 		std::set<std::type_index> visited;
 	};
@@ -149,6 +170,7 @@ namespace clumsy_lib
 
 
 
+	///////// static_dep_graph
 	template<typename list, template<typename> typename get_deps >
 	void static_dep_graph::build()
 	{
@@ -240,11 +262,17 @@ namespace clumsy_lib
 	}
 
 
+	/////////dynamic walker
 
 	void dynamic_walker::walk(std::type_index type, std::function<void(std::type_index)> fn)
 	{
+		visited.clear();
+		walk_imp( type,  fn);
+	}
 
-		if (graph.contains(type))
+	void dynamic_walker::walk_imp(std::type_index type, std::function<void(std::type_index)> fn)
+	{
+		if ((!visited.contains(type)) && graph.contains(type))
 		{
 			visited.insert(type);
 
@@ -252,11 +280,27 @@ namespace clumsy_lib
 
 			for (const auto& d : graph.get_outlets(type))
 			{
-				walk(d,fn);
+				walk_imp(d,fn);
 			}
 		}
 	}
 
+	void dynamic_walker::walk(std::function<void(std::type_index)> fn)
+	{
+		visited.clear();
+		walk_imp(fn);
+	}
+
+	void dynamic_walker::walk_imp(std::function<void(std::type_index)> fn)
+	{
+		const auto& graph_data = graph.get();
+		for (const auto& it : graph_data)
+		{
+			walk_imp(it.first, fn);
+		}
+	}
+
+	/////////static walker
 
 	template<typename list, template<typename> typename get_deps>
 	template< template<typename> typename get_fn, template<typename> typename need_update_checker, typename ...P >

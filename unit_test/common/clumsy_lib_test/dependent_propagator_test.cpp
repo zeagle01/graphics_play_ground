@@ -50,16 +50,16 @@ namespace dependent_propagator_test
 	struct vars1
 	{
 		CE_ENTRY(A, CE_LIST(adjs))
-			CE_ENTRY(B, CE_LIST(adjs, A))
-			CE_ENTRY(C, CE_LIST(adjs, A, B))
-			CE_ENTRY(D, CE_LIST(adjs, vars0::A))
-			CE_ENTRY(E, CE_LIST(adjs, B))
+		CE_ENTRY(B, CE_LIST(adjs, A))
+		CE_ENTRY(C, CE_LIST(adjs, A, B))
+		CE_ENTRY(D, CE_LIST(adjs, vars0::A))
+		CE_ENTRY(E, CE_LIST(adjs, B))
 	};
 
 	struct vars2
 	{
 		CE_ENTRY(A, CE_USE(fn, print_name)		CE_LIST(adjs))
-			CE_ENTRY(B, CE_USE(fn, print_name)		CE_LIST(adjs, A))
+		CE_ENTRY(B, CE_USE(fn, print_name)		CE_LIST(adjs, A))
 	};
 
 

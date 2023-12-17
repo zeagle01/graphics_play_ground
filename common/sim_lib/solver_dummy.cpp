@@ -23,6 +23,11 @@ namespace sim_lib
 	class dummy_solver :public solver_base
 	{
 	public:
+		dummy_solver() 
+		{
+			m_dep_graph.build<var_list>();
+		}
+
 		void update_data(const simulator_datas_t& sim_datas, const clumsy_lib::change_status_t& change_status) override
 		{
 			clumsy_lib::dependent_updater<var_list>::apply(m_datas, sim_datas, change_status);
@@ -58,9 +63,9 @@ namespace sim_lib
 		}
 
 
-		clumsy_lib::adj_list_t compute_dep_graph() override
+		const clumsy_lib::static_dep_graph& get_dep_graph() const override
 		{
-			return clumsy_lib::Dependent_Graph::build<var_list>();
+			return m_dep_graph;
 		}
 
 	private:
@@ -194,6 +199,9 @@ namespace sim_lib
 
 		using spm_t=matrix_math::sparse_matrix<float>;
 		spm_t m_linear_system;
+
+
+		clumsy_lib::static_dep_graph m_dep_graph;
 	};
 
 }
