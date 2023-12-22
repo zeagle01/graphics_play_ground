@@ -297,6 +297,8 @@ void App::connect_sim_ui()
 
 	);
 
+	m.add_ui_component<ui_component::text_line>("simulator");
+
 	m.add_ui_component<ui_component::slider_bar3>("gravity", sim.get<sim_lib::sim_data::gravity>(), {0.0,10.f},
 		[this](const auto& new_v)
 		{

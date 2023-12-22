@@ -64,6 +64,7 @@ target_sources(clumsy_lib PUBLIC
 	clumsy_lib.ixx
 	literal_value.ixx
 	static_dep_graph.ixx
+	dispatchor.ixx
 )
 
 set_source_files_properties(${partition_files} PROPERTIES COMPILE_FLAGS "/internalPartition")

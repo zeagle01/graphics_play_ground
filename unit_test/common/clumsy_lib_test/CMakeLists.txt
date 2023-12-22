@@ -19,6 +19,7 @@ add_executable(clumsy_lib_test
 	weak_ptr_test.cpp
 	dependent_propagator_test.cpp
 	literal_value_test.cpp
+	dispatchor_test.cpp
 )
 
 
