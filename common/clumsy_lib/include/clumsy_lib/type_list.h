@@ -11,6 +11,15 @@ namespace clumsy_lib
 	template<typename ...P>
 	struct type_list {};
 
+	template<typename tl>
+	struct is_type_list_imp :public std::false_type {};
+
+	template<typename ...P>
+	struct is_type_list_imp<type_list<P...>> :public std::true_type {};
+
+	template<typename tl>
+	static constexpr  bool is_type_list = is_type_list_imp<tl>::value;
+
 
 	//front
 	template<typename tl>
@@ -160,14 +169,45 @@ namespace clumsy_lib
 	template<typename ...P,typename ...Q>
 	static type_list<P..., Q...> operator+(type_list<P...> l0, type_list<Q...> l1);
 
-	template<typename ...tl>
-	struct merge_list_imp
+//// merge_list_t TODO: should use this, bug some how vs2022 doesn't work 
+//
+//	template<typename ...tl>
+//	struct merge_list_imp
+//	{
+//		static_assert((is_type_list<tl>&&...), " shbould be type list");
+//
+//		using type = decltype(( std::declval<type_list<>>() + ... + std::declval<tl>()));
+//	};
+//	template<typename ...tl>
+//	using merge_list_t = merge_list_imp<tl...>::type;
+//// merge_list_t end
+
+	template<typename tls>
+	struct merge_list_imp;
+
+	template<>
+	struct merge_list_imp<type_list<>>
 	{
-		using type = decltype((type_list<>{} + ... + tl{}));
+		using type = type_list<>;
 	};
 
+	template<typename tl>
+	struct merge_list_imp<type_list<tl>>
+	{
+		using type = tl;
+	};
+
+	template<typename tl0, typename tl1, typename ...tl  >
+	struct merge_list_imp<type_list<tl0, tl1, tl...>>
+	{
+		using head = decltype((tl0{} + tl1{})); //just can't do it with one line , bug?
+		using type = decltype((head{} + ... + tl{}));
+	};
+
+
 	template<typename ...tl>
-	using merge_list_t = merge_list_imp<tl...>::type;
+	using merge_list_t = merge_list_imp<type_list<tl...>>::type;
+
 
 
 	//////////////////////

@@ -8,6 +8,7 @@ module;
 #include "clumsy_lib/morphysm.h"
 #include "clumsy_lib/field_defines.h"
 #include "clumsy_lib/macro_loop.h"
+#include "clumsy_lib/type_list.h"
 
 #include "matrix_math/matrix_math.h"
 
@@ -28,6 +29,7 @@ import :solver_dummy;
 namespace sim_lib
 {
 	using namespace simulator_data_update;
+	using namespace clumsy_lib;
 
 	class change_status
 	{
@@ -185,10 +187,10 @@ namespace sim_lib
 
 				m_all_data_is_valid = true;
 
-				clumsy_lib::static_walker<interface_var_list, get_validator_params> walker;
+				using interface_var_list_new = clumsy_lib::extract_member_type_list_t<sim_data>;
+				clumsy_lib::static_walker<interface_var_list_new, get_validator_params> walker;
 
 				walker.walk<validator_dispatchor, update_when_dirty>(m_all_data_is_valid, m_interface_datas, m_interface_data_status);
-
 			}
 			return m_all_data_is_valid;
 		}
@@ -304,42 +306,93 @@ namespace sim_lib
 			}
 		};
 
+		//validatros
 	private:
-
 		struct validator_dispatchor
 		{
 			template<typename var, typename ...param>
 			static void apply(bool& all_data_valid, const clumsy_lib::Static_Type_Map<interface_var_list>& interface_datas, const change_status& interface_data_status)
 			{
-				bool valid = true;
-				if constexpr (!std::is_same_v<typename var::validator, std::nullptr_t>)
+				if constexpr (!std::is_same_v<typename var::validator, clumsy_lib::type_list<>>)
 				{
-					valid = var::validator::fn::apply(interface_datas.get_ref<var>(), interface_datas.get_ref<param>()...);
-
-					all_data_valid &= valid;
+					invoke_all<var,typename var::validator>::apply(all_data_valid, interface_datas);
 				}
 
-				if (valid)
-				{
-					printf(" valid check ok: %s \n", typeid(var).name());
-				}
-				else
-				{
-					printf(" invalid data: %s \n", typeid(var).name());
-				}
+
+				//printf(" invalid data: %s --\n", typeid(var).name());
+				//(printf(" invalid data: %s \n", typeid(param).name()), ...);
 			}
+
+			template<typename var, typename fn_tl>
+			struct invoke_all;
+
+			template<typename var, typename ...validator>
+			struct invoke_all<var, clumsy_lib::type_list<validator...>>
+			{
+				static void apply(bool& all_data_valid, const clumsy_lib::Static_Type_Map<interface_var_list>& interface_datas)
+				{
+					(invoke_one<typename validator::name, var, typename validator::params>::apply(all_data_valid, interface_datas),...);
+
+				}
+
+
+				template<typename Fn, typename var, typename params>
+				struct invoke_one;
+
+				template<typename Fn, typename var, typename ...param>
+				struct invoke_one<Fn, var, clumsy_lib::type_list<param...>>
+				{
+					static void apply(bool& all_data_valid, const clumsy_lib::Static_Type_Map<interface_var_list>& interface_datas)
+					{
+						all_data_valid = Fn::apply(interface_datas.get_ref<var>(), interface_datas.get_ref<param>()...);
+
+						if (!all_data_valid)
+						{
+							printf(" invalid data: %s, violation: %s\n", typeid(var).name(), typeid(Fn).name());
+						}
+					}
+
+				};
+
+			};
 		};
+
+		 
 
 
 		template<typename var>
 		struct get_validator_params
 		{
+
+			template<typename valids>
+			struct project_params;
+
+			template<typename ...valid>
+			struct project_params<clumsy_lib::type_list<valid...>>
+			{
+				using type = clumsy_lib::type_list<typename valid::params...>;
+			};
+
+			template<typename valids>
+			struct merge_params
+			{
+				using params_tl = project_params<valids>::type;
+				using type = clumsy_lib::merge_list_imp<params_tl>::type;
+			};
+
 			template<typename U>
 			static auto  choosor()
 			{
-				if constexpr (requires {typename U::validator::params; })
+				if constexpr (requires {typename U::validator; })
 				{
-					return typename U::validator::params{};
+					if constexpr (std::is_same_v<U::validator, clumsy_lib::type_list<>>)
+					{
+						return clumsy_lib::type_list<>{};
+					}
+					else
+					{
+						return typename merge_params<typename U::validator>::type{};
+					}
 				}
 				else
 				{
