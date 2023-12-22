@@ -26,7 +26,7 @@ namespace clumsy_lib
 
 			m_funcs[key] = [sub_type_fn](const base_type& b)
 				{
-					return sub_type_fn(*(dynamic_cast<const sub_type*>(&b)));
+					return sub_type_fn(dynamic_cast<const sub_type&>(b));
 				};
 		}
 

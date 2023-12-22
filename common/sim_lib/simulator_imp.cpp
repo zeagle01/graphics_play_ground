@@ -29,7 +29,6 @@ import :solver_dummy;
 namespace sim_lib
 {
 	using namespace simulator_data_update;
-	using namespace clumsy_lib;
 
 	class change_status
 	{

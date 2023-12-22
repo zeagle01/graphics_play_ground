@@ -13,6 +13,7 @@ import : GLFW_wrapper;
 import : render;
 
 export import :ui_components; 
+export import :ui_event;
 
 namespace quick_shell
 {
@@ -42,6 +43,12 @@ namespace quick_shell
 		void run_event_loop();
 		void register_frame_update_fn(std::function<void()> frame_update_fn);
 		void register_frame_update_fn(std::function<void(int, int)> frame_update_fn);
+
+		template<typename concrete_event>
+		void register_event_fn(std::function<bool(const concrete_event&)> event_fn)
+		{
+			m_glfwWrapper.register_event_fn<concrete_event>(event_fn);
+		}
 
 		// expose render api obj
 		renderer& get_renderer() { return m_renderer; }

@@ -114,7 +114,16 @@ void App::run()
 		{
 			on_mouse_move(x, y);
 		});
+
 	m.register_frame_update_fn(fps_fn(update_fn,m_fps));
+
+	//event fn
+	m.register_event_fn<mouse_pressed>([](const auto& e) 
+		{
+			printf(" right is pressed\n");
+			return true;
+		});
+
 
 
 	connect_sim_ui();

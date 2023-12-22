@@ -37,7 +37,6 @@ namespace quick_shell
 	}
 
 
-
 	//renderer
 	void renderer::draw_triangles(int* indices, float* pos, int tNum, int vNum)
 	{

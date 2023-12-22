@@ -41,6 +41,7 @@ target_sources(quick_shell PUBLIC
 	FILES 
 	main_window.ixx  ## main module definition 
 	ui_components.ixx  
+	ui_event.ixx  
 )
 
 set_source_files_properties(${partion_files} PROPERTIES COMPILE_FLAGS "/internalPartition")
