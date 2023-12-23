@@ -242,7 +242,7 @@ namespace sim_lib
 				}
 				else
 				{
-					printf("%s do not affact solver  \n", typeid(var).name());
+					//printf("%s do not affact solver  \n", typeid(var).name());
 				}
 			}
 		};

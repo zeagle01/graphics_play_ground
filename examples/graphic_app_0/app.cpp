@@ -302,7 +302,7 @@ void App::init_sim_data()
 	sim.set<sim_lib::sim_data::solver>(sim_lib::solver_type::Dummy);
 	sim.set<sim_lib::sim_data::vertex_num>(sim_pos.size());
 	sim.set<sim_lib::sim_data::positions>(sim_pos);
-	sim.set<sim_lib::sim_data::positions>(sim_pos);
+	sim.set<sim_lib::sim_data::rest_positions>(sim_pos);
 	sim.set<sim_lib::sim_data::triangles>(sim_tris);
 	//std::vector<int> stretch_t(sim_tris.size());
 	//std::iota(stretch_t.begin(), stretch_t.end(),0);
