@@ -40,8 +40,6 @@ namespace sim_lib
 			auto& vel = m_datas.get_ref<var::velocity>();
 			auto& last_pos = m_datas.get_ref<var::last_positions>();
 
-			//backup last pos
-			last_pos = pos;
 
 			for (int it = 0; it < 1; it++)
 			{
@@ -145,6 +143,18 @@ namespace sim_lib
 
 			edge_loop(add_stretch_edge_constraint);
 
+			//update fix pos
+			const auto& fixed_verts = m_datas.get_ref<var::fixed_verts>();
+			//printf("used fixed size %d \n", fixed_verts.size());
+			for (int i = 0; i < fixed_verts.size(); i++)
+			{
+				int v = fixed_verts[i];
+				dx[v] = pos[v] - last_pos[v];
+			}
+				
+			//backup last pos
+			last_pos = pos;
+
 			//jacobi
 			for (int it = 0; it < 10; it++)
 			{
@@ -179,9 +189,9 @@ namespace sim_lib
 		using tl = clumsy_lib::type_list<T...>;
 		struct var
 		{
-			CE_SOLVER_DATA(positions,			std::vector<vec3>,	solver_data_update::assign, tl<simulator_datas::positions>, tl<>)
-			CE_SOLVER_DATA(velocity,			std::vector<vec3>,	simulator_data_update::resize, tl<simulator_datas::vert_size>, tl<>)
-			CE_SOLVER_DATA(last_positions,		std::vector<vec3>,	simulator_data_update::resize, tl<simulator_datas::vert_size>, tl<>)
+			CE_SOLVER_DATA(positions,			std::vector<vec3>,	solver_data_update::assign,		tl<simulator_datas::positions>, tl<>)
+			CE_SOLVER_DATA(velocity,			std::vector<vec3>,	simulator_data_update::resize,	tl<simulator_datas::vert_size>, tl<>)
+			CE_SOLVER_DATA(last_positions,		std::vector<vec3>,	solver_data_update::assign,		tl<simulator_datas::positions>, tl<>)
 
 			CE_SOLVER_DATA(dynamic_verts,		std::vector<int>,	simulator_data_update::assign, tl<simulator_datas::dynamic_verts>, tl<>)
 			CE_SOLVER_DATA(fixed_verts,			std::vector<int>,	simulator_data_update::assign, tl<simulator_datas::fixed_verts>, tl<>)

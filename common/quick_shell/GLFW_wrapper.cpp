@@ -164,12 +164,17 @@ namespace quick_shell
 				{
 					auto& dispatchor = *(clumsy_lib::dispatchor <ui_event, bool>*)glfwGetWindowUserPointer(window);
 
+					double cposx, cposy;
+                    glfwGetCursorPos(window, &cposx, &cposy);
+
 					switch (action)
 					{
 					case GLFW_PRESS:
 					{
 						mouse_pressed e;
 						e.button = static_cast<mouse_button>(button);
+						e.x = cposx;
+						e.y = cposy;
 						dispatchor(e);
 						break;
 					}
@@ -177,6 +182,8 @@ namespace quick_shell
 					{
 						mouse_released e;
 						e.button = static_cast<mouse_button>(button);
+						e.x = cposx;
+						e.y = cposy;
 						dispatchor(e);
 						break;
 					}

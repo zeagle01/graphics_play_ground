@@ -26,7 +26,9 @@ private:
 	void connect_render_ui();
 
 private:
-	void on_mouse_move(int x, int y);
+	void pick(int x, int y);
+	void drag(int x, int y);
+	void release_pick();
 
 private:
 	void make_plane(float lx, float ly, int nx, int ny);
@@ -49,9 +51,7 @@ private:
 	std::array<float, 2> m_plane_size{ 0.5f,0.5f };
 	std::array<int, 2> m_plane_resolution{ 3,3 };
 
-	std::vector<int> fix_points;
-	std::vector<int> last_fix_points;
-	//std::vector<int> fix_points = { 0  };
+	std::vector<int> preset_fix_points = { 0, (m_plane_resolution[0] - 1) * 2 };
 
 private:
 	bool m_enable_fill = true;

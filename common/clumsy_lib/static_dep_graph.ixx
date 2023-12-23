@@ -47,6 +47,10 @@ namespace clumsy_lib
 		bool has_edge();
 
 		const std::set<std::type_index>& get_outlets(std::type_index t) const;
+
+		template<typename from>
+		bool contains() const;
+
 		bool contains(std::type_index t) const;
 
 		using adj_list_t = std::unordered_map<std::type_index, std::set<std::type_index>>;
@@ -61,7 +65,7 @@ namespace clumsy_lib
 
 	private:
 
-		template< template<typename> typename get_deps >
+		template<  template<typename> typename get_deps >
 		struct collect_deps;
 
 		adj_list_t m_data;
@@ -171,7 +175,7 @@ namespace clumsy_lib
 	template<typename list, template<typename> typename get_deps >
 	void static_dep_graph::build()
 	{
-		For_Each_Type<list>::apply<collect_deps<get_deps>>(m_data);
+		For_Each_Type<list>::apply<collect_deps< get_deps>>(m_data);
 	}
 
 	static_dep_graph static_dep_graph::merge(const static_dep_graph& dep0, const static_dep_graph& dep1)
@@ -219,7 +223,6 @@ namespace clumsy_lib
 				{
 					m_down_streams[std::type_index(typeid(upstream_t))] = std::set{ std::type_index(typeid(curr_t)) };
 				}
-
 			}
 		};
 
@@ -250,6 +253,14 @@ namespace clumsy_lib
 	const std::set<std::type_index>& static_dep_graph::get_outlets(std::type_index t) const
 	{
 		return m_data.at(t);
+	}
+
+	template<typename var>
+	bool static_dep_graph::contains() const
+	{
+		auto key = std::type_index(typeid(var));
+		return contains(key);
+
 	}
 
 	bool static_dep_graph::contains(std::type_index t) const

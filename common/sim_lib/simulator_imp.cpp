@@ -13,6 +13,7 @@ module;
 #include "matrix_math/matrix_math.h"
 
 #include <memory>
+#include <span>
 
 module sim_lib : simulator_imp;
 
@@ -51,6 +52,12 @@ namespace sim_lib
 				{
 					m_status[node_key] = true;
 				});
+		}
+
+		template<typename var>
+		bool contains() const 
+		{
+			return m_graph.contains<var>();
 		}
 
 		template<typename var>
@@ -119,6 +126,28 @@ namespace sim_lib
 		{
 			get<var>() = data;
 			mark_changed<var>();
+		}
+
+		template<typename var>
+		void set_partially(const std::vector<int>& indices, const auto& data)
+		{
+			if (indices.size() == data.size())
+			{
+				auto& var_data = get<var>();
+
+				for (int i = 0; i < indices.size(); i++)
+				{
+					int index = indices[i];
+					var_data[index] = data[i];
+				}
+
+				mark_changed<var>();
+			}
+			else
+			{
+				printf(" %s partially set size don't match\n", typeid(var).name());
+				m_all_data_is_valid = false;
+			}
 		}
 
 		template<typename var>
@@ -196,24 +225,39 @@ namespace sim_lib
 
 		void propagate_simulator_changes()
 		{
-			clumsy_lib::For_Each_Type<simulator_var_list>::apply<touch_simulator_var>(m_simulator_data_status);
+			clumsy_lib::For_Each_Type<simulator_var_list>::apply<touch_simulator_var>(m_simulator_data_status, m_interface_data_status);
 		}
 
 		struct touch_simulator_var
 		{
 			template<typename var >
-			static void apply(change_status& propagator)
+			static void apply(change_status& down_stream, const change_status& up_stream)
 			{
-				if (propagator.is_changed<var>())
+				if (down_stream.contains<var>())
 				{
-					propagator.touch<var>();
+					if (up_stream.is_changed<var>())
+					{
+						down_stream.touch<var>();
+					}
+				}
+				else
+				{
+					printf("%s do not affact solver  \n", typeid(var).name());
 				}
 			}
 		};
 
 		void print_change_status()
 		{
-			for (const auto& it : m_interface_data_status.get_all_change_status())
+			//for (const auto& it : m_interface_data_status.get_all_change_status())
+			//{
+			//	if (it.second)
+			//	{
+			//		printf("data changed: %s \n", it.first.name());
+			//	}
+			//}
+
+			for (const auto& it : m_simulator_data_status.get_all_change_status())
 			{
 				if (it.second)
 				{
@@ -238,14 +282,7 @@ namespace sim_lib
 			clumsy_lib::Down_Stream_Datas<interface_var_list> change_checker(m_interface_data_status.get_all_change_status());
 			if (change_checker.is_changed<sim_data::solver>())
 			{
-				clumsy_lib::static_dep_graph simulator_dep_graph;
-				simulator_dep_graph.build<interface_var_list>();
-
-				clumsy_lib::static_dep_graph solver_dep_graph = m_solver->get_dep_graph();
-
-				auto merged = clumsy_lib::static_dep_graph::merge(simulator_dep_graph, solver_dep_graph);
-
-				m_simulator_data_status.set_dependent_graph(merged);
+				m_simulator_data_status.set_dependent_graph(m_solver->get_dep_graph());
 
 				m_simulator_data_status.set_all_changes(true);
 

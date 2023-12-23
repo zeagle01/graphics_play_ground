@@ -4,6 +4,7 @@
 #include <chrono>
 #include <sstream>
 #include <numeric>
+#include <limits>
 
 using namespace quick_shell;
 
@@ -98,9 +99,9 @@ void App::run()
 					pos[t_indices[2] * 3 + 0], pos[t_indices[2] * 3 + 1], pos[t_indices[2] * 3 + 2]
 				};
 				renderer.draw_points(t_points.data(), 3);
+				renderer.draw_points(m_mouse_ray.p.data(), 1);
 			}
 
-			renderer.draw_points(m_mouse_ray.p.data(), 1);
 		};
 
 	auto update_fn = [&]
@@ -110,17 +111,24 @@ void App::run()
 		};
 
 	// update fn
-	m.register_frame_update_fn([&](int x, int y) 
-		{
-			on_mouse_move(x, y);
-		});
-
 	m.register_frame_update_fn(fps_fn(update_fn,m_fps));
 
 	//event fn
-	m.register_event_fn<mouse_pressed>([](const auto& e) 
+	m.register_event_fn<mouse_pressed>([this](const auto& e) 
 		{
-			printf(" right is pressed\n");
+			pick(e.x, e.y);
+			return true;
+		});
+
+	m.register_event_fn<mouse_moved>([this](const auto& e) 
+		{
+			drag(e.x, e.y);
+			return true;
+		});
+
+	m.register_event_fn<mouse_released>([this](const auto& e) 
+		{
+			release_pick();
 			return true;
 		});
 
@@ -133,13 +141,12 @@ void App::run()
 
 }
 
-void App::on_mouse_move(int x, int y)
+void App::pick(int x, int y)
 {
 	m_mouse_ray = {
 		{ x / 400.f-1.0f ,1.0f - y / 300.f ,-1.f },
 		{ 0 , 0, 1.f }
 	};
-
 
 	m_picked = m_mouse_picker.pick(
 		m_mouse_ray.p,
@@ -147,28 +154,63 @@ void App::on_mouse_move(int x, int y)
 		pos.data(), indices.data(), pos.size() / 3, indices.size() / 3 
 	);
 
-
-	fix_points = { 0, (m_plane_resolution[0] - 1) * 2 };
-
+	auto new_fix_points = preset_fix_points;
 	if (m_picked.t_index != -1)
 	{
 		int t = m_picked.t_index;
 		std::array<int, 3> t_indices{ indices[t * 3 + 0] ,indices[t * 3 + 1],indices[t * 3 + 2] };
 
-		fix_points.push_back(t_indices[0]);
-		fix_points.push_back(t_indices[1]);
-		fix_points.push_back(t_indices[2]);
+		float maxBary = 0.f;
+		int max_v = 0;
+		for (int i = 0; i < 3; i++)
+		{
+			if (m_picked.bary[i] > maxBary)
+			{
+				maxBary = m_picked.bary[i];
+				max_v = i;
+			}
+		}
 
-	}
+		new_fix_points.push_back(t_indices[max_v]);
 
-	if (fix_points != last_fix_points)
-	{
-		sim.set<sim_lib::sim_data::obstacle_vert_index>(fix_points);
+		sim.set<sim_lib::sim_data::obstacle_vert_index>(new_fix_points);
 		sim.commit_all_changes();
 	}
+}
 
-	last_fix_points = fix_points;
+void App::drag(int x, int y)
+{
+	if (m_picked.t_index != -1)
+	{
 
+		int t = m_picked.t_index;
+
+		std::array<int, 3> t_indices{ indices[t * 3 + 0] ,indices[t * 3 + 1],indices[t * 3 + 2] };
+		float maxBary = 0.f;
+		int max_v = 0;
+		for (int i = 0; i < 3; i++)
+		{
+			if (m_picked.bary[i] > maxBary)
+			{
+				maxBary = m_picked.bary[i];
+				max_v = i;
+			}
+		}
+
+		std::vector<int> v_indices{ t_indices[max_v] };
+		std::vector<sim_lib::float3> v_new_pos{ {x / 400.f - 1.0f ,1.0f - y / 300.f ,-1.f} };
+
+		sim.set_partially<sim_lib::sim_data::positions>(v_indices, v_new_pos);
+		sim.commit_all_changes();
+	}
+}
+
+void App::release_pick()
+{
+	m_picked.t_index = -1;
+	auto new_fix_points = preset_fix_points;
+	sim.set<sim_lib::sim_data::obstacle_vert_index>(new_fix_points);
+	sim.commit_all_changes();
 }
 
 void App::make_plane(float lx, float ly, int nx, int ny)
@@ -265,7 +307,7 @@ void App::init_sim_data()
 	//std::vector<int> stretch_t(sim_tris.size());
 	//std::iota(stretch_t.begin(), stretch_t.end(),0);
 	//sim.set<sim_lib::sim_data::stretch_triangles>(stretch_t);
-	sim.set<sim_lib::sim_data::obstacle_vert_index>(fix_points);
+	sim.set<sim_lib::sim_data::obstacle_vert_index>(preset_fix_points);
 
 	std::vector<sim_lib::int2> sim_edges;
 	convert_to_sim_data(sim_edges, m_edges);

@@ -154,8 +154,8 @@ namespace quick_shell
 
 	struct ui_event { virtual ~ui_event() {} };
 
-	struct mouse_pressed			:ui_event { mouse_button button; };
-	struct mouse_released			:ui_event { mouse_button button; };
+	struct mouse_pressed			:ui_event { mouse_button button; int x; int y; };
+	struct mouse_released			:ui_event { mouse_button button; int x; int y; };
 	struct mouse_moved				:ui_event { int x; int y; };
 	struct mouse_scrolled_event		:ui_event { int dx; int dy; };
 	struct mouse_button_event		:ui_event { mouse_button button; };

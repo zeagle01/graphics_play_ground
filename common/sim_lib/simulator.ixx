@@ -1,13 +1,13 @@
 module;
 
-//include things here
+//#include <span> //can't include this, compile bug?
+#include <vector>
 
 export module sim_lib;
 
 export import :sim_data;
 
 import :simulator_imp;
-
 
 namespace sim_lib
 {
@@ -19,6 +19,12 @@ namespace sim_lib
 		void set(const auto& data)
 		{
 			m_imp.set<var>(data);
+		}
+
+		template<typename var>
+		void set_partially(const std::vector<int>& indices, const auto& data)
+		{
+			m_imp.set_partially<var>(indices, data);
 		}
 
 		template<typename var>
