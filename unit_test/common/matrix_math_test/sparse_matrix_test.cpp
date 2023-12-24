@@ -12,93 +12,124 @@ using namespace matrix_math;
 
 namespace sparse_matrix_test
 {
-
-	class sparse_matrix_test : public Test
+	class linear_system_test : public Test
 	{
 	protected:
 		void SetUp() override
 		{
-
-
-		//coo
-			m_row =		{ 0,1,2,0,1 };
-			m_col =		{ 0,1,2,1,0 };
-			m_value =	{ 1,1,1,1,1 };
 		}
 
-		//coo
-		std::vector<int> m_row;
-		std::vector<int> m_col;
-		std::vector<float> m_value;
+	};
 
-		sparse_matrix<float> m_sparse_m;
+	template<typename T>
+	struct triplet
+	{
+		int col;
+		int row;
+		T v;
+		friend static auto operator <=> (const triplet & l, const triplet & r) = default;
 	};
 
 
-	TEST_F(sparse_matrix_test, build)
+	TEST_F(linear_system_test, assemble_diag)
 	{
-		m_sparse_m.reserve_space(m_row.size(),
-				[&](int i)
-				{
-					return sparse_matrix<float>::r_c{ m_row[i],m_col[i] };
-				}
-			);
+		linear_system<float, float>  ls;
+		ls.set_variables_num(2);
 
-		int stencil_num = 3;
+		auto diag_loop = ls.get_write_loop(2,
+			[](int i) {return  std::vector<int>{ i }; }
+		);
 
-
-		// one vert stencil
-		//	[1			]
-		//	[	1		]
-		//	[		1	]
-		auto write_vert = m_sparse_m.get_write_loop(stencil_num,
-			[](int i)
+		auto wirte_diag = [](auto lhs, auto rhs, int si)
 			{
-				return std::vector<int>{ i };
+				lhs(si, 0, 0) = 1.f;
+				rhs(si, 0) = 1.f;
+			};
+
+		diag_loop(wirte_diag);
+
+		std::vector<triplet<float>> exp{ {0,0,1.f},{1,1,1.f} };
+		std::vector<triplet<float>> act;
+
+		ls.for_each_nz(
+			[&act](int row, int col, const float& v)
+			{
+				act.push_back({ row,col,v });
 			}
 		);
 
+		EXPECT_THAT(act,Eq(exp));
+	}
 
-		float v = 1.f;
-		auto get_vert_m = [&]( auto get_nz, int si)
-			{
-				get_nz(si, 0, 0) = v;
-			};
+	TEST_F(linear_system_test, assemble_interaction_edges)
+	{
+		linear_system<float, float>  ls;
+		ls.set_variables_num(2);
 
-		write_vert(get_vert_m);
-
-		// two vert stencil
-		//	[2	1		]
-		//	[1	2		]
-		//	[		0	]
 		std::vector<int> edges{ 0,1 };
-		auto write_stencils = m_sparse_m.get_write_loop(edges.size() / 2,
-			[&](int i)
+		auto diag_loop = ls.get_write_loop(edges.size() / 2,
+			[&](int i) {return  std::vector<int>{ edges[i * 2 + 0], edges[i * 2 + 1] }; }
+		);
+
+		auto wirte_diag = [](auto lhs, auto rhs, int si)
 			{
-				return std::vector<int>{edges[i * 2 + 0], edges[i * 2 + 1]};
+				lhs(si, 0, 0) = 1.f;
+				lhs(si, 0, 1) = -1.f;
+				lhs(si, 1, 0) = -1.f;
+				lhs(si, 1, 1) = 1.f;
+				rhs(si, 0) = 1.f;
+			};
+
+		diag_loop(wirte_diag);
+
+		std::vector<triplet<float>> exp{ 
+			{0,0,1.f},
+			{0,1,-1.f},
+			{1,0,-1.f},
+			{1,1,1.f}
+		};
+		std::vector<triplet<float>> act;
+
+		ls.for_each_nz(
+			[&act](int row, int col, const float& v)
+			{
+				act.push_back({ row,col,v });
 			}
 		);
 
+		EXPECT_THAT(act,Eq(exp));
+	}
 
-		auto get_stencil_m = [&](auto get_nz, int si)
+	TEST_F(linear_system_test, solve_with_Jacobi)
+	{
+		linear_system<float, float>  ls;
+		int vert_num = 2;
+		ls.set_variables_num(vert_num);
+
+		std::vector<int> edges{ 0,1 };
+		auto diag_loop = ls.get_write_loop(edges.size() / 2,
+			[&](int i) {return  std::vector<int>{ edges[i * 2 + 0], edges[i * 2 + 1] }; }
+		);
+
+		auto wirte_diag = [](auto lhs, auto rhs, int si)
 			{
-				get_nz(si, 0, 0) += 2.f;
-				get_nz(si, 0, 1) += 1.f;
-				get_nz(si, 1, 0) += 1.f;
-				get_nz(si, 1, 1) += 2.f;
+				lhs(si, 0, 0) = 2.f;
+				lhs(si, 0, 1) = -1.f;
+				lhs(si, 1, 0) = -1.f;
+				lhs(si, 1, 1) = 2.f;
+
+				rhs(si, 0) = 1.f;
+				rhs(si, 1) = 1.f;
 			};
 
-		write_stencils(get_stencil_m);
+		diag_loop(wirte_diag);
 
-		// sum
-		float sum = 0;
-		auto sum_a_row = [&](int row, int col, const float& v)
-			{
-				sum += v;
-			};
-		m_sparse_m.for_each_nz(sum_a_row);
+		Jacobi_solver<float, float> solver;
+		std::vector<float> x(vert_num);
+		solver.solve(ls, x);
 
-		EXPECT_THAT(sum, Eq(9.f));
+		std::vector<float> exp{ 1.f,1.f };
+		EXPECT_THAT(x, Eq(exp));
 
 	}
 

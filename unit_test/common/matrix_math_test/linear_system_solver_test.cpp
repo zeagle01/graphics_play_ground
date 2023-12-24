@@ -73,37 +73,37 @@ namespace linear_system_solver_test
 		return ret;
 	}
 
-	TEST(Linear_System_Solver_Test, build_laplace_system_is_right)
-	{
-		auto system = build_laplace_system(2);
-		auto identity3 = get_identity<3, float>();
-		Linear_System exp
-		{
-			.A = { 2.f * identity3,-1.f * identity3, 2.f * identity3,-1.f * identity3,},
-			.I={0,2,4},
-			.J = {0,1,1,0}
-		};
-
-		EXPECT_THAT(system.A, Eq(exp.A));
-		EXPECT_THAT(system.I, Eq(exp.I));
-		EXPECT_THAT(system.J, Eq(exp.J));
-	}
-
-	TEST(Linear_System_Solver_Test, solver_2by2)
-	{
-
-		int n = 2;
-		auto system = build_laplace_system(n);
-
-		std::vector<vec3f> b(n);
-
-		Linear_System_Solver lss;
-
-		auto x = lss.solve(system.A, system.I, system.J, b);
-		std::vector<vec3f> exp(n);
-
-		EXPECT_THAT(x, Eq(exp));
-
-	}
+//	TEST(Linear_System_Solver_Test, build_laplace_system_is_right)
+//	{
+//		auto system = build_laplace_system(2);
+//		auto identity3 = get_identity<3, float>();
+//		Linear_System exp
+//		{
+//			.A = { 2.f * identity3,-1.f * identity3, 2.f * identity3,-1.f * identity3,},
+//			.I={0,2,4},
+//			.J = {0,1,1,0}
+//		};
+//
+//		EXPECT_THAT(system.A, Eq(exp.A));
+//		EXPECT_THAT(system.I, Eq(exp.I));
+//		EXPECT_THAT(system.J, Eq(exp.J));
+//	}
+//
+//	TEST(Linear_System_Solver_Test, solver_2by2)
+//	{
+//
+//		int n = 2;
+//		auto system = build_laplace_system(n);
+//
+//		std::vector<vec3f> b(n);
+//
+//		Linear_System_Solver lss;
+//
+//		auto x = lss.solve(system.A, system.I, system.J, b);
+//		std::vector<vec3f> exp(n);
+//
+//		EXPECT_THAT(x, Eq(exp));
+//
+//	}
 
 }
