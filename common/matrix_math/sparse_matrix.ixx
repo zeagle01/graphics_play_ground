@@ -11,112 +11,6 @@ export module matrix_math;
 
 namespace matrix_math
 {
-	export template<typename T>
-	class sparse_matrix
-	{
-
-	public:
-
-		struct r_c
-		{
-			int row;
-			int col;
-		};
-
-	public:
-
-		void reserve_space(int num_nz, std::function<r_c(int)> get_row_col)
-		{
-
-		}
-
-		void set_var_num(int vNum)
-		{
-			m_mat.clear();
-		}
-
-		void set_fixed_variables(const std::vector<int>& fixed_vars)
-		{
-			m_fixed_vars = std::set<int>(fixed_vars.begin(), fixed_vars.end());
-		}
-
-		struct writter
-		{
-			std::map<int, std::map<int, T>>& mat;
-			int ri;
-			int ci;
-			std::set<int>& fixed_vars;
-
-			writter& operator+=(const T& v) 
-			{
-				if (!fixed_vars.contains(ri))
-				{
-					mat[ri][ci] += v;
-				}
-				return *this; 
-			}
-
-			writter& operator=(const T& v) 
-			{
-				if (!fixed_vars.contains(ri))
-				{
-					mat[ri][ci] = v;
-				}
-				return *this; 
-			}
-		};
-
-		using get_nz_t = std::function<writter (int si, int i, int j)>;
-		using get_stencil_nz_t = std::function<void(get_nz_t, int)>;
-
-
-		std::function<void(get_stencil_nz_t)> get_write_loop(int stencil_num, std::function<std::vector<int>(int)> get_stencil)
-		{
-
-			get_nz_t get_nz_fn = [&,get_stencil](int si, int i, int j)->writter
-				{
-					std::vector<int> stencil = get_stencil(si);
-					int vi = stencil[i];
-					int vj = stencil[j];
-					return  writter{ m_mat, vi, vj, m_fixed_vars };
-				};
-
-
-			auto ret = [&,get_nz_fn, stencil_num, get_stencil](get_stencil_nz_t fn)
-				{
-					for (int si = 0; si < stencil_num; si++)
-					{
-						fn(get_nz_fn, si);
-					}
-				};
-			return ret;
-		}
-
-
-
-		void for_each_nz(std::function<void(int row, int col, const T& v)> fn)
-		{
-			for (const auto& rowIt : m_mat)
-			{
-				int row = rowIt.first;
-				for (const auto& colIt : m_mat[row])
-				{
-					int col = colIt.first;
-					const T& value = colIt.second;
-					fn(row, col, value);
-				}
-			}
-		}
-
-	private:
-
-
-		std::map<int, std::map<int, T>> m_mat;
-		std::set<int> m_fixed_vars;
-	};
-
-
-
 
 	export template<typename mat_type,typename vec_type>
 	class linear_system
@@ -131,7 +25,7 @@ namespace matrix_math
 		}
 		void set_fixed_variables(const std::vector<int>& fixed_vars)
 		{
-			m_fixed_vars = fixed_vars;
+			m_fixed_vars = std::set<int>(fixed_vars.begin(), fixed_vars.end());
 		}
 
 
@@ -172,7 +66,7 @@ namespace matrix_math
 			{
 				if (!fixed_vars.contains(i))
 				{
-					b[i] += v;
+					b[i] = b[i] + v;
 				}
 				return *this; 
 			}
@@ -191,6 +85,7 @@ namespace matrix_math
 		using get_rhs_writer = std::function<rhs_writter (int si, int i)>;
 		using get_lhs_writer = std::function<writter (int si, int i, int j)>;
 		using get_element_equations = std::function<void(get_lhs_writer, get_rhs_writer, int)>;
+
 		std::function<void(get_element_equations)> get_write_loop(int stencil_num, std::function<std::vector<int>(int)> get_stencil) 
 		{
 
@@ -220,6 +115,7 @@ namespace matrix_math
 				};
 			return ret;
 		}
+
 
 		void for_each_nz(std::function<void(int row, int col, const mat_type& v)> fn) const
 		{
@@ -269,7 +165,7 @@ namespace matrix_math
 					{
 						if (row != col)
 						{
-							Ax[row] += m * x[col];
+							Ax[row] = Ax[row] + m * x[col];
 						}
 					}
 				);

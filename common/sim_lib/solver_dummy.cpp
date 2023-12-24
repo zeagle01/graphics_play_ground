@@ -42,9 +42,9 @@ namespace sim_lib
 			}
 
 			float dt = 1e-3f;
-			auto& pos = m_datas.get_ref<var::positions>();
 			auto& vel = m_datas.get_ref<var::velocity>();
-			auto& last_pos = m_datas.get_ref<var::last_positions>();
+			const auto& pos = m_datas.get_ref<var::positions>();
+			const auto& last_pos = m_datas.get_ref<var::last_positions>();
 
 			for (int i = 0; i < vel.size(); i++)
 			{
@@ -69,17 +69,10 @@ namespace sim_lib
 		{
 
 			auto& pos = m_datas.get_ref<var::positions>();
-			auto& vel = m_datas.get_ref<var::velocity>();
-			auto& last_pos = m_datas.get_ref<var::last_positions>();
+			const auto& vel = m_datas.get_ref<var::velocity>();
+			const auto& last_pos = m_datas.get_ref<var::last_positions>();
 
-			m_linear_system.reserve_space(pos.size(),
-				[](int vi)
-				{
-					return spm_t::r_c{ vi, vi };
-				}
-			);
-
-			m_linear_system.set_var_num(pos.size());
+			m_linear_system.set_variables_num(pos.size());
 
 			m_linear_system.set_fixed_variables(m_datas.get_ref<var::fixed_verts>());
 
@@ -91,17 +84,12 @@ namespace sim_lib
 			float dt = m_datas.get_ref < var::time_step>();
 			vec3 g = m_datas.get_ref<var::gravity>();
 
-			std::vector<vec3> forces(pos.size());
-			std::vector<float> diag(pos.size());
-
-			auto get_inertial = [&](auto get_nz, int si)
+			auto get_inertial = [&](auto get_nz,auto get_lhs, int si)
 				{
 					int v = dynamic_verts[si];
-					forces[v] = mass * g;
 					float inertial_h = mass / dt / dt;
-					forces[v] += inertial_h * (vel[v] * dt);
-					diag[v] = inertial_h;
-					get_nz(si, 0, 0) = diag[v];
+					get_lhs(si, 0) = mass * g + inertial_h * (vel[v] * dt);
+					get_nz(si, 0, 0) = inertial_h;
 				};
 
 			diag_loop(get_inertial);
@@ -112,7 +100,7 @@ namespace sim_lib
 			float stretch_stiff = 1e3f;
 			auto edge_loop = m_linear_system.get_write_loop(edges.size(), [&](int ei) { return std::vector<int>{ edges[ei][0], edges[ei][1] }; });
 
-			auto add_stretch_edge_constraint = [&](auto get_nz, int ei)
+			auto add_stretch_edge_constraint = [&](auto get_nz, auto get_lhs, int ei)
 				{
 					int v0 = edges[ei][0];
 					int v1 = edges[ei][1];
@@ -125,12 +113,10 @@ namespace sim_lib
 
 					auto stretch_f = -stretch_stiff * (l - edge_lengths[ei]) * n;
 
-					forces[v0] += w[0] * stretch_f;
-					forces[v1] += w[1] * stretch_f;
+					get_lhs(ei, 0) += w[0] * stretch_f;
+					get_lhs(ei, 1) += w[1] * stretch_f;
 
-					diag[v0] += w[0] * w[0] * stretch_stiff;
 					get_nz(ei, 0, 0) += w[0] * w[0] * stretch_stiff;
-					diag[v1] += w[1] * w[1] * stretch_stiff;
 					get_nz(ei, 1, 1) += w[1] * w[1] * stretch_stiff;
 
 					get_nz(ei, 0, 1) += w[0] * w[1] * stretch_stiff;
@@ -152,25 +138,8 @@ namespace sim_lib
 			last_pos = pos;
 
 			//jacobi
-			for (int it = 0; it < 10; it++)
-			{
-				std::vector<vec3> Ax(pos.size());
-				m_linear_system.for_each_nz(
-					[&](int row, int col, const float& v)
-					{
-						if (row != col)
-						{
-							Ax[row] += v * dx[col];
-						}
-					}
-				);
-
-				for (int i = 0; i < dynamic_verts.size(); i++)
-				{
-					int v = dynamic_verts[i];
-					dx[v] = (forces[v] - Ax[v]) / diag[v];
-				}
-			}
+			matrix_math::Jacobi_solver<float, vec3> linear_solver;
+			linear_solver.solve(m_linear_system, dx);
 
 			for (int i = 0; i < pos.size(); i++)
 			{
@@ -206,7 +175,7 @@ namespace sim_lib
 		using var_list = clumsy_lib::extract_member_type_list_t<var>;
 		clumsy_lib::Static_Type_Map<var_list> m_datas;
 
-		using spm_t=matrix_math::sparse_matrix<float>;
+		using spm_t = matrix_math::linear_system<float, vec3>;
 		spm_t m_linear_system;
 
 
