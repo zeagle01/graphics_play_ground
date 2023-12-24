@@ -42,8 +42,8 @@ namespace sparse_matrix_test
 
 		auto wirte_diag = [](auto lhs, auto rhs, int si)
 			{
-				lhs(si, 0, 0) = 1.f;
-				rhs(si, 0) = 1.f;
+				lhs( 0, 0) = 1.f;
+				rhs( 0) = 1.f;
 			};
 
 		diag_loop(wirte_diag);
@@ -73,11 +73,11 @@ namespace sparse_matrix_test
 
 		auto wirte_diag = [](auto lhs, auto rhs, int si)
 			{
-				lhs(si, 0, 0) = 1.f;
-				lhs(si, 0, 1) = -1.f;
-				lhs(si, 1, 0) = -1.f;
-				lhs(si, 1, 1) = 1.f;
-				rhs(si, 0) = 1.f;
+				lhs( 0, 0) = 1.f;
+				lhs( 0, 1) = -1.f;
+				lhs( 1, 0) = -1.f;
+				lhs( 1, 1) = 1.f;
+				rhs( 0) = 1.f;
 			};
 
 		diag_loop(wirte_diag);
@@ -113,13 +113,13 @@ namespace sparse_matrix_test
 
 		auto wirte_diag = [](auto lhs, auto rhs, int si)
 			{
-				lhs(si, 0, 0) = 2.f;
-				lhs(si, 0, 1) = -1.f;
-				lhs(si, 1, 0) = -1.f;
-				lhs(si, 1, 1) = 2.f;
+				lhs( 0, 0) = 2.f;
+				lhs( 0, 1) = -1.f;
+				lhs( 1, 0) = -1.f;
+				lhs( 1, 1) = 2.f;
 
-				rhs(si, 0) = 1.f;
-				rhs(si, 1) = 1.f;
+				rhs( 0) = 1.f;
+				rhs( 1) = 1.f;
 			};
 
 		diag_loop(wirte_diag);

@@ -11,6 +11,7 @@ module;
 
 #include <cmath>
 #include <ranges>
+#include <array>
 
 module sim_lib : solver_dummy;
 
@@ -79,43 +80,21 @@ namespace sim_lib
 			m_linear_system.set_fixed_variables(m_datas.get_ref<var::fixed_verts>());
 
 			//inertial
-			//const auto& dynamic_verts = m_datas.get_ref<var::dynamic_verts>();
-			//auto diag_loop = m_linear_system.get_write_loop(dynamic_verts.size(), [&](int i) { return std::vector<int>{ dynamic_verts[i] }; });
-
-			//float mass = m_datas.get_ref<var::density>();
-			//float dt = m_datas.get_ref < var::time_step>();
-			//vec3 g = m_datas.get_ref<var::gravity>();
-
-			//auto get_inertial = [&](auto get_nz,auto get_rhs, int si)
-			//	{
-			//		int v = dynamic_verts[si];
-			//		auto equation = inertial::compute_elemnt<float, vec3>(mass, dt, g, vel[v]);
-			//		get_rhs(si, 0) = equation.get_rhs(0);
-			//		get_nz(si, 0, 0) = equation.get_lhs(0, 0);
-			//	};
-
-			//diag_loop(get_inertial);
+			const auto& dynamic_verts = m_datas.get_ref<var::dynamic_verts>();
+			auto diag_loop = m_linear_system.get_write_loop(dynamic_verts.size(), [&](int i) { return std::vector<int>{ dynamic_verts[i] }; });
 
 			float mass = m_datas.get_ref<var::density>();
 			float dt = m_datas.get_ref < var::time_step>();
 			vec3 g = m_datas.get_ref<var::gravity>();
 
-			const auto& dynamic_verts = m_datas.get_ref<var::dynamic_verts>();
 
-			m_linear_system.for_each_stencils(
-				dynamic_verts.size(),
-				[](int) {return 1; },
-				[&](int si,int ) {return dynamic_verts[si]; },
-				[&](int si)
+			auto get_inertial = [&](auto lhs, auto rhs, int si)
 				{
 					int v = dynamic_verts[si];
-					auto equation = inertial::compute_elemnt<float, vec3>(mass, dt, g, vel[v]);
-					auto get_lhs = [equation](int row, int col) {  return equation.get_lhs(row, col); };
-					auto get_rhs = [equation](int vi) {  return equation.get_rhs(vi); };
+					inertial::compute_elemnt(lhs, rhs, mass, dt, g, vel[v]);
+				};
 
-					return matrix_math::linear_system<float, vec3>::element_data_gettter{ get_lhs, get_rhs, };
-				}
-			);
+			diag_loop(get_inertial);
 
 			//edge stretch
 			const auto& edges = m_datas.get_ref<var::stretch_edges>();
@@ -123,27 +102,16 @@ namespace sim_lib
 			float stretch_stiff = 1e3f;
 			auto edge_loop = m_linear_system.get_write_loop(edges.size(), [&](int ei) { return std::vector<int>{ edges[ei][0], edges[ei][1] }; });
 
-			auto add_stretch_edge_constraint = [&](auto get_nz, auto get_lhs, int ei)
+			auto add_stretch_edge_constraint = [&](auto lhs, auto rhs, int ei)
 				{
 					int v0 = edges[ei][0];
 					int v1 = edges[ei][1];
 					std::array<vec3, 2> X{ pos[v0],pos[v1] };
 
-					float w[]{ 1,-1 };
-					auto dx = w[0] * X[0] + w[1] * X[1];
-					float l = matrix_math::norm<2>::apply(dx);
-					auto n = dx / l ;
+					edge_stretch::compute_elemnt(lhs, rhs, X, stretch_stiff, edge_lengths[ei]);
 
-					auto stretch_f = -stretch_stiff * (l - edge_lengths[ei]) * n;
-
-					get_lhs(ei, 0) += w[0] * stretch_f;
-					get_lhs(ei, 1) += w[1] * stretch_f;
-
-					get_nz(ei, 0, 0) += w[0] * w[0] * stretch_stiff;
-					get_nz(ei, 1, 1) += w[1] * w[1] * stretch_stiff;
-
-					get_nz(ei, 0, 1) += w[0] * w[1] * stretch_stiff;
-					get_nz(ei, 1, 0) += w[1] * w[0] * stretch_stiff;
+					//remove this won't compile
+					auto dx = 1.f * X[0];
 				};
 
 			edge_loop(add_stretch_edge_constraint);

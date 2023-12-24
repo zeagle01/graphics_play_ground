@@ -31,14 +31,15 @@ namespace matrix_math
 
 
 
+		template<typename T> 
 		struct writter
 		{
-			std::map<int, std::map<int, mat_type>>& mat;
+			std::map<int, std::map<int, T>>& mat;
 			const std::set<int>& fixed_vars;
 			int ri;
 			int ci;
 
-			writter& operator+=(const mat_type& v) 
+			writter& operator+=(const T& v) 
 			{
 				if (!fixed_vars.contains(ri))
 				{
@@ -47,7 +48,7 @@ namespace matrix_math
 				return *this; 
 			}
 
-			writter& operator=(const mat_type& v) 
+			writter& operator=(const T& v) 
 			{
 				if (!fixed_vars.contains(ri))
 				{
@@ -84,18 +85,21 @@ namespace matrix_math
 		};
 
 		using get_rhs_writer = std::function<rhs_writter (int si, int i)>;
-		using get_lhs_writer = std::function<writter (int si, int i, int j)>;
-		using get_element_equations = std::function<void(get_lhs_writer, get_rhs_writer, int)>;
+		using get_lhs_writer = std::function<writter<mat_type> (int si, int i, int j)>;
+
+		using get_rhs_writer_si = std::function<rhs_writter(int i)>;
+		using get_lhs_writer_si = std::function<writter<mat_type>(int i, int j)>;
+		using get_element_equations = std::function<void(get_lhs_writer_si, get_rhs_writer_si, int)>;
 
 		std::function<void(get_element_equations)> get_write_loop(int stencil_num, std::function<std::vector<int>(int)> get_stencil) 
 		{
 
-			get_lhs_writer get_lhs = [&, get_stencil](int si, int i, int j)->writter
+			get_lhs_writer get_lhs = [&, get_stencil](int si, int i, int j)->writter<mat_type>
 				{
 					std::vector<int> stencil = get_stencil(si);
 					int vi = stencil[i];
 					int vj = stencil[j];
-					return  writter{ m_mat, m_fixed_vars,vi, vj };
+					return  writter<mat_type>{ m_mat, m_fixed_vars,vi, vj };
 				};
 
 			get_rhs_writer get_rhs = [&, get_stencil](int si, int i )->rhs_writter
@@ -111,54 +115,14 @@ namespace matrix_math
 				{
 					for (int si = 0; si < stencil_num; si++)
 					{
-						fn(get_lhs, get_rhs, si);
+						auto get_lhs_si = [get_lhs, si](int i, int j) ->writter<mat_type> {return get_lhs(si, i, j); };
+						auto get_rhs_si = [get_rhs, si](int i) ->rhs_writter {return get_rhs(si, i); };
+
+						fn(get_lhs_si, get_rhs_si, si);
 					}
 				};
 			return ret;
 		}
-
-		struct element_data_gettter
-		{
-			std::function<mat_type (int row, int col)> get_lhs;
-			std::function<vec_type (int vi)> get_rhs;
-		};
-
-		void for_each_stencils(
-			int stencil_num,
-			std::function<int(int si)> get_stencil_vert_num,
-			std::function<int(int si, int vi)> get_stencils,
-			std::function<element_data_gettter(int si)> data_getter
-		)
-		{
-
-			get_lhs_writer get_lhs = [&, get_stencils](int si, int i, int j)->writter
-				{
-					int vi = get_stencils(si,i);
-					int vj = get_stencils(si,j);
-					return  writter{ m_mat, m_fixed_vars,vi, vj };
-				};
-
-			get_rhs_writer get_rhs = [&, get_stencils](int si, int i )->rhs_writter
-				{
-					int vi = get_stencils(si,i);
-					return  rhs_writter{ m_rhs, m_fixed_vars,vi };
-				};
-
-
-			for (int si = 0; si < stencil_num; si++)
-			{
-				auto getter = data_getter(si);
-				for (int i = 0; i < get_stencil_vert_num(si); i++)
-				{
-					get_rhs(si, i) += getter.get_rhs(i);
-					for (int j = 0; j < get_stencil_vert_num(si); j++)
-					{
-						get_lhs(si, i, j) += getter.get_lhs(i, j);
-					}
-				}
-			}
-		}
-
 
 		void for_each_nz(std::function<void(int row, int col, const mat_type& v)> fn) const
 		{
