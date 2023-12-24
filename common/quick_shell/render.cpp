@@ -35,7 +35,7 @@ namespace quick_shell
 			m_vertex_array->set_vertex_attribute_data(m_attribute_name_position, pos, vNum);
 
 			glEnable(GL_PROGRAM_POINT_SIZE);
-			glPointSize(2);
+			glPointSize(5);
 
 			m_shader->upload_uniform_vec3("u_obj_color", m_point_color);
 			draw_iendxes(GL_POINTS);

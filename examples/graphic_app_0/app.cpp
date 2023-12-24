@@ -91,17 +91,22 @@ void App::run()
 			if (m_picked.t_index != -1)
 			{
 				int t = m_picked.t_index;
-				std::array<int, 3> t_indices{ indices[t * 3 + 0] ,indices[t * 3 + 1],indices[t * 3 + 2] };
-				std::array<float, 9> t_points
-				{
-					pos[t_indices[0] * 3 + 0], pos[t_indices[0] * 3 + 1], pos[t_indices[0] * 3 + 2],
-					pos[t_indices[1] * 3 + 0], pos[t_indices[1] * 3 + 1], pos[t_indices[1] * 3 + 2],
-					pos[t_indices[2] * 3 + 0], pos[t_indices[2] * 3 + 1], pos[t_indices[2] * 3 + 2]
-				};
-				renderer.draw_points(t_points.data(), 3);
 				renderer.draw_points(m_mouse_ray.p.data(), 1);
 			}
 
+			std::vector<float> fixPos;
+			fixPos.reserve(m_current_fix_points.size() * 3);
+
+			for (int i = 0; i < m_current_fix_points.size(); i++)
+			{
+				int v = m_current_fix_points[i];
+				for (int j = 0; j < 3; j++)
+				{
+					fixPos.push_back(pos[v * 3 + j]);
+				}
+			}
+			fixPos.shrink_to_fit();
+			renderer.draw_points(fixPos.data(), m_current_fix_points.size());
 		};
 
 	auto update_fn = [&]
@@ -154,7 +159,7 @@ void App::pick(int x, int y)
 		pos.data(), indices.data(), pos.size() / 3, indices.size() / 3 
 	);
 
-	auto new_fix_points = preset_fix_points;
+	m_current_fix_points = m_preset_fix_points;
 	if (m_picked.t_index != -1)
 	{
 		int t = m_picked.t_index;
@@ -171,9 +176,9 @@ void App::pick(int x, int y)
 			}
 		}
 
-		new_fix_points.push_back(t_indices[max_v]);
+		m_current_fix_points.push_back(t_indices[max_v]);
 
-		sim.set<sim_lib::sim_data::obstacle_vert_index>(new_fix_points);
+		sim.set<sim_lib::sim_data::obstacle_vert_index>(m_current_fix_points);
 		sim.commit_all_changes();
 	}
 }
@@ -208,8 +213,8 @@ void App::drag(int x, int y)
 void App::release_pick()
 {
 	m_picked.t_index = -1;
-	auto new_fix_points = preset_fix_points;
-	sim.set<sim_lib::sim_data::obstacle_vert_index>(new_fix_points);
+	m_current_fix_points = m_preset_fix_points;
+	sim.set<sim_lib::sim_data::obstacle_vert_index>(m_current_fix_points);
 	sim.commit_all_changes();
 }
 
@@ -307,7 +312,13 @@ void App::init_sim_data()
 	//std::vector<int> stretch_t(sim_tris.size());
 	//std::iota(stretch_t.begin(), stretch_t.end(),0);
 	//sim.set<sim_lib::sim_data::stretch_triangles>(stretch_t);
-	sim.set<sim_lib::sim_data::obstacle_vert_index>(preset_fix_points);
+
+	int fix_v0 = 0 * m_plane_resolution[1] + m_plane_resolution[1] - 1;
+	int fix_v1 = (m_plane_resolution[0] - 1) * m_plane_resolution[1] + m_plane_resolution[1] - 1;
+
+	m_preset_fix_points = { fix_v0, fix_v1 };
+	m_current_fix_points = m_preset_fix_points;
+	sim.set<sim_lib::sim_data::obstacle_vert_index>(m_preset_fix_points);
 
 	std::vector<sim_lib::int2> sim_edges;
 	convert_to_sim_data(sim_edges, m_edges);
