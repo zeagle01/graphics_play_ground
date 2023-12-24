@@ -36,17 +36,15 @@ namespace sim_lib
 		void solve() override
 		{
 
-			auto& pos = m_datas.get_ref<var::positions>();
-			auto& vel = m_datas.get_ref<var::velocity>();
-			auto& last_pos = m_datas.get_ref<var::last_positions>();
-
-
 			for (int it = 0; it < 1; it++)
 			{
 				step();
 			}
 
 			float dt = 1e-3f;
+			auto& pos = m_datas.get_ref<var::positions>();
+			auto& vel = m_datas.get_ref<var::velocity>();
+			auto& last_pos = m_datas.get_ref<var::last_positions>();
 
 			for (int i = 0; i < vel.size(); i++)
 			{
@@ -94,8 +92,6 @@ namespace sim_lib
 			vec3 g = m_datas.get_ref<var::gravity>();
 
 			std::vector<vec3> forces(pos.size());
-			std::vector<vec3> dx(pos.size());
-			std::vector<vec3> Ax(pos.size());
 			std::vector<float> diag(pos.size());
 
 			auto get_inertial = [&](auto get_nz, int si)
@@ -103,9 +99,9 @@ namespace sim_lib
 					int v = dynamic_verts[si];
 					forces[v] = mass * g;
 					float inertial_h = mass / dt / dt;
-					forces[v] += inertial_h * (vel[si] * dt);
+					forces[v] += inertial_h * (vel[v] * dt);
 					diag[v] = inertial_h;
-					get_nz(si, 0, 0) = diag[si];
+					get_nz(si, 0, 0) = diag[v];
 				};
 
 			diag_loop(get_inertial);
@@ -113,7 +109,7 @@ namespace sim_lib
 			//edge stretch
 			const auto& edges = m_datas.get_ref<var::stretch_edges>();
 			const auto& edge_lengths = m_datas.get_ref<var::edge_lengths>();
-			float stretch_stiff = 1e-1f;
+			float stretch_stiff = 1e3f;
 			auto edge_loop = m_linear_system.get_write_loop(edges.size(), [&](int ei) { return std::vector<int>{ edges[ei][0], edges[ei][1] }; });
 
 			auto add_stretch_edge_constraint = [&](auto get_nz, int ei)
@@ -144,8 +140,8 @@ namespace sim_lib
 			edge_loop(add_stretch_edge_constraint);
 
 			//update fix pos
+			std::vector<vec3> dx(pos.size());
 			const auto& fixed_verts = m_datas.get_ref<var::fixed_verts>();
-			//printf("used fixed size %d \n", fixed_verts.size());
 			for (int i = 0; i < fixed_verts.size(); i++)
 			{
 				int v = fixed_verts[i];
@@ -158,18 +154,21 @@ namespace sim_lib
 			//jacobi
 			for (int it = 0; it < 10; it++)
 			{
-
+				std::vector<vec3> Ax(pos.size());
 				m_linear_system.for_each_nz(
 					[&](int row, int col, const float& v)
 					{
-						Ax[row] += v * dx[col];
+						if (row != col)
+						{
+							Ax[row] += v * dx[col];
+						}
 					}
 				);
 
 				for (int i = 0; i < dynamic_verts.size(); i++)
 				{
 					int v = dynamic_verts[i];
-					dx[v] += (forces[v] - Ax[v]) / diag[v];
+					dx[v] = (forces[v] - Ax[v]) / diag[v];
 				}
 			}
 
