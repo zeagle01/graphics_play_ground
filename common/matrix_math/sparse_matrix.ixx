@@ -12,6 +12,7 @@ export module matrix_math;
 namespace matrix_math
 {
 
+
 	export template<typename mat_type,typename vec_type>
 	class linear_system
 	{
@@ -114,6 +115,48 @@ namespace matrix_math
 					}
 				};
 			return ret;
+		}
+
+		struct element_data_gettter
+		{
+			std::function<mat_type (int row, int col)> get_lhs;
+			std::function<vec_type (int vi)> get_rhs;
+		};
+
+		void for_each_stencils(
+			int stencil_num,
+			std::function<int(int si)> get_stencil_vert_num,
+			std::function<int(int si, int vi)> get_stencils,
+			std::function<element_data_gettter(int si)> data_getter
+		)
+		{
+
+			get_lhs_writer get_lhs = [&, get_stencils](int si, int i, int j)->writter
+				{
+					int vi = get_stencils(si,i);
+					int vj = get_stencils(si,j);
+					return  writter{ m_mat, m_fixed_vars,vi, vj };
+				};
+
+			get_rhs_writer get_rhs = [&, get_stencils](int si, int i )->rhs_writter
+				{
+					int vi = get_stencils(si,i);
+					return  rhs_writter{ m_rhs, m_fixed_vars,vi };
+				};
+
+
+			for (int si = 0; si < stencil_num; si++)
+			{
+				auto getter = data_getter(si);
+				for (int i = 0; i < get_stencil_vert_num(si); i++)
+				{
+					get_rhs(si, i) += getter.get_rhs(i);
+					for (int j = 0; j < get_stencil_vert_num(si); j++)
+					{
+						get_lhs(si, i, j) += getter.get_lhs(i, j);
+					}
+				}
+			}
 		}
 
 

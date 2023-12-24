@@ -16,6 +16,8 @@ module sim_lib : solver_dummy;
 
 import :solver;
 import :simulator_datas;
+import :constraint_kernels;
+
 import matrix_math;
 
 namespace sim_lib
@@ -70,29 +72,50 @@ namespace sim_lib
 
 			auto& pos = m_datas.get_ref<var::positions>();
 			const auto& vel = m_datas.get_ref<var::velocity>();
-			const auto& last_pos = m_datas.get_ref<var::last_positions>();
+			auto& last_pos = m_datas.get_ref<var::last_positions>();
 
 			m_linear_system.set_variables_num(pos.size());
 
 			m_linear_system.set_fixed_variables(m_datas.get_ref<var::fixed_verts>());
 
 			//inertial
-			const auto& dynamic_verts = m_datas.get_ref<var::dynamic_verts>();
-			auto diag_loop = m_linear_system.get_write_loop(dynamic_verts.size(), [&](int i) { return std::vector<int>{ dynamic_verts[i] }; });
+			//const auto& dynamic_verts = m_datas.get_ref<var::dynamic_verts>();
+			//auto diag_loop = m_linear_system.get_write_loop(dynamic_verts.size(), [&](int i) { return std::vector<int>{ dynamic_verts[i] }; });
+
+			//float mass = m_datas.get_ref<var::density>();
+			//float dt = m_datas.get_ref < var::time_step>();
+			//vec3 g = m_datas.get_ref<var::gravity>();
+
+			//auto get_inertial = [&](auto get_nz,auto get_rhs, int si)
+			//	{
+			//		int v = dynamic_verts[si];
+			//		auto equation = inertial::compute_elemnt<float, vec3>(mass, dt, g, vel[v]);
+			//		get_rhs(si, 0) = equation.get_rhs(0);
+			//		get_nz(si, 0, 0) = equation.get_lhs(0, 0);
+			//	};
+
+			//diag_loop(get_inertial);
 
 			float mass = m_datas.get_ref<var::density>();
 			float dt = m_datas.get_ref < var::time_step>();
 			vec3 g = m_datas.get_ref<var::gravity>();
 
-			auto get_inertial = [&](auto get_nz,auto get_lhs, int si)
+			const auto& dynamic_verts = m_datas.get_ref<var::dynamic_verts>();
+
+			m_linear_system.for_each_stencils(
+				dynamic_verts.size(),
+				[](int) {return 1; },
+				[&](int si,int ) {return dynamic_verts[si]; },
+				[&](int si)
 				{
 					int v = dynamic_verts[si];
-					float inertial_h = mass / dt / dt;
-					get_lhs(si, 0) = mass * g + inertial_h * (vel[v] * dt);
-					get_nz(si, 0, 0) = inertial_h;
-				};
+					auto equation = inertial::compute_elemnt<float, vec3>(mass, dt, g, vel[v]);
+					auto get_lhs = [equation](int row, int col) {  return equation.get_lhs(row, col); };
+					auto get_rhs = [equation](int vi) {  return equation.get_rhs(vi); };
 
-			diag_loop(get_inertial);
+					return matrix_math::linear_system<float, vec3>::element_data_gettter{ get_lhs, get_rhs, };
+				}
+			);
 
 			//edge stretch
 			const auto& edges = m_datas.get_ref<var::stretch_edges>();

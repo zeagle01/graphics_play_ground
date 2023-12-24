@@ -12,6 +12,7 @@ set(partition_files
 	simulator_data_update.cpp
 	struct_functors.cpp
 	small_mat.cpp
+	constraint_kernels.cpp
 )
 
 add_library(sim_lib  
