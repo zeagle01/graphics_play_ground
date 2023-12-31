@@ -14,11 +14,11 @@ picked_info mouse_picker::pick(
 	)
 {
 
-	//TODO: use bvh 
-	geometry::bvh bvh;
-	std::vector<vec3f> rep_points;
-	bvh.build(rep_points);
-	geometry::bvh_traverser tr;
+//	//TODO: use bvh 
+//	geometry::bvh bvh;
+//	std::vector<vec3f> rep_points;
+//	bvh.build(rep_points);
+//	geometry::bvh_traverser tr;
 
 
 	//using vec = std::array<float, 3>;

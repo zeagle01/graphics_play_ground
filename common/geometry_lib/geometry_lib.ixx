@@ -7,6 +7,7 @@ export module  geometry_lib;
 
 
 export import : bvh;
+export import : aabb;
 
 namespace geometry
 {

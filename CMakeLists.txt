@@ -19,6 +19,7 @@ add_subdirectory(common)
 
 add_subdirectory(unit_test/common/matrix_math_test)
 add_subdirectory(unit_test/common/clumsy_lib_test)
+add_subdirectory(unit_test/common/geometry_lib_test)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 

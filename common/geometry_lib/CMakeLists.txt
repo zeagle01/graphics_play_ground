@@ -35,6 +35,7 @@ target_sources(geometry_lib PUBLIC
 	FILES 
 	geometry_lib.ixx  ## main module definition
 	bvh.ixx  
+	aabb.ixx  
 )
 
 set_source_files_properties(${partion_files} PROPERTIES COMPILE_FLAGS "/internalPartition")

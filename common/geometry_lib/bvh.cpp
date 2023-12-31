@@ -11,11 +11,12 @@ module geometry_lib: bvh_imp;
 
 namespace geometry
 {
+	template<typename vec>
 	class bvh_imp
 	{
 	public:
 
-		void build(std::span<const vec3f> rep_points)
+		void build(std::span<const vec> rep_points)
 		{
 
 		}
