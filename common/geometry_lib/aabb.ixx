@@ -26,6 +26,7 @@ namespace geometry
 			return  value;
 		}
 
+		friend auto operator<=>(const single_value_wrapper& l, const single_value_wrapper& r) = default;
 	private:
 		T value;
 	};
@@ -47,7 +48,7 @@ namespace geometry
 
 		}
 
-		AABB(const vec& up, const vec& down) :upper(up), lower(down) {}
+		AABB(const vec& down, const vec& up) :upper(up), lower(down) {}
 
 		AABB& operator+=(const vec& point)
 		{
@@ -58,6 +59,14 @@ namespace geometry
 			}
 			return *this;
 
+		}
+
+		AABB& operator+(const AABB& other)
+		{
+			(*this) += other.upper;
+			(*this) += other.lower;
+
+			return *this;
 		}
 
 		bool intersect(const AABB& other) const
@@ -75,6 +84,7 @@ namespace geometry
 			return ret;
 		}
 
+		friend auto operator<=>(const AABB& l, const AABB& r) = default;
 	private:
 		vec upper;
 		vec lower;
