@@ -47,6 +47,9 @@ private:
 
 	bool m_sim_data_is_valid = false;
 	std::string m_sim_data_is_str = "no";
+
+	float uniform_edge_stretch_stiff = 1e2f;
+
 private:
 	std::array<float, 2> m_plane_size{ 0.5f,0.5f };
 	std::array<int, 2> m_plane_resolution{ 8,8 };

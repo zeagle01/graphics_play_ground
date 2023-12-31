@@ -36,13 +36,14 @@ namespace sim_lib
 
 
 		CE_SIMULATOR_DATA(stretch_edges,	std::vector<int2>,		assign, EVAL(tl<sim_data::stretch_edges >), tl<>);
+		CE_SIMULATOR_DATA(stretch_edges_stiff,std::vector<float>,	assign, EVAL(tl<sim_data::stretch_edges_stiff >), tl<>);
+		CE_SIMULATOR_DATA(edge_lengths,		std::vector<float>,		compute_edge_lengths, EVAL(tl<stretch_edges,rest_positions >), tl<>);
 
 		CE_SIMULATOR_DATA(gravity,			vec3,					assign, EVAL(tl<sim_data::gravity >), tl<>);
 		CE_SIMULATOR_DATA(time_step,		float,					assign, EVAL(tl<sim_data::time_step >), tl<>);
 		CE_SIMULATOR_DATA(density,			float,					assign, EVAL(tl<sim_data::density >), tl<>);
 
 		//dynamic derived
-		CE_SIMULATOR_DATA(edge_lengths,		std::vector<float>,		compute_edge_lengths, EVAL(tl<stretch_edges,rest_positions >), tl<>);
 
 	};
 

@@ -31,6 +31,9 @@ namespace sim_lib
 	{
 		template<typename T>
 		static bool apply(const std::vector<T>& in, int size) { return in.size() == size; }
+
+		template<typename T, typename U>
+		static bool apply(const std::vector<T>& out, const std::vector<U>& in) { return in.size() == out.size(); }
 	};
 
 	template<auto v>
@@ -111,6 +114,7 @@ namespace sim_lib
 		CE_ENTRY(triangles,						CE_USE(type,	std::vector<int3>);			CE_NIL(init_val);									CE_LIST(validator,	fn<within_range, vertex_num>,fn<no_repeat>);				CE_LIST(tags));
 		CE_ENTRY(obstacle_vert_index,			CE_USE(type,	std::vector<int>);			CE_NIL(init_val);									CE_LIST(validator,	fn<within_range, vertex_num>);								CE_LIST(tags));
 		CE_ENTRY(stretch_edges,					CE_USE(type,	std::vector<int2>);			CE_NIL(init_val);									CE_LIST(validator,	fn<within_range, vertex_num>);								CE_LIST(tags));
+		CE_ENTRY(stretch_edges_stiff,			CE_USE(type,	std::vector<float>);		CE_NIL(init_val);									CE_LIST(validator,	fn<size_with, stretch_edges>);								CE_LIST(tags));
 		CE_ENTRY(gravity,						CE_USE(type,	float3);					CE_VAL(init_val,	float3{0,-10.f,0});				CE_LIST(validator);																CE_LIST(tags));
 		CE_ENTRY(time_step,						CE_USE(type,	float);						CE_VAL(init_val,	0.001f);						CE_LIST(validator,  fn<greater_than<0.f>>);										CE_LIST(tags));
 		CE_ENTRY(density,						CE_USE(type,	float);						CE_VAL(init_val,	1e-1f);							CE_LIST(validator,  fn<greater_than<0.f>>);										CE_LIST(tags));

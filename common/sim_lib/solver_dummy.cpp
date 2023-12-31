@@ -99,7 +99,7 @@ namespace sim_lib
 			//edge stretch
 			const auto& edges = m_datas.get_ref<var::stretch_edges>();
 			const auto& edge_lengths = m_datas.get_ref<var::edge_lengths>();
-			float stretch_stiff = 1e3f;
+			const auto& stretch_edges_stiff = m_datas.get_ref<var::stretch_edges_stiff>();
 			auto edge_loop = m_linear_system.get_write_loop(edges.size(), [&](int ei) { return std::vector<int>{ edges[ei][0], edges[ei][1] }; });
 
 			auto add_stretch_edge_constraint = [&](auto lhs, auto rhs, int ei)
@@ -108,7 +108,7 @@ namespace sim_lib
 					int v1 = edges[ei][1];
 					std::array<vec3, 2> X{ pos[v0],pos[v1] };
 
-					edge_stretch::compute_elemnt(lhs, rhs, X, stretch_stiff, edge_lengths[ei]);
+					edge_stretch::compute_elemnt(lhs, rhs, X, stretch_edges_stiff[ei], edge_lengths[ei]);
 
 					//remove this won't compile
 					auto dx = 1.f * X[0];
@@ -157,6 +157,7 @@ namespace sim_lib
 
 			CE_SOLVER_DATA(stretch_edges,		std::vector<int2>,	simulator_data_update::assign, tl<simulator_datas::stretch_edges>, tl<>)
 			CE_SOLVER_DATA(edge_lengths,		std::vector<float>, simulator_data_update::assign, tl<simulator_datas::edge_lengths>, tl<>)
+			CE_SOLVER_DATA(stretch_edges_stiff,	std::vector<float>, simulator_data_update::assign, tl<simulator_datas::stretch_edges_stiff>, tl<>)
 
 			CE_SOLVER_DATA(gravity,				vec3,				simulator_data_update::assign, tl<simulator_datas::gravity>, tl<>)
 			CE_SOLVER_DATA(time_step,			float,				simulator_data_update::assign, tl<simulator_datas::time_step>, tl<>)

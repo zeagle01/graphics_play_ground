@@ -323,6 +323,7 @@ void App::init_sim_data()
 	std::vector<sim_lib::int2> sim_edges;
 	convert_to_sim_data(sim_edges, m_edges);
 	sim.set<sim_lib::sim_data::stretch_edges>(sim_edges);
+	sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>(sim_edges.size(), uniform_edge_stretch_stiff));
 
 }
 
@@ -369,7 +370,7 @@ void App::connect_sim_ui()
 		}
 	);
 
-	m.add_ui_component<ui_component::slider_bar>("time_step", sim.get<sim_lib::sim_data::time_step>(), {0.0001,1.f},
+	m.add_ui_component<ui_component::input_float>("time_step", sim.get<sim_lib::sim_data::time_step>(), {0.0001,1.f},
 		[this](const auto& new_v)
 		{
 			sim.mark_changed<sim_lib::sim_data::time_step>();
@@ -377,10 +378,18 @@ void App::connect_sim_ui()
 		}
 	);
 
-	m.add_ui_component<ui_component::slider_bar>("density", sim.get<sim_lib::sim_data::density>(), {0.0001,1.f},
+	m.add_ui_component<ui_component::input_float>("density", sim.get<sim_lib::sim_data::density>(), {0.0001,1.f},
 		[this](const auto& new_v)
 		{
 			sim.mark_changed<sim_lib::sim_data::density>();
+			sim.commit_all_changes();
+		}
+	);
+
+	m.add_ui_component<ui_component::input_float>("stetch_edge_stiff", uniform_edge_stretch_stiff, {0.000,1e6f},
+		[this](const auto& new_v)
+		{
+			sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>(m_edges.size()/2, new_v));
 			sim.commit_all_changes();
 		}
 	);

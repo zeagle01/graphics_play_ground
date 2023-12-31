@@ -61,6 +61,17 @@ DEF_UI_COMPONENT_IMP (ui_component::slider_bar3,
 	return ImGui::SliderFloat3(name.c_str(), value->data(), extra.min, extra.max);
 )
 
+DEF_UI_COMPONENT_IMP (ui_component::input_float,
+	return ImGui::InputFloat(name.c_str(), value, 1e-2f, 1e-1f, "%f", ImGuiInputTextFlags_EnterReturnsTrue);
+)
+
+DEF_UI_COMPONENT_IMP (ui_component::input_float2,
+	return ImGui::InputFloat(name.c_str(), value->data(), 1e-2f, 1e-1f, "%f", ImGuiInputTextFlags_EnterReturnsTrue);
+)
+
+DEF_UI_COMPONENT_IMP (ui_component::input_float3,
+	return ImGui::InputFloat(name.c_str(), value->data(), 1e-2f, 1e-1f, "%f", ImGuiInputTextFlags_EnterReturnsTrue);
+)
 
 DEF_UI_COMPONENT_IMP(ui_component::check_box,
 	return ImGui::Checkbox(name.c_str(), value);

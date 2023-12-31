@@ -34,8 +34,12 @@ namespace quick_shell
 		CE_ADD_NODE(slider_bar,		CE_TYPE(float)			CE_FIELD(extra_data, range_f));
 		CE_ADD_NODE(slider_bar2,	CE_TYPE(arr2)			CE_FIELD(extra_data, range_f));
 		CE_ADD_NODE(slider_bar3,	CE_TYPE(arr3)			CE_FIELD(extra_data, range_f));
-
 		CE_ADD_NODE(slider_bar2i,	CE_TYPE(arr2i)			CE_FIELD(extra_data, range_i));
+
+		CE_ADD_NODE(input_float,	CE_TYPE(float)			CE_FIELD(extra_data, range_f));
+		CE_ADD_NODE(input_float2,	CE_TYPE(arr2)			CE_FIELD(extra_data, range_f));
+		CE_ADD_NODE(input_float3,	CE_TYPE(arr3)			CE_FIELD(extra_data, range_f));
+
 
 		CE_ADD_NODE(text_line,		CE_TYPE(std::string)	CE_FIELD(extra_data, no_extra));
 	};
