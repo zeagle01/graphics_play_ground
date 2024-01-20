@@ -211,6 +211,7 @@ namespace sim_lib
 		{
 			if (m_changes_has_commited)
 			{
+				printf(" ---- new data commited \n");
 				m_changes_has_commited = false;
 
 				m_all_data_is_valid = true;

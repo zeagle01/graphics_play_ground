@@ -18,4 +18,11 @@ public:
 		const float* x, const int* indices, int vNum, int tNum
 	);
 
+private:
+	picked_info bvh_pick(const std::array<float, 3>& p, const std::array<float, 3>& dir,
+		const float* x, const int* indices, int vNum, int tNum);
+
+	picked_info loop_pick(const std::array<float, 3>& p, const std::array<float, 3>& dir,
+		const float* x, const int* indices, int vNum, int tNum);
+
 };

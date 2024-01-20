@@ -48,9 +48,53 @@ namespace geometry
 	class bvh_traverser
 	{
 	public:
+		void traverse_top_down(const bvh& p_bvh, std::span<const AABB> aabbs, std::function<bool(const AABB&)> internal_fn, std::function<void(int)> leaf_fn, bool update_aabb = true)
+		{
+			if (update_aabb)
+			{
+				update_iternal_box(p_bvh, aabbs);
+			}
+
+			auto get_aabb = [&](const auto& n)
+				{
+					if (n.type == geometry::node_type::leaf)
+					{
+						return aabbs[n.index];
+					}
+					else
+					{
+						return m_internal_AABB[n.index];
+					}
+				};
+
+			auto culled_fn = [&](const auto& curr, const auto& l, const auto& r)
+				{
+					if (curr.type == node_type::inner)
+					{
+						return internal_fn(get_aabb(curr));
+					}
+					else
+					{
+						if (internal_fn(get_aabb(curr)))
+						{
+							leaf_fn(curr.index);
+						}
+						return false;
+					}
+				};
+
+			p_bvh.traverse_top_down({ 0,node_type::inner }, culled_fn);
+		}
+
+		const std::vector<AABB>& get_internal_AABB() const
+		{
+			return m_internal_AABB;
+		}
+	private:
 
 		void update_iternal_box(const bvh& p_bvh, std::span<const AABB> aabbs)
 		{
+
 			std::vector<bool> is_accessed(aabbs.size() - 1);
 			m_internal_AABB.resize(aabbs.size() - 1);
 
@@ -100,28 +144,9 @@ namespace geometry
 			m_internal_AABB.shrink_to_fit();
 		}
 
-
-		void traverse_top_down(const AABB& p_AABB, const bvh& p_bvh, std::span<const AABB> aabbs, std::function<bool(const node& curr, const node& left, const node& right,bool )> node_fn)
-		{
-			update_iternal_box(p_bvh, aabbs);
-
-			auto culled_fn = [&](const auto& curr, const auto& l, const auto& r)
-				{
-					bool intersected = p_AABB.intersect(aabbs[curr.index]);
-					bool keep_going = node_fn(curr, l, r, intersected);
-					return keep_going && intersected;
-				};
-			p_bvh.traverse_top_down({ 0,node_type::inner }, culled_fn);
-		}
-
-		const std::vector<AABB>& get_internal_AABB() const
-		{
-			return m_internal_AABB;
-		}
-
 	private:
+
 		std::vector<AABB> m_internal_AABB;
-		
 	};
 
 }
