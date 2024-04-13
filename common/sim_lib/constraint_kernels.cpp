@@ -59,6 +59,21 @@ namespace sim_lib
 			auto u0 = U[0] - U[2];
 			auto u1 = U[1] - U[2];
 
+
+			//dX=F*dU
+			//XS=FUS
+			//F=X S(US)^-1
+
+		}
+
+		template<typename write_lhs, typename write_rhs >
+		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const std::array<vec3f, 3>& X, const std::array<vec2f, 3>& U, float stretch_stiff)
+		{
+			auto u0 = U[0];
+			//auto u0 = U[0] - U[2];
+			//auto u1 = U[1] - U[2];
+
+
 			//dX=F*dU
 			//XS=FUS
 			//F=X S(US)^-1

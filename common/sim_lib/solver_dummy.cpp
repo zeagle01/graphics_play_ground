@@ -116,6 +116,9 @@ namespace sim_lib
 
 			edge_loop(add_stretch_edge_constraint);
 
+			//face stretch
+			//const auto& faces = m_datas.get_ref<var::stretch_faces>();
+
 			//update fix pos
 			std::vector<vec3> dx(pos.size());
 			const auto& fixed_verts = m_datas.get_ref<var::fixed_verts>();
