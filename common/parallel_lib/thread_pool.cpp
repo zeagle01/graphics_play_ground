@@ -24,30 +24,37 @@ namespace parallel
 						while (true)
 						{
 
-							std::unique_lock lock(m_lock);
-
-							bool keep_running = !(m_tasks.empty() && m_want_stop);
-							if (!keep_running)
+							std::function<void()> fn;
 							{
-								break;
-							}
+								std::unique_lock lock(m_lock);
 
-							m_cv.wait(lock,
-								[this,keep_running]()
+								bool keep_running = !(m_tasks.empty() && m_want_stop);
+								if (!keep_running)
 								{
-									return keep_running;
+									break;
 								}
-							);
 
-							if (!m_tasks.empty())
-							{
-								auto fn = m_tasks.back();
+								m_cv.wait(lock,
+									[this, keep_running]()
+									{
+										return keep_running;
+									}
+								);
 
-								fn();
+								if (!m_tasks.empty())
+								{
+									fn = m_tasks.back();
+									m_tasks.pop_back();
+									//m_cv.notify_one();
 
-								m_tasks.pop_back();
+								}
+
 							}
 
+							if (fn)
+							{
+								fn();
+							}
 
 						}
 					});
@@ -60,8 +67,8 @@ namespace parallel
 			{
 				std::lock_guard lock(m_lock);
 				m_want_stop = true;
-				m_cv.notify_all();
 			}
+			m_cv.notify_all();
 
 
 			for (auto& t : m_threads)
@@ -78,6 +85,8 @@ namespace parallel
 			std::lock_guard lock(m_lock);
 			m_tasks.push_back(task);
 			m_cv.notify_one();
+
+			printf(" add task \n");
 		}
 
 	private:
