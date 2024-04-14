@@ -11,7 +11,7 @@ target_sources(parallel_lib_test PUBLIC
 	TYPE CXX_MODULES
 	FILES 
 	main.cpp
-	parallel_test.cpp
+	thread_pool_test.cpp
 )
 
 set_target_properties(parallel_lib_test PROPERTIES FOLDER unit_test/common)

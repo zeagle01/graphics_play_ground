@@ -11,6 +11,11 @@ target_sources(parallel_lib PUBLIC
 	TYPE CXX_MODULES
 	FILES 
 	parallel.ixx  ## main module definition
+	parallel.cpp  ## imp unit  
+	##interface partition
+
+	##internal partition
+	thread_pool.cpp  
 )
 
 set_target_properties(parallel_lib PROPERTIES FOLDER common)
