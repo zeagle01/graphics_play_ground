@@ -12,21 +12,21 @@ import parallel_lib;
 using namespace testing;
 
 
-TEST(thread_pool_test, init_a_thread_pool)
+TEST(thread_pool_test, job_is_actually_done)
 {
 
-	int act = 0;
+	bool is_executed = 0;
 
 	{
 		parallel::thread_pool l_thread_pool(4);
 		l_thread_pool.add_task([&]()
 			{
-				act++;
+				is_executed = true;
 			}
 		);
 	}
 
-	EXPECT_THAT(act, Eq(1));
+	EXPECT_TRUE(is_executed);
 
 }
 
@@ -38,8 +38,7 @@ TEST(thread_pool_test, runinng_time_should_less)
 
 	std::function<void()> some_work = []()
 		{
-			printf(" %d doing job ...\n",std::this_thread::get_id());
-			std::this_thread::sleep_for(20ms);
+			std::this_thread::sleep_for(200ms);
 
 		};
 
@@ -58,7 +57,28 @@ TEST(thread_pool_test, runinng_time_should_less)
 	auto end = std::chrono::high_resolution_clock::now();
 	auto act = (end - begin).count() * 1e-6;
 
-	EXPECT_THAT(act, Lt(80));
+	EXPECT_THAT(act, Lt(800));
+
+}
+
+TEST(thread_pool_test, multiple_job_will_be_done)
+{
+
+	std::vector<bool > is_executed(4,false);
+
+	{
+		parallel::thread_pool l_thread_pool(2);
+
+		for (int i = 0; i < is_executed.size(); i++)
+		{
+			l_thread_pool.add_task([&, i]() { is_executed[i] = true; });
+		}
+
+	}
+
+	std::vector<bool > exp(4,true);
+
+	EXPECT_THAT(is_executed, Eq(exp));
 
 }
 
