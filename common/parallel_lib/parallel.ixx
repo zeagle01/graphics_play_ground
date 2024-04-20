@@ -20,7 +20,12 @@ namespace parallel
 	public:
 		thread_pool(int thread_num);
 
+		void start();
+
 		void add_task(std::function<void()> fn);
+
+		void wait_until_completed();
+
 	private:
 		std::shared_ptr<thread_pool_imp> m_imp;
 	};

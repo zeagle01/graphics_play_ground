@@ -21,4 +21,14 @@ namespace parallel
 		m_imp->add_task(task);
 	}
 
+	void thread_pool::start()
+	{
+		m_imp->start();
+	}
+
+	void thread_pool::wait_until_completed()
+	{
+		m_imp->wait_until_completed();
+	}
+
 }
