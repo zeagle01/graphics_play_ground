@@ -37,3 +37,6 @@ target_link_libraries(sim_lib PRIVATE clumsy_lib)
 ########## matrix_math
 target_link_libraries(sim_lib PRIVATE matrix_math)
 
+########## parallel_lib
+target_link_libraries(sim_lib PRIVATE parallel_lib)
+

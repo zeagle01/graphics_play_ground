@@ -20,6 +20,7 @@ import :simulator_datas;
 import :constraint_kernels;
 
 import matrix_math;
+import parallel_lib;
 
 namespace sim_lib
 {
@@ -49,10 +50,12 @@ namespace sim_lib
 			const auto& pos = m_datas.get_ref<var::positions>();
 			const auto& last_pos = m_datas.get_ref<var::last_positions>();
 
-			for (int i = 0; i < vel.size(); i++)
-			{
-				vel[i] = (pos[i] - last_pos[i]) / dt;
-			}
+			parallel::for_each(vel.size(), 256,
+				[&](int i)
+				{
+					vel[i] = (pos[i] - last_pos[i]) / dt;
+				}
+			);
 
 		}
 
