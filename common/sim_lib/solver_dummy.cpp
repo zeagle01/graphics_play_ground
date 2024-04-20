@@ -109,7 +109,9 @@ namespace sim_lib
 				{
 					int v0 = edges[ei][0];
 					int v1 = edges[ei][1];
-					std::array<vec3, 2> X{ pos[v0],pos[v1] };
+
+					std::array<vec3, 2> X{  pos[v0],pos[v1] };
+					//std::array<vec3f, 2> X{ vec3f{} ,vec3f{} };
 
 					edge_stretch::compute_elemnt(lhs, rhs, X, stretch_edges_stiff[ei], edge_lengths[ei]);
 

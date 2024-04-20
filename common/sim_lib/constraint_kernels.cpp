@@ -6,6 +6,7 @@ module;
 
 module sim_lib : constraint_kernels;
 
+import matrix_math;
 
 namespace sim_lib
 {
@@ -17,7 +18,7 @@ namespace sim_lib
 		{
 			float inertial_h = mass / dt / dt;
 			lhs(0,0) = inertial_h;
-			rhs(0) = mass * gravity_accelaration + inertial_h * (velocity * dt);
+			rhs(0) = mass * gravity_accelaration + inertial_h * (dt * velocity);
 		}
 
 
@@ -29,9 +30,9 @@ namespace sim_lib
 		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const std::array<vec_type, 2>& X, float stiff_modulus,float edge_length)
 		{
 			float w[]{ 1,-1 };
-			auto dx = w[0] * X[0] + w[1] * X[1];
+			vec_type dx = w[0] * X[0] + w[1] * X[1];
 			float l = matrix_math::norm<2>::apply(dx);
-			auto n = dx / l;
+			vec_type n = 1.f / l * dx;
 
 			float stiff = stiff_modulus / edge_length;
 
