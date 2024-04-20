@@ -12,6 +12,7 @@ target_sources(parallel_lib_test PUBLIC
 	FILES 
 	main.cpp
 	thread_pool_test.cpp
+	for_each_test.cpp
 )
 
 set_target_properties(parallel_lib_test PROPERTIES FOLDER unit_test/common)

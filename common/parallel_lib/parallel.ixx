@@ -11,7 +11,7 @@ import : thread_pool;
 
 namespace parallel
 {
-	export void for_each(std::function<void(int)> fn, int size, int grain);
+	export void for_each(int size, int grain, std::function<void(int)> fn);
 
 
 	//class thread_pool_imp;
@@ -20,8 +20,6 @@ namespace parallel
 	public:
 		thread_pool(int thread_num);
 
-		void start();
-
 		void add_task(std::function<void()> fn);
 
 		void wait_until_completed();
@@ -29,4 +27,5 @@ namespace parallel
 	private:
 		std::shared_ptr<thread_pool_imp> m_imp;
 	};
+
 }

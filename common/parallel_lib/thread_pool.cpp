@@ -16,16 +16,8 @@ namespace parallel
 		thread_pool_imp(int thread_num):m_thread_num(thread_num)
 		{
 			m_want_stop = false;
-			m_is_job_done = false;
-		}
+			m_is_job_done = true;
 
-		~thread_pool_imp()
-		{
-			stop_and_join_threads();
-		}
-
-		void start()
-		{
 			if (m_debug)
 			{
 				printf(" start \n");
@@ -33,6 +25,12 @@ namespace parallel
 
 			start_threads();
 		}
+
+		~thread_pool_imp()
+		{
+			stop_and_join_threads();
+		}
+
 
 		void wait_until_completed()
 		{

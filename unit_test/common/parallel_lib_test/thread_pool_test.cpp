@@ -24,7 +24,6 @@ TEST(thread_pool_test, job_is_actually_done)
 				is_executed = true;
 			}
 		);
-		l_thread_pool.start();
 	}
 
 	EXPECT_TRUE(is_executed);
@@ -44,7 +43,6 @@ TEST(thread_pool_test, get_result_with_wait_until_job_done)
 			is_executed = true;
 		}
 	);
-	l_thread_pool.start();
 	l_thread_pool.wait_until_completed();
 
 	EXPECT_TRUE(is_executed);
@@ -74,7 +72,6 @@ TEST(thread_pool_test, runinng_time_should_less)
 		l_thread_pool.add_task(some_work);
 		l_thread_pool.add_task(some_work);
 
-		l_thread_pool.start();
 
 	}
 	auto end = std::chrono::high_resolution_clock::now();
@@ -97,7 +94,6 @@ TEST(thread_pool_test, multiple_job_will_be_done)
 			l_thread_pool.add_task([&, i]() { is_executed[i] = true; });
 		}
 
-		l_thread_pool.start();
 	}
 
 	std::vector<bool > exp(4,true);
