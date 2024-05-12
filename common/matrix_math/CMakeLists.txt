@@ -24,6 +24,7 @@ target_sources(matrix_math PUBLIC
 	TYPE CXX_MODULES
 	FILES 
 	sparse_matrix.ixx
+	matrix.ixx
 )
 
 

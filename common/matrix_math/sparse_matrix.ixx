@@ -7,6 +7,7 @@ module;
 #include <set>
 
 export module matrix_math;
+export import : matrix;
 
 
 namespace matrix_math
