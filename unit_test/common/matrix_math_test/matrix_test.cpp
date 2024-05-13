@@ -7,6 +7,8 @@ using namespace testing;
 
 import matrix_math;
 
+using namespace matrix_math;
+
 
 using mat2x2 = matrix_math::matrix<float, 2, 2>;
 using mat2x3 = matrix_math::matrix<float, 2, 3>;
@@ -36,12 +38,33 @@ void expect_mat_equal(const matrix_math::matrix<T, R, C>& mat, const std::initia
 
 
 
-TEST(matrix_test, init_with_one_value)
+TEST(matrix_test, vec_init_with_zero)
 {
-	vec2 m(1.f);
+	vec2 v{};
 
-	expect_mat_equal(m, { 1.f,1.f });
+	EXPECT_THAT(v(0), Eq(0.f));
+	EXPECT_THAT(v(1), Eq(0.f));
 }
+
+TEST(matrix_test, matrix_init_with_zero)
+{
+	mat2x2 m{};
+
+	EXPECT_THAT(m(0,0), Eq(0.f));
+	EXPECT_THAT(m(1,0), Eq(0.f));
+	EXPECT_THAT(m(0,1), Eq(0.f));
+	EXPECT_THAT(m(1,1), Eq(0.f));
+}
+
+TEST(matrix_test, transposed_vec_init_with_zero)
+{
+	tvec2 v{};
+
+	EXPECT_THAT(v(0), Eq(0.f));
+	EXPECT_THAT(v(1), Eq(0.f));
+
+}
+
 
 TEST(matrix_test, init_with_values)
 {
@@ -57,7 +80,7 @@ TEST(matrix_test, init_with_values)
 		});
 }
 
-TEST(matrix_test, transposed_init)
+TEST(matrix_test, transposed_vec_init)
 {
 	tvec2 v{
 		1.f,2.f,
@@ -83,7 +106,7 @@ TEST(matrix_test, constexpr_init)
 		});
 }
 
-TEST(matrix_test, vectorize)
+TEST(matrix_test, vectorize_access)
 {
 	constexpr mat2x2 m{
 		1.f,2.f,
@@ -401,5 +424,85 @@ TEST(matrix_test, divide_assign_scalar)
 		{
 			1.f, 2.f ,
 			3.f, 4.f 
+		});
+}
+
+
+TEST(matrix_test, get_column)
+{
+	mat2x2 m
+	{ 
+		1.f,3.f,
+		2.f,4.f 
+	};
+
+	vec2 c0 = column(m, 0);
+
+
+	expect_mat_equal(c0, 
+		{
+			1.f,
+			2.f
+		});
+}
+
+
+TEST(matrix_test, assign_column)
+{
+	mat2x2 m
+	{ 
+		1.f,3.f,
+		2.f,4.f 
+	};
+
+	vec2 v{ 42.f,42.f };
+	column(m,0) = v;
+
+	expect_mat_equal(m,
+		{
+			42.f,3.f,
+			42.f,4.f
+		});
+}
+
+TEST(matrix_test, vectorize_write)
+{
+	mat2x2 m
+	{ 
+		1.f,3.f,
+		2.f,4.f 
+	};
+
+	vec4 v{ 42.f,42.f ,42.f,42.f };
+	vectorize(m) = v;
+
+	expect_mat_equal(m,
+		{
+			42.f,42.f,
+			42.f,42.f
+		});
+}
+
+TEST(matrix_test, transpose_write)
+{
+	mat2x3 m
+	{ 
+		1.f,2.f,3.f,
+		4.f,5.f,6.f
+	};
+
+	mat3x2 m1
+	{ 
+		11.f,14.f,
+		12.f,15.f,
+		13.f,16.f
+	};
+
+	transpose(m) = m1;
+
+	expect_mat_equal(m,
+		{
+			11.f,12.f,13.f,
+			14.f,15.f,16.f
 		});
 }
