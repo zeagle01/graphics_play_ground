@@ -6,279 +6,208 @@ module;
 #include <functional>
 #include <array>
 
-
 export module matrix_math: matrix;
-
-
-#define mat_like(name) template<typename,int,int> typename name
-
-template<typename T>
-struct testDebugT;
 
 namespace matrix_math
 {
-	template<typename T,int Row, int Col>
-	struct matrix;
 
-	struct accessor
+	namespace matrix_imp
 	{
-		template<typename M >
-		static decltype(auto) apply(M&& m, int r, int c)
+		template<typename T, int R, int C>
+		struct basic_info
 		{
-			if constexpr (requires (M m) { m(r, c); })
+			static constexpr int row_num = R;
+			static constexpr int col_num = C;
+			using type = T;
+		};
+
+		struct accessor
+		{
+			template<typename M >
+			static decltype(auto) apply(M&& m, int r, int c)
 			{
-				return std::forward<M>(m)(r, c);
+				if constexpr (requires { m(0, 0); })
+				{
+					return std::forward<M>(m)(r, c);
+				}
+				else
+				{
+					return std::forward<M>(m);
+				}
+			}
+		};
+
+		template<typename M>
+		concept matrix_like = requires (M  m)
+		{
+			std::decay_t<M>::row_num;
+			std::decay_t<M>::col_num;
+			matrix_imp::accessor::apply(m, 0, 0);
+		};
+
+		struct assigner
+		{
+			template<matrix_like m0_t, matrix_like m1_t>
+			static void apply(m0_t&& m0, m1_t&& m1)
+			{
+
+				constexpr int R = std::decay_t<m0_t>::row_num;
+				constexpr int C = std::decay_t<m0_t>::col_num;
+				constexpr int R1 = std::decay_t<m1_t>::row_num;
+				constexpr int C1 = std::decay_t<m1_t>::col_num;
+				static_assert(R == R1);
+				static_assert(C == C1);
+				using T = std::decay_t<m0_t>::type;
+				using T1 = std::decay_t<m1_t>::type;
+
+				static_assert(std::is_same_v<T, T1>);
+
+				for (int r = 0; r < R; r++)
+				{
+					for (int c = 0; c < C; c++)
+					{
+						accessor::apply(std::forward<m0_t>(m0), r, c) = accessor::apply(std::forward<m1_t>(m1), r, c);
+					}
+				}
+			}
+
+		};
+	}
+
+
+	namespace matrix_imp
+	{
+		template<typename T, int R, int C, typename d0_t, typename d1_t, typename op>
+		struct expression : public basic_info< T, R, C>
+		{
+			constexpr expression(const d0_t& d0, const d1_t& d1, const op& _op) : m_d0(d0), m_d1(d1), m_op(_op) {}
+
+			constexpr decltype(auto) operator()(int r, int c) const
+			{
+				return m_op(accessor::apply(m_d0, r, c), accessor::apply(m_d1, r, c));
+			}
+
+		public:
+			const d0_t& m_d0;
+			const d1_t& m_d1;
+			op m_op;
+		};
+
+		template<typename T, int R, int C, typename d0_t, typename op>
+		struct unitary_expression : public basic_info< T, R, C>
+		{
+			constexpr unitary_expression(const d0_t& d0, const op& _op) : m_d0(d0), m_op(_op) {}
+
+			constexpr decltype(auto) operator()(int r, int c) const
+			{
+				return m_op(accessor::apply(m_d0, r, c));
+			}
+
+		public:
+			const d0_t& m_d0;
+			op m_op;
+		};
+
+		template<typename T, int R, int C, typename d0_t, typename d1_t, typename op>
+		struct free_expression : public basic_info< T, R, C>
+		{
+			constexpr free_expression(const d0_t& d0, const d1_t& d1, const op& _op) : m_d0(d0), m_d1(d1), m_op(_op) {}
+
+			constexpr decltype(auto) operator()(int r, int c) const
+			{
+				return m_op(m_d0, m_d1, r, c);
+			}
+
+		public:
+			const d0_t& m_d0;
+			const d1_t& m_d1;
+			op m_op;
+
+		};
+
+
+		template<template<typename> typename op, typename d0_t, typename d1_t >
+		auto build_expression(const d0_t& d0, const d1_t& d1)
+		{
+
+			if constexpr (matrix_like<d0_t> && matrix_like<d1_t>)
+			{
+				constexpr int R = std::decay_t<d0_t>::row_num;
+				constexpr int C = std::decay_t<d0_t>::col_num;
+				constexpr int R1 = std::decay_t<d1_t>::row_num;
+				constexpr int C1 = std::decay_t<d1_t>::col_num;
+
+				static_assert(R == R1);
+				static_assert(C == C1);
+
+				using T = std::decay_t<d0_t>::type;
+				using T1 = std::decay_t<d1_t>::type;
+
+				static_assert(std::is_same_v<T, T1>);
+
+				return matrix_imp::expression<T, R, C, d0_t, d1_t, op<T>>{ d0, d1, op<T>{} };
+			}
+			else if constexpr (matrix_like<d0_t>)
+			{
+				constexpr int R = std::decay_t<d0_t>::row_num;
+				constexpr int C = std::decay_t<d0_t>::col_num;
+				using T = std::decay_t<d0_t>::type;
+				return matrix_imp::expression<T, R, C, d0_t, d1_t, op<T>>{ d0, d1, op<T>{} };
+			}
+			else if constexpr(matrix_like<d1_t>)
+			{
+				constexpr int R = std::decay_t<d1_t>::row_num;
+				constexpr int C = std::decay_t<d1_t>::col_num;
+				using T = std::decay_t<d1_t>::type;
+				return matrix_imp::expression<T, R, C, d0_t, d1_t, op<T>>{ d0, d1, op<T>{} };
 			}
 			else
 			{
-				return std::forward<M>(m);
+				constexpr int R = 1;
+				constexpr int C = 1;
+				using T = d0_t;
+				return matrix_imp::expression<T, R, C, d0_t, d1_t, op<T>>{ d0, d1, op<T>{} };
 			}
+
 		}
-	};
 
-
-	template<typename T, int R, int C, typename Op_Out, typename Op_In, mat_like(mat), typename ...T_In >
-	static void op_on_mat_component(Op_Out op_out, Op_In op_in, mat<T, R, C>& out, const T_In& ...in)
-	{
-		for (int r = 0; r < R; r++)
+		template<template<typename> typename op, typename d0_t >
+		auto build_expression(const d0_t& d0)
 		{
-			for (int c = 0; c < C; c++)
-			{
-				op_out(accessor::apply(out, r, c), op_in(accessor::apply(in, r, c) ...));
-			}
+			constexpr int R = std::decay_t<d0_t>::row_num;
+			constexpr int C = std::decay_t<d0_t>::col_num;
+			using T = std::decay_t<d0_t>::type;
+			return matrix_imp::unitary_expression<T, R, C, d0_t, op<T>>{ d0, op<T>{} };
 		}
-	}
 
-	template<typename T, int R, int C,  typename Op_Out, typename Op_In, typename ...T_In >
-	static matrix<T, R, C> op_on_mat_component(Op_Out op_out, Op_In op_in,  const T_In& ...in)
-	{
-		matrix<T, R, C> ret;
-		op_on_mat_component(op_out, op_in, ret, in...);
-		return ret;
-	}
+		struct mat_x_mat
+		{
+			template<typename m0_t, typename m1_t>
+			decltype(auto) operator()(const m0_t& m0, const m1_t& m1, int r, int c) const
+			{
+				constexpr int N = std::decay_t<m0_t>::col_num;
+				using T = std::decay_t<m0_t>::type;
 
-}
-
-namespace matrix_math
-{
-
-	namespace op
-	{
-		template<typename T> struct identity { const T& operator()(const T& v) { return  v; } };
-
-		template<typename T> struct assign { void operator()(T&out, const T& v) { out = v; } };
-
-		template<typename T> struct plus_assign { void operator()(T&out, const T& v) { out += v; } };
-
-		template<typename T> struct minus_assign { void operator()(T&out, const T& v) { out -= v; } };
-
-		template<typename T> struct multiply_assign { void operator()(T&out, const T& v) { out *= v; } };
-
-		template<typename T> struct divide_assign { void operator()(T&out, const T& v) { out /= v; } };
+				T ret{};
+				for (int i = 0; i < N; i++)
+				{
+					ret += accessor::apply(m0, r, i) * accessor::apply(m1, i, c);
+				}
+				return ret;
+			}
+		};
 
 	}
 
-}
 
-namespace matrix_math
-{
-	namespace view
-	{
-
-		template<typename U, typename T, int R, int C>
-		struct imp
-		{
-
-			template<typename Get_Acc, int R_in, int C_in, typename M, typename ...P >
-			void from(M&& m, P&& ...p)
-			{
-				Get_Acc index_map{ std::forward<P>(p)... };
-				m_get = [&m, index_map](int r, int c) -> U
-					{ 
-						auto [ri, ci] = index_map.operator()<R , C, R_in, C_in> (r, c);
-						return accessor::apply(std::forward<M>(m), ri, ci);
-					};
-			}
-
-			constexpr const T& operator()(int r, int c) const
-			{
-				return m_get(r, c);
-			}
-
-			constexpr T& operator()(int r, int c) 
-			{
-				return m_get(r, c);
-			}
-
-			operator matrix<T, R, C>()
-			{
-				return op_on_mat_component<T, R, C >(op::assign<T>{}, op::identity<T>{}, * this);
-			}
-
-			constexpr int size() const
-			{
-				return R * C;
-			}
-
-		private:
-			std::function<U (int, int)> m_get;
-
-		};
-
-		template<typename T, int R, int C>
-		struct read :public imp<const T&, T, R, C> { };
-
-		template<typename T, int N >
-		struct read<T, N, 1> :public imp<const T&, T, N, 1>
-		{
-			constexpr const T& operator()(int i) const
-			{
-				return internal::operator()(i, 0);
-			}
-
-			friend accessor;
-		private:
-			using internal = imp<const T&, T, N, 1>;
-			using internal::operator();
-		};
-
-		template<typename T, int N >
-		struct read<T, 1, N> :public imp<const T&, T, 1, N>
-		{
-			constexpr const T& operator()(int i) const
-			{
-				return internal::operator()(0, i);
-			}
-
-			friend accessor;
-		private:
-			using internal = imp<const T&, T, 1, N>;
-			using internal::operator();
-		};
-
-		template<typename T, int R, int C>
-		struct write :public imp<T&, T, R, C> 
-		{
-			template<mat_like(mat)>
-			write& operator=(const mat<T, R, C>& m)
-			{
-				op_on_mat_component<T, R, C >(op::assign<T>{}, op::identity<T>{}, * this, m);
-				return *this;
-			}
-		};
-
-		template<typename T, int N >
-		struct write<T, N, 1> :public imp<T&, T, N, 1>
-		{
-		private:
-			using internal = imp<T&, T, N, 1>;
-
-		public:
-			constexpr T& operator()(int i) 
-			{
-				return internal::operator()(i, 0);
-			}
-
-			template<mat_like(mat)>
-			write& operator=(const mat<T, N, 1>& m)
-			{
-				op_on_mat_component<T, N, 1 >(op::assign<T>{}, op::identity<T>{}, * this, m);
-				return *this;
-			}
-
-			using  internal::operator=;
-
-			friend accessor;
-		private:
-			using internal::operator();
-		};
-
-		template<typename T, int N >
-		struct write<T, 1, N> :public imp<T&, T, 1, N>
-		{
-			constexpr T& operator()(int i) 
-			{
-				return internal::operator()(0, i);
-			}
-
-			template<mat_like(mat)>
-			write& operator=(const mat<T, 1, N>& m)
-			{
-				op_on_mat_component<T, 1, N >(op::assign<T>{}, op::identity<T>{}, * this, m);
-				return *this;
-			}
-
-			friend accessor;
-		private:
-			using internal = imp<T&, T, 1, N>;
-			using internal::operator();
-		};
-
-
-
-		struct row_col
-		{
-			int row;
-			int col;
-		};
-
-		struct transposer
-		{
-			template<int R_out, int C_out, int R_in, int C_in >
-			row_col operator()(int r, int c) const
-			{
-				static_assert(R_out == C_in);
-				static_assert(C_out == R_in );
-
-				return { c,r };
-			}
-
-		};
-
-		struct vectorizer
-		{
-			template<int R_out, int C_out, int R_in, int C_in >
-			row_col operator()(int r_out, int c_out) const
-			{
-				static_assert(C_out == 1);
-				static_assert(R_out == R_in * C_in);
-
-				int c_in = r_out / R_in;
-				int r_in = r_out % R_in;
-
-				return { r_in, c_in };
-			}
-		};
-
-		struct map_column
-		{
-			template<int R_out, int C_out, int R_in, int C_in >
-			row_col operator()(int r_out, int c_out) const
-			{
-				static_assert(C_out == 1);
-				static_assert(R_out == R_in );
-
-				return { r_out, col };
-			}
-
-			int col;
-
-		};
-	}
-
-}
-
-
-namespace matrix_math
-{
-	namespace internal
+	namespace matrix_imp
 	{
 		template<typename T, int R, int C>
-		struct mat
+		struct buffer :public basic_info< T, R, C>
 		{
-			constexpr mat() = default;
+			constexpr buffer() = default;
 
-			constexpr mat(const std::initializer_list<T>& values)
+			constexpr buffer(const std::initializer_list<T>& values)
 			{
 				assert(values.size() == R * C);
 				for (int i = 0; const T & v : values)
@@ -290,237 +219,380 @@ namespace matrix_math
 				}
 			}
 
-			constexpr int size() const
+			constexpr T& operator()(int r, int c) { return m_data[r + c * R]; } 
+			constexpr const T& operator()(int r, int c) const { return m_data[r + c * R]; }
+
+			template<matrix_like m_t >
+			constexpr buffer(const m_t& m)
 			{
-				return R * C;
+				assigner::apply(*this, m);
 			}
 
-			constexpr T& operator() (int row, int col)
+			template<matrix_like m_t >
+			constexpr buffer& operator=(const m_t& m)
 			{
-				return m_data[row + col * R];
-			}
-
-			constexpr const T& operator() (int row, int col) const
-			{
-				return m_data[row + col * R];
+				assigner::apply(*this, m);
+				return *this;
 			}
 
 		private:
-			T m_data[R*C];
+			std::array<T, R* C> m_data;
+		};
+	}
+
+	namespace matrix_imp
+	{
+		struct row_col
+		{
+			int row, col;
+		};
+
+		template<typename M, typename index_mapper>
+		struct view : public basic_info< typename std::decay_t<M>::type, std::decay_t<index_mapper>::R_out, std::decay_t<index_mapper>::C_out >
+		{
+			view(M&& mat, index_mapper im) : m_mat(std::forward<M>(mat)), m_index_mapper(std::forward<index_mapper>(im)) {}
+
+			constexpr decltype(auto) operator()(int r, int c) const
+			{
+				auto [row, col] = m_index_mapper(r, c);
+				return accessor::apply(m_mat, row, col);
+			}
+
+			constexpr decltype(auto) operator()(int r, int c)
+			{
+				auto [row, col] = m_index_mapper(r, c);
+				return accessor::apply(m_mat, row, col);
+			}
+
+			template<matrix_like m_t >
+			constexpr view& operator=(const m_t& m)
+			{
+				assigner::apply(*this, m);
+				return *this;
+			}
+
+		private:
+			M m_mat;
+			index_mapper m_index_mapper;
+		};
+
+		template<typename M, typename index_mapper>
+		struct col_view : public view<M, index_mapper>
+		{
+		private:
+			using imp = view<M, index_mapper>;
+		public:
+			col_view(M&& mat, index_mapper im) : imp(std::forward<M>(mat), im) {}
+
+			constexpr decltype(auto) operator()(int i) const { return imp::operator()(i, 0); }
+			constexpr decltype(auto) operator()(int i) { return imp::operator()(i, 0); }
+
+			using imp::operator=;
+			friend struct accessor;
+		private:
+			using imp::operator();
+		};
+
+		template<typename M, typename index_mapper>
+		struct row_view : public view<M, index_mapper>
+		{
+		private:
+			using imp = view<M, index_mapper>;
+		public:
+			row_view(M&& mat, index_mapper im) : imp(std::forward<M>(mat), im) {}
+
+			constexpr decltype(auto) operator()(int i) const { return imp::operator()(0, i); }
+			constexpr decltype(auto) operator()(int i) { return imp::operator()(0, i); }
+
+			using imp::operator=;
+			friend struct accessor;
+		private:
+			using imp::operator();
+		};
+
+
+		struct view_builder
+		{
+			template<template<int, int> typename index_mapper_t, typename M ,typename ...P>
+			static decltype(auto) apply(M&& m, P&& ...p)
+			{
+				constexpr int R = std::decay_t<M>::row_num;
+				constexpr int C = std::decay_t<M>::col_num;
+				using im_t = index_mapper_t<R, C>;
+				constexpr int R_out = im_t::R_out;
+				constexpr int C_out = im_t::C_out;
+
+				im_t im{ std::forward<P>(p)... };
+
+				if constexpr (C_out == 1)
+				{
+					return matrix_imp::col_view<M, im_t >(std::forward<M>(m), im);
+				}
+				else if constexpr (R_out == 1)
+				{
+					return matrix_imp::row_view<M, im_t >(std::forward<M>(m), im);
+				}
+				else
+				{
+					return matrix_imp::view<M, im_t >(std::forward<M>(m), im);
+				}
+			}
 
 		};
 	}
+
+
+	namespace matrix_imp
+	{
+		namespace index_mapper
+		{
+			template<int R_in, int C_in>
+			struct transposer
+			{
+				static constexpr int R_out = C_in;
+				static constexpr int C_out = R_in;
+
+				row_col operator()(int r, int c) const
+				{
+					return { c,r };
+				}
+			};
+
+			template<int R_in, int C_in>
+			struct vectorizer
+			{
+				static constexpr int R_out = R_in * C_in;
+				static constexpr int C_out = 1;
+
+				row_col operator()(int r_out, int c_out) const
+				{
+					int c_in = r_out / R_in;
+					int r_in = r_out % R_in;
+
+					return { r_in, c_in };
+				}
+			};
+
+			template<int R_in, int C_in>
+			struct get_column
+			{
+				static constexpr int R_out = R_in;
+				static constexpr int C_out = 1;
+
+				row_col operator()(int r_out, int c_out) const
+				{
+					return { r_out, col };
+				}
+
+				int col;
+
+			};
+		}
+	}
+
 }
 
 
-export namespace matrix_math
+export
+namespace matrix_math
 {
+	template<typename T, int R, int C>
+	struct matrix : public matrix_imp::buffer<T, R, C> 
+	{ 
 
-	template<typename T,int Row, int Col>
-	struct matrix : public internal::mat<T, Row, Col>
-	{
-		constexpr matrix() = default;
-		constexpr matrix(const std::initializer_list<T>& values) : internal::mat<T, Row, Col>(values) { }
-	};
-
-	template<typename T,int N >
-	struct matrix<T,N,1> : public internal::mat<T, N, 1>
-	{
-		constexpr matrix() = default;
-		constexpr matrix(const std::initializer_list<T>& values) : mat(values) { }
-
-		constexpr T& operator() (int i)
-		{
-			return mat::operator()(i, 0);
-		}
-
-		constexpr const T& operator() (int i) const
-		{
-			return mat::operator()(i, 0);
-		}
-
-		friend accessor;
 	private:
-		using mat = internal::mat<T, N, 1>;
-		using mat::operator();
-	};
-
-	template<typename T,int N >
-	struct matrix<T,1,N> : public internal::mat<T, 1, N>
-	{
+		using buffer = matrix_imp::buffer<T, R, C>;
+	public:
 		constexpr matrix() = default;
-		constexpr matrix(const std::initializer_list<T>& values) : mat(values) { }
+		constexpr matrix(const std::initializer_list<T>& values) : buffer(values) {}
 
-		constexpr T& operator() (int i)
-		{
-			return mat::operator()(i, 0);
-		}
+		template<matrix_imp::matrix_like m_t >
+		matrix(const m_t& exp) : buffer(exp) {}
+	};
 
-		constexpr const T& operator() (int i) const
-		{
-			return mat::operator()(i, 0);
-		}
-
-		friend accessor;
+	template<typename T, int N>
+	struct matrix<T, N, 1> : public matrix_imp::buffer<T, N, 1>
+	{
 	private:
-		using mat = internal::mat<T, 1, N>;
-		using mat::operator();
+		using buffer = matrix_imp::buffer<T, N, 1>;
+	public:
+		constexpr matrix() = default;
+		constexpr matrix(const std::initializer_list<T>& values) : buffer(values) {}
+		template<matrix_imp::matrix_like m_t >
+		constexpr matrix(const m_t& exp) : buffer(exp) {}
+
+		constexpr T& operator()(int i) { return buffer::operator()(i, 0); }
+		constexpr const T& operator()(int i) const { return buffer::operator()(i, 0); }
+
+		friend struct matrix_imp::accessor;
+	private:
+		using buffer::operator();
+	};
+
+	template<typename T, int N>
+	struct matrix<T, 1, N> : public matrix_imp::buffer<T, 1, N>
+	{
+	private:
+		using buffer = matrix_imp::buffer<T, 1, N>;
+	public:
+		constexpr matrix() = default;
+		constexpr matrix(const std::initializer_list<T>& values) : buffer(values) {}
+
+		template<matrix_imp::matrix_like m_t >
+		constexpr matrix(const m_t& exp) : buffer(exp) {}
+
+		constexpr T& operator()(int i) { return buffer::operator()(0, i); }
+		constexpr const T& operator()(int i) const { return buffer::operator()(0, i); }
+
+		friend struct matrix_imp::accessor;
+	private:
+		using buffer::operator();
 	};
 
 
-	template<typename T,int R,int C, mat_like(mat)>
-	view::read<T, R * C, 1 > vectorize(const mat<T, R, C>& m)
+	//get views
+	template<typename M>
+	decltype(auto) transpose(M&& m)
 	{
-		view::read<T, R * C, 1 > ret;
-		ret.from<view::vectorizer, R, C>(m);
-		return ret;
+		return matrix_imp::view_builder::apply<matrix_imp::index_mapper::transposer>(m);
 	}
 
-	template<typename T,int R,int C, mat_like(mat)>
-	view::write<T, R * C, 1 > vectorize(mat<T, R, C>& m)
+	template<typename M>
+	decltype(auto) vectorize(M&& m)
 	{
-		view::write<T, R * C, 1 > ret;
-		ret.from<view::vectorizer, R, C>(m);
-		return ret;
+		return matrix_imp::view_builder::apply<matrix_imp::index_mapper::vectorizer>(m);
 	}
 
-	template<typename T,int R,int C, mat_like(mat)>
-	view::read<T, R, 1 > column(const mat<T, R, C>& m, int col)
+	template<typename M>
+	decltype(auto) column(M&& m, int col)
 	{
-
-		testDebugT<mat<T, R, C>>();
-
-		view::read<T, R , 1 > ret;
-		ret.from<view::map_column, R, C>(m, col);
-		return ret;
+		return matrix_imp::view_builder::apply<matrix_imp::index_mapper::get_column>(m, col);
 	}
 
-	template<typename T,int R,int C, mat_like(mat)>
-	view::write<T, R, 1 > column(mat<T, R, C>& m, int col)
+	///////////////operators 
+	// m+m
+	template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
+	auto operator+(const m0_t& m0 , const m1_t& m1)
 	{
-
-		view::write<T, R , 1 > ret;
-		ret.from<view::map_column, R, C>(m, col);
-		return ret;
+		return build_expression<std::plus>(m0, m1);
 	}
 
-	template<typename T, int R, int C, mat_like(mat)>
-	view::read<T, C, R> transpose(const mat<T, R, C>& m)
+	// m+s
+	template< matrix_imp::matrix_like m0_t, typename T >
+	auto operator+(const m0_t& m0, const T& m1)
 	{
-		view::read<T, C, R> ret;
-		ret.from<view::transposer, R, C>(m);
-		return ret;
+		return build_expression<std::plus>(m0, m1);
 	}
 
-	template<typename T, int R, int C, mat_like(mat)>
-	view::write<T, C, R> transpose(mat<T, R, C>& m)
+	// s+m
+	template<  typename T, matrix_imp::matrix_like m0_t>
+	auto operator+(const T& m0, const m0_t& m1)
 	{
-		view::write<T, C, R> ret;
-		ret.from<view::transposer, R, C>(m);
-		return ret;
+		return build_expression<std::plus>(m0, m1);
 	}
 
-
-	//add m+m
-	template<typename T,int R,int C, mat_like(mat)> matrix<T, R, C> operator+(const mat<T, R, C>& m0, const mat<T, R, C>& m1)
+	// -m
+	template< matrix_imp::matrix_like m0_t  >
+	auto operator-(const m0_t& m0)
 	{
-		return op_on_mat_component<T,R,C>(op::assign<T>{},std::plus<T>{}, m0, m1);
-	}
-
-	//add m+s
-	template<typename T,int R,int C, mat_like(mat)> matrix<T,R,C> operator+(const mat<T, R, C>& m, const T& s)
-	{
-		return op_on_mat_component<T,R,C>(op::assign<T>{},std::plus<T>{}, m, s);
-	}
-
-	//add s+m
-	template<typename T,int R,int C, mat_like(mat)> matrix<T, R, C> operator+(const T& s, const mat<T, R, C>& m)
-	{
-		return op_on_mat_component<T, R, C>(op::assign<T>{},std::plus<T>{}, s, m);
-	}
-
-	//minus -m
-	template<typename T, int R, int C, mat_like(mat)> matrix<T, R, C> operator-(const mat<T, R, C>& m)
-	{
-		return op_on_mat_component<T, R, C>(op::assign<T>{},std::negate<T>{}, m);
+		return build_expression<std::negate>(m0);
 	}
 
 	//minus m-m
-	template<typename T,int R,int C, mat_like(mat)> matrix<T,R,C> operator-(const mat<T, R, C>& m0, const mat<T, R, C>& m1)
+	template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
+	auto operator-(const m0_t& m0, const m1_t& m1)
 	{
-		return op_on_mat_component<T, R, C>(op::assign<T>{},std::minus<T>{}, m0, m1);
+		return build_expression<std::minus>(m0, m1);
 	}
 
 	//minus m-s
-	template<typename T,int R,int C, mat_like(mat)> matrix<T,R,C> operator-(const mat<T, R, C>& m, const T& s)
+	template< matrix_imp::matrix_like m0_t, typename m1_t>
+	auto operator-(const m0_t& m0, const m1_t& m1)
 	{
-		return op_on_mat_component<T, R, C>(op::assign<T>{},std::minus<T>{}, m, s);
+		return build_expression<std::minus>(m0, m1);
 	}
 
 	//divides m/s
-	template<typename T, int R, int C, mat_like(mat)> matrix<T, R, C> operator/(const mat<T, R, C>& m, const T& s)
+	template< matrix_imp::matrix_like m0_t, typename m1_t>
+	auto operator/(const m0_t& m0, const m1_t& m1)
 	{
-		return op_on_mat_component<T, R, C>(op::assign<T>{},std::divides<T>{}, m, s);
+		return build_expression<std::divides>(m0, m1);
 	}
 
 	//multiplies m*s
-	template<typename T,int R,int C,mat_like(mat)> matrix<T, R, C> operator*(const mat<T, R, C>& m, const T& s)
+	template< matrix_imp::matrix_like m0_t, typename m1_t>
+	auto operator*(const m0_t& m0, const m1_t& m1)
 	{
-		return op_on_mat_component<T, R, C>(op::assign<T>{},std::multiplies<T>{}, m, s);
+		return build_expression<std::multiplies>(m0, m1);
 	}
 
-	//multiplies s*m
-	template<typename T, int R, int C, mat_like(mat)> matrix<T, R, C> operator*(const T& s, const mat<T, R, C>& m)
+	//multiplies m*s
+	template<typename m0_t, matrix_imp::matrix_like m1_t >
+	auto operator*(const m0_t& m0, const m1_t& m1)
 	{
-		return op_on_mat_component<T, R, C>(op::assign<T>{},std::multiplies<T>{}, s, m);
-	}
-
-	//multiplies m*m (includes m*v and v*m)
-	template<typename T, int R, int N, int C, mat_like(mat0), mat_like(mat1) >
-	matrix<T, R, C> operator*(const  mat0<T,R,N>& m0, const mat1<T, N, C>& m1 )
-	{
-		matrix<T, R, C> ret{};
-		for (int r = 0; r < R; r++)
-		{
-			for (int c = 0; c < C; c++)
-			{
-				for (int n = 0; n < N; n++)
-				{
-					accessor::apply(ret, r, c) += accessor::apply(m0, r, n) * accessor::apply(m1, n, c);
-				}
-			}
-		}
-		return ret;
+		return build_expression<std::multiplies>(m0, m1);
 	}
 
 
-	//m*=s
-	template<typename T,int R,int C,mat_like(mat)> mat<T, R, C>& operator*=(mat<T, R, C>& m, const T& s)
+	//m*m
+	template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
+	auto operator*(const m0_t& m0 , const m1_t& m1)
 	{
-		op_on_mat_component<T, R, C>(op::multiply_assign<T>{},op::identity<T>{}, m, s);
-		return m;
+
+		constexpr int R = std::decay_t<m0_t>::row_num;
+		constexpr int C = std::decay_t<m0_t>::col_num;
+		constexpr int R1 = std::decay_t<m1_t>::row_num;
+		constexpr int C1 = std::decay_t<m1_t>::col_num;
+
+		static_assert(C == R1);
+
+		using T = std::decay_t<m0_t>::type;
+		using T1 = std::decay_t<m1_t>::type;
+		static_assert(std::is_same_v<T, T1>);
+
+		return matrix_imp::free_expression<T, R, C1, m0_t, m1_t, matrix_imp::mat_x_mat>(m0, m1, matrix_imp::mat_x_mat{});
+	}
+
+	//m+=m
+	template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
+	void operator+=(m0_t&& m0, const m1_t& m1)
+	{
+		std::forward<m0_t>(m0) = build_expression<std::plus>(std::forward<m0_t>(m0), m1);
+	}
+
+	//m-=m
+	template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
+	void operator-=(m0_t&& m0, const m1_t& m1)
+	{
+		std::forward<m0_t>(m0) = build_expression<std::minus>(std::forward<m0_t>(m0), m1);
 	}
 
 	//m+=s
-	template<typename T,int R,int C,mat_like(mat)> mat<T, R, C>& operator+=(mat<T, R, C>& m, const T& s)
+	template< matrix_imp::matrix_like m0_t, typename m1_t>
+	void operator+=(m0_t&& m0, const m1_t& m1)
 	{
-		op_on_mat_component<T, R, C>(op::plus_assign<T>{},op::identity<T>{}, m, s);
-		return m;
+		std::forward<m0_t>(m0) = build_expression<std::plus>(std::forward<m0_t>(m0), m1);
 	}
 
 	//m-=s
-	template<typename T,int R,int C,mat_like(mat)> mat<T, R, C>& operator-=(mat<T, R, C>& m, const T& s)
+	template< matrix_imp::matrix_like m0_t, typename m1_t>
+	void operator-=(m0_t&& m0, const m1_t& m1)
 	{
-		op_on_mat_component<T, R, C>(op::minus_assign<T>{},op::identity<T>{}, m, s);
-		return m;
+		std::forward<m0_t>(m0) = build_expression<std::minus>(std::forward<m0_t>(m0), m1);
 	}
+
+	//m*=s
+	template< matrix_imp::matrix_like m0_t, typename m1_t>
+	void operator*=(m0_t&& m0, const m1_t& m1)
+	{
+		std::forward<m0_t>(m0) = build_expression<std::multiplies>(std::forward<m0_t>(m0), m1);
+	}
+
 
 	//m/=s
-	template<typename T,int R,int C,mat_like(mat)> mat<T, R, C>& operator/=(mat<T, R, C>& m, const T& s)
+	template< matrix_imp::matrix_like m0_t, typename m1_t>
+	void operator/=(m0_t&& m0, const m1_t& m1)
 	{
-		op_on_mat_component<T, R, C>(op::divide_assign<T>{},op::identity<T>{}, m, s);
-		return m;
+		std::forward<m0_t>(m0) = build_expression<std::divides>(std::forward<m0_t>(m0), m1);
 	}
-
 }
-
