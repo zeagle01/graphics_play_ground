@@ -24,7 +24,7 @@ namespace matrix_math
 		struct accessor
 		{
 			template<typename M >
-			static decltype(auto) apply(M&& m, int r, int c)
+			static constexpr decltype(auto) apply(M&& m, int r, int c)
 			{
 				if constexpr (requires { m(0, 0); })
 				{
@@ -48,7 +48,7 @@ namespace matrix_math
 		struct assigner
 		{
 			template<matrix_like m0_t, matrix_like m1_t>
-			static void apply(m0_t&& m0, m1_t&& m1)
+			static constexpr void apply(m0_t&& m0, m1_t&& m1)
 			{
 
 				constexpr int R = std::decay_t<m0_t>::row_num;
