@@ -27,26 +27,26 @@ namespace sim_lib
 
 	struct edge_stretch
 	{
-		template<typename write_lhs, typename write_rhs, typename vec_type>
-		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const std::array<vec_type, 2>& X, float stiff_modulus, float edge_length)
+		template<typename write_lhs, typename write_rhs >
+		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const mat3x2& X, float stiff_modulus, float edge_length)
 		{
-			float w[]{ 1,-1 };
-			vec_type dx = w[0] * X[0] + w[1] * X[1];
+			vec2 w{ 1,-1 };
+			auto dx = X * w;
 			float l = matrix_math::length(dx);
-			vec_type n = 1.f / l * dx;
+			auto n = dx / l;
 
 			float stiff = stiff_modulus / edge_length;
 
 			auto stretch_f = -stiff * (l - edge_length) * n;
 
-			rhs(0) += w[0] * stretch_f;
-			rhs(1) += w[1] * stretch_f;
+			rhs(0) += w(0) * stretch_f;
+			rhs(1) += w(1) * stretch_f;
 
-			lhs(0, 0) += w[0] * w[0] * stiff;
-			lhs(1, 1) += w[1] * w[1] * stiff;
+			lhs(0, 0) += w(0) * w(0) * stiff;
+			lhs(1, 1) += w(1) * w(1) * stiff;
 
-			lhs(0, 1) += w[0] * w[1] * stiff;
-			lhs(1, 0) += w[1] * w[0] * stiff;
+			lhs(0, 1) += w(0) * w(1) * stiff;
+			lhs(1, 0) += w(1) * w(0) * stiff;
 		}
 
 	};

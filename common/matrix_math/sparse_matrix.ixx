@@ -181,7 +181,7 @@ namespace matrix_math
 				linear_systems.for_each_variables(
 					[&](int v, const auto& diag, const auto& b)
 					{
-						x[v] = 1.f / diag * (b - Ax[v]);
+						x[v] = (b - Ax[v]) / diag;
 					}
 				);
 			}
