@@ -125,6 +125,20 @@ namespace matrix_math
 
 		};
 
+		template<typename T, typename d0_t, typename d1_t, typename op>
+		struct free_expression<T, 1, 1, d0_t, d1_t, op> : public basic_info< T, 1, 1>
+		{
+			constexpr free_expression(const d0_t& d0, const d1_t& d1, const op& _op) : m_d0(d0), m_d1(d1), m_op(_op) {}
+			constexpr decltype(auto) operator()(int r, int c) const { return m_op(m_d0, m_d1, r, c); }
+			constexpr  operator T() { return operator()(0, 0); }
+
+		public:
+			const d0_t& m_d0;
+			const d1_t& m_d1;
+			op m_op;
+
+		};
+
 
 		template<template<typename> typename op, typename d0_t, typename d1_t >
 		auto build_expression(const d0_t& d0, const d1_t& d1)
@@ -595,4 +609,14 @@ namespace matrix_math
 	{
 		std::forward<m0_t>(m0) = build_expression<std::divides>(std::forward<m0_t>(m0), m1);
 	}
+
+
+	// length
+	template< matrix_imp::matrix_like m0_t >
+	auto length(const m0_t& v)
+	{
+		using T = std::decay_t<m0_t>::type;
+		T ret = transpose(v) * v;
+		return std::sqrt(ret);
+	};
 }

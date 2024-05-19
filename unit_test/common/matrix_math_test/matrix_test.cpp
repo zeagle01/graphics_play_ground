@@ -766,3 +766,28 @@ TEST(matrix_test, transpose_write)
 			14.f,15.f,16.f
 		});
 }
+
+TEST(matrix_test, dot_product)
+{
+	vec2 v
+	{ 
+		1.f,
+		0.f
+	};
+	float act = transpose(v) * v;
+
+	EXPECT_THAT(act, Eq(1.f));
+
+}
+
+TEST(matrix_test, length)
+{
+	vec2 v
+	{ 
+		1.f,
+		0.f
+	};
+
+	EXPECT_THAT(length(v), Eq(1.f));
+
+}
