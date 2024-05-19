@@ -168,7 +168,7 @@ namespace matrix_math
 				using T = std::decay_t<d0_t>::type;
 				return matrix_imp::expression<T, R, C, d0_t, d1_t, op<T>>{ d0, d1, op<T>{} };
 			}
-			else if constexpr(matrix_like<d1_t>)
+			else if constexpr (matrix_like<d1_t>)
 			{
 				constexpr int R = std::decay_t<d1_t>::row_num;
 				constexpr int C = std::decay_t<d1_t>::col_num;
@@ -210,6 +210,94 @@ namespace matrix_math
 				return ret;
 			}
 		};
+
+	}
+
+	template<typename T, int R, int C> struct matrix;
+
+	namespace matrix_imp
+	{
+		template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
+		auto LU_inverse(const m0_t& m0, const m1_t& m1)
+		{
+			constexpr int R = std::decay_t<m0_t>::row_num;
+			constexpr int C = std::decay_t<m0_t>::col_num;
+			constexpr int R1 = std::decay_t<m1_t>::row_num;
+			constexpr int C1 = std::decay_t<m1_t>::col_num;
+
+			static_assert(R == R1);
+			static_assert(R1 == C1); //square
+
+			using T = std::decay_t<m0_t>::type;
+			using T1 = std::decay_t<m1_t>::type;
+			static_assert(std::is_same_v<T, T1>);
+
+			constexpr int N = R1;
+			matrix<T, N, N> LU{};
+			const auto& A = m1;
+
+			//A(r,c)=L(r,i)*U(i,c)
+			for (int c = 0; c < N; c++)
+			{
+				for (int r = 0; r < N; r++)
+				{
+					T s = A(r, c);
+
+					if (r <= c)
+					{
+						for (int i = 0; i < r; i++)
+						{
+							s -= LU(r, i) * LU(i, c);
+						}
+						//L(r,r)=1.f;
+						LU(r, c) = s;
+					}
+					else
+					{
+						for (int i = 0; i < c; i++)
+						{
+							s -= LU(r, i) * LU(i, c);
+						}
+						LU(r, c) = s / LU(c, c);
+					}
+				}
+			}
+
+			const auto& B = m0;
+			matrix<T, N, C> Y;
+			//L(r,i) Y(i,c) = B(r,c)
+			for (int c = 0; c < C; c++)
+			{
+				for (int r = 0; r < N; r++)
+				{
+					T s = matrix_imp::accessor::apply(B, r, c);
+					for (int i = 0; i < r; i++)
+					{
+						s -= LU(r, i) * matrix_imp::accessor::apply(Y, i, c);
+					}
+					matrix_imp::accessor::apply(Y, r, c) = s;
+				}
+
+			}
+
+			matrix<T, N, C> X;
+
+			//U(r,i) X(i,c) = Y(r,c)
+			for (int c = 0; c < C; c++)
+			{
+				for (int r = N - 1; r >= 0; r--)
+				{
+					T s = matrix_imp::accessor::apply(Y, r, c);
+					for (int i = r + 1; i < N; i++)
+					{
+						s -= LU(r, i) * matrix_imp::accessor::apply(X, i, c);
+					}
+					matrix_imp::accessor::apply(X, r, c) = s / LU(r, r);
+				}
+			}
+
+			return X;
+		}
 
 	}
 
@@ -565,6 +653,20 @@ namespace matrix_math
 		static_assert(std::is_same_v<T, T1>);
 
 		return matrix_imp::free_expression<T, R, C1, m0_t, m1_t, matrix_imp::mat_x_mat>(m0, m1, matrix_imp::mat_x_mat{});
+	}
+
+	//m/m
+	template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
+	auto operator/(const m0_t& m0, const m1_t& m1)
+	{
+		return matrix_imp::LU_inverse(m0, m1);
+	}
+
+	//m/=m
+	template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
+	void operator/=(m0_t&& m0, const m1_t& m1)
+	{
+		std::forward<m0_t>(m0) = matrix_imp::LU_inverse(m0, m1);
 	}
 
 	//m+=m

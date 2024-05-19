@@ -791,3 +791,76 @@ TEST(matrix_test, length)
 	EXPECT_THAT(length(v), Eq(1.f));
 
 }
+
+TEST(matrix_test, matrix_solve)
+{
+	vec2 v
+	{ 
+		1.f,
+		0.f
+	};
+	mat2x2 m
+	{
+		1.f,0.f,
+		0.f,1.f
+	};
+
+	auto  act = v / m;
+
+	expect_mat_equal(act,
+		{
+			1.f,
+			0.f
+		});
+
+}
+
+TEST(matrix_test, matrix_inverse)
+{
+	mat2x2 I
+	{ 
+		1.f,0.f,
+		0.f,1.f
+	};
+
+	mat2x2 A
+	{
+		2.f,1.f,
+		7.f,4.f
+	};
+
+
+	auto  act = I / A;
+
+	expect_mat_equal(act,
+		{
+			4.f, -1.f,
+			-7.f, 2.f
+		});
+
+}
+
+TEST(matrix_test, matrix_divide_assign)
+{
+	mat2x2 act 
+	{ 
+		1.f,0.f,
+		0.f,1.f
+	};
+
+	mat2x2 A
+	{
+		2.f,1.f,
+		7.f,4.f
+	};
+
+
+	act /= A;
+
+	expect_mat_equal(act,
+		{
+			4.f, -1.f,
+			-7.f, 2.f
+		});
+
+}
