@@ -1,8 +1,6 @@
 
 module;
 
-#include "matrix_math/matrix_math.h"
-
 #include <vector>
 #include <ranges>
 #include <algorithm>
@@ -13,6 +11,8 @@ module sim_lib : simulator_data_update;
 
 import :sim_data;
 import :small_mat;
+
+import matrix_math;
 
 
 namespace sim_lib
@@ -30,7 +30,7 @@ namespace sim_lib
 			}
 
 			template<typename T, int N>
-			static void apply(std::vector<std::array<T, N>>& out, const std::vector<matrix_math::mat<N, 1, T>>& in)
+			static void apply(std::vector<std::array<T, N>>& out, const std::vector<matrix_math::matrix<T, N, 1>>& in)
 			{
 				out.resize(in.size());
 				for (int i = 0; i < in.size(); i++)
@@ -43,7 +43,7 @@ namespace sim_lib
 			}
 
 			template<typename T, int N>
-			static void apply(std::array<T, N>& out, const matrix_math::mat<N, 1, T>& in)
+			static void apply(std::array<T, N>& out, const matrix_math::matrix<T, N, 1>& in)
 			{
 				for (int j = 0; j < N; j++)
 				{
@@ -52,7 +52,7 @@ namespace sim_lib
 			}
 
 			template<typename T, int N>
-			static void apply(matrix_math::mat<N, 1, T>& out,const std::array<T, N>& in)
+			static void apply(matrix_math::matrix<T, N, 1 >& out, const std::array<T, N>& in)
 			{
 				for (int j = 0; j < N; j++)
 				{
@@ -79,7 +79,8 @@ namespace sim_lib
 				for (int i = 0; i < edges.size(); i++)
 				{
 					auto dx = pos[edges[i][0]] - pos[edges[i][1]];
-					out[i] = matrix_math::norm<2>::apply(dx);
+
+					out[i] = matrix_math::length(dx);
 				}
 			}
 

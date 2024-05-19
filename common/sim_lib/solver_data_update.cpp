@@ -3,9 +3,9 @@ module;
 
 #include <vector>
 
-#include "matrix_math/matrix_math.h"
-
 module sim_lib:solver_data_update;
+
+import matrix_math;
 
 namespace sim_lib
 {
@@ -14,7 +14,7 @@ namespace sim_lib
 		struct assign
 		{
 			template<typename T, int N>
-			static void apply(std::vector<matrix_math::mat<N, 1, T>>& out, const std::vector<std::array<T, N>>& in)
+			static void apply(std::vector<matrix_math::matrix<T,N, 1>>& out, const std::vector<std::array<T, N>>& in)
 			{
 				out.resize(in.size());
 				for (int i = 0; i < in.size(); i++)

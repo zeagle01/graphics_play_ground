@@ -1,14 +1,15 @@
 
 module;
 
-#include "matrix_math/matrix_math.h"
 
 module sim_lib:small_mat;
 
+import matrix_math;
 
 namespace sim_lib
 {
-	using vec3 = matrix_math::mat<3, 1, float>;
-	using mat3 = matrix_math::mat<3, 3, float>;
+	using vec3 = matrix_math::matrix<float, 3, 1>;
+	using vec2 = matrix_math::matrix<float, 2, 1>;
+	using mat3 = matrix_math::matrix<float, 3, 3 >;
 
 }

@@ -10,8 +10,6 @@ module;
 #include "clumsy_lib/macro_loop.h"
 #include "clumsy_lib/type_list.h"
 
-#include "matrix_math/matrix_math.h"
-
 #include <memory>
 #include <span>
 

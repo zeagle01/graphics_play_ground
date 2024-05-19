@@ -7,8 +7,6 @@ module;
 
 #include "clumsy_lib/field_defines.h"
 
-#include "matrix_math/matrix_math.h"
-
 #include <cmath>
 #include <ranges>
 #include <array>

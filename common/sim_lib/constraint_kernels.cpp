@@ -1,12 +1,13 @@
 module;
 
-#include "matrix_math/matrix_math.h"
-
 #include <vector>
 
 module sim_lib : constraint_kernels;
 
 import matrix_math;
+import :small_mat;
+
+
 
 namespace sim_lib
 {
@@ -27,11 +28,11 @@ namespace sim_lib
 	struct edge_stretch
 	{
 		template<typename write_lhs, typename write_rhs, typename vec_type>
-		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const std::array<vec_type, 2>& X, float stiff_modulus,float edge_length)
+		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const std::array<vec_type, 2>& X, float stiff_modulus, float edge_length)
 		{
 			float w[]{ 1,-1 };
 			vec_type dx = w[0] * X[0] + w[1] * X[1];
-			float l = matrix_math::norm<2>::apply(dx);
+			float l = matrix_math::length(dx);
 			vec_type n = 1.f / l * dx;
 
 			float stiff = stiff_modulus / edge_length;
@@ -68,7 +69,7 @@ namespace sim_lib
 		}
 
 		template<typename write_lhs, typename write_rhs >
-		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const std::array<vec3f, 3>& X, const std::array<vec2f, 3>& U, float stretch_stiff)
+		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const std::array<vec3, 3>& X, const std::array<vec2, 3>& U, float stretch_stiff)
 		{
 			auto u0 = U[0];
 			//auto u0 = U[0] - U[2];
