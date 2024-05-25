@@ -108,11 +108,8 @@ namespace sim_lib
 					int v0 = edges[ei][0];
 					int v1 = edges[ei][1];
 
-					mat3x2 X{  
-						pos[v0](0), pos[v1](0),
-						pos[v0](1), pos[v1](1),
-						pos[v0](2), pos[v1](2)
-					};
+
+					mat3x2 X = matrix_math::from_columns({ pos[v0], pos[v1] });
 
 					edge_stretch::compute_elemnt(lhs, rhs, X, stretch_edges_stiff[ei], edge_lengths[ei]);
 				};
@@ -125,11 +122,12 @@ namespace sim_lib
 			//update fix pos
 			std::vector<vec3> dx(pos.size());
 			const auto& fixed_verts = m_datas.get_ref<var::fixed_verts>();
-			for (int i = 0; i < fixed_verts.size(); i++)
-			{
-				int v = fixed_verts[i];
-				dx[v] = pos[v] - last_pos[v];
-			}
+			parallel::for_each(fixed_verts.size(), 256,
+				[&](int i)
+				{
+					int v = fixed_verts[i];
+					dx[v] = pos[v] - last_pos[v];
+				});
 				
 			//backup last pos
 			last_pos = pos;
@@ -138,10 +136,11 @@ namespace sim_lib
 			matrix_math::Jacobi_solver<float, vec3> linear_solver;
 			linear_solver.solve(m_linear_system, dx);
 
-			for (int i = 0; i < pos.size(); i++)
-			{
-				pos[i] = pos[i] + dx[i];
-			}
+			parallel::for_each(pos.size(), 256,
+				[&](int i)
+				{
+					pos[i] = pos[i] + dx[i];
+				});
 
 		}
 

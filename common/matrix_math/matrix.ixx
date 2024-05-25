@@ -551,6 +551,27 @@ namespace matrix_math
 		using buffer::operator();
 	};
 
+	// constructors
+	template<matrix_imp::matrix_like m_t, int sum_mat_num>
+	constexpr auto from_columns(const m_t(&sub_mats)[sum_mat_num] )
+	{
+		constexpr int sub_R = std::decay_t<m_t>::row_num;
+		constexpr int sub_C = std::decay_t<m_t>::col_num;
+
+		using T = std::decay_t<m_t>::type;
+		matrix<T, sub_R, sub_C * sum_mat_num> ret;
+		for (int si = 0; si < sum_mat_num; si++)
+		{
+			for (int r = 0; r < sub_R; r++)
+			{
+				for (int c = 0; c < sub_C; c++)
+				{
+					matrix_imp::accessor::apply(ret, r, si * sub_C + c) = matrix_imp::accessor::apply(sub_mats[si], r, c);
+				}
+			}
+		}
+		return ret;
+	}
 
 	//get views
 	template<typename M>

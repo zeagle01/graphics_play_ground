@@ -13,16 +13,37 @@ using namespace matrix_math;
 using mat2x2 = matrix_math::matrix<float, 2, 2>;
 using mat2x3 = matrix_math::matrix<float, 2, 3>;
 using mat3x2 = matrix_math::matrix<float, 3, 2>;
+using mat2x4 = matrix_math::matrix<float, 2, 4>;
 using vec2 = matrix_math::matrix<float, 2, 1>;
 using tvec2 = matrix_math::matrix<float, 1, 2>;
 using vec4 = matrix_math::matrix<float, 4, 1>;
 using vec6 = matrix_math::matrix<float, 6, 1>;
 using tvec6 = matrix_math::matrix<float, 1, 6>;
 
+template<typename M, typename T >
+void expect_mat_equal(M&& mat, const std::initializer_list<T>& expect_values)
+{
+	auto v = matrix_math::vectorize(mat);
+
+	constexpr int R = std::decay_t<M>::row_num;
+	constexpr int C = std::decay_t<M>::col_num;
+	matrix_math::matrix<T, R, C> exp(expect_values);
+	auto v_exp = matrix_math::vectorize(exp);
+
+	for (int i = 0; i < expect_values.size(); i++)
+	{
+		T act = v(i);
+		T exp = v_exp(i);
+
+		EXPECT_THAT(act, Eq(exp));
+	}
+}
+
 
 //mat init and acess
 TEST(matrix_test, init_with_zeros)
 {
+
 	mat2x2 m{};
 
 	EXPECT_THAT(m(0, 0), Eq(0.f));
@@ -66,10 +87,42 @@ TEST(matrix_test, init_with_values_constexpr)
 		2,4 
 	};
 
+}
+
+TEST(matrix_test, init_with_cols)
+{
+	vec2 c0{ 1.f,2.f };
+	vec2 c1{ 3.f,4.f };
+	mat2x2 m = from_columns({ c0,c1} );
+
 	EXPECT_THAT(m(0, 0), Eq(1.f));
 	EXPECT_THAT(m(1, 0), Eq(2.f));
 	EXPECT_THAT(m(0, 1), Eq(3.f));
 	EXPECT_THAT(m(1, 1), Eq(4.f));
+
+}
+
+TEST(matrix_test, init_with_cols_2)
+{
+	mat2x2 c0
+	{ 
+		1.f,2.f,
+		3.f,4.f 
+	};
+	mat2x2 c1
+	{ 
+		11.f,12.f ,
+		13.f,14.f 
+	};
+
+	mat2x4 m = from_columns({ c0,c1} );
+	expect_mat_equal(m,
+		{
+			1.f,2.f, 11.f,12.f,
+			3.f,4.f, 13.f,14.f
+		}
+	);
+
 
 }
 
@@ -214,24 +267,6 @@ TEST(matrix_test, vectorize_access)
 	EXPECT_THAT(v, 3);
 }
 
-template<typename M, typename T >
-void expect_mat_equal(M&& mat, const std::initializer_list<T>& expect_values)
-{
-	auto v = matrix_math::vectorize(mat);
-
-	constexpr int R = std::decay_t<M>::row_num;
-	constexpr int C = std::decay_t<M>::col_num;
-	matrix_math::matrix<T, R, C> exp(expect_values);
-	auto v_exp = matrix_math::vectorize(exp);
-
-	for (int i = 0; i < expect_values.size(); i++)
-	{
-		T act = v(i);
-		T exp = v_exp(i);
-
-		EXPECT_THAT(act, Eq(exp));
-	}
-}
 
 TEST(matrix_test, transpose_vec_acess)
 {
