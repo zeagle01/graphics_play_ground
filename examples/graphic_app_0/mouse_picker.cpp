@@ -11,6 +11,7 @@ import matrix_math;
 
 
 using vec3f = matrix_math::matrix<float, 3, 1>;
+using mat3x3f = matrix_math::matrix<float, 3, 3>;
 
 template<typename T,int N>
 using vec_tn = matrix_math::matrix<T, N, 1>;
@@ -47,9 +48,7 @@ picked_info mouse_picker::bvh_pick(const std::array<float, 3>& p, const std::arr
 			int v = indices[ti * 3 + vi];
 			auto p = vec3f({ x[v * 3 + 0],x[v * 3 + 1],x[v * 3 + 2] });
 			t_AABBs[ti] += p;
-			rep_points[ti](0) += p(0) / 3;
-			rep_points[ti](1) += p(1) / 3;
-			rep_points[ti](2) += p(2) / 3;
+			rep_points[ti] += p / 3;
 		}
 	}
 
@@ -76,12 +75,12 @@ picked_info mouse_picker::bvh_pick(const std::array<float, 3>& p, const std::arr
 		[&](int i)
 		{
 			std::array<int, 3> t = { indices[i * 3 + 0],indices[i * 3 + 1],indices[i * 3 + 2] };
-			std::array<vec3f, 3> X
-			{ {
-				vec3f({x[t[0] * 3 + 0],x[t[0] * 3 + 1],x[t[0] * 3 + 2]}),
-				vec3f({x[t[1] * 3 + 0],x[t[1] * 3 + 1],x[t[1] * 3 + 2]}),
-				vec3f({x[t[2] * 3 + 0],x[t[2] * 3 + 1],x[t[2] * 3 + 2]}),
-			} };
+			mat3x3f X 
+			( {
+				x[t[0] * 3 + 0],     x[t[1] * 3 + 0],     x[t[2] * 3 + 0],
+				x[t[0] * 3 + 1],     x[t[1] * 3 + 1],     x[t[2] * 3 + 1],
+				x[t[0] * 3 + 2],     x[t[1] * 3 + 2],     x[t[2] * 3 + 2]
+			} );
 
 			if (geometry::is_ray_triangle_intersect(w, X, pTemp, dirTemp))
 			{
@@ -101,12 +100,12 @@ picked_info mouse_picker::loop_pick(const std::array<float, 3>& p, const std::ar
 		
 		std::array<int, 3> t = { indices[i * 3 + 0],indices[i * 3 + 1],indices[i * 3 + 2] };
 
-		std::array<vec3f, 3> X
-		{{
-			vec3f({x[t[0] * 3 + 0],x[t[0] * 3 + 1],x[t[0] * 3 + 2]}),
-			vec3f({x[t[1] * 3 + 0],x[t[1] * 3 + 1],x[t[1] * 3 + 2]}),
-			vec3f({x[t[2] * 3 + 0],x[t[2] * 3 + 1],x[t[2] * 3 + 2]}),
-		}};
+		mat3x3f X
+		({
+			x[t[0] * 3 + 0],     x[t[1] * 3 + 0],     x[t[2] * 3 + 0],
+			x[t[0] * 3 + 1],     x[t[1] * 3 + 1],     x[t[2] * 3 + 1],
+			x[t[0] * 3 + 2],     x[t[1] * 3 + 2],     x[t[2] * 3 + 2]
+			});
 
 		vec3f w;
 		auto pTemp = vec3f({ p[0],p[1],p[2] });
