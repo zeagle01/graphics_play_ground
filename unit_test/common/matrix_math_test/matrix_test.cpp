@@ -93,7 +93,7 @@ TEST(matrix_test, init_with_cols)
 {
 	vec2 c0({ 1.f,2.f });
 	vec2 c1({ 3.f,4.f });
-	mat2x2 m = from_columns({ c0,c1} );
+	mat2x2 m = from_columns(c0, c1);
 
 	EXPECT_THAT(m(0, 0), Eq(1.f));
 	EXPECT_THAT(m(1, 0), Eq(2.f));
@@ -115,7 +115,7 @@ TEST(matrix_test, init_with_cols_2)
 		13.f,14.f 
 	});
 
-	mat2x4 m = from_columns({ c0,c1} );
+	mat2x4 m = from_columns(c0, c1);
 	expect_mat_equal(m,
 		{
 			1.f,2.f, 11.f,12.f,

@@ -2,7 +2,6 @@
 
 module;
 
-#include "matrix_math/matrix_math.h"
 #include <span>
 
 export module geometry_lib: bvh;

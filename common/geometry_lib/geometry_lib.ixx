@@ -1,7 +1,6 @@
 module;
 
 #include <array>
-#include "matrix_math/matrix_math.h"
 
 export module  geometry_lib;
 
@@ -9,8 +8,13 @@ export module  geometry_lib;
 export import : bvh;
 export import : aabb;
 
+import matrix_math;
+
+
 namespace geometry
 {
+	using mat3x3f = matrix_math::matrix<float, 3, 3>;
+	using vec3f = matrix_math::matrix<float, 3, 1>;
 
 	export
 	bool is_ray_triangle_intersect(vec3f& w, const std::array<vec3f, 3>& tX, const vec3f& p, const vec3f& dir)
@@ -20,18 +24,7 @@ namespace geometry
 		auto vp = p - tX[2];
 
 		
-		mat3x3f m; //{ v0, v1, -dir };
-		m(0, 0) = v0(0);
-		m(1, 0) = v0(1);
-		m(2, 0) = v0(2);
-
-		m(0, 1) = v1(0);
-		m(1, 1) = v1(1);
-		m(2, 1) = v1(2);
-
-		m(0, 2) = -dir(0);
-		m(1, 2) = -dir(1);
-		m(2, 2) = -dir(2);
+		mat3x3f m = matrix_math::from_columns(v0, v1, -dir); //{ v0, v1, -dir };
 
 		w = vp / m;
 

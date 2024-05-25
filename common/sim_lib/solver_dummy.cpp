@@ -109,7 +109,7 @@ namespace sim_lib
 					int v1 = edges[ei][1];
 
 
-					mat3x2 X = matrix_math::from_columns({ pos[v0], pos[v1] });
+					mat3x2 X = matrix_math::from_columns(pos[v0], pos[v1]);
 
 					edge_stretch::compute_elemnt(lhs, rhs, X, stretch_edges_stiff[ei], edge_lengths[ei]);
 				};

@@ -50,7 +50,6 @@ namespace matrix_math
 			template<matrix_like m0_t, matrix_like m1_t>
 			static constexpr void apply(m0_t&& m0, m1_t&& m1)
 			{
-
 				constexpr int R = std::decay_t<m0_t>::row_num;
 				constexpr int C = std::decay_t<m0_t>::col_num;
 				constexpr int R1 = std::decay_t<m1_t>::row_num;
@@ -70,7 +69,6 @@ namespace matrix_math
 					}
 				}
 			}
-
 		};
 	}
 
@@ -490,6 +488,49 @@ namespace matrix_math
 			};
 		}
 	}
+	namespace matrix_imp
+	{
+		template<typename list>
+		struct get_first_row_col_imp;
+
+		template<matrix_imp::matrix_like m0_t, matrix_imp::matrix_like ...mi_t>
+		struct get_first_row_col_imp<std::tuple<m0_t, mi_t...>>
+		{
+			static constexpr int row_num = std::decay_t<m0_t>::row_num;
+			static constexpr int col_num = std::decay_t<m0_t>::col_num;
+			using type = std::decay_t<m0_t>::type;
+		};
+		template< matrix_imp::matrix_like ... m_t>
+		using get_first_row_col = get_first_row_col_imp<std::tuple<m_t...>>;
+
+		struct assign_clumns
+		{
+			template<int r_first, int c_first, matrix_like m0_t, matrix_like m1_t>
+			static constexpr void apply(m0_t&& m0, m1_t&& m1, int& c_offset)
+			{
+				constexpr int R0 = std::decay_t<m0_t>::row_num;
+				constexpr int C0 = std::decay_t<m0_t>::col_num;
+
+				constexpr int R1 = std::decay_t<m1_t>::row_num;
+				constexpr int C1 = std::decay_t<m1_t>::col_num;
+
+
+				static_assert(R0 == R1);
+				static_assert(R1 == r_first);
+				static_assert(C1 == c_first);
+
+				for (int r = 0; r < r_first; r++)
+				{
+					for (int c = 0; c < c_first; c++)
+					{
+						accessor::apply(m0, r, c_offset + c) = accessor::apply(m1, r, c);
+					}
+				}
+				c_offset += c_first;
+			}
+		};
+		
+	}
 
 }
 
@@ -545,25 +586,20 @@ namespace matrix_math
 		using buffer::operator();
 	};
 
-	// constructors
-	template<matrix_imp::matrix_like m_t, int sum_mat_num>
-	constexpr auto from_columns(const m_t(&sub_mats)[sum_mat_num] )
-	{
-		constexpr int sub_R = std::decay_t<m_t>::row_num;
-		constexpr int sub_C = std::decay_t<m_t>::col_num;
 
-		using T = std::decay_t<m_t>::type;
+	// constructors
+	template<matrix_imp::matrix_like ... m_t>
+	constexpr auto from_columns(m_t&& ...sub_mats)
+	{
+		constexpr int sub_R = matrix_imp::get_first_row_col<m_t...>::row_num;
+		constexpr int sub_C = matrix_imp::get_first_row_col<m_t...>::col_num;
+
+		using T = matrix_imp::get_first_row_col<m_t...>::type;
+		constexpr int sum_mat_num = sizeof...(m_t);
+
 		matrix<T, sub_R, sub_C * sum_mat_num> ret;
-		for (int si = 0; si < sum_mat_num; si++)
-		{
-			for (int r = 0; r < sub_R; r++)
-			{
-				for (int c = 0; c < sub_C; c++)
-				{
-					matrix_imp::accessor::apply(ret, r, si * sub_C + c) = matrix_imp::accessor::apply(sub_mats[si], r, c);
-				}
-			}
-		}
+		int c_offset = 0;
+		(matrix_imp::assign_clumns::apply<sub_R, sub_C>(ret, sub_mats, c_offset), ...);
 		return ret;
 	}
 

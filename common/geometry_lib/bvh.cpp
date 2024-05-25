@@ -1,12 +1,13 @@
 
 module;
 
-#include "matrix_math/matrix_math.h"
 #include <span>
 #include <array>
+#include <functional>
 
 module geometry_lib: bvh_imp;
 
+import matrix_math;
 
 
 namespace geometry
