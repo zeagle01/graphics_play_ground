@@ -122,6 +122,28 @@ TEST(matrix_test, init_with_cols_2)
 			3.f,4.f, 13.f,14.f
 		}
 	);
+}
+
+TEST(matrix_test, init_with_cols_with_different_column_num)
+{
+	vec2 c0
+	({ 
+		1.f,
+		3.f,
+	});
+	mat2x2 c1
+	({ 
+		11.f,12.f ,
+		13.f,14.f 
+	});
+
+	mat2x3 m = from_columns(c0, c1);
+	expect_mat_equal(m,
+		{
+			1.f, 11.f,12.f,
+			3.f, 13.f,14.f
+		}
+	);
 
 
 }
