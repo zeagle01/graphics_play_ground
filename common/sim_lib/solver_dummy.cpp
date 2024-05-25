@@ -43,7 +43,7 @@ namespace sim_lib
 				step();
 			}
 
-			float dt = 1e-3f;
+			float dt = m_datas.get_ref < var::time_step>();
 			auto& vel = m_datas.get_ref<var::velocity>();
 			const auto& pos = m_datas.get_ref<var::positions>();
 			const auto& last_pos = m_datas.get_ref<var::last_positions>();
