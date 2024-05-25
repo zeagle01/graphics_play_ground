@@ -30,7 +30,7 @@ namespace sim_lib
 		template<typename write_lhs, typename write_rhs >
 		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const mat3x2& X, float stiff_modulus, float edge_length)
 		{
-			vec2 w={ 1,-1 };
+			vec2 w({ 1,-1 });
 			auto dx = X * w;
 			float l = matrix_math::length(dx);
 			auto n = dx / l;

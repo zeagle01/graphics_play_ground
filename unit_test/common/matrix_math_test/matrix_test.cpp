@@ -20,8 +20,8 @@ using vec4 = matrix_math::matrix<float, 4, 1>;
 using vec6 = matrix_math::matrix<float, 6, 1>;
 using tvec6 = matrix_math::matrix<float, 1, 6>;
 
-template<typename M, typename T >
-void expect_mat_equal(M&& mat, const std::initializer_list<T>& expect_values)
+template<typename M, typename T ,int values_num>
+void expect_mat_equal(M&& mat, const T(&expect_values)[values_num])
 {
 	auto v = matrix_math::vectorize(mat);
 
@@ -30,7 +30,7 @@ void expect_mat_equal(M&& mat, const std::initializer_list<T>& expect_values)
 	matrix_math::matrix<T, R, C> exp(expect_values);
 	auto v_exp = matrix_math::vectorize(exp);
 
-	for (int i = 0; i < expect_values.size(); i++)
+	for (int i = 0; i < values_num; i++)
 	{
 		T act = v(i);
 		T exp = v_exp(i);
@@ -66,11 +66,11 @@ TEST(matrix_test, default_init_with_constexpr)
 
 TEST(matrix_test, init_with_values)
 {
-	mat2x2 m
+	mat2x2 m(
 	{
 		1,3,
 		2,4 
-	};
+	});
 
 	EXPECT_THAT(m(0, 0), Eq(1.f));
 	EXPECT_THAT(m(1, 0), Eq(2.f));
@@ -82,17 +82,17 @@ TEST(matrix_test, init_with_values)
 TEST(matrix_test, init_with_values_constexpr)
 {
 	constexpr mat2x2 m
-	{
+	({
 		1,3,
 		2,4 
-	};
+	});
 
 }
 
 TEST(matrix_test, init_with_cols)
 {
-	vec2 c0{ 1.f,2.f };
-	vec2 c1{ 3.f,4.f };
+	vec2 c0({ 1.f,2.f });
+	vec2 c1({ 3.f,4.f });
 	mat2x2 m = from_columns({ c0,c1} );
 
 	EXPECT_THAT(m(0, 0), Eq(1.f));
@@ -105,15 +105,15 @@ TEST(matrix_test, init_with_cols)
 TEST(matrix_test, init_with_cols_2)
 {
 	mat2x2 c0
-	{ 
+	({ 
 		1.f,2.f,
 		3.f,4.f 
-	};
+	});
 	mat2x2 c1
-	{ 
+	({ 
 		11.f,12.f ,
 		13.f,14.f 
-	};
+	});
 
 	mat2x4 m = from_columns({ c0,c1} );
 	expect_mat_equal(m,
@@ -168,10 +168,10 @@ TEST(matrix_test, vec_assign_with_one_index)
 TEST(matrix_test, transpose_access)
 {
 	mat2x3 m
-	{
+	({
 		1,3,5,
 		2,4,6
-	};
+	});
 
 	auto mt = transpose(m);
 
@@ -187,10 +187,10 @@ TEST(matrix_test, transpose_access)
 TEST(matrix_test, transpose_assign)
 {
 	mat2x3 m
-	{
+	({
 		1,3,5,
 		2,4,6
-	};
+	});
 
 	transpose(m)(0, 1) = 42.f;
 
@@ -205,17 +205,17 @@ TEST(matrix_test, transpose_assign)
 TEST(matrix_test, transpose_assign_whole)
 {
 	mat2x3 m
-	{
+	({
 		1,3,5,
 		2,4,6
-	};
+	});
 
 	mat3x2 m0
-	{
+	({
 		1,4,
 		2,5,
 		3,6
-	};
+	});
 
 	transpose(m) = m0;
 
@@ -231,10 +231,10 @@ TEST(matrix_test, transpose_assign_whole)
 TEST(matrix_test, transpose_transpose_access)
 {
 	mat2x3 m
-	{
+	({
 		1,3,5,
 		2,4,6
-	};
+	});
 
 	transpose(transpose(m))(0, 1) = 42.f;
 
@@ -257,10 +257,10 @@ TEST(matrix_test, vectorized_cant_not_access_with_two_index)
 TEST(matrix_test, vectorize_access)
 {
 	mat2x2 m
-	{
+	({
 		1,3,
 		2,4
-	};
+	});
 
 	float v = vectorize(m)(2);
 
@@ -270,7 +270,7 @@ TEST(matrix_test, vectorize_access)
 
 TEST(matrix_test, transpose_vec_acess)
 {
-	vec2 v { 1.f,2.f };
+	vec2 v ({ 1.f,2.f });
 
 	transpose(v)(0) = 42.f;
 
@@ -281,10 +281,10 @@ TEST(matrix_test, transpose_vec_acess)
 TEST(matrix_test, get_column)
 {
 	mat2x2 m
-	{
+	({
 		1,3,
 		2,4
-	};
+	});
 
 	column(m, 0)(0) = 42.f;
 	column(m, 0)(1) = 42.f;
@@ -302,8 +302,8 @@ TEST(matrix_test, get_column)
 
 TEST(matrix_test, add)
 {
-	vec2 v0{ 1.f,1.f };
-	vec2 v1{ 1.f,1.f };
+	vec2 v0({ 1.f,1.f });
+	vec2 v1({ 1.f,1.f });
 
 	vec2 act = v0 + v1;
 
@@ -313,8 +313,8 @@ TEST(matrix_test, add)
 
 TEST(matrix_test, add_two_view)
 {
-	vec2 v0{ 1.f,1.f };
-	vec2 v1{ 1.f,1.f };
+	vec2 v0({ 1.f,1.f });
+	vec2 v1({ 1.f,1.f });
 
 	auto act = vectorize(v0) + vectorize(v1) ;
 
@@ -324,8 +324,8 @@ TEST(matrix_test, add_two_view)
 
 TEST(matrix_test, add_vec_and_view)
 {
-	vec2 v0{ 1.f,1.f };
-	vec2 v1{ 1.f,1.f };
+	vec2 v0({ 1.f,1.f });
+	vec2 v1({ 1.f,1.f });
 
 	auto act = vectorize(v0) + v1;
 
@@ -335,8 +335,8 @@ TEST(matrix_test, add_vec_and_view)
 
 TEST(matrix_test, add_three_items)
 {
-	vec2 v0{ 1.f,1.f };
-	vec2 v1{ 1.f,1.f };
+	vec2 v0({ 1.f,1.f });
+	vec2 v1({ 1.f,1.f });
 
 	auto act = vectorize(v0) + v1 + vectorize(v0);
 
@@ -347,7 +347,7 @@ TEST(matrix_test, add_three_items)
 TEST(matrix_test, add_scalar_vec)
 {
 
-	vec2 v{ 1.f,1.f };
+	vec2 v({ 1.f,1.f });
 
 	float s = 1.f;
 
@@ -359,7 +359,7 @@ TEST(matrix_test, add_scalar_vec)
 
 TEST(matrix_test, negate_vec)
 {
-	vec2 v{ 1.f,1.f };
+	vec2 v({ 1.f,1.f });
 
 	auto act = -v;
 
@@ -368,8 +368,8 @@ TEST(matrix_test, negate_vec)
 
 TEST(matrix_test, add_assian)
 {
-	vec2 v{ 1.f,1.f };
-	vec2 v1{ 1.f,1.f };
+	vec2 v({ 1.f,1.f });
+	vec2 v1({ 1.f,1.f });
 
 	v += v1;
 
@@ -378,8 +378,8 @@ TEST(matrix_test, add_assian)
 
 TEST(matrix_test, view_add_assian)
 {
-	vec2 v{ 1.f,1.f };
-	tvec2 v1{ 1.f,1.f };
+	vec2 v({ 1.f,1.f });
+	tvec2 v1({ 1.f,1.f });
 
 	transpose(v) += v1;
 
@@ -389,14 +389,14 @@ TEST(matrix_test, view_add_assian)
 
 TEST(matrix_test, multiplies_mat_mat)
 {
-	mat2x2 m0{
+	mat2x2 m0({
 		1.f,2.f,
 		3.f,4.f 
-	};
-	mat2x2 m1{ 
+	});
+	mat2x2 m1({ 
 		1.f,3.f,
 		2.f,4.f,
-	};
+	});
 
 	mat2x2 act = m0 * m1;
 	expect_mat_equal(act, 
@@ -409,11 +409,11 @@ TEST(matrix_test, multiplies_mat_mat)
 
 TEST(matrix_test, multiplies_mat_vec)
 {
-	mat2x2 m{
+	mat2x2 m({
 		1.f,2.f,
 		3.f,4.f 
-	};
-	vec2 v{ 1.f, 2.f };
+	});
+	vec2 v({ 1.f, 2.f });
 
 	vec2 act = m * v;
 	expect_mat_equal(act, { 5.f, 11.f });
@@ -422,11 +422,11 @@ TEST(matrix_test, multiplies_mat_vec)
 
 TEST(matrix_test, multiplies_vec_mat)
 {
-	mat2x2 m{
+	mat2x2 m({
 		1.f,2.f,
 		3.f,4.f 
-	};
-	vec2 v{ 1.f, 2.f };
+	});
+	vec2 v({ 1.f, 2.f });
 
 	tvec2 act = matrix_math::transpose(v) * m;
 	expect_mat_equal(act, { 7.f, 10.f });
@@ -435,8 +435,8 @@ TEST(matrix_test, multiplies_vec_mat)
 
 TEST(matrix_test, multiplies_vec_tvec)
 {
-	vec2 v0{ 1.f, 2.f };
-	vec2 v1{ 3.f, 4.f };
+	vec2 v0({ 1.f, 2.f });
+	vec2 v1({ 3.f, 4.f });
 
 	mat2x2 act = v0 * matrix_math::transpose(v1);
 	expect_mat_equal(act, 
@@ -481,9 +481,7 @@ TEST(matrix_test, transposed_vec_init_with_zero)
 
 TEST(matrix_test, transposed_vec_init)
 {
-	tvec2 v{
-		1.f,2.f,
-	};
+	tvec2 v({ 1.f,2.f });
 
 	expect_mat_equal(v, 
 		{ 
@@ -493,10 +491,10 @@ TEST(matrix_test, transposed_vec_init)
 
 TEST(matrix_test, constexpr_init)
 {
-	constexpr mat2x2 m{
+	constexpr mat2x2 m({
 		1.f,2.f,
 		3.f,4.f
-	};
+	});
 
 	expect_mat_equal(m, 
 		{ 
@@ -509,7 +507,7 @@ TEST(matrix_test, constexpr_init)
 
 TEST(matrix_test, add_scalar_right)
 {
-	vec2 v0{ 1.f,1.f };
+	vec2 v0({ 1.f,1.f });
 	vec2 act = v0 + 1.f;
 
 	expect_mat_equal(act, { 2.f,2.f });
@@ -518,7 +516,7 @@ TEST(matrix_test, add_scalar_right)
 
 TEST(matrix_test, add_scalar_left)
 {
-	vec2 v0{ 1.f,1.f };
+	vec2 v0({ 1.f,1.f });
 	vec2 act = 1.f + v0;
 
 	expect_mat_equal(act, { 2.f,2.f });
@@ -527,8 +525,8 @@ TEST(matrix_test, add_scalar_left)
 
 TEST(matrix_test, minus)
 {
-	vec2 v0{ 2.f,2.f };
-	vec2 v1{ 1.f,1.f };
+	vec2 v0({ 2.f,2.f });
+	vec2 v1({ 1.f,1.f });
 	vec2 act = v0 - v1;
 
 	expect_mat_equal(act, { 1.f,1.f });
@@ -537,7 +535,7 @@ TEST(matrix_test, minus)
 
 TEST(matrix_test, negate)
 {
-	vec2 v{ 1.f,1.f };
+	vec2 v({ 1.f,1.f });
 	vec2 act = -v;
 
 	expect_mat_equal(act, { -1.f,-1.f });
@@ -546,7 +544,7 @@ TEST(matrix_test, negate)
 
 TEST(matrix_test, minus_scalar)
 {
-	vec2 v0{ 2.f,2.f };
+	vec2 v0({ 2.f,2.f });
 	vec2 act = v0 - 1.f;
 
 	expect_mat_equal(act, { 1.f,1.f });
@@ -555,7 +553,7 @@ TEST(matrix_test, minus_scalar)
 
 TEST(matrix_test, divide_scalar)
 {
-	vec2 v0{ 2.f,2.f };
+	vec2 v0({ 2.f,2.f });
 	vec2 act = v0 / 2.f;
 
 	expect_mat_equal(act, { 1.f,1.f });
@@ -564,7 +562,7 @@ TEST(matrix_test, divide_scalar)
 
 TEST(matrix_test, multiplies_scalar_right)
 {
-	vec2 v0{ 2.f,2.f };
+	vec2 v0({ 2.f,2.f });
 	vec2 act = v0 * 2.f;
 
 	expect_mat_equal(act, { 4.f,4.f });
@@ -573,7 +571,7 @@ TEST(matrix_test, multiplies_scalar_right)
 
 TEST(matrix_test, multiplies_scalar_left)
 {
-	vec2 v0{ 2.f,2.f };
+	vec2 v0({ 2.f,2.f });
 	vec2 act = 2.f * v0;
 
 	expect_mat_equal(act, { 4.f,4.f });
@@ -583,10 +581,10 @@ TEST(matrix_test, multiplies_scalar_left)
 TEST(matrix_test, tranposed)
 {
 
-	mat2x2 m{ 
+	mat2x2 m({ 
 		1.f, 2.f ,
 		3.f, 4.f 
-	};
+	});
 	mat2x2 act = matrix_math::transpose(m);
 
 	expect_mat_equal(act, 
@@ -600,10 +598,10 @@ TEST(matrix_test, tranposed)
 TEST(matrix_test, tranposed_rectanglar_mat)
 {
 
-	mat2x3 m{ 
+	mat2x3 m({ 
 		1.f, 2.f ,3.f,
 		4.f, 5.f ,6.f
-	};
+	});
 	mat3x2 act = matrix_math::transpose(m);
 
 	expect_mat_equal(act, 
@@ -618,10 +616,10 @@ TEST(matrix_test, tranposed_rectanglar_mat)
 TEST(matrix_test, negate_transposed)
 {
 
-	mat2x3 m{ 
+	mat2x3 m({ 
 		1.f, 2.f ,3.f,
 		4.f, 5.f ,6.f
-	};
+	});
 	mat3x2 act = -matrix_math::transpose(m);
 
 	expect_mat_equal(act, 
@@ -636,10 +634,10 @@ TEST(matrix_test, negate_transposed)
 TEST(matrix_test, negate_vectorized_transposed)
 {
 
-	mat2x3 m{ 
+	mat2x3 m({ 
 		1.f, 2.f ,3.f,
 		4.f, 5.f ,6.f
-	};
+	});
 
 	vec6 act = -matrix_math::vectorize(matrix_math::transpose(m));
 	expect_mat_equal(act, { -1.f, -2.f , -3.f, -4.f , -5.f, -6.f });
@@ -649,10 +647,10 @@ TEST(matrix_test, negate_vectorized_transposed)
 TEST(matrix_test, transpose_vectorized)
 {
 
-	mat2x3 m{ 
+	mat2x3 m({ 
 		1.f, 2.f ,3.f,
 		4.f, 5.f ,6.f
-	};
+	});
 
 	tvec6 act = matrix_math::transpose(matrix_math::vectorize(m));
 	expect_mat_equal(act, { 1.f, 4.f , 2.f, 5.f , 3.f, 6.f });
@@ -662,9 +660,9 @@ TEST(matrix_test, transpose_vectorized)
 TEST(matrix_test, negate_transposed_vec)
 {
 
-	vec2 v{ 
+	vec2 v({ 
 		1.f, 2.f 
-	};
+	});
 
 	tvec2 act = -matrix_math::transpose(v);
 	expect_mat_equal(act, { -1.f, -2.f   });
@@ -676,10 +674,10 @@ TEST(matrix_test, negate_transposed_vec)
 TEST(matrix_test, multiply_assign_scalar)
 {
 	mat2x2 m
-	{ 
+	({ 
 		1.f,2.f,
 		3.f,4.f 
-	};
+	});
 
 	m *= 2.f;
 
@@ -693,10 +691,10 @@ TEST(matrix_test, multiply_assign_scalar)
 TEST(matrix_test, plus_assign_scalar)
 {
 	mat2x2 m
-	{ 
+	({ 
 		1.f,2.f,
 		3.f,4.f 
-	};
+	});
 
 	m += 2.f;
 
@@ -710,10 +708,10 @@ TEST(matrix_test, plus_assign_scalar)
 TEST(matrix_test, minus_assign_scalar)
 {
 	mat2x2 m
-	{ 
+	({ 
 		1.f,2.f,
 		3.f,4.f 
-	};
+	});
 
 	m -= 2.f;
 
@@ -727,10 +725,10 @@ TEST(matrix_test, minus_assign_scalar)
 TEST(matrix_test, divide_assign_scalar)
 {
 	mat2x2 m
-	{ 
+	({ 
 		2.f,4.f,
 		6.f,8.f 
-	};
+	});
 
 	m /= 2.f;
 
@@ -745,12 +743,12 @@ TEST(matrix_test, divide_assign_scalar)
 TEST(matrix_test, assign_column)
 {
 	mat2x2 m
-	{ 
+	({ 
 		1.f,3.f,
 		2.f,4.f 
-	};
+	});
 
-	vec2 v{ 42.f,42.f };
+	vec2 v({ 42.f,42.f });
 	column(m,0) = v;
 
 	expect_mat_equal(m,
@@ -763,12 +761,12 @@ TEST(matrix_test, assign_column)
 TEST(matrix_test, vectorize_write)
 {
 	mat2x2 m
-	{ 
+	({ 
 		1.f,3.f,
 		2.f,4.f 
-	};
+	});
 
-	vec4 v{ 42.f,42.f ,42.f,42.f };
+	vec4 v({ 42.f,42.f ,42.f,42.f });
 	vectorize(m) = v;
 
 	expect_mat_equal(m,
@@ -781,17 +779,17 @@ TEST(matrix_test, vectorize_write)
 TEST(matrix_test, transpose_write)
 {
 	mat2x3 m
-	{ 
+	({ 
 		1.f,2.f,3.f,
 		4.f,5.f,6.f
-	};
+	});
 
 	mat3x2 m1
-	{ 
+	({ 
 		11.f,14.f,
 		12.f,15.f,
 		13.f,16.f
-	};
+	});
 
 	transpose(m) = m1;
 
@@ -805,10 +803,10 @@ TEST(matrix_test, transpose_write)
 TEST(matrix_test, dot_product)
 {
 	vec2 v
-	{ 
+	({ 
 		1.f,
 		0.f
-	};
+	});
 	float act = transpose(v) * v;
 
 	EXPECT_THAT(act, Eq(1.f));
@@ -818,10 +816,10 @@ TEST(matrix_test, dot_product)
 TEST(matrix_test, length)
 {
 	vec2 v
-	{ 
+	({ 
 		1.f,
 		0.f
-	};
+	});
 
 	EXPECT_THAT(length(v), Eq(1.f));
 
@@ -830,15 +828,15 @@ TEST(matrix_test, length)
 TEST(matrix_test, matrix_solve)
 {
 	vec2 v
-	{ 
+	({ 
 		1.f,
 		0.f
-	};
+	});
 	mat2x2 m
-	{
+	({
 		1.f,0.f,
 		0.f,1.f
-	};
+	});
 
 	auto  act = v / m;
 
@@ -853,16 +851,16 @@ TEST(matrix_test, matrix_solve)
 TEST(matrix_test, matrix_inverse)
 {
 	mat2x2 I
-	{ 
+	({ 
 		1.f,0.f,
 		0.f,1.f
-	};
+	});
 
 	mat2x2 A
-	{
+	({
 		2.f,1.f,
 		7.f,4.f
-	};
+	});
 
 
 	auto  act = I / A;
@@ -878,16 +876,16 @@ TEST(matrix_test, matrix_inverse)
 TEST(matrix_test, matrix_divide_assign)
 {
 	mat2x2 act 
-	{ 
+	({ 
 		1.f,0.f,
 		0.f,1.f
-	};
+	});
 
 	mat2x2 A
-	{
+	({
 		2.f,1.f,
 		7.f,4.f
-	};
+	});
 
 
 	act /= A;

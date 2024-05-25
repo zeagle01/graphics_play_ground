@@ -308,10 +308,9 @@ namespace matrix_math
 		struct buffer :public basic_info< T, R, C>
 		{
 			constexpr buffer() = default;
-
-			constexpr buffer(const std::initializer_list<T>& values)
+			template<int values_num> constexpr buffer(const T(&values)[values_num])
 			{
-				assert(values.size() == R * C);
+				static_assert(values_num == R * C);
 				for (int i = 0; const T & v : values)
 				{
 					int r = i / C;
@@ -506,10 +505,8 @@ namespace matrix_math
 		using buffer = matrix_imp::buffer<T, R, C>;
 	public:
 		constexpr matrix() = default;
-		constexpr matrix(const std::initializer_list<T>& values) : buffer(values) {}
-
-		template<matrix_imp::matrix_like m_t >
-		matrix(const m_t& exp) : buffer(exp) {}
+		template<int values_num> constexpr matrix(const T(&values)[values_num]): buffer(values){}
+		template<matrix_imp::matrix_like m_t > matrix(const m_t& exp) : buffer(exp) {}
 	};
 
 	template<typename T, int N>
@@ -519,9 +516,8 @@ namespace matrix_math
 		using buffer = matrix_imp::buffer<T, N, 1>;
 	public:
 		constexpr matrix() = default;
-		constexpr matrix(const std::initializer_list<T>& values) : buffer(values) {}
-		template<matrix_imp::matrix_like m_t >
-		constexpr matrix(const m_t& exp) : buffer(exp) {}
+		template<int values_num> constexpr matrix(const T(&values)[values_num]): buffer(values){}
+		template<matrix_imp::matrix_like m_t > constexpr matrix(const m_t& exp) : buffer(exp) {}
 
 		constexpr T& operator()(int i) { return buffer::operator()(i, 0); }
 		constexpr const T& operator()(int i) const { return buffer::operator()(i, 0); }
@@ -538,10 +534,8 @@ namespace matrix_math
 		using buffer = matrix_imp::buffer<T, 1, N>;
 	public:
 		constexpr matrix() = default;
-		constexpr matrix(const std::initializer_list<T>& values) : buffer(values) {}
-
-		template<matrix_imp::matrix_like m_t >
-		constexpr matrix(const m_t& exp) : buffer(exp) {}
+		template<int values_num> constexpr matrix(const T(&values)[values_num]) : buffer(values) {}
+		template<matrix_imp::matrix_like m_t > constexpr matrix(const m_t& exp) : buffer(exp) {}
 
 		constexpr T& operator()(int i) { return buffer::operator()(0, i); }
 		constexpr const T& operator()(int i) const { return buffer::operator()(0, i); }
