@@ -212,16 +212,4 @@ namespace geometry
 		std::array<std::vector<int>, 2> m_parent;
 	};
 
-
-	//template<typename AABB>
-	//class bvh_traverser_imp
-	//{
-	//public:
-
-	//	void update_iternal_box(const bvh& p_bvh, std::span<const AABB> boxes)
-	//	{
-	//	}
-
-	//	
-	//};
 }

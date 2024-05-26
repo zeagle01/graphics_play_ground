@@ -146,7 +146,7 @@ namespace sim_lib
 
 		struct convert_pos
 		{
-			static void apply(std::vector<vec3>& out, const std::vector<float3>& in)
+			static void apply(std::vector<vec3f>& out, const std::vector<float3>& in)
 			{
 				out.resize(in.size());
 				for (int i = 0; i < in.size(); i++)

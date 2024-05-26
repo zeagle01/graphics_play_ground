@@ -1,6 +1,5 @@
 
 
-#include "matrix_math/matrix_math.h"
 #include "gmock/gmock.h"
 
 import geometry_lib;
@@ -68,18 +67,27 @@ namespace aabb_test
 		EXPECT_TRUE(a.intersect(b));
 	}
 
+	TEST(aabb_test, aabb_with_upper_first_parameter)
+	{
+
+		geometry::AABB1f a(1.f, -1.f);
+		geometry::AABB1f b(2.f, -2.f);
+
+		EXPECT_TRUE(a.intersect(b));
+	}
+
 	template<typename T,int N>
-	using my_vec = matrix_math::mat<N, 1, T>;
+	using my_vec = matrix_math::matrix<T, N, 1>;
+	using vec2f = my_vec<float,2>;
 
 	TEST(aabb_test, aabb_intersect_AABB2f)
 	{
-
 		geometry::AABB2f<my_vec> b;
-		b += {0.2f, 0.3f};
-		b += {0.5f, 0.8f};
+		b += vec2f({0.2f, 0.3f});
+		b += vec2f({0.5f, 0.8f});
 		geometry::AABB2f<my_vec> a;
-		a += {0.f, 0.f};
-		a += {1.f, 1.f};
+		a += vec2f({0.f, 0.f});
+		a += vec2f({1.f, 1.f});
 
 		EXPECT_TRUE(a.intersect(b));
 	}

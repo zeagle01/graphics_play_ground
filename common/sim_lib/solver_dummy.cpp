@@ -57,7 +57,7 @@ namespace sim_lib
 
 		}
 
-		const std::vector<vec3>& get_result() const override
+		const std::vector<vec3f>& get_result() const override
 		{
 			return m_datas.get_ref<var::positions>();
 		}
@@ -86,7 +86,7 @@ namespace sim_lib
 
 			float mass = m_datas.get_ref<var::density>();
 			float dt = m_datas.get_ref < var::time_step>();
-			vec3 g = m_datas.get_ref<var::gravity>();
+			vec3f g = m_datas.get_ref<var::gravity>();
 
 
 			auto get_inertial = [&](auto lhs, auto rhs, int si)
@@ -109,7 +109,7 @@ namespace sim_lib
 					int v1 = edges[ei][1];
 
 
-					mat3x2 X = matrix_math::from_columns(pos[v0], pos[v1]);
+					mat3x2f X = matrix_math::from_columns(pos[v0], pos[v1]);
 
 					edge_stretch::compute_elemnt(lhs, rhs, X, stretch_edges_stiff[ei], edge_lengths[ei]);
 				};
@@ -120,7 +120,7 @@ namespace sim_lib
 			//const auto& faces = m_datas.get_ref<var::stretch_faces>();
 
 			//update fix pos
-			std::vector<vec3> dx(pos.size());
+			std::vector<vec3f> dx(pos.size());
 			const auto& fixed_verts = m_datas.get_ref<var::fixed_verts>();
 			parallel::for_each(fixed_verts.size(), 256,
 				[&](int i)
@@ -133,7 +133,7 @@ namespace sim_lib
 			last_pos = pos;
 
 			//jacobi
-			matrix_math::Jacobi_solver<float, vec3> linear_solver;
+			matrix_math::Jacobi_solver<float, vec3f> linear_solver;
 			linear_solver.solve(m_linear_system, dx);
 
 			parallel::for_each(pos.size(), 256,
@@ -153,9 +153,9 @@ namespace sim_lib
 		using tl = clumsy_lib::type_list<T...>;
 		struct var
 		{
-			CE_SOLVER_DATA(positions,			std::vector<vec3>,	solver_data_update::assign,		tl<simulator_datas::positions>, tl<>)
-			CE_SOLVER_DATA(velocity,			std::vector<vec3>,	simulator_data_update::resize,	tl<simulator_datas::vert_size>, tl<>)
-			CE_SOLVER_DATA(last_positions,		std::vector<vec3>,	solver_data_update::assign,		tl<simulator_datas::positions>, tl<>)
+			CE_SOLVER_DATA(positions,			std::vector<vec3f>,	solver_data_update::assign,		tl<simulator_datas::positions>, tl<>)
+			CE_SOLVER_DATA(velocity,			std::vector<vec3f>,	simulator_data_update::resize,	tl<simulator_datas::vert_size>, tl<>)
+			CE_SOLVER_DATA(last_positions,		std::vector<vec3f>,	solver_data_update::assign,		tl<simulator_datas::positions>, tl<>)
 
 			CE_SOLVER_DATA(dynamic_verts,		std::vector<int>,	simulator_data_update::assign, tl<simulator_datas::dynamic_verts>, tl<>)
 			CE_SOLVER_DATA(fixed_verts,			std::vector<int>,	simulator_data_update::assign, tl<simulator_datas::fixed_verts>, tl<>)
@@ -164,7 +164,7 @@ namespace sim_lib
 			CE_SOLVER_DATA(edge_lengths,		std::vector<float>, simulator_data_update::assign, tl<simulator_datas::edge_lengths>, tl<>)
 			CE_SOLVER_DATA(stretch_edges_stiff,	std::vector<float>, simulator_data_update::assign, tl<simulator_datas::stretch_edges_stiff>, tl<>)
 
-			CE_SOLVER_DATA(gravity,				vec3,				simulator_data_update::assign, tl<simulator_datas::gravity>, tl<>)
+			CE_SOLVER_DATA(gravity,				vec3f,				simulator_data_update::assign, tl<simulator_datas::gravity>, tl<>)
 			CE_SOLVER_DATA(time_step,			float,				simulator_data_update::assign, tl<simulator_datas::time_step>, tl<>)
 			CE_SOLVER_DATA(density,				float,				simulator_data_update::assign, tl<simulator_datas::density>, tl<>)
 		};
@@ -172,7 +172,7 @@ namespace sim_lib
 		using var_list = clumsy_lib::extract_member_type_list_t<var>;
 		clumsy_lib::Static_Type_Map<var_list> m_datas;
 
-		using spm_t = matrix_math::linear_system<float, vec3>;
+		using spm_t = matrix_math::linear_system<float, vec3f>;
 		spm_t m_linear_system;
 
 

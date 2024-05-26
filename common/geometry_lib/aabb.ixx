@@ -33,7 +33,7 @@ namespace geometry
 
 
 	export
-		template<typename element_type, int N, typename vec >
+	template<typename element_type, int N, typename vec >
 	class AABB
 	{
 	public:
@@ -48,7 +48,11 @@ namespace geometry
 
 		}
 
-		AABB(const vec& down, const vec& up) :upper(up), lower(down) {}
+		AABB(const vec& p0, const vec& p1): AABB()
+		{
+			this->operator+=(p0);
+			this->operator+=(p1);
+		}
 
 		AABB& operator+=(const vec& point)
 		{

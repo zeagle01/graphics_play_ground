@@ -44,7 +44,6 @@ namespace bvh_test
 
 	TEST_F(bvh_tester, one_dimension_tree)
 	{
-
 		build_with_pointes({ 0.f,1.f });
 
 		std::vector<geometry::node> traversed_nodes;
@@ -59,7 +58,6 @@ namespace bvh_test
 		m_bvh.traverse_bottom_up({ 1,geometry::node_type::leaf }, get_node);
 
 		expect_nodes_equal(traversed_nodes, { {1,geometry::node_type::leaf},{0,geometry::node_type::inner} });
-
 	}
 
 	TEST_F(bvh_tester, traverse_top_down)
@@ -104,6 +102,43 @@ namespace bvh_test
 
 		std::vector<int> exp{ 0 };
 		EXPECT_THAT(intersected_nodes, Eq(exp));
+	}
+
+	TEST_F(bvh_tester, actual_comparison_is_less)
+	{
+		float thickness = 1.f;
+		int n = 1000;
+		std::vector<float> points(n);
+		build_with_pointes(points);
+
+		std::vector<geometry::AABB1f> aabbs(n);
+
+		for (int i = 0; i < n; i++)
+		{
+			float p = i * 1.f;
+			points[i] = p;
+
+			aabbs[i] = { p - 0.5f * thickness, p + 0.5f * thickness };
+		}
+
+		geometry::AABB1f target_AABB{ 0.f,1.0f };
+
+		std::vector<int> intersected_nodes;
+
+		int compare_count = 0;
+		auto internal_fn = [&](const auto& box)
+			{
+				compare_count++;
+				return target_AABB.intersect(box);
+			};
+
+		auto leaf_fn = [&](int i)
+			{
+				intersected_nodes.push_back(i);
+			};
+		m_traverser.traverse_top_down(m_bvh, aabbs, internal_fn, leaf_fn);
+
+		EXPECT_THAT(compare_count, Lt(n));
 	}
 
 }

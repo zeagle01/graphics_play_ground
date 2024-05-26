@@ -14,8 +14,8 @@ namespace sim_lib
 	struct inertial
 	{
 
-		template<typename write_lhs, typename write_rhs, typename vec_type>
-		static void compute_elemnt(write_lhs lhs, write_rhs rhs, float mass, float dt, const vec_type& gravity_accelaration, const vec_type& velocity)
+		template<typename write_lhs, typename write_rhs >
+		static void compute_elemnt(write_lhs lhs, write_rhs rhs, float mass, float dt, const vec3f& gravity_accelaration, const vec3f& velocity)
 		{
 			float inertial_h = mass / dt / dt;
 			lhs(0,0) = inertial_h;
@@ -28,9 +28,9 @@ namespace sim_lib
 	struct edge_stretch
 	{
 		template<typename write_lhs, typename write_rhs >
-		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const mat3x2& X, float stiff_modulus, float edge_length)
+		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const mat3x2f& X, float stiff_modulus, float edge_length)
 		{
-			vec2 w({ 1,-1 });
+			vec2f w({ 1,-1 });
 			auto dx = X * w;
 			float l = matrix_math::length(dx);
 			auto n = dx / l;
@@ -55,32 +55,21 @@ namespace sim_lib
 	struct triangle_stretch
 	{
 
-		template<typename write_lhs, typename write_rhs, typename vec_type,typename vec_type_u>
-		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const std::array<vec_type, 3>& X, const std::array<vec_type_u, 3>& U, float stretch_stiff)
-		{
-			auto u0 = U[0] - U[2];
-			auto u1 = U[1] - U[2];
-
-
-			//dX=F*dU
-			//XS=FUS
-			//F=X S(US)^-1
-
-		}
-
 		template<typename write_lhs, typename write_rhs >
-		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const std::array<vec3, 3>& X, const std::array<vec2, 3>& U, float stretch_stiff)
+		static void compute_elemnt(write_lhs lhs, write_rhs rhs, const mat3x3f& X, const mat2x3f& U, float stretch_stiff)
 		{
-			auto u0 = U[0];
-			//auto u0 = U[0] - U[2];
-			//auto u1 = U[1] - U[2];
+			constexpr mat3x2f S({
+				1.f,0.f,
+				0.f,1.f,
+				-1.f,-1.f
+				});
 
+			mat2x2f I{};
 
-			//dX=F*dU
-			//XS=FUS
-			//F=X S(US)^-1
+			auto F = X * S * (I / (U * S));
 
 		}
+
 	};
 }
 
