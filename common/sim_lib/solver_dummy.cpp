@@ -37,24 +37,13 @@ namespace sim_lib
 
 		void solve() override
 		{
-
+			//newton step
 			for (int it = 0; it < 1; it++)
 			{
 				step();
 			}
 
-			float dt = m_datas.get_ref < var::time_step>();
-			auto& vel = m_datas.get_ref<var::velocity>();
-			const auto& pos = m_datas.get_ref<var::positions>();
-			const auto& last_pos = m_datas.get_ref<var::last_positions>();
-
-			parallel::for_each(vel.size(), 256,
-				[&](int i)
-				{
-					vel[i] = (pos[i] - last_pos[i]) / dt;
-				}
-			);
-
+			update_velocity();
 		}
 
 		const std::vector<vec3f>& get_result() const override
@@ -71,76 +60,124 @@ namespace sim_lib
 	private:
 		void step()
 		{
+			init_linear_system();
 
+			assemble_inertial();
+
+			assemble_stretch();
+
+			solve_fix_pos();
+
+			backup_last();
+
+			solve_linear_system();
+
+			step_forward();
+		}
+	private:
+		void solve_linear_system()
+		{
+			auto& dx = m_datas.get_ref<var::dx>();
+
+			matrix_math::Jacobi_solver<float, vec3f> linear_solver;
+			linear_solver.solve(m_linear_system, dx);
+
+		}
+
+		void step_forward()
+		{
 			auto& pos = m_datas.get_ref<var::positions>();
-			const auto& vel = m_datas.get_ref<var::velocity>();
-			auto& last_pos = m_datas.get_ref<var::last_positions>();
+			const auto& dx = m_datas.get_ref<var::dx>();
+			parallel::for_each(pos.size(), 256,
+				[&](int i)
+				{
+					pos[i] += dx[i];
+				});
+		}
 
-			m_linear_system.set_variables_num(pos.size());
-
-			m_linear_system.set_fixed_variables(m_datas.get_ref<var::fixed_verts>());
-
-			//inertial
-			const auto& dynamic_verts = m_datas.get_ref<var::dynamic_verts>();
-			auto diag_loop = m_linear_system.get_write_loop(dynamic_verts.size(), [&](int i) { return std::vector<int>{ dynamic_verts[i] }; });
-
-			float mass = m_datas.get_ref<var::density>();
+		void update_velocity()
+		{
 			float dt = m_datas.get_ref < var::time_step>();
-			vec3f g = m_datas.get_ref<var::gravity>();
+			auto& vel = m_datas.get_ref<var::velocity>();
+			const auto& pos = m_datas.get_ref<var::positions>();
+			const auto& last_pos = m_datas.get_ref<var::last_positions>();
 
-
-			auto get_inertial = [&](auto lhs, auto rhs, int si)
+			parallel::for_each(vel.size(), 256,
+				[&](int i)
 				{
-					int v = dynamic_verts[si];
-					inertial::compute_elemnt(lhs, rhs, mass, dt, g, vel[v]);
-				};
+					vel[i] = (pos[i] - last_pos[i]) / dt;
+				}
+			);
+		}
 
-			diag_loop(get_inertial);
+		void init_linear_system()
+		{
+			auto& last_pos = m_datas.get_ref<var::last_positions>();
+			m_linear_system.set_variables_num(last_pos.size());
+			m_linear_system.set_fixed_variables(m_datas.get_ref<var::fixed_verts>());
+		}
 
-			//edge stretch
-			const auto& edges = m_datas.get_ref<var::stretch_edges>();
-			const auto& edge_lengths = m_datas.get_ref<var::edge_lengths>();
-			const auto& stretch_edges_stiff = m_datas.get_ref<var::stretch_edges_stiff>();
-			auto edge_loop = m_linear_system.get_write_loop(edges.size(), [&](int ei) { return std::vector<int>{ edges[ei][0], edges[ei][1] }; });
-
-			auto add_stretch_edge_constraint = [&](auto lhs, auto rhs, int ei)
-				{
-					int v0 = edges[ei][0];
-					int v1 = edges[ei][1];
-
-
-					mat3x2f X = matrix_math::from_columns(pos[v0], pos[v1]);
-
-					edge_stretch::compute_elemnt(lhs, rhs, X, stretch_edges_stiff[ei], edge_lengths[ei]);
-				};
-
-			edge_loop(add_stretch_edge_constraint);
-
-			//face stretch
-			//const auto& faces = m_datas.get_ref<var::stretch_faces>();
-
-			//update fix pos
-			std::vector<vec3f> dx(pos.size());
+		void solve_fix_pos()
+		{
+			auto& dx = m_datas.get_ref<var::dx>();
 			const auto& fixed_verts = m_datas.get_ref<var::fixed_verts>();
+			const auto& pos = m_datas.get_ref<var::positions>();
+			const auto& last_pos = m_datas.get_ref<var::last_positions>();
+
 			parallel::for_each(fixed_verts.size(), 256,
 				[&](int i)
 				{
 					int v = fixed_verts[i];
 					dx[v] = pos[v] - last_pos[v];
 				});
-				
-			//backup last pos
+		}
+
+		void backup_last()
+		{
+			const auto& pos = m_datas.get_ref<var::positions>();
+			auto& last_pos = m_datas.get_ref<var::last_positions>();
 			last_pos = pos;
+		}
 
-			//jacobi
-			matrix_math::Jacobi_solver<float, vec3f> linear_solver;
-			linear_solver.solve(m_linear_system, dx);
+		void assemble_inertial()
+		{
 
-			parallel::for_each(pos.size(), 256,
-				[&](int i)
+			const auto& vel = m_datas.get_ref<var::velocity>();
+			const auto& dynamic_verts = m_datas.get_ref<var::dynamic_verts>();
+			float mass = m_datas.get_ref<var::density>();
+			float dt = m_datas.get_ref < var::time_step>();
+			vec3f g = m_datas.get_ref<var::gravity>();
+			auto get_inertial = [&](auto lhs, auto rhs, int si)
 				{
-					pos[i] = pos[i] + dx[i];
-				});
+					int v = dynamic_verts[si];
+					inertial::compute_elemnt(lhs, rhs, mass, dt, g, vel[v]);
+				};
+
+			auto diag_loop = m_linear_system.get_write_loop(dynamic_verts.size(), [&](int i) { return std::vector<int>{ dynamic_verts[i] }; });
+			diag_loop(get_inertial);
+		}
+
+		void assemble_stretch()
+		{
+			auto& pos = m_datas.get_ref<var::positions>();
+			const auto& edges = m_datas.get_ref<var::stretch_edges>();
+			const auto& edge_lengths = m_datas.get_ref<var::edge_lengths>();
+			const auto& stretch_edges_stiff = m_datas.get_ref<var::stretch_edges_stiff>();
+			auto add_stretch_edge_constraint = [&](auto lhs, auto rhs, int ei)
+				{
+					int v0 = edges[ei][0];
+					int v1 = edges[ei][1];
+
+					mat3x2f X = matrix_math::from_columns(pos[v0], pos[v1]);
+
+					edge_stretch::compute_elemnt(lhs, rhs, X, stretch_edges_stiff[ei], edge_lengths[ei]);
+				};
+
+			auto edge_loop = m_linear_system.get_write_loop(edges.size(), [&](int ei) { return std::vector<int>{ edges[ei][0], edges[ei][1] }; });
+			edge_loop(add_stretch_edge_constraint);
+
+			//face stretch
+			//const auto& faces = m_datas.get_ref<var::stretch_faces>();
 
 		}
 
@@ -156,6 +193,7 @@ namespace sim_lib
 			CE_SOLVER_DATA(positions,			std::vector<vec3f>,	solver_data_update::assign,		tl<simulator_datas::positions>, tl<>)
 			CE_SOLVER_DATA(velocity,			std::vector<vec3f>,	simulator_data_update::resize,	tl<simulator_datas::vert_size>, tl<>)
 			CE_SOLVER_DATA(last_positions,		std::vector<vec3f>,	solver_data_update::assign,		tl<simulator_datas::positions>, tl<>)
+			CE_SOLVER_DATA(dx,					std::vector<vec3f>,	simulator_data_update::resize,	tl<simulator_datas::vert_size>, tl<>)
 
 			CE_SOLVER_DATA(dynamic_verts,		std::vector<int>,	simulator_data_update::assign, tl<simulator_datas::dynamic_verts>, tl<>)
 			CE_SOLVER_DATA(fixed_verts,			std::vector<int>,	simulator_data_update::assign, tl<simulator_datas::fixed_verts>, tl<>)
