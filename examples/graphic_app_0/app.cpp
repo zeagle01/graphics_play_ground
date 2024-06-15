@@ -94,19 +94,7 @@ void App::run()
 				renderer.draw_points(m_mouse_ray.p.data(), 1);
 			}
 
-			std::vector<float> fixPos;
-			fixPos.reserve(m_current_fix_points.size() * 3);
-
-			for (int i = 0; i < m_current_fix_points.size(); i++)
-			{
-				int v = m_current_fix_points[i];
-				for (int j = 0; j < 3; j++)
-				{
-					fixPos.push_back(pos[v * 3 + j]);
-				}
-			}
-			fixPos.shrink_to_fit();
-			renderer.draw_points(fixPos.data(), m_current_fix_points.size());
+			renderer.draw_points(m_current_fix_points_pos.front().data(), m_current_fix_points.size());
 		};
 
 	auto update_fn = [&]
@@ -160,6 +148,7 @@ void App::pick(int x, int y)
 	);
 
 	m_current_fix_points = m_preset_fix_points;
+	m_current_fix_points_pos = m_preset_fix_points_pos;
 	if (m_picked.t_index != -1)
 	{
 		int t = m_picked.t_index;
@@ -176,9 +165,12 @@ void App::pick(int x, int y)
 			}
 		}
 
-		m_current_fix_points.push_back(t_indices[max_v]);
+		int picked_v = t_indices[max_v];
+		m_current_fix_points.push_back(picked_v);
+		m_current_fix_points_pos.push_back(float3{ pos[picked_v * 3 + 0],pos[picked_v * 3 + 1],pos[picked_v * 3 + 2] });
 
 		sim.set<sim_lib::sim_data::obstacle_vert_index>(m_current_fix_points);
+		sim.set<sim_lib::sim_data::obstacle_vert_pos>(m_current_fix_points_pos);
 		sim.commit_all_changes();
 	}
 }
@@ -205,7 +197,18 @@ void App::drag(int x, int y)
 		std::vector<int> v_indices{ t_indices[max_v] };
 		std::vector<sim_lib::float3> v_new_pos{ {x / 400.f - 1.0f ,1.0f - y / 300.f ,-1.f} };
 
-		sim.set_partially<sim_lib::sim_data::positions>(v_indices, v_new_pos);
+		std::vector<int> v_indices_pos;
+		for (int i = 0; i < m_current_fix_points.size(); i++)
+		{
+			if (m_current_fix_points[i] == v_indices[0])
+			{
+				v_indices_pos.push_back(i);
+				m_current_fix_points_pos[i] = v_new_pos[0];
+				break;
+			}
+		}
+
+		sim.set_partially<sim_lib::sim_data::obstacle_vert_pos>(v_indices_pos, v_new_pos);
 		sim.commit_all_changes();
 	}
 }
@@ -214,7 +217,10 @@ void App::release_pick()
 {
 	m_picked.t_index = -1;
 	m_current_fix_points = m_preset_fix_points;
+	m_current_fix_points_pos = m_preset_fix_points_pos;
+
 	sim.set<sim_lib::sim_data::obstacle_vert_index>(m_current_fix_points);
+	sim.set<sim_lib::sim_data::obstacle_vert_pos>(m_current_fix_points_pos);
 	sim.commit_all_changes();
 }
 
@@ -317,8 +323,13 @@ void App::init_sim_data()
 	int fix_v1 = (m_plane_resolution[0] - 1) * m_plane_resolution[1] + m_plane_resolution[1] - 1;
 
 	m_preset_fix_points = { fix_v0, fix_v1 };
+	m_preset_fix_points_pos = { sim_pos[fix_v0], sim_pos[fix_v1] };
+
 	m_current_fix_points = m_preset_fix_points;
+	m_current_fix_points_pos = m_preset_fix_points_pos;
+
 	sim.set<sim_lib::sim_data::obstacle_vert_index>(m_preset_fix_points);
+	sim.set<sim_lib::sim_data::obstacle_vert_pos>(m_preset_fix_points_pos);
 
 	std::vector<sim_lib::int2> sim_edges;
 	convert_to_sim_data(sim_edges, m_edges);

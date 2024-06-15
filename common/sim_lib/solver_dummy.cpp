@@ -37,10 +37,14 @@ namespace sim_lib
 
 		void solve() override
 		{
+			backup_last();
+
 			//newton step
 			for (int it = 0; it < 1; it++)
 			{
-				step();
+				solve_dx();
+
+				step_forward();
 			}
 
 			update_velocity();
@@ -58,7 +62,7 @@ namespace sim_lib
 		}
 
 	private:
-		void step()
+		void solve_dx()
 		{
 			init_linear_system();
 
@@ -68,11 +72,8 @@ namespace sim_lib
 
 			solve_fix_pos();
 
-			backup_last();
-
 			solve_linear_system();
 
-			step_forward();
 		}
 	private:
 		void solve_linear_system()
@@ -122,13 +123,13 @@ namespace sim_lib
 			auto& dx = m_datas.get_ref<var::dx>();
 			const auto& fixed_verts = m_datas.get_ref<var::fixed_verts>();
 			const auto& pos = m_datas.get_ref<var::positions>();
-			const auto& last_pos = m_datas.get_ref<var::last_positions>();
+			const auto& target_pos = m_datas.get_ref<var::fixed_verts_pos>();
 
 			parallel::for_each(fixed_verts.size(), 256,
 				[&](int i)
 				{
 					int v = fixed_verts[i];
-					dx[v] = pos[v] - last_pos[v];
+					dx[v] = target_pos[i] - pos[v];
 				});
 		}
 
@@ -197,6 +198,7 @@ namespace sim_lib
 
 			CE_SOLVER_DATA(dynamic_verts,		std::vector<int>,	simulator_data_update::assign, tl<simulator_datas::dynamic_verts>, tl<>)
 			CE_SOLVER_DATA(fixed_verts,			std::vector<int>,	simulator_data_update::assign, tl<simulator_datas::fixed_verts>, tl<>)
+			CE_SOLVER_DATA(fixed_verts_pos,		std::vector<vec3f>,	simulator_data_update::assign, tl<simulator_datas::fixed_verts_pos>, tl<>)
 
 			CE_SOLVER_DATA(stretch_edges,		std::vector<int2>,	simulator_data_update::assign, tl<simulator_datas::stretch_edges>, tl<>)
 			CE_SOLVER_DATA(edge_lengths,		std::vector<float>, simulator_data_update::assign, tl<simulator_datas::edge_lengths>, tl<>)

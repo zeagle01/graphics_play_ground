@@ -54,8 +54,11 @@ private:
 	std::array<float, 2> m_plane_size{ 0.5f,0.5f };
 	std::array<int, 2> m_plane_resolution{ 8,8 };
 
+	using float3 = std::array<float, 3>;
 	std::vector<int> m_preset_fix_points;
+	std::vector<float3> m_preset_fix_points_pos;
 	std::vector<int> m_current_fix_points;
+	std::vector<float3> m_current_fix_points_pos;
 
 private:
 	bool m_enable_fill = true;

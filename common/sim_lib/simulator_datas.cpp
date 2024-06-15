@@ -27,21 +27,21 @@ namespace sim_lib
 	struct simulator_datas
 	{
 		//geometry
-		CE_SIMULATOR_DATA(vert_size,		int,					assign, EVAL(tl<sim_data::vertex_num>), tl<>);
-		CE_SIMULATOR_DATA(positions,		std::vector<vec3f>,		convert_pos, EVAL(tl<sim_data::positions >), tl<>);
-		CE_SIMULATOR_DATA(rest_positions,	std::vector<vec3f>,		convert_pos, EVAL(tl<sim_data::rest_positions >), tl<>);
+		CE_SIMULATOR_DATA(vert_size,			int,					assign, EVAL(tl<sim_data::vertex_num>), tl<>);
+		CE_SIMULATOR_DATA(positions,			std::vector<vec3f>,		convert_pos, EVAL(tl<sim_data::positions >), tl<>);
+		CE_SIMULATOR_DATA(rest_positions,		std::vector<vec3f>,		convert_pos, EVAL(tl<sim_data::rest_positions >), tl<>);
 
-		CE_SIMULATOR_DATA(dynamic_verts,	std::vector<int>,		compute_complete_set, EVAL(tl<sim_data::vertex_num,sim_data::obstacle_vert_index>), tl<>);
-		CE_SIMULATOR_DATA(fixed_verts,		std::vector<int>,		assign, EVAL(tl<sim_data::obstacle_vert_index>), tl<>);
+		CE_SIMULATOR_DATA(dynamic_verts,		std::vector<int>,		compute_complete_set, EVAL(tl<sim_data::vertex_num,sim_data::obstacle_vert_index>), tl<>);
+		CE_SIMULATOR_DATA(fixed_verts,			std::vector<int>,		assign, EVAL(tl<sim_data::obstacle_vert_index>), tl<>);
+		CE_SIMULATOR_DATA(fixed_verts_pos,		std::vector<vec3f>,		convert_pos, EVAL(tl<sim_data::obstacle_vert_pos>), tl<>);
 
+		CE_SIMULATOR_DATA(stretch_edges,		std::vector<int2>,		assign, EVAL(tl<sim_data::stretch_edges >), tl<>);
+		CE_SIMULATOR_DATA(stretch_edges_stiff,	std::vector<float>,		assign, EVAL(tl<sim_data::stretch_edges_stiff >), tl<>);
+		CE_SIMULATOR_DATA(edge_lengths,			std::vector<float>,		compute_edge_lengths, EVAL(tl<stretch_edges,rest_positions >), tl<>);
 
-		CE_SIMULATOR_DATA(stretch_edges,	std::vector<int2>,		assign, EVAL(tl<sim_data::stretch_edges >), tl<>);
-		CE_SIMULATOR_DATA(stretch_edges_stiff,std::vector<float>,	assign, EVAL(tl<sim_data::stretch_edges_stiff >), tl<>);
-		CE_SIMULATOR_DATA(edge_lengths,		std::vector<float>,		compute_edge_lengths, EVAL(tl<stretch_edges,rest_positions >), tl<>);
-
-		CE_SIMULATOR_DATA(gravity,			vec3f,					assign, EVAL(tl<sim_data::gravity >), tl<>);
-		CE_SIMULATOR_DATA(time_step,		float,					assign, EVAL(tl<sim_data::time_step >), tl<>);
-		CE_SIMULATOR_DATA(density,			float,					assign, EVAL(tl<sim_data::density >), tl<>);
+		CE_SIMULATOR_DATA(gravity,				vec3f,					assign, EVAL(tl<sim_data::gravity >), tl<>);
+		CE_SIMULATOR_DATA(time_step,			float,					assign, EVAL(tl<sim_data::time_step >), tl<>);
+		CE_SIMULATOR_DATA(density,				float,					assign, EVAL(tl<sim_data::density >), tl<>);
 
 		//dynamic derived
 
