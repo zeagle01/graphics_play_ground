@@ -101,11 +101,8 @@ namespace sim_lib
 			float s = c;
 
 			mat2x2f orientation[] = {
-				mat2x2f(
-				{
-					1.f,0.f,
-					0.f,1.f
-				} ),
+
+				I2,
 
 				mat2x2f(
 				{
@@ -123,14 +120,11 @@ namespace sim_lib
 			{
 				const auto& R = orientation[orientation_i];
 
-				//mat2x2f dm = R * U * S;
-				//mat2x2f invDm = I2 / dm;
 				auto W = S * (I2 / (R * U * S));
 
 				for (int col_i = 0; col_i < 2; col_i++)
 				{
 					const auto& w = column(W, col_i);
-					//vec3f w = column(W, col_i);
 
 					auto dx = X * w;
 
@@ -150,8 +144,7 @@ namespace sim_lib
 
 					for (int i = 0; i < 3; i++)
 					{
-						vec3f v = area * k[col_i] * C * w(i) * n;
-						rhs(i) += v;
+						rhs(i) += -area * k[col_i] * C * w(i) * n;
 
 						for (int j = 0; j < 3; j++)
 						{

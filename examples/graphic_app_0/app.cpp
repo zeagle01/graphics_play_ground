@@ -346,7 +346,9 @@ void App::init_sim_data()
 	std::vector<int> stretch_t(sim_tris.size());
 	std::iota(stretch_t.begin(), stretch_t.end(),0);
 	sim.set<sim_lib::sim_data::stretch_triangles>(stretch_t);
-	sim.set<sim_lib::sim_data::stretch_triangles_stiff>(std::vector<sim_lib::triangle_stretch_stiff>(stretch_t.size(), uniform_triangle_stretch_stiff));
+	sim.set<sim_lib::sim_data::stretch_triangles_stiff>(
+		std::vector<sim_lib::triangle_stretch_stiff>(stretch_t.size(), uniform_triangle_stretch_stiff)
+	);
 
 }
 
@@ -413,6 +415,13 @@ void App::connect_sim_ui()
 		[this](const auto& new_v)
 		{
 			sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>(m_edges.size()/2, new_v));
+
+			sim_lib::triangle_stretch_stiff new_trinagle_stiff = { new_v,new_v,new_v,new_v };
+
+			sim.set<sim_lib::sim_data::stretch_triangles_stiff>(
+				std::vector<sim_lib::triangle_stretch_stiff>(indices.size() / 3, new_trinagle_stiff)
+			);
+
 			sim.commit_all_changes();
 		}
 	);

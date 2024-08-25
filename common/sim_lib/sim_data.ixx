@@ -149,7 +149,7 @@ namespace sim_lib
 		CE_ENTRY(stretch_triangles_stiff,		CE_USE(type,	std::vector<triangle_stretch_stiff>);CE_NIL(init_val);									CE_LIST(validator,	fn<size_with, stretch_triangles>);							CE_LIST(tags));
 
 		CE_ENTRY(gravity,						CE_USE(type,	float3);							CE_VAL(init_val,	float3{0,-10.f,0});				CE_LIST(validator);																CE_LIST(tags));
-		CE_ENTRY(time_step,						CE_USE(type,	float);								CE_VAL(init_val,	0.0001f);							CE_LIST(validator,  fn<greater_than<0.f>>);										CE_LIST(tags));
+		CE_ENTRY(time_step,						CE_USE(type,	float);								CE_VAL(init_val,	0.01f);							CE_LIST(validator,  fn<greater_than<0.f>>);										CE_LIST(tags));
 		CE_ENTRY(density,						CE_USE(type,	float);								CE_VAL(init_val,	1e-1f);							CE_LIST(validator,  fn<greater_than<0.f>>);										CE_LIST(tags));
 
 	};
