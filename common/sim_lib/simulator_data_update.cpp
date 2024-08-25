@@ -42,6 +42,17 @@ namespace sim_lib
 				}
 			}
 
+			template<typename T >
+			static void apply(std::vector<T>& out, const std::vector<int>& index, const std::vector<T>& in)
+			{
+				out.resize(index.size());
+				for (int i = 0; i < index.size(); i++)
+				{
+					int ind = index[i];
+					out[i] = in[ind];
+				}
+			}
+
 			template<typename T, int N>
 			static void apply(std::array<T, N>& out, const matrix_math::matrix<T, N, 1>& in)
 			{
@@ -59,6 +70,7 @@ namespace sim_lib
 					out(j) = in[j];
 				}
 			}
+
 		};
 
 		struct resize
@@ -152,6 +164,19 @@ namespace sim_lib
 				for (int i = 0; i < in.size(); i++)
 				{
 					for (int j = 0; j < 3; j++)
+					{
+						out[i](j) = in[i][j];
+					}
+				}
+				out.shrink_to_fit();
+			}
+
+			static void apply(std::vector<vec2f>& out, const std::vector<float2>& in)
+			{
+				out.resize(in.size());
+				for (int i = 0; i < in.size(); i++)
+				{
+					for (int j = 0; j < 2; j++)
 					{
 						out[i](j) = in[i][j];
 					}

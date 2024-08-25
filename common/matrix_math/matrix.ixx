@@ -5,6 +5,8 @@ module;
 #include <initializer_list>
 #include <functional>
 #include <array>
+#include <type_traits>
+#include <numeric>
 
 export module matrix_math: matrix;
 
@@ -212,90 +214,184 @@ namespace matrix_math
 	}
 
 	template<typename T, int R, int C> struct matrix;
+	template<int Row_size, int Col_size, typename M > decltype(auto) submatrix(M&& m, int row_offset, int col_offset);
+	template<typename M> decltype(auto) column(M&& m, int col);
 
 	namespace matrix_imp
 	{
-		template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
-		auto LU_inverse(const m0_t& m0, const m1_t& m1)
+
+		struct LU_solver
 		{
-			constexpr int R = std::decay_t<m0_t>::row_num;
-			constexpr int C = std::decay_t<m0_t>::col_num;
-			constexpr int R1 = std::decay_t<m1_t>::row_num;
-			constexpr int C1 = std::decay_t<m1_t>::col_num;
-
-			static_assert(R == R1);
-			static_assert(R1 == C1); //square
-
-			using T = std::decay_t<m0_t>::type;
-			using T1 = std::decay_t<m1_t>::type;
-			static_assert(std::is_same_v<T, T1>);
-
-			constexpr int N = R1;
-			matrix<T, N, N> LU{};
-			const auto& A = m1;
-
-			//A(r,c)=L(r,i)*U(i,c)
-			for (int c = 0; c < N; c++)
+			template< matrix_imp::matrix_like m_t >
+			static void swap_row(m_t& A, int i, int j, int* permutation)
 			{
-				for (int r = 0; r < N; r++)
-				{
-					T s = A(r, c);
+				constexpr int C = std::decay_t<m_t>::col_num;
 
-					if (r <= c)
+				for (int c = 0; c < C; c++)
+				{
+					std::swap(A(i, c), A(j, c));
+				}
+
+				std::swap(permutation[i], permutation[j]);
+			}
+
+			template< typename vec >
+			static int find_max_index(const vec& v, int n)
+			{
+				auto max_value = std::abs(v(0));
+				int ret = 0;
+
+				for (int i = 1; i < n; i++)
+				{
+					auto curr_value = std::abs(v(i));
+					if (curr_value > max_value)
 					{
+						max_value = curr_value;
+						ret = i;
+					}
+				}
+				return ret;
+			}
+
+
+			template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
+			static void LU_decompose(m0_t& LU, int* permutation, m1_t& A)
+			{
+
+				constexpr int R1 = std::decay_t<m1_t>::row_num;
+				constexpr int C1 = std::decay_t<m1_t>::col_num;
+				using T = std::decay_t<m0_t>::type;
+				static_assert(R1 == C1); //square
+				constexpr int N = R1;
+				
+				if constexpr (N == 1)
+				{
+					LU = A;
+				}
+				else
+				{
+
+					auto A_first_col = matrix_math::column(A, 0);
+
+					int max_I = find_max_index(A_first_col, N);
+
+					swap_row(A, 0, max_I, permutation);
+
+					LU(0, 0) = A(0, 0);
+
+					auto L10 = matrix_math::submatrix<N - 1, 1>(LU, 1, 0);
+					auto U01 = matrix_math::submatrix<1, N - 1>(LU, 0, 1);
+
+					auto A10 = matrix_math::submatrix<N - 1, 1>(A, 1, 0);
+					auto A01 = matrix_math::submatrix<1, N - 1>(A, 0, 1);
+
+					U01 = A01;
+					L10 = A10 / A(0, 0);
+
+					matrix<T, N - 1, N - 1>	 S = matrix_math::submatrix<N - 1, N - 1>(A, 1, 1) - L10 * U01;
+					auto LU11 = matrix_math::submatrix<N - 1, N - 1>(LU, 1, 1);
+
+					LU_decompose(LU11, permutation, S);
+
+				}
+
+			}
+
+			template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
+			static auto LU_solve(const m0_t& _B, const m1_t& LU, const std::vector<int>& permutation)
+			{
+
+				constexpr int R = std::decay_t<m0_t>::row_num;
+				constexpr int C = std::decay_t<m0_t>::col_num;
+				constexpr int R1 = std::decay_t<m1_t>::row_num;
+				constexpr int C1 = std::decay_t<m1_t>::col_num;
+
+				static_assert(R == R1);
+				static_assert(R1 == C1); //square
+
+				using T = std::decay_t<m0_t>::type;
+				using T1 = std::decay_t<m1_t>::type;
+				static_assert(std::is_same_v<T, T1>);
+
+				constexpr int N = R1;
+
+				matrix<T, R, C> B;
+
+				for (int ri = 0; ri < R; ri++)
+				{
+					for (int ci = 0; ci < C; ci++)
+					{
+						matrix_imp::accessor::apply(B, ri, ci) = matrix_imp::accessor::apply(_B, permutation[ri], ci);
+					}
+				}
+
+
+				matrix<T, N, C> Y;
+
+				//L(r,i) Y(i,c) = B(r,c)
+				for (int c = 0; c < C; c++)
+				{
+					for (int r = 0; r < N; r++)
+					{
+						T s = matrix_imp::accessor::apply(B, r, c);
 						for (int i = 0; i < r; i++)
 						{
-							s -= LU(r, i) * LU(i, c);
+							s -= LU(r, i) * matrix_imp::accessor::apply(Y, i, c);
 						}
-						//L(r,r)=1.f;
-						LU(r, c) = s;
+						matrix_imp::accessor::apply(Y, r, c) = s;
 					}
-					else
+
+				}
+
+				matrix<T, N, C> X;
+
+				//U(r,i) X(i,c) = Y(r,c)
+				for (int c = 0; c < C; c++)
+				{
+					for (int r = N - 1; r >= 0; r--)
 					{
-						for (int i = 0; i < c; i++)
+						T s = matrix_imp::accessor::apply(Y, r, c);
+						for (int i = r + 1; i < N; i++)
 						{
-							s -= LU(r, i) * LU(i, c);
+							s -= LU(r, i) * matrix_imp::accessor::apply(X, i, c);
 						}
-						LU(r, c) = s / LU(c, c);
+						matrix_imp::accessor::apply(X, r, c) = s / LU(r, r);
 					}
 				}
+
+				return X;
 			}
 
-			const auto& B = m0;
-			matrix<T, N, C> Y;
-			//L(r,i) Y(i,c) = B(r,c)
-			for (int c = 0; c < C; c++)
+			template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
+			static auto LU_inverse(const m0_t& B, const m1_t& A)
 			{
-				for (int r = 0; r < N; r++)
-				{
-					T s = matrix_imp::accessor::apply(B, r, c);
-					for (int i = 0; i < r; i++)
-					{
-						s -= LU(r, i) * matrix_imp::accessor::apply(Y, i, c);
-					}
-					matrix_imp::accessor::apply(Y, r, c) = s;
-				}
 
+				constexpr int R = std::decay_t<m0_t>::row_num;
+				constexpr int C = std::decay_t<m0_t>::col_num;
+				constexpr int R1 = std::decay_t<m1_t>::row_num;
+				constexpr int C1 = std::decay_t<m1_t>::col_num;
+
+				static_assert(R == R1);
+				static_assert(R1 == C1); //square
+
+				using T = std::decay_t<m0_t>::type;
+				using T1 = std::decay_t<m1_t>::type;
+				static_assert(std::is_same_v<T, T1>);
+
+				constexpr int N = R1;
+				matrix<T, N, N> LU{};
+
+				std::vector<int> permutation(N);
+				std::iota(permutation.begin(), permutation.end(), 0);
+
+				matrix<T, N, N> copy_A = A;
+
+				LU_decompose(LU, permutation.data(), copy_A);
+
+				return LU_solve(B, LU, permutation);
 			}
 
-			matrix<T, N, C> X;
-
-			//U(r,i) X(i,c) = Y(r,c)
-			for (int c = 0; c < C; c++)
-			{
-				for (int r = N - 1; r >= 0; r--)
-				{
-					T s = matrix_imp::accessor::apply(Y, r, c);
-					for (int i = r + 1; i < N; i++)
-					{
-						s -= LU(r, i) * matrix_imp::accessor::apply(X, i, c);
-					}
-					matrix_imp::accessor::apply(X, r, c) = s / LU(r, r);
-				}
-			}
-
-			return X;
-		}
+		};
 
 	}
 
@@ -328,9 +424,9 @@ namespace matrix_math
 			}
 
 			template<matrix_like m_t >
-			constexpr buffer& operator=(const m_t& m)
+			constexpr buffer& operator=(m_t&& m)
 			{
-				assigner::apply(*this, m);
+				assigner::apply(*this, std::forward<m_t>(m));
 				return *this;
 			}
 
@@ -364,9 +460,9 @@ namespace matrix_math
 			}
 
 			template<matrix_like m_t >
-			constexpr view& operator=(const m_t& m)
+			constexpr view& operator=(m_t&& m)
 			{
-				assigner::apply(*this, m);
+				assigner::apply(*this, std::forward<m_t>(m));
 				return *this;
 			}
 
@@ -410,14 +506,15 @@ namespace matrix_math
 		};
 
 
+		template<typename ...Q>
 		struct view_builder
 		{
-			template<template<int, int> typename index_mapper_t, typename M ,typename ...P>
+			template<template<int, int, typename ...> typename index_mapper_t, typename M, typename ...P >
 			static decltype(auto) apply(M&& m, P&& ...p)
 			{
 				constexpr int R = std::decay_t<M>::row_num;
 				constexpr int C = std::decay_t<M>::col_num;
-				using im_t = index_mapper_t<R, C>;
+				using im_t = index_mapper_t<R, C, Q...>;
 				constexpr int R_out = im_t::R_out;
 				constexpr int C_out = im_t::C_out;
 
@@ -486,6 +583,43 @@ namespace matrix_math
 				int col;
 
 			};
+
+			template<int R_in, int C_in>
+			struct get_cofactor
+			{
+				static constexpr int R_out = R_in - 1;
+				static constexpr int C_out = C_in - 1;
+
+				row_col operator()(int r_out, int c_out) const
+				{
+					int c_in = c_out < col ? c_out : c_out + 1;
+					int r_in = r_out < row ? r_out : r_out + 1;
+
+					return { r_in, c_in };
+				}
+
+				int row;
+				int col;
+			};
+
+			template<int R_in, int C_in, typename Rsize_t, typename Csize_t>
+			struct get_submatrix
+			{
+				static constexpr int R_out = Rsize_t::value;
+				static constexpr int C_out = Csize_t::value;
+
+				row_col operator()(int r_out, int c_out) const
+				{
+					int c_in = c_out + col_offset;
+					int r_in = r_out + row_offset;
+
+					return { r_in, c_in };
+				}
+
+				int row_offset;
+				int col_offset;
+			};
+
 		}
 	}
 	namespace matrix_imp
@@ -583,6 +717,23 @@ namespace matrix_math
 		using buffer::operator();
 	};
 
+	template<typename T >
+	struct matrix<T, 1, 1> : public matrix_imp::buffer<T, 1, 1>
+	{
+	private:
+		using buffer = matrix_imp::buffer<T, 1, 1>;
+	public:
+		constexpr matrix() = default;
+		template<matrix_imp::matrix_like m_t > constexpr matrix(const m_t& exp) : buffer(exp) {}
+
+		constexpr T& operator()() { return buffer::operator()(0, 0); }
+		constexpr const T& operator()() const { return buffer::operator()(0, 0); }
+
+		friend struct matrix_imp::accessor;
+	private:
+		using buffer::operator();
+	};
+
 
 	// constructors
 	template<matrix_imp::matrix_like ... m_t>
@@ -602,19 +753,33 @@ namespace matrix_math
 	template<typename M>
 	decltype(auto) transpose(M&& m)
 	{
-		return matrix_imp::view_builder::apply<matrix_imp::index_mapper::transposer>(m);
+		return matrix_imp::view_builder<>::apply<matrix_imp::index_mapper::transposer>(std::forward<M>(m));
 	}
 
 	template<typename M>
 	decltype(auto) vectorize(M&& m)
 	{
-		return matrix_imp::view_builder::apply<matrix_imp::index_mapper::vectorizer>(m);
+		return matrix_imp::view_builder<>::apply<matrix_imp::index_mapper::vectorizer>(std::forward<M>(m));
 	}
 
 	template<typename M>
 	decltype(auto) column(M&& m, int col)
 	{
-		return matrix_imp::view_builder::apply<matrix_imp::index_mapper::get_column>(m, col);
+		return matrix_imp::view_builder<>::apply<matrix_imp::index_mapper::get_column>(std::forward<M>(m), col);
+	}
+
+	template<typename M>
+	decltype(auto) cofactor(M&& m, int row, int col)
+	{
+		return matrix_imp::view_builder<>::apply<matrix_imp::index_mapper::get_cofactor>(std::forward<M>(m), row, col);
+	}
+
+	template<int Row_size, int Col_size, typename M >
+	decltype(auto) submatrix(M&& m, int row_offset, int col_offset)
+	{
+		using Row_size_t = std::integral_constant<int, Row_size>;
+		using Col_size_t = std::integral_constant<int, Col_size>;
+		return matrix_imp::view_builder<Row_size_t, Col_size_t>::apply<matrix_imp::index_mapper::get_submatrix>(std::forward<M>(m), row_offset, col_offset);
 	}
 
 	///////////////operators 
@@ -705,14 +870,14 @@ namespace matrix_math
 	template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
 	auto operator/(const m0_t& m0, const m1_t& m1)
 	{
-		return matrix_imp::LU_inverse(m0, m1);
+		return matrix_imp::LU_solver::LU_inverse(m0, m1);
 	}
 
 	//m/=m
 	template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
 	void operator/=(m0_t&& m0, const m1_t& m1)
 	{
-		std::forward<m0_t>(m0) = matrix_imp::LU_inverse(m0, m1);
+		std::forward<m0_t>(m0) = matrix_imp::LU_solver::LU_inverse(m0, m1);
 	}
 
 	//m+=m
@@ -758,6 +923,52 @@ namespace matrix_math
 		std::forward<m0_t>(m0) = build_expression<std::divides>(std::forward<m0_t>(m0), m1);
 	}
 
+	// cross
+	template< matrix_imp::matrix_like m_t >
+	auto cross(const m_t& a,const m_t& b)
+	{
+		constexpr int R = std::decay_t<m_t>::row_num;
+		constexpr int C = std::decay_t<m_t>::col_num;
+		using T = std::decay_t<m_t>::type;
+
+		static_assert(R == 3);
+		static_assert(C == 1);
+
+		matrix<T, R, C> ret;
+		ret(0) = a(1) * b(2) - a(2) * b(1);
+		ret(1) = a(2) * b(0) - a(0) * b(2);
+		ret(2) = a(0) * b(1) - a(1) * b(0);
+
+		return ret;
+
+	};
+
+
+	template< matrix_imp::matrix_like m_t >
+	auto det(const m_t& a)
+	{
+		constexpr int R = std::decay_t<m_t>::row_num;
+		constexpr int C = std::decay_t<m_t>::col_num;
+		using T = std::decay_t<m_t>::type;
+
+		static_assert(R == C);
+
+		if constexpr (R == 1)
+		{
+			return matrix_imp::accessor::apply(a, 0, 0);
+		}
+		else
+		{
+			T ret{};
+			for (int i = 0; i < R; i++)
+			{
+				int s = i % 2 == 0 ? 1 : -1;
+				ret += s * a(0, i) * det(cofactor(a, 0, i));
+			}
+			return ret;
+		}
+
+	}
 
 	// length
 	template< matrix_imp::matrix_like m0_t >
@@ -767,4 +978,26 @@ namespace matrix_math
 		T ret = transpose(v) * v;
 		return std::sqrt(ret);
 	};
+
+
+	template<typename T,int N>
+	auto identity()
+	{
+		matrix<T, N, N> ret;
+		for (int i = 0; i < N; i++)
+		{
+			for (int j = 0; j < N; j++)
+			{
+				if (i == j)
+				{
+					ret(i, j) = 1;
+				}
+				else
+				{
+					ret(i, j) = 0;
+				}
+			}
+		}
+		return ret;
+	}
 }

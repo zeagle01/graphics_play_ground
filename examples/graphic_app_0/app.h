@@ -44,15 +44,17 @@ private:
 	std::vector< int> indices;
 	std::vector< int> m_edges;
 	std::vector<float> pos;
+	std::vector<float> pos_2d;
 
 	bool m_sim_data_is_valid = false;
 	std::string m_sim_data_is_str = "no";
 
 	float uniform_edge_stretch_stiff = 1e2f;
+	sim_lib::triangle_stretch_stiff uniform_triangle_stretch_stiff = { 1e2f,1e2f,1e2f,1e2f };
 
 private:
 	std::array<float, 2> m_plane_size{ 0.5f,0.5f };
-	std::array<int, 2> m_plane_resolution{ 8,8 };
+	std::array<int, 2> m_plane_resolution{ 10,10 };
 
 	using float3 = std::array<float, 3>;
 	std::vector<int> m_preset_fix_points;

@@ -232,6 +232,8 @@ void App::make_plane(float lx, float ly, int nx, int ny)
 
 	pos.clear();
 	pos.reserve(nx * ny);
+	pos_2d.clear();
+	pos_2d.reserve(nx * ny);
 
 	for (int xi = 0; xi < nx; xi++)
 	{
@@ -240,9 +242,13 @@ void App::make_plane(float lx, float ly, int nx, int ny)
 			pos.push_back(xi * dx);
 			pos.push_back(yi * dy);
 			pos.push_back(0);
+
+			pos_2d.push_back(xi * dx);
+			pos_2d.push_back(yi * dy);
 		}
 	}
 	pos.shrink_to_fit();
+	pos_2d.shrink_to_fit();
 
 	indices.clear();
 	indices.reserve((nx - 1) * (ny - 1) * 2);
@@ -306,6 +312,8 @@ void App::init_sim_data()
 
 	std::vector<sim_lib::float3> sim_pos;
 	convert_to_sim_data(sim_pos, pos);
+	std::vector<sim_lib::float2> sim_pos_2d;
+	convert_to_sim_data(sim_pos_2d, pos_2d);
 
 	std::vector<sim_lib::int3> sim_tris;
 	convert_to_sim_data(sim_tris, indices);
@@ -314,10 +322,9 @@ void App::init_sim_data()
 	sim.set<sim_lib::sim_data::vertex_num>(sim_pos.size());
 	sim.set<sim_lib::sim_data::positions>(sim_pos);
 	sim.set<sim_lib::sim_data::rest_positions>(sim_pos);
+	sim.set<sim_lib::sim_data::material_positions>(sim_pos_2d);
 	sim.set<sim_lib::sim_data::triangles>(sim_tris);
-	//std::vector<int> stretch_t(sim_tris.size());
-	//std::iota(stretch_t.begin(), stretch_t.end(),0);
-	//sim.set<sim_lib::sim_data::stretch_triangles>(stretch_t);
+
 
 	int fix_v0 = 0 * m_plane_resolution[1] + m_plane_resolution[1] - 1;
 	int fix_v1 = (m_plane_resolution[0] - 1) * m_plane_resolution[1] + m_plane_resolution[1] - 1;
@@ -335,6 +342,11 @@ void App::init_sim_data()
 	convert_to_sim_data(sim_edges, m_edges);
 	sim.set<sim_lib::sim_data::stretch_edges>(sim_edges);
 	sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>(sim_edges.size(), uniform_edge_stretch_stiff));
+
+	std::vector<int> stretch_t(sim_tris.size());
+	std::iota(stretch_t.begin(), stretch_t.end(),0);
+	sim.set<sim_lib::sim_data::stretch_triangles>(stretch_t);
+	sim.set<sim_lib::sim_data::stretch_triangles_stiff>(std::vector<sim_lib::triangle_stretch_stiff>(stretch_t.size(), uniform_triangle_stretch_stiff));
 
 }
 

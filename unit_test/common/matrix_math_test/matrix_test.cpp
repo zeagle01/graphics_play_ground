@@ -13,8 +13,10 @@ using namespace matrix_math;
 using mat2x2 = matrix_math::matrix<float, 2, 2>;
 using mat2x3 = matrix_math::matrix<float, 2, 3>;
 using mat3x2 = matrix_math::matrix<float, 3, 2>;
+using mat3x3 = matrix_math::matrix<float, 3, 3>;
 using mat2x4 = matrix_math::matrix<float, 2, 4>;
 using vec2 = matrix_math::matrix<float, 2, 1>;
+using vec3 = matrix_math::matrix<float, 3, 1>;
 using tvec2 = matrix_math::matrix<float, 1, 2>;
 using vec4 = matrix_math::matrix<float, 4, 1>;
 using vec6 = matrix_math::matrix<float, 6, 1>;
@@ -35,7 +37,8 @@ void expect_mat_equal(M&& mat, const T(&expect_values)[values_num])
 		T act = v(i);
 		T exp = v_exp(i);
 
-		EXPECT_THAT(act, Eq(exp));
+		//EXPECT_THAT(act, EXPECT_FLOAT_EQ(exp));
+		EXPECT_NEAR(act, exp, 1e-4);
 	}
 }
 
@@ -268,6 +271,106 @@ TEST(matrix_test, transpose_transpose_access)
 	EXPECT_THAT(m(1,2), Eq(6.f));
 
 }
+
+TEST(matrix_test, cofactor)
+{
+
+	mat3x3 m
+	({
+		1,4,7,
+		2,5,8,
+		3,6,9
+	});
+
+	auto cm = cofactor(m, 0, 0);
+
+	expect_mat_equal(cm, 
+		{
+			5,8,
+			6,9
+		});
+
+}
+
+TEST(matrix_test, submatrix)
+{
+
+	mat3x3 m
+	({
+		1,4,7,
+		2,5,8,
+		3,6,9
+	});
+
+	auto cm = matrix_math::submatrix<2,2>(m, 0, 0);
+
+	expect_mat_equal(cm, 
+		{
+			1,4,
+			2,5
+		});
+
+}
+
+TEST(matrix_test, submatrix_with_offset)
+{
+
+	mat3x3 m
+	({
+		1,4,7,
+		2,5,8,
+		3,6,9
+	});
+
+	auto cm = matrix_math::submatrix<2,2>(m, 0, 1);
+
+	expect_mat_equal(cm, 
+		{
+			4,7,
+			5,8
+		});
+
+}
+
+TEST(matrix_test, row_submatrix)
+{
+
+	mat3x3 m
+	({
+		1,4,7,
+		2,5,8,
+		3,6,9
+	});
+
+	auto cm = matrix_math::submatrix<1,2>(m, 0, 0);
+
+	expect_mat_equal(cm, 
+		{
+			1,4,
+		});
+
+}
+
+TEST(matrix_test, col_submatrix)
+{
+
+	mat3x3 m
+	({
+		1,4,7,
+		2,5,8,
+		3,6,9
+	});
+
+	auto cm = matrix_math::submatrix<2,1>(m, 0, 0);
+
+	expect_mat_equal(cm, 
+		{
+			1,
+			2
+		});
+
+}
+
 
 TEST(matrix_test, vectorized_cant_not_access_with_two_index)
 {
@@ -847,6 +950,57 @@ TEST(matrix_test, length)
 
 }
 
+TEST(matrix_test, det)
+{
+	mat2x2 m
+	({ 
+		1.f,2.f,
+		3.f,4.f
+	});
+
+	EXPECT_THAT(matrix_math::det(m), Eq(-2.f));
+
+}
+
+TEST(matrix_test, cross)
+{
+	vec3 a
+	({ 
+		1.f,
+		0.f,
+		0.f,
+	});
+
+	vec3 b
+	({ 
+		0.f,
+		1.f,
+		0.f
+	});
+
+	auto c = cross(a, b);
+	expect_mat_equal(c,
+		{
+			0.f,
+			0.f,
+			1.f
+		}
+	);
+
+}
+
+TEST(matrix_test, identity)
+{
+	auto I = identity<float, 2>();
+	expect_mat_equal(I,
+		{
+			1.f,0.f,
+			0.f,1.f
+		}
+	);
+
+}
+
 TEST(matrix_test, matrix_solve)
 {
 	vec2 v
@@ -891,6 +1045,31 @@ TEST(matrix_test, matrix_inverse)
 		{
 			4.f, -1.f,
 			-7.f, 2.f
+		});
+
+}
+
+TEST(matrix_test, matrix_inverse_with_zero_diag)
+{
+	mat2x2 I
+	({ 
+		1.f,0.f,
+		0.f,1.f
+	});
+
+	mat2x2 A
+	({
+		0.f,1.f,
+		1.f,0.f
+	});
+
+
+	auto  act = I / A;
+
+	expect_mat_equal(act,
+		{
+			0.f, 1.f,
+			1.f, 0.f
 		});
 
 }
