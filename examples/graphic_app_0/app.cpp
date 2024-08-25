@@ -38,6 +38,14 @@ static void convert_from_sim_data(std::vector<T>& out, const std::vector<std::ar
 	}
 }
 
+void App::show_fps()
+{
+	m_sim_data_is_str = m_sim_data_is_valid ? "yes" : "no";
+	m.add_ui_component<ui_component::text_line>("sim_data_is_ready", m_sim_data_is_str);
+	m.add_ui_component<ui_component::text_line>("fps", m_fps);
+	m.add_ui_component<ui_component::text_line>("sim_fps", m_sim_fps);
+	m.add_ui_component<ui_component::text_line>("render_fps", m_render_fps);
+}
 
 void App::run()
 {
@@ -47,11 +55,6 @@ void App::run()
 
 	prepare_mesh();
 
-	m_sim_data_is_str = m_sim_data_is_valid ? "yes" : "no";
-	m.add_ui_component<ui_component::text_line>("sim_data_is_ready", m_sim_data_is_str);
-	m.add_ui_component<ui_component::text_line>("fps", m_fps);
-	m.add_ui_component<ui_component::text_line>("sim_fps", m_sim_fps);
-	m.add_ui_component<ui_component::text_line>("render_fps", m_render_fps);
 
 
 	init_sim();
@@ -101,6 +104,11 @@ void App::run()
 		{
 			fps_fn(animation_fn,m_sim_fps)();
 			fps_fn(render_fn,m_render_fps)();
+
+			m.clear_components();
+			show_fps();
+			connect_sim_ui();
+			connect_render_ui();
 		};
 
 	// update fn
@@ -125,10 +133,6 @@ void App::run()
 			return true;
 		});
 
-
-
-	connect_sim_ui();
-	connect_render_ui();
 
 	m.run_event_loop();
 
@@ -338,17 +342,21 @@ void App::init_sim_data()
 	sim.set<sim_lib::sim_data::obstacle_vert_index>(m_preset_fix_points);
 	sim.set<sim_lib::sim_data::obstacle_vert_pos>(m_preset_fix_points_pos);
 
-	std::vector<sim_lib::int2> sim_edges;
-	convert_to_sim_data(sim_edges, m_edges);
-	sim.set<sim_lib::sim_data::stretch_edges>(sim_edges);
-	sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>(sim_edges.size(), uniform_edge_stretch_stiff));
+	if (m_enable_edge_stretch_constraint)
+	{
+		std::vector<sim_lib::int2> sim_edges;
+		convert_to_sim_data(sim_edges, m_edges);
+		sim.set<sim_lib::sim_data::stretch_edges>(sim_edges);
+		sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>(sim_edges.size(), uniform_edge_stretch_stiff));
+	}
 
-	std::vector<int> stretch_t(sim_tris.size());
-	std::iota(stretch_t.begin(), stretch_t.end(),0);
-	sim.set<sim_lib::sim_data::stretch_triangles>(stretch_t);
-	sim.set<sim_lib::sim_data::stretch_triangles_stiff>(
-		std::vector<sim_lib::triangle_stretch_stiff>(stretch_t.size(), uniform_triangle_stretch_stiff)
-	);
+	if (m_enable_face_stretch_constraint)
+	{
+		std::vector<int> stretch_t(sim_tris.size());
+		std::iota(stretch_t.begin(), stretch_t.end(), 0);
+		sim.set<sim_lib::sim_data::stretch_triangles>(stretch_t);
+		sim.set<sim_lib::sim_data::stretch_triangles_stiff>(std::vector<sim_lib::triangle_stretch_stiff>(stretch_t.size(), uniform_triangle_stretch_stiff));
+	}
 
 }
 
@@ -411,30 +419,81 @@ void App::connect_sim_ui()
 		}
 	);
 
-	m.add_ui_component<ui_component::input_float>("stetch_edge_stiff", uniform_edge_stretch_stiff, {0.000,1e6f},
+	m.add_ui_component<ui_component::check_box>("enable_edge_stretch_constraint", m_enable_edge_stretch_constraint, {},
+		[&,this](const auto& new_v)
+		{
+			m_enable_edge_stretch_constraint = new_v;
+
+			if (m_enable_edge_stretch_constraint)
+			{
+				std::vector<sim_lib::int2> sim_edges;
+				convert_to_sim_data(sim_edges, m_edges);
+				sim.set<sim_lib::sim_data::stretch_edges>(sim_edges);
+				sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>(m_edges.size() / 2, uniform_edge_stretch_stiff));
+			}
+			else
+			{
+				sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>{});
+				sim.set<sim_lib::sim_data::stretch_edges>(std::vector<sim_lib::int2>{});
+			}
+			sim.commit_all_changes();
+		}
+	);
+
+	m.add_ui_component<ui_component::input_float>("stetch_edge_stiff", uniform_edge_stretch_stiff, { 0.000,1e6f },
 		[this](const auto& new_v)
 		{
-			sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>(m_edges.size()/2, new_v));
+			if (m_enable_edge_stretch_constraint)
+			{
+				sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>(m_edges.size() / 2, uniform_edge_stretch_stiff));
+				sim.commit_all_changes();
+			}
+		}
+	);
 
-			sim_lib::triangle_stretch_stiff new_trinagle_stiff = { new_v,new_v,new_v,new_v };
 
-			sim.set<sim_lib::sim_data::stretch_triangles_stiff>(
-				std::vector<sim_lib::triangle_stretch_stiff>(indices.size() / 3, new_trinagle_stiff)
-			);
+
+	m.add_ui_component<ui_component::check_box>("enable_face_stretch_constraint", m_enable_face_stretch_constraint, {},
+		[&,this](const auto& new_v)
+		{
+			m_enable_face_stretch_constraint = new_v;
+			if (m_enable_face_stretch_constraint)
+			{
+				std::vector<int> stretch_t(indices.size() / 3);
+				std::iota(stretch_t.begin(), stretch_t.end(), 0);
+				sim.set<sim_lib::sim_data::stretch_triangles>(stretch_t);
+				sim.set<sim_lib::sim_data::stretch_triangles_stiff>(std::vector<sim_lib::triangle_stretch_stiff>(stretch_t.size(), uniform_triangle_stretch_stiff));
+			}
+			else
+			{
+				sim.set<sim_lib::sim_data::stretch_triangles>(std::vector<int>{});
+				sim.set<sim_lib::sim_data::stretch_triangles_stiff>(std::vector<sim_lib::triangle_stretch_stiff>());
+			}
 
 			sim.commit_all_changes();
 		}
 	);
 
-//	m.add_ui_component<ui_component::slider_bar>("stretch stiff", sim.get<sim_lib::sim_data::stretch_stiff>(), {0.0001,1.f},
-//		[this](const auto& new_v)
-//		{
-//			sim.mark_changed<sim_lib::sim_data::stretch_stiff>();
-//			m_sim_data_is_valid = sim.commit_all_changes();
-//		}
-//	);
+	m.add_ui_component<ui_component::input_float>("stetch_face_stiff", uniform_edge_stretch_stiff, { 0.000,1e6f },
+		[this](const auto& new_v)
+		{
+			if (m_enable_face_stretch_constraint)
+			{
+				sim_lib::triangle_stretch_stiff new_trinagle_stiff = { new_v,new_v,new_v,new_v };
+
+				sim.set<sim_lib::sim_data::stretch_triangles_stiff>(
+					std::vector<sim_lib::triangle_stretch_stiff>(indices.size() / 3, new_trinagle_stiff)
+				);
+
+				sim.commit_all_changes();
+
+			}
+		}
+	);
+
 
 }
+
 
 void App::connect_render_ui()
 {

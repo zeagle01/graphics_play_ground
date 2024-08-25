@@ -160,28 +160,27 @@ namespace sim_lib
 
 		void assemble_stretch()
 		{
-			////edge stretch
-			//{
-			//	const auto& pos = m_datas.get_ref<var::positions>();
-			//	const auto& edges = m_datas.get_ref<var::stretch_edges>();
-			//	const auto& edge_lengths = m_datas.get_ref<var::edge_lengths>();
-			//	const auto& stretch_edges_stiff = m_datas.get_ref<var::stretch_edges_stiff>();
-			//	auto add_stretch_edge_constraint = [&](auto lhs, auto rhs, int ei)
-			//		{
-			//			int v0 = edges[ei][0];
-			//			int v1 = edges[ei][1];
+			//edge stretch
+			{
+				const auto& pos = m_datas.get_ref<var::positions>();
+				const auto& edges = m_datas.get_ref<var::stretch_edges>();
+				const auto& edge_lengths = m_datas.get_ref<var::edge_lengths>();
+				const auto& stretch_edges_stiff = m_datas.get_ref<var::stretch_edges_stiff>();
+				auto add_stretch_edge_constraint = [&](auto lhs, auto rhs, int ei)
+					{
+						int v0 = edges[ei][0];
+						int v1 = edges[ei][1];
 
-			//			mat3x2f X = matrix_math::from_columns(pos[v0], pos[v1]);
+						mat3x2f X = matrix_math::from_columns(pos[v0], pos[v1]);
 
-			//			edge_stretch::compute_elemnt(lhs, rhs, X, stretch_edges_stiff[ei], edge_lengths[ei]);
-			//		};
+						edge_stretch::compute_elemnt(lhs, rhs, X, stretch_edges_stiff[ei], edge_lengths[ei]);
+					};
 
-			//	auto edge_loop = m_linear_system.get_write_loop(edges.size(), [&](int ei) { return std::vector<int>{ edges[ei][0], edges[ei][1] }; });
-			//	edge_loop(add_stretch_edge_constraint);
+				auto edge_loop = m_linear_system.get_write_loop(edges.size(), [&](int ei) { return std::vector<int>{ edges[ei][0], edges[ei][1] }; });
+				edge_loop(add_stretch_edge_constraint);
 
-			//}
+			}
 
-			//return;
 
 			//face stretch
 			{

@@ -24,6 +24,7 @@ private:
 private:
 	void connect_sim_ui();
 	void connect_render_ui();
+	void show_fps();
 
 private:
 	void pick(int x, int y);
@@ -61,6 +62,10 @@ private:
 	std::vector<float3> m_preset_fix_points_pos;
 	std::vector<int> m_current_fix_points;
 	std::vector<float3> m_current_fix_points_pos;
+
+private:
+	bool m_enable_edge_stretch_constraint = false;
+	bool m_enable_face_stretch_constraint = true;
 
 private:
 	bool m_enable_fill = true;

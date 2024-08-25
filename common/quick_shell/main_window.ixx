@@ -43,6 +43,7 @@ namespace quick_shell
 		void run_event_loop();
 		void register_frame_update_fn(std::function<void()> frame_update_fn);
 		void register_frame_update_fn(std::function<void(int, int)> frame_update_fn);
+		void clear_components();
 
 		template<typename concrete_event>
 		void register_event_fn(std::function<bool(const concrete_event&)> event_fn)

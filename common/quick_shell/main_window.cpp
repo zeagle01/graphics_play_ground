@@ -36,6 +36,11 @@ namespace quick_shell
 		m_glfwWrapper.register_frame_update_fn(frame_update_fn);
 	}
 
+	void main_window::clear_components()
+	{
+		m_ui_panel.clear();
+	}
+
 
 	//renderer
 	void renderer::draw_triangles(int* indices, float* pos, int tNum, int vNum)
@@ -57,4 +62,5 @@ namespace quick_shell
 	{
 		m_render_imp.draw_points(pos, vNum);
 	}
+
 }

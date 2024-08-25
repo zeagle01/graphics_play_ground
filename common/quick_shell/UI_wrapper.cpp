@@ -35,6 +35,10 @@ namespace quick_shell
 			m_connects.push_back(ui_com_obj);
 		}
 
+		void clear()
+		{
+			m_connects.clear();
+		}
 
 		void upate_ui_data()
 		{
