@@ -291,7 +291,7 @@ namespace matrix_math
 					matrix<T, N - 1, N - 1>	 S = matrix_math::submatrix<N - 1, N - 1>(A, 1, 1) - L10 * U01;
 					auto LU11 = matrix_math::submatrix<N - 1, N - 1>(LU, 1, 1);
 
-					LU_decompose(LU11, permutation, S);
+					LU_decompose(LU11, permutation + 1, S);
 
 				}
 
