@@ -23,12 +23,7 @@ namespace sim_lib
 		{
 			float inertial_h = mass / dt / dt;
 
-			mat3x3f I
-			({
-				1.f,0.f,0.f,
-				0.f ,1.f,0.f,
-				0.f,0.f,1.f
-			});
+			mat3x3f I = matrix_math::identity<float, 3>();
 
 			lhs(0, 0) = inertial_h * I;
 			rhs(0) = mass * gravity_accelaration + inertial_h * (dt * velocity);
@@ -53,12 +48,7 @@ namespace sim_lib
 
 			auto stretch_f = -stiff * (l - edge_length) * n;
 
-			mat3x3f I
-			({
-				1.f,0.f,0.f,
-				0.f ,1.f,0.f,
-				0.f,0.f,1.f
-			});
+			mat3x3f I = matrix_math::identity<float, 3>();
 
 			for (int i = 0; i < 2; i++)
 			{
@@ -69,13 +59,6 @@ namespace sim_lib
 					lhs(i, j) += w(i) * w(j) * stiff * I;
 				}
 			}
-
-//			rhs(1) += w(1) * stretch_f;
-//
-//			lhs(1, 1) += w(1) * w(1) * stiff;
-//
-//			lhs(0, 1) += w(0) * w(1) * stiff;
-//			lhs(1, 0) += w(1) * w(0) * stiff;
 		}
 
 	};

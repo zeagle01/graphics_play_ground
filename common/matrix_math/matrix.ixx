@@ -222,6 +222,7 @@ namespace matrix_math
 
 		struct LU_solver
 		{
+		private:
 			template< matrix_imp::matrix_like m_t >
 			static void swap_row(m_t& A, int i, int j, int* permutation)
 			{
@@ -263,7 +264,7 @@ namespace matrix_math
 				using T = std::decay_t<m0_t>::type;
 				static_assert(R1 == C1); //square
 				constexpr int N = R1;
-				
+
 				if constexpr (N == 1)
 				{
 					LU = A;
@@ -362,6 +363,7 @@ namespace matrix_math
 				return X;
 			}
 
+		public:
 			template< matrix_imp::matrix_like m0_t, matrix_imp::matrix_like m1_t>
 			static auto LU_inverse(const m0_t& B, const m1_t& A)
 			{
