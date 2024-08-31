@@ -123,7 +123,7 @@ namespace sim_lib
 
 					auto n = dx / l;
 
-					auto nnT = n * transpose(n);
+					mat3x3f nnT = n * transpose(n);
 
 					for (int i = 0; i < 3; i++)
 					{
