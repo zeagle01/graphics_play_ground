@@ -65,12 +65,15 @@ namespace geometry
 
 		}
 
-		AABB& operator+(const AABB& other)
+		friend AABB operator+(const AABB& l,const AABB& r)
 		{
-			(*this) += other.upper;
-			(*this) += other.lower;
-
-			return *this;
+			AABB ret;
+			for (int i = 0; i < N; i++)
+			{
+				ret.upper(i) = std::max(l.upper(i), r.upper(i));
+				ret.lower(i) = std::min(l.lower(i), r.lower(i));
+			}
+			return ret;
 		}
 
 		bool intersect(const AABB& other) const

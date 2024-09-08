@@ -165,7 +165,7 @@ namespace matrix_math
 	public:
 		void solve(const linear_system<mat_type, vec_type>& linear_systems, std::vector<vec_type>& x)
 		{
-			int max_it = 30;
+			int max_it = 50;
 			for (int it = 0; it < max_it; it++)
 			{
 				std::vector<vec_type>  Ax(x.size());
