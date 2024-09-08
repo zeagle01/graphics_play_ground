@@ -62,6 +62,16 @@ namespace geometry
 				lower(i) = std::min(point(i), lower(i));
 			}
 			return *this;
+		}
+
+		AABB& operator+=(const AABB& other_box)
+		{
+			for (int i = 0; i < N; i++)
+			{
+				upper(i) = std::max(other_box.upper(i), upper(i));
+				lower(i) = std::min(other_box.lower(i), lower(i));
+			}
+			return *this;
 
 		}
 
@@ -89,6 +99,16 @@ namespace geometry
 			}
 
 			return ret;
+		}
+
+		vec get_upper() const
+		{
+			return upper;
+		}
+
+		vec get_lower() const
+		{
+			return lower;
 		}
 
 		friend auto operator<=>(const AABB& l, const AABB& r) = default;

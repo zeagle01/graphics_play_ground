@@ -6,149 +6,50 @@ module;
 #include <functional>
 #include <algorithm>
 #include <bit>
+#include <array>
+#include <vector>
 
 export module geometry_lib: bvh;
-
-import :bvh_imp;
 
 import matrix_math;
 
 namespace geometry
 {
 
-	export using geometry::node;
-	export using geometry::node_type;
-
-	export 
-	class bvh
+	export
+	struct z_order_key
 	{
 	public:
-
-		template<typename vec>
-		void build(std::span<const vec> rep_points)
+		unsigned int operator()(float x, float y, float z)
 		{
-			imp.build(rep_points);
-		}
-
-		void traverse_bottom_up(const node& p_node, std::function<bool(const node& curr, const node& left, const node& right)> node_fn) const 
-		{
-			imp.traverse_bottom_up(p_node, node_fn);
-		}
-
-		void traverse_top_down(const node& p_node, std::function<bool(const node& curr, const node& left, const node& right)> node_fn) const 
-		{
-			imp.traverse_top_down(p_node, node_fn);
-		}
-
-	private:
-		bvh_imp imp;
-	};
-
-
-	export 
-	template<typename AABB>
-	class bvh_traverser
-	{
-	public:
-		void traverse_top_down(const bvh& p_bvh, std::span<const AABB> aabbs, std::function<bool(const AABB&)> internal_fn, std::function<void(int)> leaf_fn, bool update_aabb = true)
-		{
-			if (update_aabb)
-			{
-				update_iternal_box(p_bvh, aabbs);
-			}
-
-			auto get_aabb = [&](const auto& n)
-				{
-					if (n.type == geometry::node_type::leaf)
-					{
-						return aabbs[n.index];
-					}
-					else
-					{
-						return m_internal_AABB[n.index];
-					}
-				};
-
-			auto culled_fn = [&](const auto& curr, const auto& l, const auto& r)
-				{
-					if (curr.type == node_type::inner)
-					{
-						return internal_fn(get_aabb(curr));
-					}
-					else
-					{
-						if (internal_fn(get_aabb(curr)))
-						{
-							leaf_fn(curr.index);
-						}
-						return false;
-					}
-				};
-
-			p_bvh.traverse_top_down({ 0,node_type::inner }, culled_fn);
-		}
-
-		const std::vector<AABB>& get_internal_AABB() const
-		{
-			return m_internal_AABB;
-		}
-	private:
-
-		void update_iternal_box(const bvh& p_bvh, std::span<const AABB> aabbs)
-		{
-
-			std::vector<bool> is_accessed(aabbs.size() - 1);
-			m_internal_AABB.resize(aabbs.size() - 1);
-
-			auto get_aabb = [&](const auto& n)
-				{
-					if (n.type == geometry::node_type::leaf)
-					{
-						return aabbs[n.index];
-					}
-					else
-					{
-						return m_internal_AABB[n.index];
-					}
-				};
-
-			auto is_handled = [&](const auto& p_node)
-				{
-					return (p_node.type == geometry::node_type::inner && is_accessed[p_node.index])
-						|| p_node.type == geometry::node_type::leaf;
-
-				};
-
-			auto build_iternal_aabb = [&](const auto& curr, const auto& l, const auto& r)
-				{
-					if (curr.type == geometry::node_type::inner)
-					{
-						if ((!is_handled(curr)) && is_handled(l) && is_handled(r))
-						{
-							m_internal_AABB[curr.index] = get_aabb(l) + get_aabb(r);
-							is_accessed[curr.index] = true;
-						}
-						else
-						{
-							return false;
-						}
-
-					}
-
-					return true;
-				};
-
-			for (int i = 0; i < aabbs.size() - 1; i++)
-			{
-				p_bvh.traverse_bottom_up({ i,geometry::node_type::inner }, build_iternal_aabb);
-			}
-
-			m_internal_AABB.shrink_to_fit();
+			return morton_3D(x, y, z);
 		}
 
 	private:
 
-		std::vector<AABB> m_internal_AABB;
+		// Expands a 10-bit integer into 30 bits
+		// by inserting 2 zeros after each bit.
+		unsigned int expand_bits(unsigned int v)
+		{
+			v = (v * 0x00010001u) & 0xFF0000FFu;
+			v = (v * 0x00000101u) & 0x0F00F00Fu;
+			v = (v * 0x00000011u) & 0xC30C30C3u;
+			v = (v * 0x00000005u) & 0x49249249u;
+			return v;
+		}
+
+		// Calculates a 30-bit Morton code for the
+		// given 3D point located within the unit cube [0,1].
+		unsigned int morton_3D(float x, float y, float z)
+		{
+			x = std::min(std::max(x * 1024.0f, 0.0f), 1023.0f);
+			y = std::min(std::max(y * 1024.0f, 0.0f), 1023.0f);
+			z = std::min(std::max(z * 1024.0f, 0.0f), 1023.0f);
+			unsigned int xx = expand_bits((unsigned int)x);
+			unsigned int yy = expand_bits((unsigned int)y);
+			unsigned int zz = expand_bits((unsigned int)z);
+			return xx * 4 + yy * 2 + zz;
+		}
 	};
 
 
@@ -245,6 +146,7 @@ namespace geometry
 		void compute_order_key(std::vector<key_index>& records, std::span<const vec> rep_points)
 		{
 			records.resize(rep_points.size());
+
 			for (int i = 0; i < rep_points.size(); i++)
 			{
 				auto key = m_order_key_fn(rep_points[i]);
@@ -318,7 +220,7 @@ namespace geometry
 
 			while (true)
 			{
-				if (upper_bound == 1)
+				if (upper_bound <= 1)
 				{
 					break;
 				}

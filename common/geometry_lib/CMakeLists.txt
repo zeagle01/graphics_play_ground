@@ -16,7 +16,6 @@ target_sources(geometry_lib PUBLIC
 	geometry_lib.ixx  ## main module definition
 	bvh.ixx  
 	aabb.ixx  
-	bvh.cpp
 )
 
 ### moduel support end
