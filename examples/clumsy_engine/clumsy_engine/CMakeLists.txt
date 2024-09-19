@@ -147,10 +147,7 @@ ${include_files}
 ${source_files}
 )
 
-
 set_target_properties(clumsy_engine PROPERTIES FOLDER examples/clumsy_engine)
-
-
 
 
 target_compile_features(clumsy_engine PRIVATE cxx_std_20)
@@ -200,17 +197,18 @@ target_link_libraries(clumsy_engine PUBLIC clumsy_lib)
 target_link_libraries(clumsy_engine PUBLIC my_stb)
 
 ########## cuda
-include(FindCUDAToolkit)
+find_package(CUDAToolkit REQUIRED)
 if(CUDAToolkit_FOUND)
-	message("CUDAToolkit_BIN_DIR: ${CUDAToolkit_BIN_DIR}")
-	message("CUDAToolkit_INCLUDE_DIRS: ${CUDAToolkit_INCLUDE_DIRS}")
-	message("CUDAToolkit_LIBRARY_DIR: ${CUDAToolkit_LIBRARY_DIR}")
-	message("CUDAToolkit_TARGET_DIR: ${CUDAToolkit_TARGET_DIR}")
-	message("CUDAToolkit_NVCC_EXECUTABLE: ${CUDAToolkit_NVCC_EXECUTABLE}")
+	message("---- CUDAToolkit_BIN_DIR: ${CUDAToolkit_BIN_DIR}")
+	message("---- CUDAToolkit_INCLUDE_DIRS: ${CUDAToolkit_INCLUDE_DIRS}")
+	message("---- CUDAToolkit_LIBRARY_DIR: ${CUDAToolkit_LIBRARY_DIR}")
+	message("---- CUDAToolkit_TARGET_DIR: ${CUDAToolkit_TARGET_DIR}")
+	message("---- CUDAToolkit_NVCC_EXECUTABLE: ${CUDAToolkit_NVCC_EXECUTABLE}")
 
 	enable_language(CUDA)
+else()
+	message("-------- can't find cuda'")
 endif()
-
 
 
 include(GNUInstallDirs)
