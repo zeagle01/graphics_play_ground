@@ -179,7 +179,7 @@ namespace soft_render
 			template< typename F, typename ...P>
 			static void apply(P&&...p)
 			{
-				(typename F::template apply<TP>(std::forward<P>(p)...), ...);
+				(F::template apply<TP>(std::forward<P>(p)...), ...);
 			}
 		};
 

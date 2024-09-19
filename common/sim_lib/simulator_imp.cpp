@@ -420,7 +420,7 @@ namespace sim_lib
 			{
 				if constexpr (requires {typename U::validator; })
 				{
-					if constexpr (std::is_same_v<U::validator, clumsy_lib::type_list<>>)
+					if constexpr (std::is_same_v<typename U::validator, clumsy_lib::type_list<>>)
 					{
 						return clumsy_lib::type_list<>{};
 					}

@@ -146,7 +146,7 @@ namespace soft_render
 			template< typename F, typename ...P>
 			static void apply(type_map& tm, P&&...p)
 			{
-				(typename F::template apply<TP>(tm.get_ref<TP>(), std::forward<P>(p)...), ...);
+				(F::template apply<TP>(tm.get_ref<TP>(), std::forward<P>(p)...), ...);
 			}
 		};
 

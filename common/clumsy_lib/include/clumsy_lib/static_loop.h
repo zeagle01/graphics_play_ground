@@ -16,7 +16,7 @@ namespace clumsy_lib
 		template< typename F, typename ...P>
 		static void apply(P&&...p)
 		{
-			(typename F::template apply<TP>(std::forward<P>(p)...), ...);
+			(F::template apply<TP>(std::forward<P>(p)...), ...);
 		}
 	};
 
@@ -31,7 +31,7 @@ namespace clumsy_lib
 		template<typename F, typename ...P>
 		static void apply(P&&...p)
 		{
-			((typename F:: template apply<N>(std::forward<P>(p)...)), ...);
+			((F:: template apply<N>(std::forward<P>(p)...)), ...);
 		}
 	};
 
