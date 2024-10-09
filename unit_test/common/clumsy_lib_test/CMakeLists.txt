@@ -20,6 +20,7 @@ add_executable(clumsy_lib_test
 	dependent_propagator_test.cpp
 	literal_value_test.cpp
 	dispatchor_test.cpp
+	enum_tagged_morphysm_test.cpp
 )
 
 

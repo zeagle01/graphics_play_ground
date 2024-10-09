@@ -21,6 +21,7 @@ add_library(clumsy_lib STATIC
 	include/clumsy_lib/morphysm.h
 	include/clumsy_lib/type_getter.h
 	include/clumsy_lib/weak_ptr.h
+	include/clumsy_lib/enum_tagged_morphysm.h
 	clumsy_lib.cpp
 )
 
@@ -45,7 +46,8 @@ target_sources(clumsy_lib PUBLIC
 	literal_value.ixx
 	static_dep_graph.ixx
 	dispatchor.ixx
+	enum_tagged_morphysm.ixx
 )
 
 
-### moduel support end
+target_link_libraries(clumsy_lib PRIVATE my_magic_enum)
