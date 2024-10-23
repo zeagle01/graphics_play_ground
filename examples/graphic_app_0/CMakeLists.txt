@@ -12,10 +12,16 @@ add_executable(graphic_app_0
 	mouse_picker.cpp
 )
 
+target_sources(graphic_app_0 PUBLIC
+    FILE_SET CXX_MODULES FILES
+	app.ixx
+	plane_maker.ixx
+	simulation_layer.ixx
+)
+
 set_target_properties(graphic_app_0 PROPERTIES FOLDER examples)
 
 target_compile_features(graphic_app_0 PRIVATE cxx_std_20)
-
 
 target_link_libraries(graphic_app_0 PRIVATE quick_shell)
 

@@ -9,6 +9,7 @@
 
 import quick_shell;
 import sim_lib;
+import app;
 
 
 class App
@@ -31,9 +32,12 @@ private:
 	void drag(int x, int y);
 	void release_pick();
 
+	//plane maker
 private:
 	void make_plane(float lx, float ly, int nx, int ny);
+	plane_maker m_plane_maker;
 
+	//mouse picker
 private:
 	mouse_picker m_mouse_picker;
 
@@ -41,6 +45,7 @@ private:
 	struct mouse_ray { std::array<float, 3> p, dir; };
 	mouse_ray m_mouse_ray;
 
+	//simulator
 private:
 	std::vector< int> indices;
 	std::vector< int> m_edges;
