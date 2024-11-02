@@ -47,20 +47,13 @@ void App::show_fps()
 	m.add_ui_component<ui_component::text_line>("render_fps", m_render_fps);
 }
 
-void App::run()
+
+struct App::FPS_wrapper
 {
-
-	m.init(800, 600);
-
-	auto& renderer = m.get_renderer();
-
-	prepare_mesh();
-
-	init_sim();
-
-	auto fps_fn = [&](auto fn, std::string& fps)
-		{
-			return [&,fn] {
+	static auto apply(auto fn, std::string& fps)
+	{
+		return [&, fn]
+			{
 				auto b = std::chrono::high_resolution_clock::now();
 
 				fn();
@@ -72,66 +65,90 @@ void App::run()
 
 				fps = ss.str();
 			};
-		};
+	}
+};
 
-	auto animation_fn = [&]()
-		{
-			m_sim_data_is_valid = sim.step();
 
-			if (m_sim_data_is_valid)
-			{
-				convert_from_sim_data(pos, sim.get<sim_lib::sim_data::positions>());
-			}
-		};
+void App::render()
+{
+	auto& renderer = m.get_renderer();
+	renderer.draw_triangles(indices.data(), pos.data(), indices.size() / 3, pos.size() / 3);
 
-	//m.register_frame_update_fn(animation_fn);
+	if (m_picked.t_index != -1)
+	{
+		int t = m_picked.t_index;
+		renderer.draw_points(m_mouse_ray.p.data(), 1);
+	}
 
-	auto render_fn = [&]
-		{
-			renderer.draw_triangles(indices.data(), pos.data(), indices.size() / 3, pos.size() / 3);
+	renderer.draw_points(m_current_fix_points_pos.front().data(), m_current_fix_points.size());
 
-			if (m_picked.t_index != -1)
-			{
-				int t = m_picked.t_index;
-				renderer.draw_points(m_mouse_ray.p.data(), 1);
-			}
+}
 
-			renderer.draw_points(m_current_fix_points_pos.front().data(), m_current_fix_points.size());
-		};
+		
+void App::animate()
+{
+	m_sim_data_is_valid = sim.step();
 
-	auto update_fn = [&]
-		{
-			fps_fn(animation_fn,m_sim_fps)();
-			fps_fn(render_fn,m_render_fps)();
+	if (m_sim_data_is_valid)
+	{
+		convert_from_sim_data(pos, sim.get<sim_lib::sim_data::positions>());
+	}
+}
 
-			m.clear_components();
-			show_fps();
-			connect_sim_ui();
-			connect_render_ui();
-		};
+void App::update()
+{
+	FPS_wrapper::apply([this]() { animate(); }, m_sim_fps)();
+	FPS_wrapper::apply([this]() { render(); }, m_render_fps)();
 
+	m.clear_components();
+	show_fps();
+	connect_sim_ui();
+	connect_render_ui();
+
+}
+
+void App::register_update_fn()
+{
 	// update fn
-	m.register_frame_update_fn(fps_fn(update_fn,m_fps));
+	m.register_frame_update_fn(FPS_wrapper::apply([this]() { update(); }, m_fps));
+}
 
+void App::register_event_fn()
+{
 	//event fn
-	m.register_event_fn<mouse_pressed>([this](const auto& e) 
+	m.register_event_fn<mouse_pressed>([this](const auto& e)
 		{
 			pick(e.x, e.y);
 			return true;
 		});
 
-	m.register_event_fn<mouse_moved>([this](const auto& e) 
+	m.register_event_fn<mouse_moved>([this](const auto& e)
 		{
 			drag(e.x, e.y);
 			return true;
 		});
 
-	m.register_event_fn<mouse_released>([this](const auto& e) 
+	m.register_event_fn<mouse_released>([this](const auto& e)
 		{
 			release_pick();
 			return true;
 		});
 
+
+}
+
+void App::run()
+{
+
+	m.init(800, 600);
+
+	prepare_mesh();
+
+	init_sim();
+
+	register_update_fn();
+
+	register_event_fn();
 
 	m.run_event_loop();
 

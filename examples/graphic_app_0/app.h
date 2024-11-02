@@ -18,9 +18,20 @@ public:
 	void run();
 
 private:
+	void register_update_fn();
+	void register_event_fn();
+
+private:
 	void prepare_mesh();
 	void init_sim();
 	void init_sim_data();
+
+private:
+	struct FPS_wrapper;
+private:
+	void update();
+	void render();
+	void animate();
 
 private:
 	void connect_sim_ui();

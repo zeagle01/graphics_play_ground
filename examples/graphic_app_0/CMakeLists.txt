@@ -16,7 +16,6 @@ target_sources(graphic_app_0 PUBLIC
     FILE_SET CXX_MODULES FILES
 	app.ixx
 	plane_maker.ixx
-	simulation_layer.ixx
 )
 
 set_target_properties(graphic_app_0 PROPERTIES FOLDER examples)
