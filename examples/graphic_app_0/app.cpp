@@ -68,9 +68,15 @@ struct App::FPS_wrapper
 	}
 };
 
+bool App::make_scene()
+{
+	return m_plane_maker.make_plane(indices, m_edges, pos, pos_2d, m);
+}
 
 void App::render()
 {
+	connect_render_ui();
+
 	auto& renderer = m.get_renderer();
 	renderer.draw_triangles(indices.data(), pos.data(), indices.size() / 3, pos.size() / 3);
 
@@ -85,8 +91,19 @@ void App::render()
 }
 
 		
-void App::animate()
+void App::animate(bool geometry_changed)
 {
+
+	if (geometry_changed)
+	{
+		init_sim_data();
+		sim.commit_all_changes();
+	}
+	else
+	{
+		connect_sim_ui();
+	}
+
 	m_sim_data_is_valid = sim.step();
 
 	if (m_sim_data_is_valid)
@@ -97,14 +114,12 @@ void App::animate()
 
 void App::update()
 {
-	FPS_wrapper::apply([this]() { animate(); }, m_sim_fps)();
-	FPS_wrapper::apply([this]() { render(); }, m_render_fps)();
-
 	m.clear_components();
 	show_fps();
-	connect_sim_ui();
-	connect_render_ui();
 
+	bool geometry_changed = make_scene();
+	FPS_wrapper::apply([this, geometry_changed]() { animate(geometry_changed); }, m_sim_fps)();
+	FPS_wrapper::apply([this]() { render(); }, m_render_fps)();
 }
 
 void App::register_update_fn()
@@ -140,11 +155,7 @@ void App::register_event_fn()
 void App::run()
 {
 
-	m.init(800, 600);
-
-	prepare_mesh();
-
-	init_sim();
+	init();
 
 	register_update_fn();
 
@@ -244,30 +255,7 @@ void App::release_pick()
 	sim.commit_all_changes();
 }
 
-void App::make_plane(float lx, float ly, int nx, int ny)
-{
-	m_plane_maker.make_plane(
-		 indices,
-		 m_edges,
-		 pos,
-		 pos_2d,
-		lx, ly, nx, ny
-	);
-}
 
-void App::prepare_mesh()
-{
-
-	 indices = { 0,1,2 };
-	 pos = {
-		0.f,0.f,0.f,
-		1.f,0.f,0.f,
-		1.f,1.f,0.f
-	};
-
-	 make_plane(m_plane_size[0], m_plane_size[1], m_plane_resolution[0], m_plane_resolution[1]);
-
-}
 
 void App::init_sim_data()
 {
@@ -318,38 +306,16 @@ void App::init_sim_data()
 
 }
 
-void App::init_sim()
+void App::init()
 {
+	m.init(800, 600);
+
 	sim.init();
-
-	init_sim_data();
-
-	sim.commit_all_changes();
 }
+
 
 void App::connect_sim_ui()
 {
-
-	m.add_ui_component<ui_component::text_line>("draping plane");
-
-	m.add_ui_component<ui_component::slider_bar2>("plane_size", m_plane_size, { 0.1,1.5 },
-		[this](const auto& new_v)
-		{
-			make_plane(new_v[0], new_v[1], m_plane_resolution[0], m_plane_resolution[1]);
-			init_sim_data();
-			sim.commit_all_changes();
-		}
-	);
-
-	m.add_ui_component<ui_component::slider_bar2i>("plane_resolution", m_plane_resolution, { 2,200 },
-		[this](const auto& new_v)
-		{
-			make_plane(m_plane_size[0], m_plane_size[1], new_v[0], new_v[1]);
-			init_sim_data();
-			sim.commit_all_changes();
-		}
-
-	);
 
 	m.add_ui_component<ui_component::text_line>("simulator");
 

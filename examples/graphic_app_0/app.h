@@ -22,16 +22,18 @@ private:
 	void register_event_fn();
 
 private:
-	void prepare_mesh();
-	void init_sim();
+	void init();
 	void init_sim_data();
 
 private:
 	struct FPS_wrapper;
+
 private:
 	void update();
+private:
+	bool make_scene();
+	void animate(bool geometry_changed);
 	void render();
-	void animate();
 
 private:
 	void connect_sim_ui();
@@ -45,7 +47,6 @@ private:
 
 	//plane maker
 private:
-	void make_plane(float lx, float ly, int nx, int ny);
 	plane_maker m_plane_maker;
 
 	//mouse picker
