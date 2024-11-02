@@ -70,6 +70,9 @@ struct App::FPS_wrapper
 
 bool App::make_scene()
 {
+	m.add_ui_component_new<ui_component_new::combo_box>(m_scene_maker_type);
+
+	m_scene_maker.set(m_scene_maker_type);
 	return m_scene_maker->make(indices, m_edges, pos, pos_2d, m);
 }
 

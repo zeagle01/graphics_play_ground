@@ -2,6 +2,11 @@ module;
 
 #include "clumsy_lib/field_defines.h"
 
+//#include "imgui.h"
+//#include "imgui_impl_glfw.h"
+//#include "imgui_impl_opengl3.h"
+//#include "magic_enum/magic_enum.hpp"
+
 #include <string>
 #include <array>
 
@@ -40,7 +45,14 @@ namespace quick_shell
 		CE_ADD_NODE(input_float2,	CE_TYPE(arr2)			CE_FIELD(extra_data, range_f));
 		CE_ADD_NODE(input_float3,	CE_TYPE(arr3)			CE_FIELD(extra_data, range_f));
 
-
 		CE_ADD_NODE(text_line,		CE_TYPE(std::string)	CE_FIELD(extra_data, no_extra));
 	};
+
+	export struct ui_component_new
+	{
+		CE_ENTRY(check_box);
+		CE_ENTRY(combo_box);
+	};
+
 }
+

@@ -76,6 +76,11 @@ namespace quick_shell
 			m_ui_panel.add_ui_component<ui_com>(name, value, no_extra{}, nullptr);
 		}
 
+		template<typename  ui_com,typename ...P>
+		void add_ui_component_new(P&& ...p)
+		{
+			m_ui_panel.add_ui_component_new<ui_component_imp_new<ui_com>>(std::forward<P>(p)...);
+		}
 
 
 	private:

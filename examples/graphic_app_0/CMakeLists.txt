@@ -18,6 +18,7 @@ target_sources(graphic_app_0 PUBLIC
 	scene_maker.ixx
 	matrix_using.cpp
 	plane_maker.cpp
+	plane_stacker.cpp
 )
 
 set_target_properties(graphic_app_0 PROPERTIES FOLDER examples)

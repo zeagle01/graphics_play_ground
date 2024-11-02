@@ -46,3 +46,6 @@ target_link_libraries(quick_shell PRIVATE glad)
 
 ########## imgui
 target_link_libraries(quick_shell PRIVATE my_imgui)
+
+########## magic_enum
+target_link_libraries(quick_shell PRIVATE my_magic_enum)

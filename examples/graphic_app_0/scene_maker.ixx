@@ -17,6 +17,7 @@ using namespace quick_shell;
 export enum class scene_maker_type
 {
 	make_a_plane,
+	stack_planes
 };
 
 class scene_maker_interface;

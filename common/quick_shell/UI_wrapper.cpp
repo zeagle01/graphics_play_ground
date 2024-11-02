@@ -35,6 +35,17 @@ namespace quick_shell
 			m_connects.push_back(ui_com_obj);
 		}
 
+		template<typename  ui_com, typename ...P>
+		void add_ui_component_new(P&& ... p)
+		{
+			m_connects.push_back(
+				[&]()
+				{
+					ui_com::apply(std::forward<P>(p)...);
+				}
+			);
+		}
+
 		void clear()
 		{
 			m_connects.clear();

@@ -4,6 +4,7 @@ module;
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "magic_enum/magic_enum.hpp"
 
 #include <string>
 #include <functional>
@@ -85,5 +86,51 @@ DEF_UI_COMPONENT_IMP(ui_component::text_line,
 
 
 #undef DEF_UI_COMPONENT_IMP
+
+}
+
+namespace quick_shell
+{
+	template<typename ui_component>
+	struct ui_component_imp_new;
+
+	template<> struct ui_component_imp_new<ui_component_new::check_box>
+	{
+		static bool apply(bool& value, std::string& name)
+		{
+			return ImGui::Checkbox(name.c_str(), &value);
+		}
+	};
+
+	template<> struct ui_component_imp_new<ui_component_new::combo_box>
+	{
+		//TODO: make magic_enum get_names work
+		template<typename enum_type>
+		static bool apply(enum_type& value)
+		{
+
+			constexpr auto enums = magic_enum::enum_values<enum_type>();
+			static char const* c[enums.size()];
+			get_c_string_array<enum_type>(c);
+
+			//std::string name = std::string(magic_enum::enum_type_name<enum_type>());
+			return ImGui::Combo(__FUNCSIG__, reinterpret_cast<int*>(&value), c, enums.size());
+			//return true;
+		}
+	private:
+		template<typename enum_type >
+		static void get_c_string_array(char const** c)
+		{
+			constexpr auto enums = magic_enum::enum_values<enum_type>();
+			static std::array<std::string, enums.size()>  str;
+			for (int i = 0; i < enums.size(); i++)
+			{
+				//str[i] = std::string(magic_enum::enum_name(enums[i]));
+				str[i] = std::to_string(i);
+				c[i] = str[i].c_str();
+			}
+
+		}
+	};
 
 }
