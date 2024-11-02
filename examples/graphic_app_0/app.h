@@ -47,7 +47,7 @@ private:
 
 	//plane maker
 private:
-	plane_maker m_plane_maker;
+	scene_maker m_scene_maker;
 
 	//mouse picker
 private:

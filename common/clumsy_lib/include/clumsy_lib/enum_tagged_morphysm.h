@@ -20,3 +20,14 @@ public:																							\
 	{																							\
 		return std::make_shared<base_type::imp<enum_value>>();									\
 	}																							\
+
+
+#define CLUMSY_ENUM_TAGGED_MORPHYSM_IMP_DECLARE(base_type,enum_value)							\
+	template<> class base_type::imp<enum_value> : public  base_type								\
+
+
+#define CLUMSY_ENUM_TAGGED_MORPHYSM_IMP_REGISTER(base_type,enum_value)							\
+	template<> std::shared_ptr<base_type> base_type::create<enum_value>()						\
+	{																							\
+		return std::make_shared<base_type::imp<enum_value>>();									\
+	}																							\

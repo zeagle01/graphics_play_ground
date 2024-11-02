@@ -15,7 +15,9 @@ add_executable(graphic_app_0
 target_sources(graphic_app_0 PUBLIC
     FILE_SET CXX_MODULES FILES
 	app.ixx
-	plane_maker.ixx
+	scene_maker.ixx
+	matrix_using.cpp
+	plane_maker.cpp
 )
 
 set_target_properties(graphic_app_0 PROPERTIES FOLDER examples)
@@ -29,3 +31,5 @@ target_link_libraries(graphic_app_0 PRIVATE sim_lib)
 target_link_libraries(graphic_app_0 PRIVATE geometry_lib)
 
 target_link_libraries(graphic_app_0 PRIVATE matrix_math)
+
+target_link_libraries(graphic_app_0 PRIVATE clumsy_lib)

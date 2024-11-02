@@ -70,7 +70,7 @@ struct App::FPS_wrapper
 
 bool App::make_scene()
 {
-	return m_plane_maker.make_plane(indices, m_edges, pos, pos_2d, m);
+	return m_scene_maker->make(indices, m_edges, pos, pos_2d, m);
 }
 
 void App::render()
