@@ -18,7 +18,8 @@ namespace quick_shell
 
 		m_ui_fn = [this]() { m_ui_panel.upate_ui_data(); };
 
-		m_glfwWrapper.register_frame_update_fn([this]() {m_renderer.clear_screen(); });
+		m_glfwWrapper.register_frame_update_fn([this]() { this->clear_components(); });
+		m_glfwWrapper.register_frame_update_fn([this]() { m_renderer.clear_screen(); });
 	}
 
 	void main_window::run_event_loop()

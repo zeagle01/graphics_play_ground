@@ -146,4 +146,14 @@ namespace quick_shell
 		}
 	};
 
+	//TODO: not working
+	//template<> struct ui_component_imp_new<ui_component_new::input3>
+	//{
+	//	static bool apply(float* value, const std::string& name)
+	//	{
+
+	//		return ImGui::InputFloat(name.c_str(), value, 1e-2f, 1e-1f, "%f", ImGuiInputTextFlags_EnterReturnsTrue);
+	//	}
+	//};
+
 }

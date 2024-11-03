@@ -8,6 +8,7 @@ target_sources(rigid_body PUBLIC
     FILE_SET CXX_MODULES FILES
 	main.cpp
 	rigid_body_dynamic.ixx
+	helper.cpp
 )
 
 set_target_properties(rigid_body PROPERTIES FOLDER examples)
