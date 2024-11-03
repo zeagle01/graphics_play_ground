@@ -19,7 +19,7 @@ namespace quick_shell
 	{
 	public:
 
-		void draw_points(float* pos, int vNum)
+		void draw_points(const float* pos, int vNum)
 		{
 
 			create_shader_if_not_exsit();
@@ -42,7 +42,7 @@ namespace quick_shell
 		}
 
 
-		void draw_triangles(int* indices, float* pos, int tNum, int vNum)
+		void draw_triangles(const int* indices, const float* pos, int tNum, int vNum)
 		{
 
 			create_shader_if_not_exsit();

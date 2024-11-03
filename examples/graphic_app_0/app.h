@@ -7,9 +7,18 @@
 #include <array>
 #include "mouse_picker.h"
 
+
 import quick_shell;
 import sim_lib;
 import app;
+import matrix_math;
+
+
+using vec2f = matrix_math::matrix<float, 2, 1>;
+using vec3f = matrix_math::matrix<float, 3, 1>;
+
+using vec2i = matrix_math::matrix<int, 2, 1>;
+using vec3i = matrix_math::matrix<int, 3, 1>;
 
 
 class App
@@ -45,6 +54,11 @@ private:
 	void drag(int x, int y);
 	void release_pick();
 
+private:
+	struct convert_from_sim_data;
+	struct convert_to_sim_data;
+	struct as_buffer_ptr;
+
 	//plane maker
 private:
 	scene_maker m_scene_maker;
@@ -60,10 +74,10 @@ private:
 
 	//simulator
 private:
-	std::vector< int> indices;
-	std::vector< int> m_edges;
-	std::vector<float> pos;
-	std::vector<float> pos_2d;
+	std::vector<vec3i> indices;
+	std::vector<vec2i> m_edges;
+	std::vector<vec3f> pos;
+	std::vector<vec2f> pos_2d;
 
 	bool m_sim_data_is_valid = false;
 	std::string m_sim_data_is_str = "no";
@@ -72,7 +86,6 @@ private:
 	sim_lib::triangle_stretch_stiff uniform_triangle_stretch_stiff = { 1e2f,1e2f,1e2f,1e2f };
 
 private:
-	std::array<float, 2> m_plane_size{ 0.5f,0.5f };
 	std::array<int, 2> m_plane_resolution{ 10,10 };
 
 	using float3 = std::array<float, 3>;

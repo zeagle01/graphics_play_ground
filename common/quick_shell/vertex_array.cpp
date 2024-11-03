@@ -229,7 +229,7 @@ namespace quick_shell
 				glDeleteBuffers(1, &m_renderer_id);
 			}
 
-			void set_data(int* vertices, int size)
+			void set_data(const int* vertices, int size)
 			{
 				m_count = size;
 				bind();
@@ -310,7 +310,7 @@ namespace quick_shell
 			}
 		}
 
-		void set_index_buffer(int *indices, int size)
+		void set_index_buffer(const int *indices, int size)
 		{
 			bind();
 			m_index_buffer = std::make_unique<index_buffer>();

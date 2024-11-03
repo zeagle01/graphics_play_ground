@@ -9,6 +9,7 @@ module;
 module app:plane_stacker;
 
 import :scene_maker;
+import :matrix_using;
 
 import quick_shell;
 
@@ -19,10 +20,10 @@ CLUMSY_ENUM_TAGGED_MORPHYSM_IMP_DECLARE(scene_maker_interface, scene_maker_type:
 public:
 	bool make
 	(
-		std::vector< int>&indices,
-		std::vector<int>&m_edges,
-		std::vector<float>&pos,
-		std::vector<float>&pos_2d,
+		std::vector<vec3i>&indices,
+		std::vector<vec2i>&m_edges,
+		std::vector<vec3f>&pos,
+		std::vector<vec2f>&pos_2d,
 		quick_shell::main_window & m
 	) override
 	{
@@ -31,7 +32,7 @@ public:
 		bool changed = m_changed;
 		if (changed)
 		{
-			make_plane(indices, m_edges, pos, pos_2d, m_plane_size[0], m_plane_size[1], m_plane_resolution[0], m_plane_resolution[1]);
+			//make_plane(indices, m_edges, pos, pos_2d, m_plane_size[0], m_plane_size[1], m_plane_resolution[0], m_plane_resolution[1]);
 		}
 		m_changed = false;
 		return changed;
@@ -138,7 +139,9 @@ private:
 private:
 	std::array<float, 2> m_plane_size{ 0.5f,0.5f };
 	std::array<int, 2> m_plane_resolution{ 10,10 };
-	bool m_changed=true;
+	bool m_changed = true;
+
+	int m_layers = 1;
 
 };
 

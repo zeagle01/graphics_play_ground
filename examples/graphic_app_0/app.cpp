@@ -8,35 +8,52 @@
 
 using namespace quick_shell;
 
-template<typename T,int N>
-static void convert_to_sim_data(std::vector<std::array<T, N>>& out, const std::vector<T>& in)
+struct App::convert_to_sim_data
 {
-	int eNum = in.size()/N;
-	out.resize(eNum);
-
-	for (int i = 0; i < eNum; i++)
+	template<typename T, int N>
+	static void apply(std::vector<std::array<T, N>>& out, const std::vector < matrix_math::matrix<T, N, 1>>& in)
 	{
-		for (int j = 0; j < N; j++)
+		int eNum = in.size() ;
+		out.resize(eNum);
+
+		for (int i = 0; i < eNum; i++)
 		{
-			out[i][j] = in[i * N + j];
+			for (int j = 0; j < N; j++)
+			{
+				out[i][j] = in[i](j);
+			}
 		}
 	}
-}
+};
 
-template<typename T,int N>
-static void convert_from_sim_data(std::vector<T>& out, const std::vector<std::array<T, N>>& in)
+struct App::convert_from_sim_data
 {
-	int eNum = in.size();
-	out.resize(eNum * N);
-
-	for (int i = 0; i < eNum; i++)
+	template<typename T, int N>
+	static void apply(std::vector < matrix_math::matrix<T, N, 1>>& out, const std::vector<std::array<T, N>>& in)
 	{
-		for (int j = 0; j < N; j++)
+		int eNum = in.size();
+		out.resize(eNum);
+
+		for (int i = 0; i < eNum; i++)
 		{
-			out[i * N + j] = in[i][j];
+			for (int j = 0; j < N; j++)
+			{
+				out[i](j) = in[i][j];
+			}
 		}
 	}
-}
+
+};
+
+struct App::as_buffer_ptr
+{
+	template<typename T, int N>
+	static const T* apply(const std::vector<matrix_math::matrix<T, N, 1>>& v)
+	{
+		return &(v.front()(0));
+	}
+};
+
 
 void App::show_fps()
 {
@@ -74,6 +91,7 @@ bool App::make_scene()
 
 	m_scene_maker.set(m_scene_maker_type);
 	return m_scene_maker->make(indices, m_edges, pos, pos_2d, m);
+	return true;
 }
 
 void App::render()
@@ -81,7 +99,7 @@ void App::render()
 	connect_render_ui();
 
 	auto& renderer = m.get_renderer();
-	renderer.draw_triangles(indices.data(), pos.data(), indices.size() / 3, pos.size() / 3);
+	renderer.draw_triangles(as_buffer_ptr::apply(indices), as_buffer_ptr::apply(pos), indices.size(), pos.size());
 
 	if (m_picked.t_index != -1)
 	{
@@ -111,7 +129,7 @@ void App::animate(bool geometry_changed)
 
 	if (m_sim_data_is_valid)
 	{
-		convert_from_sim_data(pos, sim.get<sim_lib::sim_data::positions>());
+		convert_from_sim_data::apply(pos, sim.get<sim_lib::sim_data::positions>());
 	}
 }
 
@@ -178,7 +196,7 @@ void App::pick(int x, int y)
 	m_picked = m_mouse_picker.pick(
 		m_mouse_ray.p,
 		m_mouse_ray.dir,
-		pos.data(), indices.data(), pos.size() / 3, indices.size() / 3 
+		as_buffer_ptr::apply(pos), as_buffer_ptr::apply(indices), pos.size(), indices.size()
 	);
 
 	m_current_fix_points = m_preset_fix_points;
@@ -186,7 +204,6 @@ void App::pick(int x, int y)
 	if (m_picked.t_index != -1)
 	{
 		int t = m_picked.t_index;
-		std::array<int, 3> t_indices{ indices[t * 3 + 0] ,indices[t * 3 + 1],indices[t * 3 + 2] };
 
 		float maxBary = 0.f;
 		int max_v = 0;
@@ -199,9 +216,9 @@ void App::pick(int x, int y)
 			}
 		}
 
-		int picked_v = t_indices[max_v];
+		int picked_v = indices[t](max_v);
 		m_current_fix_points.push_back(picked_v);
-		m_current_fix_points_pos.push_back(float3{ pos[picked_v * 3 + 0],pos[picked_v * 3 + 1],pos[picked_v * 3 + 2] });
+		m_current_fix_points_pos.push_back(float3{ pos[picked_v](0),pos[picked_v](1),pos[picked_v](2) });
 
 		sim.set<sim_lib::sim_data::obstacle_vert_index>(m_current_fix_points);
 		sim.set<sim_lib::sim_data::obstacle_vert_pos>(m_current_fix_points_pos);
@@ -213,10 +230,8 @@ void App::drag(int x, int y)
 {
 	if (m_picked.t_index != -1)
 	{
-
 		int t = m_picked.t_index;
 
-		std::array<int, 3> t_indices{ indices[t * 3 + 0] ,indices[t * 3 + 1],indices[t * 3 + 2] };
 		float maxBary = 0.f;
 		int max_v = 0;
 		for (int i = 0; i < 3; i++)
@@ -228,7 +243,7 @@ void App::drag(int x, int y)
 			}
 		}
 
-		std::vector<int> v_indices{ t_indices[max_v] };
+		std::vector<int> v_indices{ indices[t](max_v) };
 		std::vector<sim_lib::float3> v_new_pos{ {x / 400.f - 1.0f ,1.0f - y / 300.f ,-1.f} };
 
 		std::vector<int> v_indices_pos;
@@ -264,12 +279,12 @@ void App::init_sim_data()
 {
 
 	std::vector<sim_lib::float3> sim_pos;
-	convert_to_sim_data(sim_pos, pos);
+	convert_to_sim_data::apply(sim_pos, pos);
 	std::vector<sim_lib::float2> sim_pos_2d;
-	convert_to_sim_data(sim_pos_2d, pos_2d);
+	convert_to_sim_data::apply(sim_pos_2d, pos_2d);
 
 	std::vector<sim_lib::int3> sim_tris;
-	convert_to_sim_data(sim_tris, indices);
+	convert_to_sim_data::apply(sim_tris, indices);
 
 	sim.set<sim_lib::sim_data::solver>(sim_lib::solver_type::Dummy);
 	sim.set<sim_lib::sim_data::vertex_num>(sim_pos.size());
@@ -294,7 +309,7 @@ void App::init_sim_data()
 	if (m_enable_edge_stretch_constraint)
 	{
 		std::vector<sim_lib::int2> sim_edges;
-		convert_to_sim_data(sim_edges, m_edges);
+		convert_to_sim_data::apply(sim_edges, m_edges);
 		sim.set<sim_lib::sim_data::stretch_edges>(sim_edges);
 		sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>(sim_edges.size(), uniform_edge_stretch_stiff));
 	}
@@ -354,7 +369,7 @@ void App::connect_sim_ui()
 			if (m_enable_edge_stretch_constraint)
 			{
 				std::vector<sim_lib::int2> sim_edges;
-				convert_to_sim_data(sim_edges, m_edges);
+				convert_to_sim_data::apply(sim_edges, m_edges);
 				sim.set<sim_lib::sim_data::stretch_edges>(sim_edges);
 				sim.set<sim_lib::sim_data::stretch_edges_stiff>(std::vector<float>(m_edges.size() / 2, uniform_edge_stretch_stiff));
 			}

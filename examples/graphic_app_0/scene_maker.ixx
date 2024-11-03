@@ -30,10 +30,10 @@ class scene_maker_interface
 {
 public:
 	virtual bool make(
-		std::vector< int>&indices,
-		std::vector<int>&m_edges,
-		std::vector<float>&pos,
-		std::vector<float>&pos_2d,
+		std::vector<vec3i>&indices,
+		std::vector<vec2i>&m_edges,
+		std::vector<vec3f>&pos,
+		std::vector<vec2f>&pos_2d,
 		quick_shell::main_window & m
 	) = 0;
 
