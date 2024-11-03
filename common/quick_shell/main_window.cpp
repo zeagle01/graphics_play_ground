@@ -17,6 +17,8 @@ namespace quick_shell
 		m_renderer.load_glad(GLFW_wrapper::get_proc_address());
 
 		m_ui_fn = [this]() { m_ui_panel.upate_ui_data(); };
+
+		m_glfwWrapper.register_frame_update_fn([this]() {m_renderer.clear_screen(); });
 	}
 
 	void main_window::run_event_loop()
@@ -61,6 +63,11 @@ namespace quick_shell
 	void renderer::draw_points(float* pos, int vNum)
 	{
 		m_render_imp.draw_points(pos, vNum);
+	}
+
+	void renderer::clear_screen()
+	{
+		m_render_imp.clear_screen();
 	}
 
 }

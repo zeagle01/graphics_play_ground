@@ -30,6 +30,7 @@ namespace quick_shell
 		void enable_wireframe(bool isLine);
 		void draw_triangles(const int* indices, const float* pos, int tNum, int vNum);
 		void draw_points(float* pos, int vNum);
+		void clear_screen();
 	private:
 		renderer_imp  m_render_imp;
 	};

@@ -101,6 +101,12 @@ namespace quick_shell
 		void enable_fill(bool v) { m_is_enable_fill = v; }
 		void enable_wireframe(bool v) { m_is_enable_wireframe = v; }
 
+		void clear_screen()
+		{
+			glClearColor(0.3, 0.2, 0.1, 1.);//default color;
+			glClear(GL_COLOR_BUFFER_BIT);
+		}
+
 	private:
 
 		void create_shader_if_not_exsit()
@@ -136,11 +142,6 @@ namespace quick_shell
 			}
 		}
 
-		void clear_screen()
-		{
-			glClearColor(0.3, 0.2, 0.1, 1.);//default color;
-			glClear(GL_COLOR_BUFFER_BIT);
-		}
 
 	private:
 		void draw_iendxes(int mode)
