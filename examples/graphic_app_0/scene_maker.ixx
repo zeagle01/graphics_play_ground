@@ -37,6 +37,8 @@ public:
 		quick_shell::main_window & m
 	) = 0;
 
+	virtual std::vector<int> get_fixed() { return {}; };
+
 		CLUMSY_ENUM_TAGGED_MORPHYSM(scene_maker_interface, scene_maker_type);
 };
 

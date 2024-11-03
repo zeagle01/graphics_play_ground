@@ -52,6 +52,7 @@ namespace quick_shell
 	{
 		CE_ENTRY(check_box);
 		CE_ENTRY(combo_box);
+		CE_ENTRY(input);
 	};
 
 }

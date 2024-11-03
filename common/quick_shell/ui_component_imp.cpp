@@ -96,7 +96,7 @@ namespace quick_shell
 
 	template<> struct ui_component_imp_new<ui_component_new::check_box>
 	{
-		static bool apply(bool& value, std::string& name)
+		static bool apply(bool& value, const std::string& name)
 		{
 			return ImGui::Checkbox(name.c_str(), &value);
 		}
@@ -130,6 +130,19 @@ namespace quick_shell
 				c[i] = str[i].c_str();
 			}
 
+		}
+	};
+
+	template<> struct ui_component_imp_new<ui_component_new::input>
+	{
+		static bool apply(float& value, const std::string& name)
+		{
+			return ImGui::InputFloat(name.c_str(), &value, 1e-2f, 1e-1f, "%f", ImGuiInputTextFlags_EnterReturnsTrue);
+		}
+
+		static bool apply(int& value, const std::string& name)
+		{
+			return ImGui::InputInt(name.c_str(), &value, 1, 10, ImGuiInputTextFlags_EnterReturnsTrue);
 		}
 	};
 

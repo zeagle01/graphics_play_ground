@@ -87,11 +87,12 @@ struct App::FPS_wrapper
 
 bool App::make_scene()
 {
-	m.add_ui_component_new<ui_component_new::combo_box>(m_scene_maker_type);
+	m.add_ui_component_new<ui_component_new::combo_box>(nullptr, m_scene_maker_type);
 
 	m_scene_maker.set(m_scene_maker_type);
-	return m_scene_maker->make(indices, m_edges, pos, pos_2d, m);
-	return true;
+	bool geometry_changed = m_scene_maker->make(indices, m_edges, pos, pos_2d, m);
+	m_preset_fix_points = m_scene_maker->get_fixed();
+	return geometry_changed;
 }
 
 void App::render()
@@ -122,14 +123,18 @@ void App::animate(bool geometry_changed)
 	}
 	else
 	{
+		m.add_ui_component_new<quick_shell::ui_component_new::check_box>(nullptr, m_is_sim_running, "runing simulation");
 		connect_sim_ui();
 	}
 
-	m_sim_data_is_valid = sim.step();
-
-	if (m_sim_data_is_valid)
+	if (m_is_sim_running)
 	{
-		convert_from_sim_data::apply(pos, sim.get<sim_lib::sim_data::positions>());
+		m_sim_data_is_valid = sim.step();
+
+		if (m_sim_data_is_valid)
+		{
+			convert_from_sim_data::apply(pos, sim.get<sim_lib::sim_data::positions>());
+		}
 	}
 }
 
@@ -294,11 +299,11 @@ void App::init_sim_data()
 	sim.set<sim_lib::sim_data::triangles>(sim_tris);
 
 
-	int fix_v0 = 0 * m_plane_resolution[1] + m_plane_resolution[1] - 1;
-	int fix_v1 = (m_plane_resolution[0] - 1) * m_plane_resolution[1] + m_plane_resolution[1] - 1;
-
-	m_preset_fix_points = { fix_v0, fix_v1 };
-	m_preset_fix_points_pos = { sim_pos[fix_v0], sim_pos[fix_v1] };
+	m_preset_fix_points_pos.resize(m_preset_fix_points.size());
+	for (int i = 0; i < m_preset_fix_points.size(); i++)
+	{
+		m_preset_fix_points_pos[i] = sim_pos[m_preset_fix_points[i]];
+	}
 
 	m_current_fix_points = m_preset_fix_points;
 	m_current_fix_points_pos = m_preset_fix_points_pos;

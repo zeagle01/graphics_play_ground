@@ -39,6 +39,13 @@ public:
 
 	}
 
+	std::vector<int> get_fixed()  override
+	{ 
+		int fix_v0 = 0 * m_plane_resolution[1] + m_plane_resolution[1] - 1;
+		int fix_v1 = (m_plane_resolution[0] - 1) * m_plane_resolution[1] + m_plane_resolution[1] - 1;
+		return { fix_v0,fix_v1 };
+	};
+
 
 private:
 

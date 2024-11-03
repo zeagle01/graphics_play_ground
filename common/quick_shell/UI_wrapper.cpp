@@ -36,12 +36,18 @@ namespace quick_shell
 		}
 
 		template<typename  ui_com, typename ...P>
-		void add_ui_component_new(P&& ... p)
+		void add_ui_component_new(std::function<void()> call_back, P&& ... p)
 		{
 			m_connects.push_back(
-				[&]()
+				[&, call_back]()
 				{
-					ui_com::apply(std::forward<P>(p)...);
+					if (ui_com::apply(std::forward<P>(p)...))
+					{
+						if (call_back)
+						{
+							call_back();
+						}
+					}
 				}
 			);
 		}

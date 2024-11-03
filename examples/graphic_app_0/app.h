@@ -74,6 +74,9 @@ private:
 
 	//simulator
 private:
+	bool m_is_sim_running = false;
+
+private:
 	std::vector<vec3i> indices;
 	std::vector<vec2i> m_edges;
 	std::vector<vec3f> pos;
@@ -86,8 +89,6 @@ private:
 	sim_lib::triangle_stretch_stiff uniform_triangle_stretch_stiff = { 1e2f,1e2f,1e2f,1e2f };
 
 private:
-	std::array<int, 2> m_plane_resolution{ 10,10 };
-
 	using float3 = std::array<float, 3>;
 	std::vector<int> m_preset_fix_points;
 	std::vector<float3> m_preset_fix_points_pos;
