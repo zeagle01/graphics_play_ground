@@ -30,21 +30,14 @@ public:
 		m_window.init(800, 600);
 
 		auto& renderer = m_window.get_renderer();
-		std::vector<float> pos{
-			0.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 1.f, 0.f
-		};
 
-		std::vector<int> triangles{ 0, 1, 2 };
-
-		m_orientation = matrix_math::identity<float, 3>();
-		m_center = vec3f( {0,0,0});
+		m_center = vec3f({ 0,0,0 });
 		m_velocity = vec3f({ 0.f,0,0 });
-		m_angular_velocity = vec3f({ 1.f,0,1.f });
+		m_angular_moment = vec3f({ 1.f,0,1.f });
+		m_orientation = matrix_math::identity<float, 3>();
 
 		std::array<float, 3> ui_velocity = vec_2_arr(m_velocity);
-		std::array<float, 3> ui_angular_velocity = vec_2_arr(m_angular_velocity);
+		std::array<float, 3> ui_angular_moment = vec_2_arr(m_angular_moment);
 		std::array<float, 3> ui_center = vec_2_arr(m_center);
 		std::array<float, 3> ui_side_length = vec_2_arr(m_side_length);
 
@@ -54,14 +47,18 @@ public:
 			{
 				m_window.add_ui_component<quick_shell::ui_component::slider_bar3>("rect side length", ui_side_length, { 0.1,2.f });
 				m_window.add_ui_component<quick_shell::ui_component::slider_bar3>("linear velocity", ui_velocity, { 0.0,5.f });
-				m_window.add_ui_component<quick_shell::ui_component::slider_bar3>("angular velocity", ui_angular_velocity, { 0.0,5.f });
+				m_window.add_ui_component<quick_shell::ui_component::slider_bar3>("angular moment", ui_angular_moment, { 0.0,100.f });
 
 				m_velocity =				arr_2_vec(ui_velocity);
-				m_angular_velocity =		arr_2_vec(ui_angular_velocity);
+				m_angular_moment =			arr_2_vec(ui_angular_moment);
+
 				m_side_length =				arr_2_vec(ui_side_length);
+				m_rotationInertial0 = get_cuboid_rotation_inertial(m_side_length);
+
+				auto angular_velocity = m_orientation / m_rotationInertial0 * matrix_math::transpose(m_orientation) * m_angular_moment;
 
 				m_center += m_velocity * dt;
-				m_orientation += schew_matrix(m_angular_velocity) * m_orientation * dt;
+				m_orientation += schew_matrix(angular_velocity) * m_orientation * dt;
 
 				auto rigid_body_mesh = get_repsentation_mesh(m_orientation, m_center);
 
@@ -151,7 +148,10 @@ private:
 		std::array<int, 4> face_vertex[] = {
 			{0,1,3,2}, //front
 			{4,6,7,5}, //back
-			//more
+			{0,4,6,2}, //left
+			{1,5,7,3}, //left
+			{0,1,5,4}, //bottom
+			{2,3,7,6}, //bottom
 
 		};
 		int face_num = std::size(face_vertex);
@@ -177,17 +177,33 @@ private:
 			});
 	}
 
+	mat3f get_cuboid_rotation_inertial(const vec3f& side_length)
+	{
+		float a = side_length(0);
+		float b = side_length(1);
+		float c = side_length(2);
+		float V = a * b * c;
+
+		return 1.f / V * mat3f({
+				b*b+c*c,		0,				0,
+				0,				a*a+c*c,		0,
+				0,				0,				a*a+b*b,
+			});
+	}
+
 
 private:
 	quick_shell::main_window m_window;
 
 private:
 	mat3f m_orientation;
+	mat3f m_rotationInertial0;
+
 	vec3f m_center;
 	vec3f m_velocity;
-	vec3f m_angular_velocity;
+	vec3f m_angular_moment;
 
-	vec3f m_side_length = vec3f({ 1.f,1.f,1.f });
+	vec3f m_side_length = vec3f({ 1.0f,0.5f,1.5f });
 
 	float dt = 1 / 1000.f;
 
