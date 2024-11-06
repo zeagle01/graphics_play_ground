@@ -2,6 +2,7 @@
 #include "openGL_renderer_API.h"
 #include "glad/glad.h"
 #include "vertex_array.h"
+#include "log.h"
 namespace clumsy_engine
 {
 
@@ -43,6 +44,17 @@ namespace clumsy_engine
 	void OpenGL_Renderer_API::draw_indexed(Ref<Vertex_Array> vertex_array)
 	{
 		glDrawElements(GL_TRIANGLES, vertex_array->get_index_buffer()->get_count(), GL_UNSIGNED_INT, nullptr);
+
+	}
+
+	void OpenGL_Renderer_API::draw_indexed(Ref<Vertex_Array> vertex_array, int count)
+	{
+		if (count > vertex_array->get_index_buffer()->get_count())
+		{
+			CE_CORE_WARN("draw count %d exceed vao size %d", count, vertex_array->get_index_buffer()->get_count());
+		}
+
+		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 
 	}
 

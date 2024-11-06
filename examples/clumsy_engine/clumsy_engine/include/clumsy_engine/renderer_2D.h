@@ -18,6 +18,7 @@ namespace clumsy_engine
 
 		static void begin_scene(Ref<Camara> camara);
 		static void	end_scene();
+		static void flush();
 
 			//
 		static void draw_quad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);

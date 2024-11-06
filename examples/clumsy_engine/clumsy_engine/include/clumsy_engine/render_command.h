@@ -29,6 +29,11 @@ namespace clumsy_engine
 			s_renderer_API->draw_indexed(vertex_array);
 		}
 
+		static inline void draw_indexed(Ref<Vertex_Array> vertex_array, int count)
+		{
+			s_renderer_API->draw_indexed(vertex_array, count);
+		}
+
 	private:
 		static Ref<Renderer_API> s_renderer_API;
 

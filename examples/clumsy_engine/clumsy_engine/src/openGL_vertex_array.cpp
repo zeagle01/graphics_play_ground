@@ -59,8 +59,8 @@ namespace clumsy_engine
 		{
 			CE_CORE_ERROR("can't find vertex buffer in vertex array ");
 		}
-
 	}
+
 
 
 	void OpenGL_Vertex_Array::add_vertex_buffer(Ref<Vertex_Buffer> vb)

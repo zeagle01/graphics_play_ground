@@ -18,6 +18,7 @@ namespace clumsy_engine
 		void set_viewport(int x, int y, int  width, int height) override;
 
 		void draw_indexed(Ref<Vertex_Array> vertex_array) override;
+		void draw_indexed(Ref<Vertex_Array> vertex_array, int count) override;
 
 	};
 

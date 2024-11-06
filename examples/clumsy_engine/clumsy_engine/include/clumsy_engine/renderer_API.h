@@ -29,6 +29,7 @@ namespace clumsy_engine
 		virtual void set_polygon_mode(bool isLine) = 0;
 
 		virtual void draw_indexed(Ref<Vertex_Array> vertex_array) = 0;
+		virtual void draw_indexed(Ref<Vertex_Array> vertex_array, int count) = 0;
 		virtual void set_viewport(int x, int y, int  width, int height) = 0;
 
 		inline static API get_API() { return s_API; };

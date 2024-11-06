@@ -20,6 +20,14 @@ namespace clumsy_engine
         glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), vertices, GL_DYNAMIC_DRAW);
     }
 
+	OpenGL_Vertex_Buffer::OpenGL_Vertex_Buffer(int size)
+	{
+        glCreateBuffers(1,&m_renderer_id);
+        bind();
+        glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
+
+	}
+
 
     void OpenGL_Vertex_Buffer::bind() const
     {

@@ -133,6 +133,7 @@ namespace clumsy_engine
             virtual void set_data(float const* data,int num) = 0;
 
             static std::unique_ptr<Vertex_Buffer> create(float *vertices, int size);
+			static std::unique_ptr<Vertex_Buffer> create(int size);
             static std::unique_ptr<Vertex_Buffer> create();
     };
 

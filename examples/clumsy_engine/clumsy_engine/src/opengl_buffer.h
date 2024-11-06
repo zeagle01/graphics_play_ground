@@ -15,6 +15,7 @@ namespace clumsy_engine
         public:
             OpenGL_Vertex_Buffer();
             OpenGL_Vertex_Buffer(float *vertices, int size);
+			OpenGL_Vertex_Buffer(int size);
             ~OpenGL_Vertex_Buffer();
 
             void bind() const override;
