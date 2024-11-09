@@ -17,32 +17,40 @@ void Sandbox_2D::on_update(clumsy_engine::Time_Step dt)
 	clumsy_engine::Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
 	clumsy_engine::Render_Command::clear();
 
+	clumsy_engine::Renderer_2D::reset_statistic();
+
 	clumsy_engine::Renderer_2D::begin_scene(m_camara_controller->get_camara());
 
-	for (int i = 0; i < 4; i++)
+	int num_of_column = 100;
+	float side = 2.f / num_of_column;
+	for (int i = 0; i < num_of_column; i++)
 	{
-		if (i % 2 == 0)
+		for (int j = 0; j < num_of_column; j++)
 		{
-			clumsy_engine::Renderer_2D::draw_quad
-			(
-				{
-					.position = { 0.f,-i * 0.4f },
-					.size = { 0.2f, 0.2f },
-					.rotation = glm::radians(45.f),
+			if ((i + j) % 2 == 0)
+			{
+				clumsy_engine::Renderer_2D::draw_quad
+				(
+					{
+						.position = { i * side,j * side },
+						.size = { side, side },
+						.rotation = glm::radians(45.f),
+						.tint_color = m_plane_color
+					}
+				);
+			}
+			else
+			{
+				clumsy_engine::Renderer_2D::draw_quad
+				(
+					{
+					.position = { i * side,j * side },
+					.size = { side, side },
 					.tint_color = m_plane_color
-				}
-			);
-		}
-		else
-		{
-			clumsy_engine::Renderer_2D::draw_quad
-			(
-				{
-				.position = { 0.f,-i * 0.4f },
-				.size = { 0.2f, 0.2f },
-				.tint_color = m_plane_color
-				}
-			);
+					}
+				);
+			}
+
 		}
 	}
 
@@ -70,6 +78,13 @@ void Sandbox_2D::on_imgui_render(ImGuiContext* imgui_context)
 
 	ImGui::Begin("Test from demo layer");
 	ImGui::Text("hello world from demo layer");
+
+	ImGui::Text("render statistic:");
+	ImGui::Text("draw call: %d", clumsy_engine::Renderer_2D::get_statistic().num_draw_calls);
+	ImGui::Text("num quad: %d", clumsy_engine::Renderer_2D::get_statistic().num_quad);
+	ImGui::Text("number of vertex: %d", clumsy_engine::Renderer_2D::get_statistic().get_vertex_num());
+	ImGui::Text("number of triangles: %d", clumsy_engine::Renderer_2D::get_statistic().get_triangle_num());
+
 	ImGui::ColorEdit4("plane color", glm::value_ptr(m_plane_color));
 	ImGui::End();
 

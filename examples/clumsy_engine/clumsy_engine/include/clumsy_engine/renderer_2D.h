@@ -22,7 +22,6 @@ namespace clumsy_engine
 
 	public:
 
-
 		struct param
 		{
 			const glm::vec2& position;
@@ -35,17 +34,21 @@ namespace clumsy_engine
 
 		static void draw_quad(param p);
 
-	};
+	public:
+		struct Statistics
+		{
+			int32_t num_draw_calls;
+			int32_t num_quad;
+			int32_t get_vertex_num();
+			int32_t get_triangle_num();
+		};
 
-//	//TODO:
-//	struct quad_drawer
-//	{
-//		quad_drawer& with_position(const glm::vec2& p);
-//		quad_drawer& with_size(const glm::vec2& s);
-//		quad_drawer& with_rotation(float degree);
-//		quad_drawer& with_color(float degree);
-//		quad_drawer& with_texture(Ref<Texture_2D>);
-//	};
+		static void reset_statistic();
+		static Statistics get_statistic();
+
+	private:
+		static void reset_batch();
+	};
 
 }
 

@@ -34,7 +34,7 @@ namespace clumsy_engine
 		uint32_t current_quad = 0;
 		uint32_t current_texture_slot = 1; //texture 0 is reserved for white texture 
 
-
+		Renderer_2D::Statistics statistics;
 	};
 
 	static  Render_2D_Storage s_data;
@@ -110,13 +110,18 @@ namespace clumsy_engine
 	{
 	}
 
+	void Renderer_2D::reset_batch()
+	{
+		s_data.current_quad = 0;
+		s_data.current_texture_slot = 1;
+	}
+
 	void Renderer_2D::begin_scene(Ref<Camara> camara)
 	{
 		s_data.m_shader_texture->bind();
 		s_data.m_shader_texture->upload_uniform_mat4("u_view_projection", camara->get_view_projection_matrix());
 
-		s_data.current_quad = 0;
-		s_data.current_texture_slot = 1;
+		reset_batch();
 	}
 
 	void Renderer_2D::end_scene()
@@ -137,11 +142,19 @@ namespace clumsy_engine
 		}
 
 		Render_Command::draw_indexed(s_data.m_vertex_array_plane, s_data.current_quad * 6);
+		s_data.statistics.num_draw_calls++;
 	}
 
 	void Renderer_2D::draw_quad(param p)
 	{
+		if (!(s_data.current_quad < s_data.max_quads))
+		{
+			end_scene();
+			reset_batch();
+		}
+
 		int qi = s_data.current_quad;
+
 		constexpr std::array<float, 2> dir[] =
 		{
 			{ 0.f, 0.f },
@@ -191,33 +204,28 @@ namespace clumsy_engine
 			s_data.tilling_factor[qi * 4 + i] = p.tilling_factor;
 		}
 		s_data.current_quad++;
+
+		s_data.statistics.num_quad++;
 	}
 
-//	quad_drawer& quad_drawer::with_position(const glm::vec2& p)
-//	{
-//
-//		return *this;
-//	}
-//
-//	quad_drawer& quad_drawer::with_size(const glm::vec2& s)
-//	{
-//		return *this;
-//	}
-//
-//	quad_drawer& quad_drawer::with_rotation(float degree)
-//	{
-//
-//		return *this;
-//	}
-//
-//	quad_drawer& quad_drawer::with_color(float degree)
-//	{
-//
-//		return *this;
-//	}
-//
-//	quad_drawer& quad_drawer::with_texture(Ref<Texture_2D>)
-//	{
-//		return *this;
-//	}
+	void Renderer_2D::reset_statistic()
+	{
+		s_data.statistics = {};
+	}
+
+	Renderer_2D::Statistics Renderer_2D::get_statistic()
+	{
+		return s_data.statistics;
+	}
+
+	int32_t Renderer_2D::Statistics::get_vertex_num()
+	{
+		return num_quad * 4;
+	}
+
+	int32_t Renderer_2D::Statistics::get_triangle_num()
+	{
+		return num_quad * 2;
+	}
+
 }
