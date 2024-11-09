@@ -155,12 +155,12 @@ namespace clumsy_engine
 
 		int qi = s_data.current_quad;
 
-		constexpr std::array<float, 2> dir[] =
+		glm::vec2 quad_texture_span[] =
 		{
-			{ 0.f, 0.f },
-			{ 1.f, 0.f },
-			{ 1.f, 1.f },
-			{ 0.f, 1.f }
+			{ 0.f,					0.f},
+			{ p.texture_span[0],	0.f},
+			{ p.texture_span[0],	p.texture_span[1] },
+			{ 0.f,					p.texture_span[1] }
 		};
 
 		constexpr std::array<glm::vec4, 4> ref_quad_positions
@@ -198,7 +198,7 @@ namespace clumsy_engine
 		for (int i = 0; i < std::size(ref_quad_positions); i++)
 		{
 			s_data.positions[qi * 4 + i] = transform * ref_quad_positions[i];
-			s_data.texcoods[qi * 4 + i] = { dir[i][0] , dir[i][1] };
+			s_data.texcoods[qi * 4 + i] = p.texture_origin + quad_texture_span[i];
 			s_data.colors[qi * 4 + i] = p.tint_color;
 			s_data.texture_index[qi * 4 + i] = texture_index;
 			s_data.tilling_factor[qi * 4 + i] = p.tilling_factor;

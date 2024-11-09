@@ -30,6 +30,8 @@ namespace clumsy_engine
 			Ref<Texture_2D> texture = nullptr;
 			float tilling_factor = 1.f;
 			const glm::vec4& tint_color = glm::vec4(1.f);
+			const glm::vec2& texture_origin = { 0.f, 0.f };
+			const glm::vec2& texture_span = { 1.f, 1.f };
 		};
 
 		static void draw_quad(param p);

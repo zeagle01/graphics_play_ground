@@ -62,8 +62,9 @@ void Sandbox_2D::on_update(clumsy_engine::Time_Step dt)
 		.rotation = glm::radians(45.f),
 		.texture = m_texture,
 		.tilling_factor = 10.f,
-		.tint_color = {0.9f, 0.8f, 0.9f, 1.0}
-
+		.tint_color = {0.9f, 0.8f, 0.9f, 1.0},
+		.texture_origin = {0.03f,0.0f},
+		.texture_span = {0.15f,0.15f},
 		}
 	);
 
