@@ -20,20 +20,32 @@ namespace clumsy_engine
 		static void	end_scene();
 		static void flush();
 
-			//
-		static void draw_quad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
-		static void draw_quad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
+	public:
 
-		static void draw_quad(const glm::vec2& position, const glm::vec2& size, Ref<Texture_2D> texture, float tilling_factor = 1.f, const glm::vec4& tint_color = glm::vec4(1.f));
-		static void draw_quad(const glm::vec3& position, const glm::vec2& size, Ref<Texture_2D> texture, float tilling_factor = 1.f, const glm::vec4& tint_color = glm::vec4(1.f));
 
-		static void draw_rotated_quad(const glm::vec3& position, const glm::vec2& size, float rotation, Ref<Texture_2D> texture, float tilling_factor = 1.f, const glm::vec4& tint_color = glm::vec4(1.f));
-		static void draw_rotated_quad(const glm::vec2& position, const glm::vec2& size, float rotation, Ref<Texture_2D> texture, float tilling_factor = 1.f, const glm::vec4& tint_color = glm::vec4(1.f));
+		struct param
+		{
+			const glm::vec2& position;
+			const glm::vec2& size = { 1.f, 1.f };
+			float rotation = 0.f;
+			Ref<Texture_2D> texture = nullptr;
+			float tilling_factor = 1.f;
+			const glm::vec4& tint_color = glm::vec4(1.f);
+		};
 
-		static void draw_rotated_quad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color);
-		static void draw_rotated_quad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color);
+		static void draw_quad(param p);
 
 	};
+
+//	//TODO:
+//	struct quad_drawer
+//	{
+//		quad_drawer& with_position(const glm::vec2& p);
+//		quad_drawer& with_size(const glm::vec2& s);
+//		quad_drawer& with_rotation(float degree);
+//		quad_drawer& with_color(float degree);
+//		quad_drawer& with_texture(Ref<Texture_2D>);
+//	};
 
 }
 

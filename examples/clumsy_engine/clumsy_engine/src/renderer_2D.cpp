@@ -34,6 +34,7 @@ namespace clumsy_engine
 		uint32_t current_quad = 0;
 		uint32_t current_texture_slot = 1; //texture 0 is reserved for white texture 
 
+
 	};
 
 	static  Render_2D_Storage s_data;
@@ -138,169 +139,85 @@ namespace clumsy_engine
 		Render_Command::draw_indexed(s_data.m_vertex_array_plane, s_data.current_quad * 6);
 	}
 
-	//
-	void Renderer_2D::draw_quad(const glm::vec2& position, const glm::vec2& size,  const glm::vec4& color)
-	{
-		draw_quad({ position.x,position.y,0.f }, size,  color);
-	}
-	void Renderer_2D::draw_quad(const glm::vec3& position, const glm::vec2& size,  const glm::vec4& color)
+	void Renderer_2D::draw_quad(param p)
 	{
 		int qi = s_data.current_quad;
-		std::array<float, 2> dir[]=
-		{ 
+		constexpr std::array<float, 2> dir[] =
+		{
 			{ 0.f, 0.f },
 			{ 1.f, 0.f },
 			{ 1.f, 1.f },
 			{ 0.f, 1.f }
 		};
 
-		for (int i = 0; i < std::size(dir); i++)
+		constexpr std::array<glm::vec4, 4> ref_quad_positions
 		{
-			s_data.positions[qi * 4 + i] = { position[0] + dir[i][0] * size[0],position[1] + dir[i][1] * size[1],0.f };
-			s_data.texcoods[qi * 4 + i] = { dir[i][0] , dir[i][1] };
-			s_data.colors[qi * 4 + i] = color;
-			s_data.texture_index[qi * 4 + i] = 0.f;
-			s_data.tilling_factor[qi * 4 + i] = 1.f;
-		}
-		s_data.current_quad++;
-
-#if OLD_LOGIC
-		s_data.m_shader_texture->bind();
-		s_data.m_shader_texture->upload_uniform_vec4("u_color", color);
-		s_data.m_shader_texture->upload_uniform_float("u_tilingFactor", 1.f);
-
-		s_data.m_white_texture->bind();
-
-		auto model_matrix = glm::mat4(1.f);
-		model_matrix = glm::translate(model_matrix, glm::vec3(position.x, position.y, 0.f));
-		model_matrix = glm::scale(model_matrix, glm::vec3(size.x, size.y, 1.f));
-
-		s_data.m_shader_texture->upload_uniform_mat4("u_model_matrix", model_matrix);
-
-		s_data.m_vertex_array_plane->bind();
-		Render_Command::draw_indexed(s_data.m_vertex_array_plane);
-#endif
-	}
-
-	void Renderer_2D::draw_rotated_quad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
-	{
-
-
-		s_data.m_shader_texture->bind();
-		s_data.m_shader_texture->upload_uniform_vec4("u_color", color);
-		s_data.m_shader_texture->upload_uniform_float("u_tilingFactor", 1.f);
-
-		s_data.m_white_texture->bind();
-
-		auto model_matrix = glm::mat4(1.f);
-		model_matrix = glm::translate(model_matrix, glm::vec3(position.x, position.y, 0.f));
-		model_matrix = glm::rotate(model_matrix, rotation, { 0.f, 0.f, 1.f });
-		model_matrix = glm::scale(model_matrix, glm::vec3(size.x, size.y, 1.f));
-
-
-		s_data.m_shader_texture->upload_uniform_mat4("u_model_matrix", model_matrix);
-
-		s_data.m_vertex_array_plane->bind();
-		Render_Command::draw_indexed(s_data.m_vertex_array_plane);
-
-	}
-
-	void Renderer_2D::draw_rotated_quad(const glm::vec3& position, const glm::vec2& size, float rotation, Ref<Texture_2D> texture, float tilling_factor, const glm::vec4& tint_color)
-	{
-
-		s_data.m_shader_texture->bind();
-		texture->bind(0);
-
-		s_data.m_shader_texture->upload_uniform_vec4("u_color", tint_color);
-		s_data.m_shader_texture->upload_uniform_float("u_tilingFactor", tilling_factor);
-
-		auto model_matrix = glm::mat4(1.f);
-		model_matrix = glm::translate(model_matrix, glm::vec3(position.x, position.y, 0.f));
-		model_matrix = glm::rotate(model_matrix, rotation, { 0.f, 0.f, 1.f });
-		model_matrix = glm::scale(model_matrix, glm::vec3(size.x, size.y, 1.f));
-
-		s_data.m_shader_texture->upload_uniform_mat4("u_model_matrix", model_matrix);
-
-		s_data.m_vertex_array_plane->bind();
-		Render_Command::draw_indexed(s_data.m_vertex_array_plane);
-
-	}
-
-	void Renderer_2D::draw_rotated_quad(const glm::vec2& position, const glm::vec2& size, float rotation, Ref<Texture_2D> texture, float tilling_factor, const glm::vec4& tint_color)
-	{
-		draw_rotated_quad({ position.x,position.y,0.f }, size, rotation, texture, tilling_factor, tint_color);
-	}
-
-	void Renderer_2D::draw_rotated_quad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
-	{
-		draw_rotated_quad({ position.x,position.y,0.f }, size, rotation, color);
-	}
-
-	void Renderer_2D::draw_quad(const glm::vec2& position, const glm::vec2& size, Ref<Texture_2D> texture, float tilling_factor, const glm::vec4& tint_color)
-	{
-		draw_quad({ position.x,position.y,0.f }, size, texture, tilling_factor, tint_color);
-	}
-
-	void Renderer_2D::draw_quad(const glm::vec3& position, const glm::vec2& size, Ref<Texture_2D> texture, float tilling_factor, const glm::vec4& tint_color)
-	{
-
-		constexpr glm::vec4 color = { 1.f,1.f,1.f,1.f };
-
-		int qi = s_data.current_quad;
-		std::array<float, 2> dir[] =
-		{
-			{ 0.f, 0.f },
-			{ 1.f, 0.f },
-			{ 1.f, 1.f },
-			{ 0.f, 1.f }
+			glm::vec4{-0.5f,-0.5f,0.f,1.f},
+			glm::vec4{0.5f,-0.5f,0.f,1.f},
+			glm::vec4{0.5f,0.5f,0.f,1.f},
+			glm::vec4{-0.5f,0.5f,0.f,1.f}
 		};
 
 		float texture_index = 0.f;
-
-		for (int i = 1; i < s_data.current_texture_slot; i++)
+		if (p.texture != nullptr)
 		{
-			if (texture->get_render_id() == s_data.m_textures[i]->get_render_id())
+			for (int i = 1; i < s_data.current_texture_slot; i++)
 			{
-				texture_index = i;
-				break;
+				if (p.texture->get_render_id() == s_data.m_textures[i]->get_render_id())
+				{
+					texture_index = i;
+					break;
+				}
 			}
-	}
 
-		if (texture_index == 0.f) //a new texture
-		{
-			texture_index = s_data.current_texture_slot;
-			s_data.m_textures[s_data.current_texture_slot] = texture;
-			s_data.current_texture_slot++;
+			if (texture_index == 0.f) //a new texture
+			{
+				texture_index = s_data.current_texture_slot;
+				s_data.m_textures[s_data.current_texture_slot] = p.texture;
+				s_data.current_texture_slot++;
+			}
 		}
+		glm::mat4 transform =
+			glm::translate(glm::mat4(1.f), glm::vec3{ p.position.x,p.position.y,0.f })
+			* glm::rotate(glm::mat4(1.f), p.rotation, { 0.f,0.f,1.f })
+			* glm::scale(glm::mat4(1.f), { p.size.x, p.size.y,0.f });
 
-		for (int i = 0; i < std::size(dir); i++)
+		for (int i = 0; i < std::size(ref_quad_positions); i++)
 		{
-			s_data.positions[qi * 4 + i] = { position[0] + dir[i][0] * size[0], position[1] + dir[i][1] * size[1], 0.f };
+			s_data.positions[qi * 4 + i] = transform * ref_quad_positions[i];
 			s_data.texcoods[qi * 4 + i] = { dir[i][0] , dir[i][1] };
-			s_data.colors[qi * 4 + i] = color;
+			s_data.colors[qi * 4 + i] = p.tint_color;
 			s_data.texture_index[qi * 4 + i] = texture_index;
-			s_data.tilling_factor[qi * 4 + i] = tilling_factor;
+			s_data.tilling_factor[qi * 4 + i] = p.tilling_factor;
 		}
 		s_data.current_quad++;
-
-
-#if OLD_LOGIC
-		s_data.m_shader_texture->bind();
-		texture->bind(0);
-
-		s_data.m_shader_texture->upload_uniform_vec4("u_color", tint_color);
-		s_data.m_shader_texture->upload_uniform_float("u_tilingFactor", tilling_factor);
-
-		auto model_matrix = glm::mat4(1.f);
-		model_matrix = glm::translate(model_matrix, glm::vec3(position.x, position.y, 0.f));
-		model_matrix = glm::scale(model_matrix, glm::vec3(size.x, size.y, 1.f));
-
-		s_data.m_shader_texture->upload_uniform_mat4("u_model_matrix", model_matrix);
-
-
-		s_data.m_vertex_array_plane->bind();
-		Render_Command::draw_indexed(s_data.m_vertex_array_plane);
-#endif
-
 	}
+
+//	quad_drawer& quad_drawer::with_position(const glm::vec2& p)
+//	{
+//
+//		return *this;
+//	}
+//
+//	quad_drawer& quad_drawer::with_size(const glm::vec2& s)
+//	{
+//		return *this;
+//	}
+//
+//	quad_drawer& quad_drawer::with_rotation(float degree)
+//	{
+//
+//		return *this;
+//	}
+//
+//	quad_drawer& quad_drawer::with_color(float degree)
+//	{
+//
+//		return *this;
+//	}
+//
+//	quad_drawer& quad_drawer::with_texture(Ref<Texture_2D>)
+//	{
+//		return *this;
+//	}
 }
