@@ -101,4 +101,10 @@ namespace clumsy_engine
 		glDeleteTextures(1, &m_render_id);
 		CE_CORE_INFO("texture deleted");
 	}
+
+	uint32_t OpenGL_Texture_2D::get_render_id() const
+	{
+		return m_render_id;
+
+	}
 }

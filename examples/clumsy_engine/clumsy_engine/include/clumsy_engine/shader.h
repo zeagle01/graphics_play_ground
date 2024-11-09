@@ -29,6 +29,7 @@ namespace clumsy_engine
 		virtual void upload_uniform_vec4(const std::string& name, const glm::vec4& m) = 0;
 		virtual void upload_uniform_float(const std::string& name, const float& v) = 0;
 		virtual void upload_uniform_int(const std::string& name, const int& v) = 0;
+		virtual void upload_uniform_int_array(const std::string& name, int* v, int count) = 0;
 
 		virtual unsigned int get_id() = 0;
 

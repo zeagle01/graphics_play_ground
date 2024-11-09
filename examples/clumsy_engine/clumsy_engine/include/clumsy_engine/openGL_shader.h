@@ -29,6 +29,7 @@ namespace clumsy_engine
 		void upload_uniform_vec4(const std::string& name, const glm::vec4& m) override;
 		void upload_uniform_float(const std::string& name, const float& v) override;
 		void upload_uniform_int(const std::string& name, const int& v) override;
+		void upload_uniform_int_array(const std::string& name, int* v, int count) override;
 
 		unsigned int get_id() override { return m_renderer_id; }
 	private:

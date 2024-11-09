@@ -21,6 +21,9 @@ namespace clumsy_engine
 		void set_data(void* data, int size) override;
 
 		void bind(int slot) const override;
+
+		uint32_t get_render_id() const override;
+
 	private:
 		int m_width;
 		int m_height;

@@ -16,6 +16,7 @@ namespace clumsy_engine
 
 		virtual void set_data(void* data, int size) = 0;
 		virtual void bind(int slot = 0) const = 0;
+		virtual uint32_t get_render_id() const = 0;
 	};
 
 	class Texture_2D :public Texture

@@ -19,7 +19,7 @@ void Sandbox_2D::on_update(clumsy_engine::Time_Step dt)
 
 	clumsy_engine::Renderer_2D::begin_scene(m_camara_controller->get_camara());
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		if (i == 0)
 		{
@@ -32,6 +32,7 @@ void Sandbox_2D::on_update(clumsy_engine::Time_Step dt)
 	}
 
 	//clumsy_engine::Renderer_2D::draw_rotated_quad({ 0.5f, 0.1f }, { 0.5f,0.5f }, glm::radians(45.f), m_texture, 10.f, glm::vec4(0.9f, 0.8f, 0.9f, 1.0));
+	clumsy_engine::Renderer_2D::draw_quad({ 0.5f, 0.1f }, { 0.5f,0.5f }, m_texture, 5.f, glm::vec4(0.9f, 0.8f, 0.9f, 1.0));
 
 	clumsy_engine::Renderer_2D::end_scene();
 
