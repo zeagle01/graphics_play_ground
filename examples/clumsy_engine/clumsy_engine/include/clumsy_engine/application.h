@@ -38,6 +38,7 @@ namespace clumsy_engine
 		virtual ~Application();
 
 		void run();
+		void close();
 
 		void push_layer(Ref<Layer> layer);
 		void push_overlay(Ref<Layer> overlay);

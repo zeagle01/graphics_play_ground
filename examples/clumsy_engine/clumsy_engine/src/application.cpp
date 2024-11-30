@@ -131,6 +131,11 @@ namespace clumsy_engine
 
 	}
 
+	void Application::close()
+	{
+		m_is_running = false;
+	}
+
 
 	bool Application::On_Window_Close(Window_Close_Event& e)
 	{
