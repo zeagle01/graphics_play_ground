@@ -6,6 +6,7 @@
 #include <memory>
 #include <map>
 #include <functional>
+#include <string>
 
 
 
@@ -33,7 +34,7 @@ namespace clumsy_engine
 	public:
 		static Application& get_singleton();
 
-		Application();
+		Application(const std::string& name="unknow app");
 
 		virtual ~Application();
 

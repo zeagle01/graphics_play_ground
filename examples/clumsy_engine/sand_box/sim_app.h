@@ -61,7 +61,8 @@ private:
 class Sim_App:public clumsy_engine::Application
 {
 	public:
-		Sim_App() 
+		Sim_App(): 
+			Application("sim_app")
 		{
 
 			push_layer(std::make_shared<Sim_Gui>());

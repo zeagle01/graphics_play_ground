@@ -38,7 +38,7 @@ namespace clumsy_engine
 	}
 
 
-	Application::Application()
+	Application::Application(const std::string& name)
 		:m_is_running(true)
 		, m_layer_stack(std::make_unique<Layer_Stack>())
 		, m_dispatcher_imp(std::make_shared<Dispatcher<Event, bool>>())
@@ -47,7 +47,7 @@ namespace clumsy_engine
 
 		s_singleton = this;
 
-		m_window = Window::create();
+		m_window = Window::create({ .title = name,.width = 800,.height = 600 });
 		m_window->set_event_callback(BIND_MEMBER(on_event));
 		m_window->set_vertical_sync(false);
 

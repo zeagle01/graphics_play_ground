@@ -240,7 +240,7 @@ export(
 include(GenerateExportHeader)
 generate_export_header(clumsy_engine)
 
-set_target_properties( sand_box clumsy_engine
+set_target_properties(clumsy_engine
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/lib
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/lib

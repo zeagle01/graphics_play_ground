@@ -284,7 +284,8 @@ private:
 class SanBox_App:public clumsy_engine::Application
 {
 	public:
-		SanBox_App() 
+		SanBox_App() :
+			Application("sand_box app")
 		{
 			push_layer(std::make_shared<Sandbox_2D>());
 			//push_layer(std::make_shared<Layer_Demo>());
