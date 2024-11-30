@@ -31,6 +31,7 @@ namespace clumsy_engine
 		Ref<frame_buffer> m_frame_buffer;
 
 		glm::vec4 m_plane_color = glm::vec4(1.f, 0.f, 0.f, 1.f);
+		glm::vec2 m_view_port_size;
 
 	};
 }

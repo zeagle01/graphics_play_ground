@@ -191,11 +191,26 @@ namespace clumsy_engine
 
 			ImGui::ColorEdit4("plane color", glm::value_ptr(m_plane_color));
 
-			//int32_t textureId = m_texture->get_render_id();
-			int32_t textureId = m_frame_buffer->get_color_attatchment_render_id();
-			ImGui::Image((void*)textureId, ImVec2(1280, 720), ImVec2(0, 1), ImVec2(1, 0));
-
 			ImGui::End();
+
+
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
+			ImGui::Begin("viewport");
+			ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+			if (viewportSize[0] != m_view_port_size[0] || viewportSize[1] != m_view_port_size[1])
+			{
+				m_view_port_size[0] = viewportSize[0];
+				m_view_port_size[1] = viewportSize[1];
+
+				m_frame_buffer->resize(m_view_port_size[0], m_view_port_size[1]);
+
+				m_camara_controller->on_resize(m_view_port_size[0], m_view_port_size[1]);
+
+			}
+			int32_t textureId = m_frame_buffer->get_color_attatchment_render_id();
+			ImGui::Image((void*)textureId, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::End();
+			ImGui::PopStyleVar();
 		}
 
 

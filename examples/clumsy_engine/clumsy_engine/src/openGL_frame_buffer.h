@@ -16,10 +16,13 @@ namespace clumsy_engine
 
 		void bind() override;
 		void unbind() override;
+		void resize(uint32_t width, uint32_t height) override;
 		uint32_t get_color_attatchment_render_id() const override;
 
-		void resize();
 
+	private:
+		void resize();
+		void delete_resource();
 	private:
 		uint32_t m_render_id;
 		uint32_t m_color_attatchment;

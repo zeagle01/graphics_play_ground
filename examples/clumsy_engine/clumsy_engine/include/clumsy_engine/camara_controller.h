@@ -23,6 +23,7 @@ namespace clumsy_engine
 
 		void on_update(Time_Step ts);
 		void on_event(Event& e);
+		void on_resize(float width, float height);
 
 		clumsy_engine::Ref<clumsy_engine::Camara> get_camara() { return m_camara; }
 

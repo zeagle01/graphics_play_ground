@@ -16,7 +16,7 @@ namespace clumsy_engine
 
 	openGL_frame_buffer::~openGL_frame_buffer()
 	{
-		glDeleteFramebuffers(1, &m_render_id);
+		delete_resource();
 	}
 
 	void openGL_frame_buffer::resize()
@@ -59,6 +59,8 @@ namespace clumsy_engine
 	{
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_render_id);
+
+		glViewport(0, 0, m_specs.width, m_specs.height);
 	}
 
 	void openGL_frame_buffer::unbind()
@@ -69,6 +71,23 @@ namespace clumsy_engine
 	uint32_t openGL_frame_buffer::get_color_attatchment_render_id() const
 	{
 		return m_color_attatchment;
+	}
+
+	void openGL_frame_buffer::resize(uint32_t width, uint32_t height) 
+	{
+		delete_resource();
+
+		m_specs.width = width;
+		m_specs.height = height;
+		resize();
+	}
+
+	void openGL_frame_buffer::delete_resource()
+	{
+		glDeleteFramebuffers(1, &m_render_id);
+		glDeleteTextures(1, &m_color_attatchment);
+		glDeleteTextures(1, &m_depth_attatchment);
+
 	}
 }
 

@@ -58,13 +58,19 @@ namespace clumsy_engine
 		return false;
 
 	}
+
+	void Camara_Controller::on_resize(float width, float height)
+	{
+		m_aspect_ratio = width / height;
+
+		m_camara->set_view_field(-m_zoom_level * m_aspect_ratio, m_zoom_level * m_aspect_ratio, -m_zoom_level, m_zoom_level, m_near_plane, m_far_plane);
+	}
+
 	bool Camara_Controller::on_window_resized(Window_Resize_Event& e)
 	{
 		if (e.get_height() != 0)
 		{
-			m_aspect_ratio = 1.f * e.get_width() / e.get_height();
-
-			m_camara->set_view_field(-m_zoom_level * m_aspect_ratio, m_zoom_level * m_aspect_ratio, -m_zoom_level, m_zoom_level, m_near_plane , m_far_plane );
+			on_resize(e.get_width(), e.get_height());
 		}
 
 		return false;
