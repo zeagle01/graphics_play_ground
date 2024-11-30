@@ -4,6 +4,7 @@
 #include "clumsy_engine/clumsy_engine.h"
 #include "clumsy_engine/camara_controller.h"
 #include "clumsy_engine/texture.h"
+#include "clumsy_engine/frame_buffer.h"
 
 
 class Sandbox_2D: public clumsy_engine::Layer
@@ -26,6 +27,8 @@ private:
 	clumsy_engine::Ref<clumsy_engine::Camara_Controller> m_camara_controller;
 
 	clumsy_engine::Ref<clumsy_engine::Texture_2D> m_texture; 
+	clumsy_engine::Ref<clumsy_engine::frame_buffer> m_frame_buffer; 
+
 
 	glm::vec4 m_plane_color = glm::vec4(1.f, 0.f, 0.f,1.f);
 

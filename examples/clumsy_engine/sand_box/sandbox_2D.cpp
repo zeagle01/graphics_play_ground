@@ -14,10 +14,13 @@ void Sandbox_2D::on_update(clumsy_engine::Time_Step dt)
 {
 	m_camara_controller->on_update(dt);
 
+	clumsy_engine::Renderer_2D::reset_statistic();
+
+    m_frame_buffer->bind();
+
 	clumsy_engine::Render_Command::set_clear_color({ 0.2, 0.1, 0.3, 0.2 });
 	clumsy_engine::Render_Command::clear();
 
-	clumsy_engine::Renderer_2D::reset_statistic();
 
 	clumsy_engine::Renderer_2D::begin_scene(m_camara_controller->get_camara());
 
@@ -69,6 +72,8 @@ void Sandbox_2D::on_update(clumsy_engine::Time_Step dt)
 	);
 
 	clumsy_engine::Renderer_2D::end_scene();
+
+	m_frame_buffer->unbind();
 
 
 }
@@ -183,8 +188,9 @@ void Sandbox_2D::on_imgui_render(ImGuiContext* imgui_context)
 
 		ImGui::ColorEdit4("plane color", glm::value_ptr(m_plane_color));
 
-		int32_t textureId = m_texture->get_render_id();
-		ImGui::Image((void*)textureId, ImVec2(256, 256));
+		//int32_t textureId = m_texture->get_render_id();
+		int32_t textureId = m_frame_buffer->get_color_attatchment_render_id();
+		ImGui::Image((void*)textureId, ImVec2(1280, 720));
 
 		ImGui::End();
 	}
@@ -206,6 +212,12 @@ void Sandbox_2D::on_attach()
 	std::string resources_dir = "../../../resources/";
 	std::string texture_image = resources_dir + "textures/awesomeface.png";
 	m_texture = clumsy_engine::Texture_2D::create(texture_image);
+    m_frame_buffer = clumsy_engine::frame_buffer::create(
+        {
+			.width = 1280,
+			.height = 720
+        }
+    );
 
 
 }
