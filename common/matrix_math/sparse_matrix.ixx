@@ -8,6 +8,7 @@ module;
 
 export module matrix_math;
 export import : matrix;
+export import : matrix_alias;
 
 
 namespace matrix_math

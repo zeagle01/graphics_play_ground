@@ -14,6 +14,9 @@ import : render;
 
 export import :ui_components; 
 export import :ui_event;
+export import :camera;
+
+import matrix_math;
 
 namespace quick_shell
 {
@@ -28,7 +31,11 @@ namespace quick_shell
 
 		void enable_fill(bool isLine);
 		void enable_wireframe(bool isLine);
+
+		void draw_triangles(const int* indices, const float* pos, int tNum, int vNum, const matrix_math::mat4f& view_projection_matrix);
+
 		void draw_triangles(const int* indices, const float* pos, int tNum, int vNum);
+
 		void draw_points(float* pos, int vNum);
 		void clear_screen();
 	private:

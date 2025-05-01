@@ -48,7 +48,6 @@ namespace soft_render
 
 	private:
 
-		mat4 m_vp;
 		mat4 m_view_matrix;
 		mat4 m_projection_matrix;
 

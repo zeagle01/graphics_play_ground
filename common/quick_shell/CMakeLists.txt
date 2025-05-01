@@ -12,10 +12,11 @@ target_sources(quick_shell PUBLIC
 	FILE_SET cxx_modules
 	TYPE CXX_MODULES
 	FILES 
-	main_window.cpp ## imp
 	main_window.ixx  ## main module definition 
 	ui_components.ixx  
 	ui_event.ixx  
+	camera.ixx
+	main_window.cpp ## imp
 	GLFW_wrapper.cpp
 	UI_wrapper.cpp
 	render.cpp
@@ -49,3 +50,6 @@ target_link_libraries(quick_shell PRIVATE my_imgui)
 
 ########## magic_enum
 target_link_libraries(quick_shell PRIVATE my_magic_enum)
+
+########## matrix
+target_link_libraries(quick_shell PRIVATE matrix_math)

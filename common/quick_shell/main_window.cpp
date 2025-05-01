@@ -46,6 +46,11 @@ namespace quick_shell
 
 
 	//renderer
+	void renderer::draw_triangles(const int* indices, const float* pos, int tNum, int vNum, const matrix_math::mat4f& view_projection_matrix)
+	{
+		m_render_imp.draw_triangles(indices, pos, tNum, vNum, view_projection_matrix);
+	}
+
 	void renderer::draw_triangles(const int* indices, const float* pos, int tNum, int vNum)
 	{
 		m_render_imp.draw_triangles(indices, pos, tNum, vNum);

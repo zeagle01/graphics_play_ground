@@ -25,6 +25,7 @@ target_sources(matrix_math PUBLIC
 	FILES 
 	sparse_matrix.ixx
 	matrix.ixx
+	matrix_alias.ixx
 )
 
 

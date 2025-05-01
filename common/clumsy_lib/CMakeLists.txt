@@ -47,6 +47,7 @@ target_sources(clumsy_lib PUBLIC
 	static_dep_graph.ixx
 	dispatchor.ixx
 	enum_tagged_morphysm.ixx
+	id_generator.ixx
 )
 
 

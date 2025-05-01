@@ -13,6 +13,8 @@ module quick_shell : render;
 import :shader;
 import :vartex_array;
 
+import matrix_math;
+
 namespace quick_shell
 {
 	class renderer_imp
@@ -44,6 +46,11 @@ namespace quick_shell
 
 		void draw_triangles(const int* indices, const float* pos, int tNum, int vNum)
 		{
+			draw_triangles(indices, pos, tNum, vNum, matrix_math::identity<float, 4>());
+		}
+
+		void draw_triangles(const int* indices, const float* pos, int tNum, int vNum, const matrix_math::mat4f& view_projection_matrix)
+		{
 
 			create_shader_if_not_exsit();
 
@@ -65,7 +72,8 @@ namespace quick_shell
 			clear_screen();
 
 			m_shader->bind();
-			m_shader->upload_uniform_mat4("u_view_projection", identity.data());
+			auto vpPtr = &view_projection_matrix(0, 0);
+			m_shader->upload_uniform_mat4("u_view_projection", vpPtr);
 			m_shader->upload_uniform_mat4("u_model_matrix", identity.data());
 
 			if (m_is_enable_fill)

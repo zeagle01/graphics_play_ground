@@ -43,7 +43,7 @@ namespace quick_shell
 			glUniform1fv(location, 1, &v);
 		}
 
-		void upload_uniform_mat4(const std::string& name, float* m)
+		void upload_uniform_mat4(const std::string& name, const float* m)
 		{
 			auto location = glGetUniformLocation(m_renderer_id, name.c_str());
 			glUniformMatrix4fv(location, 1, GL_FALSE, m);

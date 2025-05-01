@@ -146,7 +146,6 @@ namespace soft_render
 
 		auto camara_matrix = get_camara_matrix();
 
-
 		auto m_near = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::near>();
 		auto m_far = m_configs.get_ref<config::camara>().m_configs.get_ref<Camara::config::far>();
 
@@ -156,12 +155,10 @@ namespace soft_render
 
 		if (m_configs.get_ref<config::perpective>())
 		{
-			m_vp = view_port * projection * camara_matrix;
 			m_projection_matrix = view_port * projection;
 		}
 		else
 		{
-			m_vp = view_port *  camara_matrix;
 			m_projection_matrix = view_port;
 		}
 

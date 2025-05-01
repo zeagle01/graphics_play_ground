@@ -981,6 +981,18 @@ namespace matrix_math
 		return std::sqrt(ret);
 	};
 
+	template< matrix_imp::matrix_like m_t >
+	auto normalize(const m_t& v)
+	{
+		constexpr int R = std::decay_t<m_t>::row_num;
+		constexpr int C = std::decay_t<m_t>::col_num;
+		using T = std::decay_t<m_t>::type;
+
+		T length = transpose(v) * v;
+		length = std::sqrt(length);
+		return v / length;
+	};
+
 
 	template<typename T,int N>
 	auto identity()
